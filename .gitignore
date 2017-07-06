@@ -100,9 +100,14 @@ ENV/
 # mypy
 .mypy_cache/
 
+# Emacs
 *~
-*.log
-*.db
-*.out
 *#
 
+# Temporary files
+*.log
+*.out
+
+# Development databases
+*.db
+*.sqlite3
