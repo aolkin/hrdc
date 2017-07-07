@@ -1,4 +1,4 @@
-from django.contrib import admin 
+from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import Group
 
@@ -10,7 +10,7 @@ class UserCreationForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ("email",)
-        
+
     def save(self, commit=True):
         user = super().save(commit=False)
         if commit:
