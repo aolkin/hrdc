@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'anymail',
     'config',
     'dramaorg',
     'casting'
@@ -108,7 +109,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'US/Eastern'
 
 USE_I18N = True
 
@@ -121,3 +122,18 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+AUTH_USER_MODEL = "dramaorg.User"
+
+ANYMAIL = {
+    "MAILGUN_API_KEY": "key-1113ec6d3ccf6f9419ef02fb6e3cf18c",
+    "MAILGUN_SENDER_DOMAIN": "aolkin.me"
+}
+EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
+
+DEFAULT_FROM_EMAIL = "Development Application <devtest@aolkin.me>"
+
+ADMIN_SITE_TITLE = "HRDC Site Administration"
+
+ADMIN_GROUP_NAME = "HRDC Board"
