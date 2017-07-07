@@ -45,6 +45,8 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ('email', 'first_name', 'last_name',)
     readonly_fields = ('last_login', 'date_joined', 'login_token')
     ordering = ('email',)
+    save_as_continue = False
+    save_on_top = True
 
     def change_view(self, request, *args, **kwargs):
         if not request.user.is_superuser:
@@ -66,5 +68,7 @@ class ShowAdmin(admin.ModelAdmin):
     list_editable = ('invisible',)
     search_fields = ('title',)
     prepopulated_fields = {"slug": ("title",)}
+    save_as_continue = False
+    save_on_top = True
 
 admin.site.unregister(Group)

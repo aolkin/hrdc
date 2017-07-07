@@ -77,6 +77,8 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
             return full_name
         else:
             return "<{}>".format(self.email)
+    get_full_name.short_description = "Full Name"
+    get_full_name.admin_order_field = "first_name"
     
     def get_short_name(self):
         return self.first_name.strip()
