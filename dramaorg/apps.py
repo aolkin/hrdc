@@ -15,7 +15,7 @@ class DramaorgConfig(AppConfig):
             Permission = import_module("django.contrib.auth.models").Permission
             cts = import_module("django.contrib.contenttypes.models")
             models = import_module("dramaorg.models")
-            
+
             types = cts.ContentType.objects.get_for_models(models.Show,
                                                            models.User)
             q = Q(codename__contains="add") | Q(codename__contains="change")

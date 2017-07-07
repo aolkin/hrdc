@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib import auth
 from django.conf import settings
-from django.utils import text, timezone
+from django.utils import timezone
 
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -20,7 +20,7 @@ class UserManager(auth.models.BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
         return user
-    
+
     def create_superuser(self, email, password):
         return self.create_user(email, password, is_superuser=True)
 
