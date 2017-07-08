@@ -4,9 +4,10 @@ from django.conf import settings
 from django.utils import timezone
 
 from django.db.models.signals import post_save
+from django.contrib.auth.signals import user_logged_in
 from django.dispatch import receiver
 
-import hashlib, base64, uuid
+import hashlib, base64, uuid, datetime
 
 from .utils import get_admin_group
 from . import email
@@ -39,6 +40,7 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     
     is_active = models.BooleanField(default=True)
     login_token = models.CharField(max_length=86, default=generate_token)
+    token_expiry = models.DateTimeField(default=timezone.now)
 
     date_joined = models.DateTimeField(default=timezone.now)
     last_login = models.DateTimeField(default=timezone.now)
@@ -49,14 +51,20 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         self.clear_token(False)
         super().set_password(*args, **kwargs)
     
-    def new_token(self, save=True):
+    def new_token(self, save=True, expiring=False):
         self.login_token = generate_token()
+        if expiring:
+            self.token_expiry = (timezone.now() +
+                                 datetime.timedelta(hours=1))
+        else:
+            self.token_expiry = timezone.now()
         if save:
             self.save()
         return self.login_token
 
     def clear_token(self, save=True):
         self.login_token = ""
+        self.token_expiry = timezone.now()
         if save:
             self.save()
     
@@ -93,9 +101,13 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 
 @receiver(post_save)
 def invite_user(sender, instance, created, raw, **kwargs):
-    if sender == User and created:
+    if sender == User and created and not instance.is_initialized:
         email.send_invite(instance)
-    
+
+@receiver(user_logged_in)
+def clear_token_on_user(sender, request, user, **kwargs):
+    user.clear_token()
+        
 def _get_year():
     return timezone.now().year
     

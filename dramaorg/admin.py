@@ -17,6 +17,14 @@ class UserCreationForm(forms.ModelForm):
             user.save()
         return user
 
+def generate_tokens(modeladmin, request, queryset):
+    for obj in queryset:
+        obj.new_token(expiring=True)
+        
+def clear_tokens(modeladmin, request, queryset):
+    for obj in queryset:
+        obj.clear_token()
+        
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     fieldsets = (
@@ -24,7 +32,7 @@ class UserAdmin(BaseUserAdmin):
         ('Personal Info', {'fields': ('first_name', 'last_name', 'phone')}),
         ('Permissions', {'fields': ('is_active', 'is_superuser', 'groups')}),
         ('Information', {'fields': ('last_login', 'date_joined',
-                                    'login_token')}),
+                                    'login_token', 'token_expiry')}),
     )
     staff_fieldsets = (
         (None, {'fields': ('email', 'first_name', 'last_name', 'phone',
@@ -44,16 +52,20 @@ class UserAdmin(BaseUserAdmin):
     list_filter = ('is_active','is_superuser')
     search_fields = ('email', 'first_name', 'last_name',)
     readonly_fields = ('last_login', 'date_joined', 'login_token')
+    actions = [generate_tokens, clear_tokens]
+    staff_actions = []
     ordering = ('email',)
-    save_as_continue = False
+    save_as_continue = True
 
     def change_view(self, request, *args, **kwargs):
         if not request.user.is_superuser:
             try:
                 self.fieldsets = self.staff_fieldsets
                 self.readonly_fields = self.staff_readonly
+                self.actions = self.staff_actions
                 response = super().change_view(request, *args, **kwargs)
             finally:
+                self.actions = UserAdmin.actions
                 self.fieldsets = UserAdmin.fieldsets
                 self.readonly_fields = UserAdmin.readonly_fields
             return response

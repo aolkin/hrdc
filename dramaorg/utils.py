@@ -16,6 +16,6 @@ def test_initialized(user):
     return user.is_authenticated and user.is_initialized
 
 def user_is_initialized(func):
-    f  = user_passes_test(test_initialized, login_url="dramaorg:create")
+    f  = user_passes_test(test_initialized, login_url="dramaorg:profile")
     return f(func)
 
