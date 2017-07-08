@@ -31,14 +31,17 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'suit',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'bootstrapform',
     'anymail',
     'config',
+    'basetemplates',
     'dramaorg',
     'casting'
 ]
@@ -66,6 +69,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'basetemplates.context_processor',
             ],
         },
     },
@@ -103,6 +107,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+CSRF_USE_SESSIONS = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
@@ -134,6 +139,24 @@ EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 
 DEFAULT_FROM_EMAIL = "Development Application <devtest@aolkin.me>"
 
-ADMIN_SITE_TITLE = "HRDC Site Administration"
+CONFIGURATION_APP_TITLE = "Global Settings"
+
+ADMIN_SITE_TITLE = "HRDC Apps"
 
 ADMIN_GROUP_NAME = "HRDC Board"
+
+LOGIN_URL = "dramaorg:login"
+LOGIN_REDIRECT_URL = "dramaorg:index"
+LOGOUT_REDIRECT_URL = LOGIN_URL
+
+BT_SITE_TITLE = "HRDC"
+BT_BOOTSTRAP_VERSION = "4.0.0-alpha.6"
+BT_BOOTSTRAP_CSS_INTEGRITY = "sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ"
+BT_BOOTSTRAP_JS_INTEGRITY = "sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn"
+BT_TETHER_VERSION = "1.4.0"
+BT_TETHER_INTEGRITY = "sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb"
+
+BT_FOOTER_OWNER = "Harvard-Radcliffe Dramatic Club"
+BT_FOOTER_SITE = "http://hrdctheater.com"
+BT_HEADER_IMAGE = "logo.png"
+BT_HEADER_URL = "dramaorg:index"
