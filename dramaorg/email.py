@@ -8,7 +8,7 @@ from config import config
 
 def send_invite(user):
     url = (config.get("root_url","http://localhost") +
-           reverse("token_create", args=(user.login_token,)))
+           reverse("dramaorg:token_create", args=(user.login_token,)))
     msg = EmailMultiAlternatives(
         subject="Please activate your account",
         body="Click to activate your account: {}".format(url),

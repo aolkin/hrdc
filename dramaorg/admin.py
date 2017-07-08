@@ -16,7 +16,7 @@ class UserCreationForm(forms.ModelForm):
         if commit:
             user.save()
         return user
-        
+
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     fieldsets = (
@@ -46,7 +46,6 @@ class UserAdmin(BaseUserAdmin):
     readonly_fields = ('last_login', 'date_joined', 'login_token')
     ordering = ('email',)
     save_as_continue = False
-    save_on_top = True
 
     def change_view(self, request, *args, **kwargs):
         if not request.user.is_superuser:
@@ -66,9 +65,10 @@ class ShowAdmin(admin.ModelAdmin):
     list_display = ('title', 'season', 'year', 'people', 'invisible')
     list_filter = ('season', 'year', 'staff', 'invisible')
     list_editable = ('invisible',)
+    filter_horizontal = ('staff',)
+    exclude = ('invisible',)
     search_fields = ('title',)
     prepopulated_fields = {"slug": ("title",)}
     save_as_continue = False
-    save_on_top = True
 
 admin.site.unregister(Group)

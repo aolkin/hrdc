@@ -3,7 +3,7 @@ from django.db.models import Q
 
 from importlib import import_module
 
-from . import get_admin_group
+from .utils import get_admin_group
 
 class DramaorgConfig(AppConfig):
     name = 'dramaorg'

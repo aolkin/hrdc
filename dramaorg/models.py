@@ -8,7 +8,7 @@ from django.dispatch import receiver
 
 import hashlib, base64, uuid
 
-from . import get_admin_group
+from .utils import get_admin_group
 from . import email
 
 class UserManager(auth.models.BaseUserManager):
@@ -27,7 +27,7 @@ class UserManager(auth.models.BaseUserManager):
 def generate_token():
     b = hashlib.blake2b(uuid.uuid4().bytes).digest()
     return base64.b64encode(b)[:-2].decode().replace("/","-")
-    
+
 class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     USERNAME_FIELD = "email"
     EMAIL_FIELD = "email"
@@ -45,14 +45,20 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     
     objects = UserManager()
 
-    def new_token(self):
+    def set_password(self, *args, **kwargs):
+        self.clear_token(False)
+        super().set_password(*args, **kwargs)
+    
+    def new_token(self, save=True):
         self.login_token = generate_token()
-        self.save()
+        if save:
+            self.save()
         return self.login_token
 
-    def clear_token(self):
+    def clear_token(self, save=True):
         self.login_token = ""
-        self.save()
+        if save:
+            self.save()
     
     @property
     def is_initialized(self):

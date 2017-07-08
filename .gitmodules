@@ -1,3 +1,6 @@
 [submodule "config"]
 	path = config
 	url = git@github.com:baryon5/config.git
+[submodule "basetemplates"]
+	path = basetemplates
+	url = git@github.com:baryon5/basetemplates.git
