@@ -1,0 +1,19 @@
+{% extends "bt/default.html" %}
+
+{% block title %}User Profile{% endblock %}
+
+{% load bt %}
+{% load bootstrap %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+  <form method="POST" class="col-md-6">
+    <legend class="text-center">
+      User Profile Information</legend>
+    {% csrf_token %}
+    {{ form|bootstrap }}
+    <button type="submit" class="btn btn-primary btn-block">Save</button>
+  </form>
+</div>
+{% endblock %}

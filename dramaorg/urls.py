@@ -25,8 +25,8 @@ app_name = "dramaorg"
 urlpatterns = [
     url(r'^$', index, name="index"),
     url(r'', include(auth_urls)),
-    url(r'create/$', CreateView.as_view(), name="create"),
-    url(r'login/([A-Za-z0-9+-]{86})/$', TokenView.as_view(),
-        name="token_create"),
+    url(r'profile/$', ProfileView.as_view(), name="profile"),
+    url(r'u/([A-Za-z0-9+-]{86})/$', capture_token, name="token_reset"),
+    url(r'password/token/$', TokenView.as_view(), name="password_token"),
     url(r'reset/$', ResetView.as_view(), name="start_reset"),
 ]
