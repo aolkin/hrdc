@@ -1,4 +1,6 @@
 from django.db.utils import OperationalError
+from django.db.models import Q
+
 from django.contrib.auth.decorators import user_passes_test
 
 from importlib import import_module
@@ -12,6 +14,31 @@ def get_admin_group():
     except OperationalError:
         return None
 
+    
+def add_change_permissions(*models):
+    add_permissions(models,
+                    Q(codename__contains="add") |
+                    Q(codename__contains="change"))
+    
+def add_all_permissions(*models):
+    add_permissions(models,
+                    Q(codename__contains="add") |
+                    Q(codename__contains="delete") |
+                    Q(codename__contains="change"))
+    
+def add_delete_permissions(*models):
+    add_permissions(models, Q(codename__contains="delete"))
+    
+def add_permissions(models, q):
+    group = get_admin_group()
+    if group:
+        Permission = import_module("django.contrib.auth.models").Permission
+        cts = import_module("django.contrib.contenttypes.models")
+        
+        types = cts.ContentType.objects.get_for_models(*models)
+        perms = Permission.objects.filter(q, content_type__in=types.values())
+        group.permissions.add(*perms)
+    
 def test_initialized(user):
     return user.is_authenticated and user.is_initialized
 
