@@ -151,7 +151,7 @@ LOGOUT_URL = "dramaorg:logout"
 LOGIN_REDIRECT_URL = "dramaorg:index"
 LOGOUT_REDIRECT_URL = LOGIN_URL
 
-BT_SITE_TITLE = "HRDC"
+BT_SITE_TITLE = "HRDC Apps"
 BT_FAVICON_URL = "https://hrdctheater.com/wp-content/uploads/2016/02/cropped-HRDC-Logo-2-32x32.png"
 BT_BOOTSTRAP_VERSION = "4.0.0-alpha.6"
 BT_BOOTSTRAP_CSS_INTEGRITY = "sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ"
