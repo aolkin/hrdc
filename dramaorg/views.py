@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse_lazy, reverse, resolve
+from django.urls.exceptions import NoReverseMatch
+from django.conf import settings
 from django.utils import timezone
 from django.utils.decorators import method_decorator 
 
@@ -19,10 +21,42 @@ from .utils import user_is_initialized
 from .email import send_reset
 from .models import User
 
+all_indexes = []
+admin_indexes = [
+    (reverse_lazy("admin:index"), "Site Admin",
+     "edit objects, invite users, etc."),
+]
+
 @login_required
 @user_is_initialized
 def index(request):
-    return render(request, "dramaorg/index.html")
+    if not all_indexes:
+        for i in settings.INSTALLED_APPS:
+            try:
+                u = reverse(i+":index")
+                r = resolve(u)
+                if r.func != index:
+                    name = r.func.verbose_name if hasattr(
+                        r.func, "verbose_name") else r.view_name
+                    all_indexes.append((u, name,
+                                        getattr(r.func, "help_text", "")))
+            except NoReverseMatch:
+                pass
+            try:
+                u = reverse(i+":admin")
+                r = resolve(u)
+                name = r.func.verbose_name if hasattr(
+                    r.func, "verbose_name") else r.view_name
+                admin_indexes.append((u, name,
+                                      getattr(r.func, "help_text", "")))
+            except NoReverseMatch:
+                pass
+    context = { "indexes": all_indexes, "admin_indexes": admin_indexes }
+    return render(request, "dramaorg/index.html", context)
+
+# These variables are set here only for documentation purposes
+index.verbose_name = "This Page!"
+index.help_text = "List of your shows"
 
 SESSION_TOKEN_KEY = "_CAPTURED_LOGIN_TOKEN"
 
