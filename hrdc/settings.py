@@ -32,18 +32,19 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'suit',
+    'config',
+    'basetemplates',
+    'hrdc',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'dramaorg',
+    'casting',
     'bootstrapform',
     'anymail',
-    'config',
-    'basetemplates',
-    'dramaorg',
-    'casting'
 ]
 
 MIDDLEWARE = [
@@ -146,6 +147,7 @@ ADMIN_SITE_TITLE = "HRDC Apps"
 ADMIN_GROUP_NAME = "HRDC Board"
 
 LOGIN_URL = "dramaorg:login"
+LOGOUT_URL = "dramaorg:logout"
 LOGIN_REDIRECT_URL = "dramaorg:index"
 LOGOUT_REDIRECT_URL = LOGIN_URL
 

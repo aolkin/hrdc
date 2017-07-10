@@ -1,32 +1,29 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy, reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator 
 
 from django import forms
-from django.views import View
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, UpdateView
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.forms import SetPasswordForm
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
 
 from .utils import test_initialized, user_is_initialized
 from .email import send_reset
 from .models import User
+from .mixins import InitializedMixin
 
-class InitializedMixin(UserPassesTestMixin):
-    login_url = "dramaorg:profile"
-    def test_func(self):
-        return test_initialized(self.request.user)
-
+@login_required
 @user_is_initialized
 def index(request):
-    return render(request, "bt/default.html")
+    return render(request, "dramaorg/index.html")
 
 SESSION_TOKEN_KEY = "_CAPTURED_LOGIN_TOKEN"
 
@@ -84,15 +81,14 @@ class TokenView(FormView):
 
 class PasswordResetForm(forms.Form):
     email = forms.EmailField(label="Email", max_length=254)
-    
-    def get_users(self, email):
-        return get_user_model().objects.filter(**{
-            '%s__iexact' % get_user_model().get_email_field_name(): email,
-            'is_active': True,
-        })
 
     def send(self):
-        for user in self.get_users(self.cleaned_data["email"]):
+        users = get_user_model().objects.filter(**{
+            '%s__iexact' % get_user_model().get_email_field_name():
+            self.cleaned_data["email"],
+            'is_active': True,
+        })
+        for user in users:
             user.new_token(expiring=True)
             send_reset(user)
 
@@ -106,11 +102,13 @@ class ResetView(FormView):
         messages.success(self.request, "Password reset email sent.")
         return super().form_valid(form)
 
-class ProfileForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ['first_name', 'last_name', 'phone', 'email']
-    
-class ProfileView(LoginRequiredMixin, FormView):
-    form_class = ProfileForm
+class ProfileView(LoginRequiredMixin, UpdateView):
+    model = User
+    fields = ['first_name', 'last_name', 'pgps', 'phone', 'email']
     template_name = "dramaauth/user_profile.html"
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def get_success_url(self):
+        return self.request.GET.get("next", reverse("dramaorg:index"))
