@@ -46,7 +46,7 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
     add_form = UserCreationForm
-    add_form_template = "dramaorg/invite_user.html"
+    add_form_template = "dramaadmin/invite_user.html"
     list_display = ('get_full_name', 'email', 'phone', 'is_pdsm', 'is_board',
                     'is_active')
     list_filter = ('is_active','is_superuser')

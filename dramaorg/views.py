@@ -15,10 +15,9 @@ from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 
-from .utils import test_initialized, user_is_initialized
+from .utils import user_is_initialized
 from .email import send_reset
 from .models import User
-from .mixins import InitializedMixin
 
 @login_required
 @user_is_initialized

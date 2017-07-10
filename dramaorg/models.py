@@ -112,11 +112,8 @@ def clear_token_on_user(sender, request, user, **kwargs):
         
 def _get_year():
     return timezone.now().year
-    
-class Show(models.Model):
-    title = models.CharField(max_length=150)
-    staff = models.ManyToManyField(settings.AUTH_USER_MODEL)
-    
+
+class Season(models.Model):    
     SEASONS = (
         (0, "Winter"),
         (1, "Spring"),
@@ -125,6 +122,13 @@ class Show(models.Model):
     )
     year = models.PositiveSmallIntegerField(default=_get_year)
     season = models.PositiveSmallIntegerField(choices=SEASONS, default=3)
+
+    class Meta:
+        abstract = True
+
+class Show(Season):
+    title = models.CharField(max_length=150)
+    staff = models.ManyToManyField(settings.AUTH_USER_MODEL)
     
     slug = models.SlugField(unique=True, db_index=True)
     invisible = models.BooleanField(default=False)
