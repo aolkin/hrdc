@@ -113,6 +113,10 @@ def clear_token_on_user(sender, request, user, **kwargs):
 def _get_year():
     return timezone.now().year
 
+class SeasonManager(models.Manager):
+    def in_season(self, obj):
+        return self.filter(year=obj.year, season=obj.season)
+
 class Season(models.Model):    
     SEASONS = (
         (0, "Winter"),
@@ -123,9 +127,19 @@ class Season(models.Model):
     year = models.PositiveSmallIntegerField(default=_get_year)
     season = models.PositiveSmallIntegerField(choices=SEASONS, default=3)
 
+    objects = SeasonManager()
+
+    @property
+    def seasonname(self):
+        return Season.SEASONS[self.season][1]
+    
+    @property
+    def seasonstr(self):
+        return "{} {}".format(self.seasonname, self.year)
+    
     class Meta:
         abstract = True
-
+                           
 class Show(Season):
     title = models.CharField(max_length=150)
     staff = models.ManyToManyField(settings.AUTH_USER_MODEL)

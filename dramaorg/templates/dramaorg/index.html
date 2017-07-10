@@ -2,4 +2,75 @@
 
 {% block content %}
 {% include "dramaorg/user_dropdown.html" %}
+
+{% if request.user.show_set.exists %}
+<h3 class="text-center">Your Shows</h3>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Show</th>
+      <th>Season</th>
+      <th>Administrative Staff</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for show in request.user.show_set.all %}
+  <tr>
+    <td>{{ show.title }}</td>
+    <td>{{ show.seasonstr }}</td>
+    <td>{{ show.people }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% if all_indexes %}
+<h3 class="text-center mt-5">
+  HRDC Apps
+  <br><small class="text-muted">Administer your shows</small>
+</h3>
+<div class="row justify-content-center">
+  <div class="list-group col-md-6">
+    {% for index in indexes %}
+    <a href="{{ index.0 }}" class="list-group-item list-group-item-action">
+      <div class="d-flex w-100 justify-content-between">
+	<h5 class="mb-0">{{ index.1 }}</h5>
+	{% if index.2 %}
+	<small class="text-muted">{{ index.2 }}</small>
+	{% endif %}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% else %}
+<p class="lead">
+  You are not a member of the administrative staff on any shows.
+  {% if not user.is_board %}
+  If this is in error, please contact an HRDC Board member.
+  {% endif %}
+</p>
+{% endif %}
+
+{% if user.is_board %}
+<h3 class="text-center mt-5">
+  HRDC Apps Administration
+  <br><small class="text-muted">controls for board members</small>
+</h3>
+<div class="row justify-content-center">
+  <div class="list-group col-md-6">
+    {% for index in admin_indexes %}
+    <a href="{{ index.0 }}" class="list-group-item list-group-item-action">
+      <div class="d-flex w-100 justify-content-between">
+	<h5 class="mb-0">{{ index.1 }}</h5>
+	{% if index.2 %}
+	<small class="text-muted">{{ index.2 }}</small>
+	{% endif %}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
 {% endblock %}
