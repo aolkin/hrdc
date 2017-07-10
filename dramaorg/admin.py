@@ -28,17 +28,15 @@ def clear_tokens(modeladmin, request, queryset):
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
-        ('Personal Info', {'fields': ('first_name', 'last_name', 'phone')}),
+        (None, {'fields': ('first_name', 'last_name', 'pgps')}),
+        ('Contact Info', {'fields': ('email', 'phone')}),
         ('Permissions', {'fields': ('is_active', 'is_superuser', 'groups')}),
-        ('Information', {'fields': ('last_login', 'date_joined',
-                                    'login_token', 'token_expiry')}),
+        ('Information', {'fields': ('last_login', 'date_joined', 'password')}),
     )
     staff_fieldsets = (
-        (None, {'fields': ('email', 'first_name', 'last_name', 'phone',
-                           'groups', 'is_active')}),
+        (None, {'fields': ('first_name', 'last_name', 'pgps', 'email', 'phone',
+                           'groups', 'is_active', 'password')}),
     )
-    staff_readonly = ('email', 'first_name', 'last_name', 'phone', 'groups')
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
@@ -51,26 +49,24 @@ class UserAdmin(BaseUserAdmin):
                     'is_active')
     list_filter = ('is_active','is_superuser')
     search_fields = ('email', 'first_name', 'last_name',)
-    readonly_fields = ('last_login', 'date_joined', 'login_token')
-    actions = [generate_tokens, clear_tokens]
-    staff_actions = []
+    readonly_fields = ('last_login', 'date_joined')
+    staff_readonly = ('email', 'first_name', 'last_name', 'pgps',
+                      'phone', 'groups')
+    actions = [generate_tokens, clear_tokens] if settings.DEBUG else []
     ordering = ('email',)
     save_as_continue = True
-
-    def change_view(self, request, *args, **kwargs):
-        if not request.user.is_superuser:
-            try:
-                self.fieldsets = self.staff_fieldsets
-                self.readonly_fields = self.staff_readonly
-                self.actions = self.staff_actions
-                response = super().change_view(request, *args, **kwargs)
-            finally:
-                self.actions = UserAdmin.actions
-                self.fieldsets = UserAdmin.fieldsets
-                self.readonly_fields = UserAdmin.readonly_fields
-            return response
+    
+    def get_readonly_fields(self, request, *args):
+        if request.user.is_superuser:
+            return self.readonly_fields
         else:
-            return super().change_view(request, *args, **kwargs)
+            return self.staff_readonly
+
+    def get_fieldsets(self, request, *args):
+        if request.user.is_superuser:
+            return self.fieldsets
+        else:
+            return self.staff_fieldsets
     
 @admin.register(Show)
 class ShowAdmin(admin.ModelAdmin):

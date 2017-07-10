@@ -13,20 +13,20 @@ def auth_view(name):
     return NewView.as_view()
 
 auth_urls = [
-    url(r'login/$', auth_view("Login"), name='login'),
-    url(r'logout/$', auth_view("Logout"), name='logout'),
-    url(r'password/$', auth_view("PasswordChange"),
+    url(r'^login/$', auth_view("Login"), name='login'),
+    url(r'^logout/$', auth_view("Logout"), name='logout'),
+    url(r'^password/$', auth_view("PasswordChange"),
         name='password_change'),
-    url(r'password/done/$', auth_view("PasswordChangeDone"),
+    url(r'^password/done/$', auth_view("PasswordChangeDone"),
         name='PasswordChange_done'),
 ]
 
 app_name = "dramaorg"
 urlpatterns = [
     url(r'^$', index, name="index"),
-    url(r'', include(auth_urls)),
-    url(r'profile/$', ProfileView.as_view(), name="profile"),
-    url(r'u/([A-Za-z0-9+-]{86})/$', capture_token, name="token_reset"),
-    url(r'password/token/$', TokenView.as_view(), name="password_token"),
-    url(r'reset/$', ResetView.as_view(), name="start_reset"),
+    url(r'^', include(auth_urls)),
+    url(r'^profile/$', ProfileView.as_view(), name="profile"),
+    url(r'^u/([A-Za-z0-9+-]{86})/$', capture_token, name="token_reset"),
+    url(r'^password/token/$', TokenView.as_view(), name="password_token"),
+    url(r'^reset/$', ResetView.as_view(), name="start_reset"),
 ]

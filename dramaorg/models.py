@@ -153,7 +153,7 @@ class Season(models.Model):
                       
 class Show(Season):
     title = models.CharField(max_length=150)
-    staff = models.ManyToManyField(settings.AUTH_USER_MODEL)
+    staff = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
     space = models.ForeignKey(Space)
     
     slug = models.SlugField(unique=True, db_index=True)
