@@ -109,7 +109,18 @@ def invite_user(sender, instance, created, raw, **kwargs):
 @receiver(user_logged_in)
 def clear_token_on_user(sender, request, user, **kwargs):
     user.clear_token()
-        
+
+class Space(models.Model):
+    name = models.CharField(max_length=150)
+    building = models.CharField(max_length=150, blank=True)
+    address = models.TextField(blank=True)
+
+    def __str__(self):
+        if self.building:
+            return "{}, {}".format(self.name, self.building)
+        else:
+            return self.name
+    
 def _get_year():
     return timezone.now().year
 
@@ -133,16 +144,17 @@ class Season(models.Model):
     def seasonname(self):
         return Season.SEASONS[self.season][1]
     
-    @property
     def seasonstr(self):
         return "{} {}".format(self.seasonname, self.year)
+    seasonstr.short_description = "Season"
     
     class Meta:
         abstract = True
-                           
+                      
 class Show(Season):
     title = models.CharField(max_length=150)
     staff = models.ManyToManyField(settings.AUTH_USER_MODEL)
+    space = models.ForeignKey(Space)
     
     slug = models.SlugField(unique=True, db_index=True)
     invisible = models.BooleanField(default=False)

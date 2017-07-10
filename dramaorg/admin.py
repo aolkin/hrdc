@@ -74,8 +74,8 @@ class UserAdmin(BaseUserAdmin):
     
 @admin.register(Show)
 class ShowAdmin(admin.ModelAdmin):
-    list_display = ('title', 'season', 'year', 'people', 'invisible')
-    list_filter = ('season', 'year', 'staff', 'invisible')
+    list_display = ('title', 'seasonstr', 'space', 'people', 'invisible')
+    list_filter = ('season', 'year', 'staff', 'invisible', 'space')
     list_editable = ('invisible',)
     filter_horizontal = ('staff',)
     exclude = ('invisible',)
@@ -83,4 +83,10 @@ class ShowAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("title",)}
     save_as_continue = False
 
+@admin.register(Space)
+class SpaceAdmin(admin.ModelAdmin):
+    list_display = ('name', 'building',)
+    list_filter = ('building',)
+    search_fields = ('name', 'building')
+    
 admin.site.unregister(Group)

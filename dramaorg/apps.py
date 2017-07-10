@@ -17,7 +17,8 @@ class DramaorgConfig(AppConfig):
             models = import_module("dramaorg.models")
 
             types = cts.ContentType.objects.get_for_models(models.Show,
-                                                           models.User)
+                                                           models.User,
+                                                           models.Space)
             q = Q(codename__contains="add") | Q(codename__contains="change")
             perms = Permission.objects.filter(q,
                                               content_type__in=types.values())
