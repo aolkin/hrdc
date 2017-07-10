@@ -1,0 +1,6 @@
+{% extends "bt/user_dropdown.html" %}
+
+{% block user_authenticated_actions %}
+<a href="{% url 'dramaorg:profile' %}" class="dropdown-item">Edit Profile</a>
+<a href="{% url 'dramaorg:password_change' %}" class="dropdown-item">Change Password</a>
+{% endblock %}
