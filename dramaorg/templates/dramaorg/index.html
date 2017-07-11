@@ -1,5 +1,7 @@
 {% extends "bt/default.html" %}
 
+{% load bootstrap %}
+
 {% block title %}Your Shows{% endblock %}
 
 {% block content %}
@@ -28,11 +30,11 @@
 {% if all_indexes %}
 <h3 class="text-center mt-5">
   HRDC Apps
-  <br><small class="text-muted">Administer your shows</small>
+  <br><small class="text-muted">administrative tasks for your shows</small>
 </h3>
 <div class="row justify-content-center">
-  <div class="list-group col-md-6">
-    {% for index in indexes %}
+  <div class="col-md-6">
+    {% for index in all_indexes %}
     <a href="{{ index.0 }}" class="list-group-item list-group-item-action">
       <div class="d-flex w-100 justify-content-between">
 	<h5 class="mb-0">{{ index.1 }}</h5>
@@ -61,7 +63,7 @@
   <br><small class="text-muted">controls for board members</small>
 </h3>
 <div class="row justify-content-center">
-  <div class="list-group col-md-6">
+  <div class="col-md-6">
     {% for index in admin_indexes %}
     <a href="{{ index.0 }}" class="list-group-item list-group-item-action">
       <div class="d-flex w-100 justify-content-between">
@@ -75,4 +77,21 @@
   </div>
 </div>
 {% endif %}
+
+<div class="row justify-content-center mt-5">
+{% if user.is_superuser %}
+  <form method="POST" class="col-md-6">
+    {% csrf_token %}
+    {{ form|bootstrap_inline }}
+    <button type="submit" class="btn btn-primary btn-block">
+      Set Current Season
+    </button>
+  </form>
+{% else %}
+  <div class="text-muted">current season:</div>
+</div>
+<div class="row justify-content-center">
+  <h4 class="display-4 text-muted">{{ current_season }}</h4>
+{% endif %}
+</div>
 {% endblock %}

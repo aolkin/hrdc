@@ -23,7 +23,7 @@ auth_urls = [
 
 app_name = "dramaorg"
 urlpatterns = [
-    url(r'^$', index, name="index"),
+    url(r'^$', IndexView.as_view(), name="index"),
     url(r'^', include(auth_urls)),
     url(r'^profile/$', ProfileView.as_view(), name="profile"),
     url(r'^u/([A-Za-z0-9+-]{86})/$', capture_token, name="token_reset"),
