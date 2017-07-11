@@ -110,16 +110,34 @@ def invite_user(sender, instance, created, raw, **kwargs):
 def clear_token_on_user(sender, request, user, **kwargs):
     user.clear_token()
 
-class Space(models.Model):
+class GroupProxy(auth.models.Group):
+    class Meta:
+        proxy = True
+        verbose_name = auth.models.Group._meta.verbose_name
+        verbose_name_plural = auth.models.Group._meta.verbose_name_plural
+
+class Building(models.Model):
     name = models.CharField(max_length=150)
-    building = models.CharField(max_length=150, blank=True)
     address = models.TextField(blank=True)
 
     def __str__(self):
-        if self.building:
+        return self.name
+        
+class Space(models.Model):
+    name = models.CharField(max_length=150)
+    building = models.ForeignKey(Building)
+    include_building_name = models.BooleanField(
+        default=True, help_text="uncheck this to hide the building name when "+
+        "displaying the full name of the space")
+
+    def full_name(self):
+        if self.include_building_name:
             return "{}, {}".format(self.name, self.building)
         else:
             return self.name
+    
+    def __str__(self):
+        return self.name
     
 def _get_year():
     return timezone.now().year

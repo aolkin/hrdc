@@ -132,6 +132,9 @@ STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = "dramaorg.User"
 
+SHOW_MODEL = "dramaorg.Show"
+SPACE_MODEL = "dramaorg.Space"
+
 ANYMAIL = {
     "MAILGUN_API_KEY": "key-1113ec6d3ccf6f9419ef02fb6e3cf18c",
     "MAILGUN_SENDER_DOMAIN": "aolkin.me"
@@ -163,3 +166,5 @@ BT_FOOTER_OWNER = "Harvard-Radcliffe Dramatic Club"
 BT_FOOTER_SITE = "http://hrdctheater.com"
 BT_HEADER_IMAGE = "logo.png"
 BT_HEADER_URL = "dramaorg:index"
+
+CASTING_IS_COMMON = True

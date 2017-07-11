@@ -1,5 +1,4 @@
 from django.apps import AppConfig
-from django.db.models import Q
 
 from importlib import import_module
 

@@ -1,0 +1,8 @@
+
+/* ### Django-Suit fixes ### */
+
+.widget-AdminSplitDateTime label,
+.widget-AdminDateWidget label,
+.widget-AdminTimeWidget label {
+    color: initial;
+}
