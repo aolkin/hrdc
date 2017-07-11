@@ -12,14 +12,19 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 
 from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
+
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 
 from .utils import user_is_initialized
+from .mixins import InitializedMixin
 from .email import send_reset
-from .models import User
+from .models import *
+
+from config import config
 
 all_indexes = []
 admin_indexes = [
@@ -27,36 +32,78 @@ admin_indexes = [
      "edit objects, invite users, etc."),
 ]
 
-@login_required
-@user_is_initialized
-def index(request):
-    if not all_indexes:
-        for i in settings.INSTALLED_APPS:
-            try:
-                u = reverse(i+":index")
-                r = resolve(u)
-                if r.func != index:
+class SeasonForm(forms.ModelForm):
+    class Meta:
+        model = Season
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        if not kwargs["initial"]:
+            kwargs["initial"] = {
+                "year": config.get(settings.ACTIVE_YEAR_KEY, None),
+                "season": config.get(settings.ACTIVE_SEASON_KEY, None)
+            }
+        super().__init__(*args, **kwargs)
+        
+    def save(self, *args):
+        config[settings.ACTIVE_SEASON_KEY] = self.cleaned_data["season"]
+        config[settings.ACTIVE_YEAR_KEY] = self.cleaned_data["year"]
+
+class IndexView(SuccessMessageMixin, FormView):
+    template_name = "dramaorg/index.html"
+    success_url = reverse_lazy("dramaorg:index")
+    form_class = SeasonForm
+
+    def get_success_message(self, data):
+        return "Season updated successfully."
+    
+    @method_decorator(login_required)
+    @method_decorator(user_is_initialized)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def post(self, *args, **kwargs):
+        if self.request.user.is_superuser:
+            return super().post(*args, **kwargs)
+        else:
+            messages.error(self.request,
+                           "Illegal operation: cannot set current season")
+            return super().get(*args, **kwargs)
+        
+    def form_valid(self, form):
+        if self.request.user.is_superuser:
+            form.save()
+        return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        if not all_indexes:
+            for i in settings.INSTALLED_APPS:
+                try:
+                    u = reverse(i+":index")
+                    r = resolve(u)
+                    if r.app_name != "dramaorg":
+                        name = r.func.verbose_name if hasattr(
+                            r.func, "verbose_name") else r.view_name
+                        all_indexes.append((u, name,
+                                            getattr(r.func, "help_text", "")))
+                except NoReverseMatch:
+                    pass
+                try:
+                    u = reverse(i+":admin")
+                    r = resolve(u)
                     name = r.func.verbose_name if hasattr(
                         r.func, "verbose_name") else r.view_name
-                    all_indexes.append((u, name,
-                                        getattr(r.func, "help_text", "")))
-            except NoReverseMatch:
-                pass
-            try:
-                u = reverse(i+":admin")
-                r = resolve(u)
-                name = r.func.verbose_name if hasattr(
-                    r.func, "verbose_name") else r.view_name
-                admin_indexes.append((u, name,
-                                      getattr(r.func, "help_text", "")))
-            except NoReverseMatch:
-                pass
-    context = { "indexes": all_indexes, "admin_indexes": admin_indexes }
-    return render(request, "dramaorg/index.html", context)
-
-# These variables are set here only for documentation purposes
-index.verbose_name = "This Page!"
-index.help_text = "List of your shows"
+                    admin_indexes.append((u, name,
+                                          getattr(r.func, "help_text", "")))
+                except NoReverseMatch:
+                    pass
+        context = super().get_context_data(**kwargs)
+        context["all_indexes"] = all_indexes
+        context["admin_indexes"] = admin_indexes
+        context["current_season"] = "{} {}".format(
+            Season.SEASONS[config.get_int(settings.ACTIVE_SEASON_KEY, 0)][1],
+            config.get(settings.ACTIVE_YEAR_KEY, ""))
+        return context
 
 SESSION_TOKEN_KEY = "_CAPTURED_LOGIN_TOKEN"
 

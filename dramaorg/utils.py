@@ -13,7 +13,6 @@ def get_admin_group():
             name=settings.ADMIN_GROUP_NAME)[0]
     except OperationalError:
         return None
-
     
 def add_change_permissions(*models):
     add_permissions(models,
