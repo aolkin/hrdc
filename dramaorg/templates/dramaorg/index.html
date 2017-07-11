@@ -1,6 +1,7 @@
 {% extends "bt/default.html" %}
 
 {% load bootstrap %}
+{% load drama %}
 
 {% block title %}Your Shows{% endblock %}
 
@@ -91,7 +92,7 @@
   <div class="text-muted">current season:</div>
 </div>
 <div class="row justify-content-center">
-  <h4 class="display-4 text-muted">{{ current_season }}</h4>
+  <h4 class="display-4 text-muted">{% current_season %}</h4>
 {% endif %}
 </div>
 {% endblock %}
