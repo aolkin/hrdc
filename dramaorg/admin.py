@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.admin import GroupAdmin
 from django.contrib.auth.models import Group
 
 from django import forms
@@ -28,7 +29,7 @@ def clear_tokens(modeladmin, request, queryset):
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     fieldsets = (
-        (None, {'fields': ('first_name', 'last_name', 'pgps')}),
+        (None, {'fields': (('first_name', 'last_name'), 'pgps')}),
         ('Contact Info', {'fields': ('email', 'phone')}),
         ('Permissions', {'fields': ('is_active', 'is_superuser', 'groups')}),
         ('Information', {'fields': ('last_login', 'date_joined', 'password')}),
@@ -74,15 +75,24 @@ class ShowAdmin(admin.ModelAdmin):
     list_filter = ('season', 'year', 'staff', 'invisible', 'space')
     list_editable = ('invisible',)
     filter_horizontal = ('staff',)
+    fields = ('title', ('season', 'year'), 'space', 'staff', 'slug')
     exclude = ('invisible',)
     search_fields = ('title',)
     prepopulated_fields = {"slug": ("title",)}
     save_as_continue = False
 
+@admin.register(Building)
+class BuildingAdmin(admin.ModelAdmin):
+    def has_module_permission(self, request):
+        return False
+    
 @admin.register(Space)
 class SpaceAdmin(admin.ModelAdmin):
-    list_display = ('name', 'building',)
+    list_display = ('name', 'building', 'include_building_name')
     list_filter = ('building',)
-    search_fields = ('name', 'building')
-    
+    list_editable = ('name', 'building', 'include_building_name')
+    list_display_links = None
+    search_fields = ('name', 'building__name')
+
+admin.register(GroupProxy, GroupAdmin)
 admin.site.unregister(Group)
