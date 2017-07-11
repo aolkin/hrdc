@@ -100,9 +100,6 @@ class IndexView(SuccessMessageMixin, FormView):
         context = super().get_context_data(**kwargs)
         context["all_indexes"] = all_indexes
         context["admin_indexes"] = admin_indexes
-        context["current_season"] = "{} {}".format(
-            Season.SEASONS[config.get_int(settings.ACTIVE_SEASON_KEY, 0)][1],
-            config.get(settings.ACTIVE_YEAR_KEY, ""))
         return context
 
 SESSION_TOKEN_KEY = "_CAPTURED_LOGIN_TOKEN"
