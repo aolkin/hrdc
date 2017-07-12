@@ -76,7 +76,7 @@ class SlotAdmin(admin.StackedInline):
 
     class Media:
         css = {
-            'all': ('casting/admin.css',)
+            'all': ('casting/django_admin.css',)
         }
 
     def get_queryset(self, request):

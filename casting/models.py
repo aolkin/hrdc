@@ -89,7 +89,7 @@ class Audition(AssociateShowMixin, AssociateActorMixin):
                               choices=STATUSES)
 
     def __str__(self):
-        return "{} for {}".format(self.actor, self.show.name)
+        return "{} for {}".format(self.actor, self.show)
 
 class Character(AssociateShowMixin):
     name = models.CharField(max_length=60)

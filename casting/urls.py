@@ -15,5 +15,9 @@ urlpatterns = [
     url(r'^auditions/signin/(?P<pk>\d+)/popout/$',
         ActorSignInStart.as_view(popout=True),
         name="sign_in_start_popout"),
+    url(r'^auditions/signin/profile/$', ActorSignInProfile.as_view(),
+        name="sign_in_profile"),
+    url(r'^auditions/signin/done/$', ActorSignInDone.as_view(),
+        name="sign_in_done"),
     url(r'^admin/$', admin, name="admin"),
 ]

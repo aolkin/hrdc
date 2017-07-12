@@ -1,0 +1,33 @@
+{% extends "casting/sign_in_base.html" %}
+
+{% load bootstrap %}
+
+{% block content %}
+<div class="text-center">
+  <h1>Enter Profile Information</h1>
+</div>
+<h4 class="text-center text-muted">Selected Shows:</h4>
+<div class="row justify-content-center">
+  <div class="col-lg-4 col-md-6">
+    {% include "casting/sign_in_shows.html"%}
+  </div>
+</div>
+<p class="text-center text-muted">To change this, please
+  <a href="{% url 'casting:sign_in_start' request.session.building %}">
+    start over</a>.
+</p>
+<p class="lead text-center">
+  Please provide the following additional information.
+</p>
+<p class="lead text-center">
+  If you audition for additional shows later, you will not need to fill in
+  this page again.
+</p>
+<div class="row justify-content-center">
+  <form method="POST" class="col-lg-6 col-md-8 audition-sign-in-shows">
+    {% csrf_token %}
+    {{ form|bootstrap }}
+    <button type="submit" class="btn btn-primary btn-block">Sign-In</button>
+  </form>
+</div>
+{% endblock %}

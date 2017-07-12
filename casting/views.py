@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
-from django.views.generic.base import TemplateResponseMixin
+from django.views.generic.base import *
 from django.views.generic.edit import *
 
 from django.urls import reverse_lazy, reverse
@@ -108,23 +108,23 @@ class SignInStartForm(forms.Form):
         self.building = instance
         super().__init__(**kwargs)
 
-class ActorSignInBase(UserPassesTestMixin, TemplateResponseMixin,
-                      BaseUpdateView):
-    model = building_model
+class ActorSignInBase(UserPassesTestMixin, TemplateResponseMixin):
     popout = False
 
     def test_func(self):
         return test_pdsm(self.request.user)
-    
+
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context["BT_hide_messages"] = True
         context["BT_header_url"] = None
-        context["popout"] = self.popout
+        self.request.session["popout"] = self.popout
+        context["shows"] = CastingMeta.objects.filter(
+            id__in=self.request.session.get("show_ids",[]))
         return context
 
-class ActorSignInStart(ActorSignInBase):
+class ActorSignInStart(ActorSignInBase, BaseUpdateView):
     form_class = SignInStartForm
+    model = building_model
     template_name = "casting/sign_in_start.html"
     show_all = False
 
@@ -145,7 +145,7 @@ class ActorSignInStart(ActorSignInBase):
         else:
             slots = get_current_slots().filter(space__building=self.object)
         context["shows"] = slots.distinct().values_list("show__show__title",
-                                                        "show__show__id")
+                                                        "show__id")
         return context
         
     def form_valid(self, form):
@@ -153,6 +153,53 @@ class ActorSignInStart(ActorSignInBase):
             email=form.cleaned_data["email"],
             defaults={"source": "casting"})
         self.request.session["actor"] = actor.pk
+        self.request.session["building"] = self.object.pk
         self.request.session["show_ids"] = form.cleaned_data["shows"]
         self.actor_is_initialized = actor.is_initialized
         return FormView.form_valid(self, form)
+
+PROFILE_FIELDS = ["first_name", "last_name", "phone",]
+PROFILE_WIDGETS = dict(zip(PROFILE_FIELDS, [
+    forms.TextInput(attrs={ "autocomplete": "off" }) for i in range(len(
+        PROFILE_FIELDS))]))
+print(PROFILE_WIDGETS)
+
+class ActorProfileForm(forms.ModelForm):
+    class Meta:
+        model = get_user_model()
+        fields = PROFILE_FIELDS + ["pgps"]
+        widgets = PROFILE_WIDGETS
+    
+class ActorSignInProfile(ActorSignInBase, BaseUpdateView):
+    template_name = "casting/sign_in_profile.html"
+    form_class = ActorProfileForm
+    success_url = reverse_lazy("casting:sign_in_done")
+
+    def get_object(self, *args, **kwargs):
+        return get_user_model().objects.get(pk=self.request.session["actor"])
+    
+class ActorSignInDone(ActorSignInBase, TemplateView):
+    template_name = "casting/sign_in_done.html"
+    
+    def get(self, *args, **kwargs):
+        for i in self.request.session.get("show_ids", []):
+            obj, created = Audition.objects.get_or_create(
+                actor_id=self.request.session["actor"], show_id=i)
+            if not created:
+                if obj.status == Audition.STATUSES[2][0]:
+                    messages.error(self.request,
+                                     "You have already auditioned for {}!"
+                                     .format(
+                                         CastingMeta.objects.get(id=i)))
+                else:
+                    messages.warning(self.request,
+                                     "You have already signed in for {}!"
+                                     .format(
+                                         CastingMeta.objects.get(id=i)))
+        response = super().get(*args, **kwargs)
+        try:
+            del self.request.session["show_ids"]
+            del self.request.session["actor"]
+        except KeyError:
+            pass
+        return response

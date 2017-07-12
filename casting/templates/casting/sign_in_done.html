@@ -1,0 +1,21 @@
+{% extends "casting/sign_in_base.html" %}
+
+{% load bootstrap %}
+
+
+{% block content %}
+<div class="text-center">
+  <h2>Thanks for signing in!</h2>
+  <p class="lead">
+    Please wait until you are called to audition.
+  </p>
+</div>
+<div class="row justify-content-center">
+  <div class="col-lg-6 col-md-8 audition-sign-in-shows">
+    {% include "casting/sign_in_shows.html" %}
+    <a href="{% url 'casting:sign_in_start' request.session.building %}"
+       class="btn btn-primary btn-block"
+       data-autoreset="{% if shows %}5000{% else %}15000{% endif %}">Done</a>
+  </div>
+</div>
+{% endblock %}
