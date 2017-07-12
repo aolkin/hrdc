@@ -57,18 +57,24 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('email',)
     save_as_continue = True
     
-    def get_readonly_fields(self, request, *args):
-        if request.user.is_superuser:
-            return self.readonly_fields
+    def get_readonly_fields(self, request, obj):
+        if obj:
+            if request.user.is_superuser:
+                return self.readonly_fields
+            else:
+                return self.staff_readonly
         else:
-            return self.staff_readonly
+            return []
 
-    def get_fieldsets(self, request, *args):
-        if request.user.is_superuser:
-            return self.fieldsets
+    def get_fieldsets(self, request, obj):
+        if obj:
+            if request.user.is_superuser:
+                return self.fieldsets
+            else:
+                return self.staff_fieldsets
         else:
-            return self.staff_fieldsets
-    
+            return self.add_fieldsets
+            
 @admin.register(Show)
 class ShowAdmin(admin.ModelAdmin):
     list_display = ('title', 'seasonstr', 'space', 'people', 'invisible')

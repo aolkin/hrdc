@@ -1,0 +1,15 @@
+{% load bootstrap %}
+
+{% if legal %}
+<form method="POST" action="{% url 'casting:edit_show' object.pk %}">
+  {% csrf_token %}
+{{ form|bootstrap }}
+</form>
+{% else %}
+{% if user.is_authenticated %}
+You do not have access to this show.
+{% else %}
+You have been logged out.
+<a href="{% url SETTINGS.LOGIN_URL %}">Log in again</a>.
+{% endif %}
+{% endif %}

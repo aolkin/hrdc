@@ -1,0 +1,35 @@
+{% extends "casting/sign_in_base.html" %}
+
+{% load bootstrap %}
+
+
+{% block content %}
+<div class="text-center">
+  <h1>Welcome to Common Casting</h1>
+  <p class="lead">
+    Enter your email and select the shows you wish to audition for to begin.
+  </p>
+  <p class="lead">
+    <big>Shows currently holding auditions at {{ object }}:</big>
+  </p>
+</div>
+<div class="row justify-content-center">
+  <form method="POST" class="col-lg-6 col-md-8 audition-sign-in-shows">
+    {% csrf_token %}
+    {{ form|bootstrap_inline }}
+    {% for show in shows %}
+    <div class="row mb-2 justify-content-center">
+      <div class="col-md-9">
+	<label class="custom-control custom-checkbox">
+	  <input class="custom-control-input" type="checkbox"
+		 name="shows" value="{{ show.1 }}" id="show-{{ show.1 }}">
+	  <span class="custom-control-indicator"></span>
+	  <span class="custom-control-description">{{ show.0 }}</span>
+	</label>
+      </div>
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+  </form>
+</div>
+{% endblock %}

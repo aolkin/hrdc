@@ -9,6 +9,8 @@ from django.dispatch import receiver
 
 import hashlib, base64, uuid, datetime
 
+from config import config
+
 from .utils import get_admin_group
 from . import email
 
@@ -145,6 +147,11 @@ def _get_year():
 class SeasonManager(models.Manager):
     def in_season(self, obj):
         return self.filter(year=obj.year, season=obj.season)
+    
+    def current_season(self):
+        return self.filter(
+            year=config.get(settings.ACTIVE_YEAR_KEY, None),
+            season=config.get(settings.ACTIVE_SEASON_KEY, None))
 
 class Season(models.Model):    
     SEASONS = (
@@ -168,7 +175,7 @@ class Season(models.Model):
     
     class Meta:
         abstract = True
-                      
+
 class Show(Season):
     title = models.CharField(max_length=150)
     staff = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
