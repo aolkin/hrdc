@@ -1,8 +1,8 @@
 "use strict";
 
-$('.edit-show-modal').on('show.bs.modal', function (event) {
+$(".edit-show-modal").on("show.bs.modal", function (event) {
     var button = $(event.relatedTarget);
-    var target = button.attr('href');
+    var target = button.attr("href");
     if (target) {
         var modal = $(this).find(".modal-body");
         modal.load(target);
@@ -27,7 +27,7 @@ let SUGGESTED_DOMAINS = [
 
 function suggestEmailDomains(q, cb) {
     let parts = q.split("@");
-    if (parts[0] && parts.length == 2 && parts[1]) {
+    if (parts[0] && parts.length === 2 && parts[1]) {
         let matches = [];
         for (let domain of SUGGESTED_DOMAINS) {
             if (domain.startsWith(parts[1])) {
@@ -36,11 +36,13 @@ function suggestEmailDomains(q, cb) {
         }
         cb(matches);
     } else {
-        cb([]);
+        return [];
     }
-};
+}
 
 $("input[type=email]").typeahead({
     minLength: 2,
-    source: suggestEmailDomains
+    source: suggestEmailDomains,
+    fitToElement: true,
+    autoSelect: true
 })

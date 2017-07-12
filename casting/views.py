@@ -2,14 +2,21 @@ from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.edit import *
+
 from django.urls import reverse_lazy, reverse
+from django.db.models import Q
+
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth import get_user_model
 from django.contrib import messages
+
+
 from django import forms
 from django.apps import apps
 from django.conf import settings
 from django.utils import timezone
+import datetime
 
 from config import config
 
@@ -90,8 +97,7 @@ class SignInStartForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-        shows = show_model.objects.filter(id__in=self.data.getlist("shows",[]))
-        print(shows)
+        shows = self.data.getlist("shows",[])
         if not shows:
             raise forms.ValidationError(
                 "Please select a show to audition for!")
@@ -115,14 +121,38 @@ class ActorSignInBase(UserPassesTestMixin, TemplateResponseMixin,
         context["BT_hide_messages"] = True
         context["BT_header_url"] = None
         context["popout"] = self.popout
-        context["shows"] = get_current_slots().filter(
-            space__building=self.object).values_list("show__show__title",
-                                                     "show__show__id")
         return context
 
 class ActorSignInStart(ActorSignInBase):
     form_class = SignInStartForm
     template_name = "casting/sign_in_start.html"
+    show_all = False
 
+    def get_success_url(self):
+        if self.actor_is_initialized:
+            return reverse("casting:sign_in_done")
+        else:
+            return reverse("casting:sign_in_profile")
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        if self.show_all:
+            q = Q(day=timezone.localdate(), start__gte=datetime.time(hour=9))
+            q |= Q(day=timezone.localdate() - datetime.timedelta(days=1),
+                   end__gt=datetime.time(hour=21))
+            slots = Slot.objects.auditions().filter(
+                q, space__building=self.object)
+        else:
+            slots = get_current_slots().filter(space__building=self.object)
+        context["shows"] = slots.distinct().values_list("show__show__title",
+                                                        "show__show__id")
+        return context
+        
     def form_valid(self, form):
-        return super().form_invalid(form)
+        actor, created = get_user_model().objects.get_or_create(
+            email=form.cleaned_data["email"],
+            defaults={"source": "casting"})
+        self.request.session["actor"] = actor.pk
+        self.request.session["show_ids"] = form.cleaned_data["shows"]
+        self.actor_is_initialized = actor.is_initialized
+        return FormView.form_valid(self, form)

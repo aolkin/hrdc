@@ -95,7 +95,7 @@
   <a href="{% url 'admin:casting_castingmeta_changelist' %}">site admin</a>
   to edit or add shows</h5>
 {% endif %}
-{% if user.is_pdsm or user.is_board %}
+{% if buildings and user.is_pdsm or user.is_board %}
 <h3 class="text-center mt-5">
   Actor Sign-In Forms
   <br><small class="text-muted">use these when tabling for auditions</small>

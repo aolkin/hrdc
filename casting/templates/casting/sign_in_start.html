@@ -6,6 +6,7 @@
 {% block content %}
 <div class="text-center">
   <h1>Welcome to Common Casting</h1>
+  {% if shows %}
   <p class="lead">
     Enter your email and select the shows you wish to audition for to begin.
   </p>
@@ -31,5 +32,13 @@
     {% endfor %}
     <button type="submit" class="btn btn-primary btn-block">Sign In</button>
   </form>
+  {% else %}
+  <div class="lead text-danger">
+    <big>
+      <strong>No shows are currently holding auditions here.</strong>
+      <br>Please come back later...
+    </big>
+  </p>
+  {% endif %}
 </div>
 {% endblock %}

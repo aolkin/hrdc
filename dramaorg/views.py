@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy, reverse, resolve
 from django.urls.exceptions import NoReverseMatch
@@ -20,7 +19,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 
 from .utils import user_is_initialized
-from .mixins import InitializedMixin
 from .email import send_reset
 from .models import *
 
@@ -119,7 +117,7 @@ class TokenView(FormView):
         try:
             t = self.request.session[SESSION_TOKEN_KEY]
             self.user = get_user_model().objects.get(login_token=t)
-            if (self.user.is_initialized and
+            if (self.user.has_usable_password() and
                 self.user.token_expiry < timezone.now()):
                 self.user = None
         except (TypeError, KeyError, ValueError, OverflowError,

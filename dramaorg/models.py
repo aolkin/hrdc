@@ -41,7 +41,9 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     phone = models.CharField(max_length=20)
     pgps = models.CharField(max_length=20, blank=True,
                             verbose_name="Preferred Gender Pronouns")
-    
+
+    source = models.CharField(default="default", editable=False,
+                              max_length=20)
     is_active = models.BooleanField(default=True)
     login_token = models.CharField(max_length=86, default=generate_token)
     token_expiry = models.DateTimeField(default=timezone.now)
@@ -74,8 +76,7 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     
     @property
     def is_initialized(self):
-        return bool(self.first_name and self.last_name and self.phone
-                    and self.has_usable_password())
+        return bool(self.first_name and self.last_name and self.phone)
 
     @property
     def is_board(self):
@@ -105,8 +106,9 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 
 @receiver(post_save)
 def invite_user(sender, instance, created, raw, **kwargs):
-    if sender == User and created and not instance.is_initialized:
-        email.send_invite(instance)
+    if sender == User and created and not instance.has_usable_password():
+        if instance.source == "default":
+            email.send_invite(instance)
 
 @receiver(user_logged_in)
 def clear_token_on_user(sender, request, user, **kwargs):
