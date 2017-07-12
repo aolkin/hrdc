@@ -125,7 +125,7 @@ class ActorSignInBase(UserPassesTestMixin, TemplateResponseMixin):
 class ActorSignInStart(ActorSignInBase, BaseUpdateView):
     form_class = SignInStartForm
     model = building_model
-    template_name = "casting/sign_in_start.html"
+    template_name = "casting/sign_in/start.html"
     show_all = False
 
     def get_success_url(self):
@@ -171,7 +171,7 @@ class ActorProfileForm(forms.ModelForm):
         widgets = PROFILE_WIDGETS
     
 class ActorSignInProfile(ActorSignInBase, BaseUpdateView):
-    template_name = "casting/sign_in_profile.html"
+    template_name = "casting/sign_in/profile.html"
     form_class = ActorProfileForm
     success_url = reverse_lazy("casting:sign_in_done")
 
@@ -179,7 +179,7 @@ class ActorSignInProfile(ActorSignInBase, BaseUpdateView):
         return get_user_model().objects.get(pk=self.request.session["actor"])
     
 class ActorSignInDone(ActorSignInBase, TemplateView):
-    template_name = "casting/sign_in_done.html"
+    template_name = "casting/sign_in/done.html"
     
     def get(self, *args, **kwargs):
         for i in self.request.session.get("show_ids", []):
