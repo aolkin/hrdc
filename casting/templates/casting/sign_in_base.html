@@ -3,9 +3,9 @@
 {% block title %}Actor Sign-In | Common Casting{% endblock %}
 
 {% block extra_footer %}
-{% if not popout %}
+{% if not request.session.popout %}
 <div class="fixed-bottom">
-  <a href="{% url 'casting:index' %}" class="text-muted d-block">
+  <a href="{% url 'casting:index' %}" class="text-muted d-block bg-faded">
     leave sign-in form
   </a>
 </div>

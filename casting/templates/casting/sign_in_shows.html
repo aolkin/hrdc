@@ -1,0 +1,24 @@
+<div class="row mb-2 justify-content-center">
+  <div class="col-md-9 custom-controls-stacked">
+    {% for show in shows %}
+    <label class="custom-control custom-checkbox">
+      <input class="custom-control-input" type="checkbox"
+	     disabled checked>
+      <span class="custom-control-indicator"></span>
+      <span class="custom-control-description">{{ show }}</span>
+    </label>
+    {% empty %}
+  </div>
+</div>
+<h2 class="text-center text-danger">
+  Error: did not sign-in for any shows</h2>
+<p class="lead text-center">
+  This shouldn't have happened. Please 
+  <a href="{% url 'casting:sign_in_start' request.session.building %}">
+    start over</a> and try again.
+</p>
+<div>
+  <div>
+    {% endfor %}
+  </div>
+</div>

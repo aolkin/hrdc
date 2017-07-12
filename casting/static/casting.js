@@ -45,4 +45,10 @@ $("input[type=email]").typeahead({
     source: suggestEmailDomains,
     fitToElement: true,
     autoSelect: true
-})
+});
+
+$("a[href][data-autoreset]").each(function(index, el) {
+    setTimeout((function(){
+        location.assign($(this).attr("href"));
+    }).bind(this), $(el).data("autoreset"));
+});
