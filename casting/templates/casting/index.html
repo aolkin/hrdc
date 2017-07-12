@@ -1,0 +1,124 @@
+{% extends "bt/default.html" %}
+
+{% load bootstrap %}
+{% load drama %}
+
+{% block title %}Common Casting{% endblock %}
+
+{% block content %}
+{% include "dramaorg/user_dropdown.html" %}
+
+{% if request.user.show_set.exists %}
+<h3 class="text-center">Your Shows registered for Common Casting</h3>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Show</th>
+      <th>Season</th>
+      <th>Administrative Staff
+	<small class="text-muted">has access to this site</small></th>
+      <th>Show Contact Email</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for show in request.user.show_set.all %}
+    {% if show.casting_meta %}
+    <tr>
+      <td>{{ show.title }}</td>
+      <td>{{ show.seasonstr }}</td>
+      <td>{{ show.people }}</td>
+      <td>
+	{% if show.casting_meta.contact_email %}
+	<a href="mailto:{{ show.casting_meta.contact_email }}">
+	  {{ show.casting_meta.contact_email }}</a>
+	<a href="{% url 'casting:edit_show' show.casting_meta.pk %}"
+	   data-toggle="modal"
+	   data-target="#edit-show-{{ show.casting_meta.pk }}">
+	  (edit)
+	</a>
+	{% else %}
+	<b>&lt;missing&gt;</b>
+	<a href="{% url 'casting:edit_show' show.casting_meta.pk %}"
+	   data-toggle="modal"
+	   data-target="#edit-show-{{ show.casting_meta.pk }}">
+	  (set)
+	</a>
+	{% endif %}
+	<div class="modal fade edit-show-modal"
+	     id="edit-show-{{ show.casting_meta.pk }}" tabindex="-1">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+		<h5 class="modal-title">Edit {{ show.title }}</h5>
+		<button type="button" class="close" data-dismiss="modal"
+			aria-label="Close">
+		  <span aria-hidden="true">&times;</span>
+		</button>
+	      </div>
+	      <div class="modal-body"></div>
+	      <div class="modal-footer">
+		<button type="button" class="btn btn-secondary"
+			data-dismiss="modal">Close</button>
+		<button type="button" class="btn btn-primary body-submit">
+		  Update</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+      </td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+</table>
+{% if not user.is_board %}
+<p class="text-muted text-center">If any of this information is incorrect or
+  shows are missing from your dashboard, please contact a board member.</p>
+{% endif %}
+
+{% else %}
+<p class="lead">
+  You are not a member of the administrative staff on any shows.
+  {% if not user.is_board %}
+  If this is in error, please contact an HRDC Board member.
+  {% endif %}
+</p>
+{% endif %}
+
+{% if user.is_board %}
+<h4 class="text-center mt-5">
+  <a href="{% url 'casting:admin' %}">
+    Common Casting Administration
+    <small class="text-muted">for board members</small>
+  </a>
+</h4>
+<h5 class="text-center text-muted">Please use the
+  <a href="{% url 'admin:casting_castingmeta_changelist' %}">site admin</a>
+  to edit or add shows</h5>
+{% endif %}
+{% if user.is_pdsm or user.is_board %}
+<h3 class="text-center mt-5">
+  Actor Sign-In Forms
+  <br><small class="text-muted">use these when tabling for auditions</small>
+</h3>
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    {% for building in buildings %}
+    <a href="{% url 'casting:sign_in_start' building.pk %}"
+       class="list-group-item list-group-item-action" target="_popout">
+      <div class="d-flex w-100 justify-content-between">
+	<h5 class="mb-0">{{ building.name }}</h5>
+	<small class="text-muted">{{ building.slots }}</small>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<div class="row justify-content-center mt-5">
+  <div class="text-muted">current season:</div>
+</div>
+<div class="row justify-content-center">
+  <h4 class="display-4 text-muted">{% current_season %}</h4>
+</div>
+{% endblock %}

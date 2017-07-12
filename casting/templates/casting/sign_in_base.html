@@ -1,0 +1,18 @@
+{% extends "bt/default.html" %}
+
+{% block title %}Actor Sign-In | Common Casting{% endblock %}
+
+{% block extra_footer %}
+{% if not popout %}
+<div class="fixed-bottom">
+  <a href="{% url 'casting:index' %}" class="text-muted d-block">
+    leave sign-in form
+  </a>
+</div>
+<style>
+  #bt-container {
+    padding-bottom: 1rem;
+  }
+</style>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,10 @@
+.audition-sign-in-shows .custom-control-description {
+    font-size: 1.5em;
+}
+.audition-sign-in-shows .custom-control {
+    padding-left: 3rem;
+}
+.audition-sign-in-shows .custom-control-indicator {
+    height: 2rem;
+    width: 2rem;
+}

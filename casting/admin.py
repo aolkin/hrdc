@@ -83,8 +83,11 @@ class SlotAdmin(admin.StackedInline):
         return super().get_queryset(request).filter(type=self.type)
     
     def get_extra(self, request, obj=None, **kwargs):
-        n = obj.slot_set.filter(type=self.type).count()
-        return max(self.extra - n, 0)
+        if obj:
+            n = obj.slot_set.filter(type=self.type).count()
+            return max(self.extra - n, 0)
+        else:
+            return self.extra
     
 class AuditionSlotAdmin(SlotAdmin):
     type = Slot.TYPES[0][0]
