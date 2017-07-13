@@ -1,13 +1,9 @@
-{% extends "bt/default.html" %}
+{% extends "casting/base.html" %}
 
 {% load bootstrap %}
 {% load drama %}
 
-{% block title %}Common Casting{% endblock %}
-
 {% block content %}
-{% include "dramaorg/user_dropdown.html" %}
-
 {% if request.user.show_set.exists %}
 <h3 class="text-center">Your Shows registered for Common Casting</h3>
 <table class="table table-striped">
@@ -97,17 +93,17 @@
 {% endif %}
 {% if buildings and user.is_pdsm or user.is_board %}
 <h3 class="text-center mt-5">
-  Actor Sign-In Forms
-  <br><small class="text-muted">use these when tabling for auditions</small>
+  Audition Tabling
+  <br><small class="text-muted">locations currently holding auditions</small>
 </h3>
 <div class="row justify-content-center">
-  <div class="col-md-6">
+  <div class="col-md-8">
     {% for building in buildings %}
-    <a href="{% url 'casting:sign_in_start' building.pk %}"
-       class="list-group-item list-group-item-action" target="_popout">
+    <a href="{% url 'casting:tabling' building.pk %}"
+       class="list-group-item list-group-item-action">
       <div class="d-flex w-100 justify-content-between">
 	<h5 class="mb-0">{{ building.name }}</h5>
-	<small class="text-muted">{{ building.slots }}</small>
+	<small class="text-muted text-right">{{ building.slots }}</small>
       </div>
     </a>
     {% endfor %}

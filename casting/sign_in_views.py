@@ -6,20 +6,17 @@ from django.urls import reverse_lazy, reverse
 from django.db.models import Q
 
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 
+from django.conf.urls import url
+
 from django import forms
-from django.conf import settings
 from django.utils import timezone
 import datetime
 
 from .models import *
-from .views import get_current_slots, building_model
-
-def test_pdsm(user):
-    return user.is_authenticated() and user.is_pdsm
+from .views import get_current_slots, building_model, test_pdsm
 
 class SignInStartForm(forms.Form):
     email = forms.EmailField(
@@ -135,3 +132,15 @@ class ActorSignInDone(ActorSignInBase, TemplateView):
         except KeyError:
             pass
         return response
+
+urlpatterns = [
+    url(r'^(?P<pk>\d+)/$', ActorSignInStart.as_view(),
+        name="sign_in_start"),
+    url(r'^(?P<pk>\d+)/all/$', ActorSignInStart.as_view(show_all=True),
+        name="sign_in_start_all"),
+    url(r'^(?P<pk>\d+)/popout/$', ActorSignInStart.as_view(popout=True),
+        name="sign_in_start_popout"),
+    url(r'^profile/$', ActorSignInProfile.as_view(),
+        name="sign_in_profile"),
+    url(r'^done/$', ActorSignInDone.as_view(),
+        name="sign_in_done")]

@@ -12,6 +12,9 @@ from .models import *
 def test_board(user):
     return user.is_authenticated() and user.is_board
 
+def test_pdsm(user):
+    return user.is_authenticated() and user.is_pdsm
+
 class ShowEditor(UpdateView):
     model = CastingMeta
     fields = ("contact_email",)
@@ -27,7 +30,8 @@ class ShowEditor(UpdateView):
         if self.test_func():
             return super().post(*args, **kwargs)
         else:
-            messages.error(self.request, "You do not have access to that show.")
+            messages.error(self.request,
+                           "You do not have access to that show.")
             return HttpResponseRedirect(reverse("login"))
         
     def get(self, *args, **kwargs):
@@ -49,20 +53,6 @@ def get_current_slots():
 
 building_model = (apps.get_model(settings.SPACE_MODEL)
                   .building.field.related_model)
-@login_required
-def index(request):
-    building_ids = (get_current_slots().distinct()
-                    .values_list("space__building"))
-    buildings = building_model.objects.filter(pk__in=building_ids).values(
-        "pk", "name")
-    for b in buildings:
-        shows = get_current_slots().filter(
-            space__building=b["pk"]).distinct().values_list(
-                "show__show__title")
-        b["slots"] = ", ".join([i[0] for i in shows])
-    return render(request, "casting/index.html", locals())
-index.verbose_name = "Common Casting"
-index.help_text = "audition actors and cast your shows"
 
 @user_passes_test(test_board)
 def admin(request):

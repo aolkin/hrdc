@@ -7,6 +7,15 @@ import datetime
 class CastingReleaseMeta(models.Model):
     publish_callbacks = models.DateTimeField(null=True, blank=True)
     publish_casts = models.DateTimeField(null=True, blank=True)
+
+    STAGES = (
+        (0, "Auditions"),
+        (1, "Callbacks"),
+        (2, "First-Round Casting Released"),
+        (3, "Cast Lists Released"),
+    )
+    stage = models.PositiveSmallIntegerField(default=0)
+    
     signing_opens = models.DateTimeField(null=True, blank=True)
     second_signing_opens = models.DateTimeField(null=True, blank=True)
 
@@ -123,7 +132,8 @@ STANDARD_TIMES = (
     datetime.time(hour=23, minute=30),
     datetime.time(hour=23, minute=59, second=59),
     datetime.time(hour=11),
-    datetime.time(hour=19)
+    datetime.time(hour=19),
+    datetime.time()
 )
 ALL_TIMES = list(sorted(
     [datetime.time(hour=i) for i in range(9, 24)] +

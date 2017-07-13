@@ -50,12 +50,25 @@
 {% endif %}
 
 {% else %}
-<p class="lead">
-  You are not a member of the administrative staff on any shows.
-  {% if not user.is_board %}
-  If this is in error, please contact an HRDC Board member.
-  {% endif %}
-</p>
+<div class="text-center">
+  <p class="lead">
+    You are not a member of the executive staff on any shows.
+    {% if not user.is_board %}
+    If this is in error, please contact an HRDC Board member.
+    {% endif %}
+  </p>
+  <p>
+    This site is designed primarily for executive staff members on HRDC shows.
+    However, you may still:
+  </p>
+  <h3>
+    <a href="{% url 'dramaorg:profile' %}">edit your profile</a>
+  </h3>
+  <h4>or</h4>
+  <h3>
+    <a href="{% url 'dramaorg:password_change' %}">change your password</a>
+  </h3>
+</div>
 {% endif %}
 
 {% if user.is_board %}

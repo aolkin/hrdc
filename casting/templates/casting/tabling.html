@@ -1,0 +1,29 @@
+{% extends "casting/base.html" %}
+
+{% block title %}{{ building.name }} | Casting{% endblock %}
+
+{% block content %}
+<h3 class="text-center">{{ building.name }}</h3>
+<a href="{% url 'casting:sign_in_start' building.pk %}" target="_popout"
+   class="text-center">
+  <h5 class="mb-0">&gt; Open Actor Sign-In Form &lt;</h5>
+</a>
+<table class="table table-striped mt-3">
+  <thead>
+    <tr>
+      <th>Sign-In Time</th>
+      <th>Name</th>
+      <th>PGPs</th>
+      <th>Show</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for audition in auditions %}
+    <tr data-pk="{{ audition.pk }}">
+      {% include "casting/pieces/tabling_row.html" %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
