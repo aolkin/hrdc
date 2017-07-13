@@ -1,0 +1,27 @@
+{% extends "casting/base.html" %}
+
+{% block title %}{{ object }} | Casting{% endblock %}
+
+{% block content %}
+<h2 class="text-center">{{ object }}</h2>
+<table class="table table-striped mt-3">
+  <thead>
+    <tr>
+      <th>Sign-In Time</th>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Phone</th>
+      <th>PGPs</th>
+      <!--<th></th>-->
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for audition in object.audition_set.all %}
+    <tr data-pk="{{ audition.pk }}">
+      {% include "casting/pieces/audition_row.html" %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

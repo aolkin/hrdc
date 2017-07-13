@@ -47,6 +47,13 @@ class SeasonForm(forms.ModelForm):
         config[settings.ACTIVE_SEASON_KEY] = self.cleaned_data["season"]
         config[settings.ACTIVE_YEAR_KEY] = self.cleaned_data["year"]
 
+def get_link(u):
+    r = resolve(u)
+    func = r.func.view_class if hasattr(r.func, "view_class") else r.func
+    name = func.verbose_name if hasattr(func, "verbose_name") else r.view_name
+    return (u, name, getattr(func, "help_text", ""))
+                        
+        
 class IndexView(SuccessMessageMixin, FormView):
     template_name = "dramaorg/index.html"
     success_url = reverse_lazy("dramaorg:index")
@@ -77,22 +84,14 @@ class IndexView(SuccessMessageMixin, FormView):
         if not all_indexes:
             for i in settings.INSTALLED_APPS:
                 try:
-                    u = reverse(i+":index")
-                    r = resolve(u)
-                    if r.app_name != "dramaorg":
-                        name = r.func.verbose_name if hasattr(
-                            r.func, "verbose_name") else r.view_name
-                        all_indexes.append((u, name,
-                                            getattr(r.func, "help_text", "")))
+                    if i != "dramaorg":
+                        u = reverse(i+":index")
+                        all_indexes.append(get_link(u))
                 except NoReverseMatch:
                     pass
                 try:
                     u = reverse(i+":admin")
-                    r = resolve(u)
-                    name = r.func.verbose_name if hasattr(
-                        r.func, "verbose_name") else r.view_name
-                    admin_indexes.append((u, name,
-                                          getattr(r.func, "help_text", "")))
+                    admin_indexes.append(get_link(u))
                 except NoReverseMatch:
                     pass
         context = super().get_context_data(**kwargs)

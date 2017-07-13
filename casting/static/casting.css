@@ -8,3 +8,16 @@
     height: 2rem;
     width: 2rem;
 }
+
+.view-audition .copyable * {
+    background-color: transparent;
+    color: black;
+}
+
+table .btn {
+    cursor: pointer;
+}
+
+.bt-sidebar-content {
+    min-height: 24em;
+}

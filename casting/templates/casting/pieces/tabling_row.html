@@ -1,0 +1,10 @@
+<td>{{ audition.signed_in }}</td>
+<td>{{ audition.actor.get_full_name }}</td>
+<td>{{ audition.actor.pgps }}</td>
+<td>{{ audition.show }}</td>
+<td {% if audition.status == "called"%}
+    class="bg-primary text-white text-uppercase"{% endif %}
+    {% if audition.status == "done"%}
+    class="text-success"{% endif %}>
+  {{ audition.get_status_display }}
+</td>
