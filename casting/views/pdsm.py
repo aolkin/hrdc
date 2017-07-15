@@ -12,12 +12,12 @@ from django.contrib import messages
 from django.utils import timezone
 
 from ..models import *
-from . import test_pdsm, get_current_slots, building_model
+from . import get_current_slots, building_model
+from ..utils import test_pdsm
 
 class StaffViewMixin(UserPassesTestMixin):
     def test_func(self):
-        return (self.request.user.is_authenticated() and
-                self.request.user.is_pdsm)
+        return test_pdsm(self.request.user)
     
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
