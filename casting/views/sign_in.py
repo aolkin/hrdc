@@ -114,7 +114,6 @@ class ActorSignInDone(ActorSignInBase, TemplateView):
     template_name = "casting/sign_in/done.html"
     
     def get(self, *args, **kwargs):
-        building = int(self.request.session["building"])
         for showspace in self.request.session.get("show_ids", []):
             i, space = showspace.split(":")
             space = int(space)
@@ -130,7 +129,7 @@ class ActorSignInDone(ActorSignInBase, TemplateView):
                 else:
                     if obj.space_id != space:
                         obj.space_id = space
-                        obj.status == Audition.STATUSES[0][0]
+                        obj.status = Audition.STATUSES[0][0]
                         with suppress_autotime(obj, "signed_in"):
                             obj.signed_in = timezone.now()
                         obj.save()

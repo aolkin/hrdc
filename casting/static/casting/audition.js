@@ -6,6 +6,6 @@ $(".btn-copy-excel").click(function(){
     target.setSelectionRange(0, target.value.length);
     if (!document.execCommand("copy")) {
         alert("Failed to copy automatically!");
-    };
-    el.attr("hidden", true)
+    }
+    el.attr("hidden", true);
 });
