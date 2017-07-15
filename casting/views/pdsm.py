@@ -11,8 +11,8 @@ from django.contrib import messages
 
 from django.utils import timezone
 
-from .models import *
-from .views import test_pdsm, get_current_slots, building_model
+from ..models import *
+from . import test_pdsm, get_current_slots, building_model
 
 class StaffViewMixin(UserPassesTestMixin):
     def test_func(self):
@@ -77,16 +77,9 @@ class TablingView(StaffViewMixin, DetailView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context["shows"] = Slot.objects.filter(
-            day=timezone.localdate(),
+        context["auditions"] = Audition.objects.filter(
+            signed_in__date=timezone.localdate(),
             space__building=self.object)
-        context["auditions"] = []
-        for slot in context["shows"]:
-            context["auditions"] += Audition.objects.filter(
-                show=slot.show,
-                signed_in__date=timezone.localdate(),
-                signed_in__time__range=(slot.start, slot.end)
-            )
         return context
     
 class AuditionView(StaffViewMixin, DetailView):
@@ -102,10 +95,6 @@ class AuditionView(StaffViewMixin, DetailView):
                                "executive staff of that show. Log in as a "
                                "different user?")
         return False
-    
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        return context
 
 class AuditionStatusBase(StaffViewMixin, SingleObjectMixin, View):
     model = Audition
@@ -121,17 +110,14 @@ class AuditionStatusBase(StaffViewMixin, SingleObjectMixin, View):
         self.object.save()
         return HttpResponseRedirect(self.get_redirect_url())
     
-class AuditionCallView(AuditionStatusBase):
-    new_status = "called"
-    
     def get_redirect_url(self):
         return reverse("casting:audition", args=(self.object.show.pk,))
+    
+class AuditionCallView(AuditionStatusBase):
+    new_status = "called"
 
 class AuditionDoneView(AuditionStatusBase):
     new_status = "done"
-    
-    def get_redirect_url(self):
-        return reverse("casting:audition", args=(self.object.show.pk,))
     
 urlpatterns = [
     url('^$', IndexView.as_view(), name='index'),

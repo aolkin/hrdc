@@ -21,3 +21,7 @@ table .btn {
 .bt-sidebar-content {
     min-height: 24em;
 }
+
+.pulse {
+    transition: all .5s ease-in-out;
+}

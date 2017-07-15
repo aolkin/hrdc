@@ -52,3 +52,45 @@ $("a[href][data-autoreset]").each(function(index, el) {
         location.assign($(this).attr("href"));
     }).bind(this), $(el).data("autoreset"));
 });
+
+function initTooltips(parent) {
+    if (!parent) {
+        parent = $(document.body);
+    }
+    parent.find('[data-toggle="tooltip"]').tooltip();
+}
+
+$(function() {
+    if (window.channels) {
+        const bridge = new channels.WebSocketBridge();
+        bridge.connect(location.pathname + "ws/");
+        bridge.listen(function(data, stream) {
+            var el = $("#" + data.id);
+            if (el.length < 1) {
+                el = $(data.element).attr("id", data.id);
+                $(data.container).append(el);
+            }
+            el.html(data.html);
+            if (data.pulse) {
+                el.addClass(data.pulse);
+                setTimeout(function() {
+                    el.addClass("pulse");
+                    setTimeout(function() {
+                        el.removeClass(data.pulse);
+                        setTimeout((function(){
+                                        this.removeClass("pulse");
+                                    }).bind(el), 1000);
+                    }, 0);
+                }, 0);
+            }
+            initTooltips(el);
+        });
+    }
+
+    initTooltips();
+});
+
+$(document.body).on("click", "a.ajaxify", function(e){
+    e.preventDefault();
+    $.get($(this).attr("href"));
+});

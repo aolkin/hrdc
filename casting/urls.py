@@ -2,9 +2,9 @@
 from django.conf.urls import url, include
 
 from .views import *
-from .sign_in_views import urlpatterns as signin_patterns
-from .pdsm_views import urlpatterns as pdsm_patterns
-from .pdsm_views import IndexView
+from .views.sign_in import urlpatterns as signin_patterns
+from .views.pdsm import urlpatterns as pdsm_patterns
+from .views.pdsm import IndexView
 
 app_name = "casting"
 urlpatterns = [
