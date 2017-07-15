@@ -13,4 +13,3 @@ class CastingConfig(AppConfig):
         add_all_permissions(models.Slot)
         add_change_permissions(models.CastingMeta,
                                models.CastingReleaseMeta)
-

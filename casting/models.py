@@ -1,6 +1,11 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.template.loader import render_to_string
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+from channels.generic.websockets import JsonWebsocketConsumer
 
 import datetime
 
@@ -96,9 +101,35 @@ class Audition(AssociateShowMixin, AssociateActorMixin):
     signed_in = models.DateTimeField(auto_now_add=True)
     status = models.CharField(default=STATUSES[0][0], max_length=20,
                               choices=STATUSES)
+    space = models.ForeignKey(settings.SPACE_MODEL, blank=True, null=True)
 
     def __str__(self):
         return "{} for {}".format(self.actor, self.show)
+
+STATUS_CLASSES = {
+    "waiting": "bg-warning",
+    "called": "bg-primary",
+    "done": "bg-success",
+}       
+@receiver(post_save)
+def send_auditions(sender, instance, *args, **kwargs):
+    if sender == Audition:
+        def make_message(template, status="waiting"):
+            return {
+                "container": "table tbody",
+                "element": "<tr>",
+                "pulse": STATUS_CLASSES[status],
+                "id": "audition-{}".format(instance.pk),
+                "html": render_to_string(template, { "audition": instance })
+            }
+        if instance.space:
+            JsonWebsocketConsumer.group_send(
+                "auditions-building-{}".format(instance.space.building.pk),
+                make_message("casting/pieces/tabling_row.html",
+                             instance.status))
+        JsonWebsocketConsumer.group_send(
+            "auditions-show-{}".format(instance.show.pk),
+            make_message("casting/pieces/audition_row.html"))
 
 class Character(AssociateShowMixin):
     name = models.CharField(max_length=60)

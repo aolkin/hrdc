@@ -46,7 +46,15 @@ INSTALLED_APPS = [
     'casting',
     'bootstrapform',
     'anymail',
+    'channels',
 ]
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "asgiref.inmemory.ChannelLayer",
+        "ROUTING": "hrdc.routing.channel_routing",
+    },
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -142,6 +150,7 @@ AUTH_USER_MODEL = "dramaorg.User"
 
 SHOW_MODEL = "dramaorg.Show"
 SPACE_MODEL = "dramaorg.Space"
+BUILDING_MODEL = "dramaorg.Building"
 
 ANYMAIL = {
     "MAILGUN_API_KEY": "key-1113ec6d3ccf6f9419ef02fb6e3cf18c",

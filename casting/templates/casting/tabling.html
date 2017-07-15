@@ -1,5 +1,7 @@
 {% extends "casting/base.html" %}
 
+{% block extra_scripts %}{% include "casting/wsbridge.html" %}{% endblock %}
+
 {% block title %}{{ building.name }} | Casting{% endblock %}
 
 {% block content %}
@@ -20,7 +22,7 @@
   </thead>
   <tbody>
     {% for audition in auditions %}
-    <tr data-pk="{{ audition.pk }}">
+    <tr id="audition-{{ audition.pk }}">
       {% include "casting/pieces/tabling_row.html" %}
     </tr>
     {% endfor %}

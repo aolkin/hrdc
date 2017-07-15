@@ -13,7 +13,11 @@
 <div class="row justify-content-center">
   <div class="col-lg-6 col-md-8 audition-sign-in-shows">
     {% include "casting/sign_in/shows.html" %}
-    <a href="{% url 'casting:sign_in_start' request.session.building %}"
+    <a {% if request.session.popout %}
+       href="{% url 'casting:sign_in_start_popout' request.session.building %}"
+       {% else %}
+       href="{% url 'casting:sign_in_start' request.session.building %}"
+       {% endif %}
        class="btn btn-primary btn-block"
        data-autoreset="{% if shows %}5000{% else %}15000{% endif %}">Done</a>
   </div>

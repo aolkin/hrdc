@@ -7,13 +7,9 @@ from django.utils import timezone
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.apps import apps
 
-from .models import *
+from ..models import *
 
-def test_board(user):
-    return user.is_authenticated() and user.is_board
-
-def test_pdsm(user):
-    return user.is_authenticated() and user.is_pdsm
+from ..utils import *
 
 class ShowEditor(UpdateView):
     model = CastingMeta
@@ -51,8 +47,7 @@ def get_current_slots():
         start__lte=timezone.localtime(),
         end__gte=timezone.localtime())
 
-building_model = (apps.get_model(settings.SPACE_MODEL)
-                  .building.field.related_model)
+building_model = apps.get_model(settings.BUILDING_MODEL)
 
 @user_passes_test(test_board)
 def admin(request):

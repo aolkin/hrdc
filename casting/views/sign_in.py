@@ -15,8 +15,9 @@ from django import forms
 from django.utils import timezone
 import datetime
 
-from .models import *
-from .views import get_current_slots, building_model, test_pdsm
+from ..models import *
+from . import get_current_slots, building_model
+from ..utils import test_pdsm, suppress_autotime
 
 class SignInStartForm(forms.Form):
     email = forms.EmailField(
@@ -47,9 +48,9 @@ class ActorSignInBase(UserPassesTestMixin, TemplateResponseMixin):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["BT_header_url"] = None
-        self.request.session["popout"] = self.popout
         context["shows"] = CastingMeta.objects.filter(
-            id__in=self.request.session.get("show_ids",[]))
+            id__in=map(lambda x: x.split(":")[0],
+                       self.request.session.get("show_ids",[])))
         return context
 
 class ActorSignInStart(ActorSignInBase, BaseUpdateView):
@@ -66,6 +67,7 @@ class ActorSignInStart(ActorSignInBase, BaseUpdateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
+        self.request.session["popout"] = self.popout
         if self.show_all:
             q = Q(day=timezone.localdate(), start__gte=datetime.time(hour=9))
             q |= Q(day=timezone.localdate() - datetime.timedelta(days=1),
@@ -75,7 +77,8 @@ class ActorSignInStart(ActorSignInBase, BaseUpdateView):
         else:
             slots = get_current_slots().filter(space__building=self.object)
         context["shows"] = slots.distinct().values_list("show__show__title",
-                                                        "show__id")
+                                                        "show__id",
+                                                        "space__id")
         return context
         
     def form_valid(self, form):
@@ -111,20 +114,38 @@ class ActorSignInDone(ActorSignInBase, TemplateView):
     template_name = "casting/sign_in/done.html"
     
     def get(self, *args, **kwargs):
-        for i in self.request.session.get("show_ids", []):
+        building = int(self.request.session["building"])
+        for showspace in self.request.session.get("show_ids", []):
+            i, space = showspace.split(":")
+            space = int(space)
             obj, created = Audition.objects.get_or_create(
-                actor_id=self.request.session["actor"], show_id=i)
+                actor_id=self.request.session["actor"], show_id=i,
+                defaults={ "space_id": space })
             if not created:
                 if obj.status == Audition.STATUSES[2][0]:
-                    messages.error(self.request,
-                                     "You have already auditioned for {}!"
-                                     .format(
-                                         CastingMeta.objects.get(id=i)))
+                    messages.error(
+                        self.request,
+                        "You have already auditioned for {}!".format(
+                            CastingMeta.objects.get(id=i)))
                 else:
-                    messages.warning(self.request,
-                                     "You have already signed in for {}!"
-                                     .format(
-                                         CastingMeta.objects.get(id=i)))
+                    if obj.space_id != space:
+                        obj.space_id = space
+                        obj.status == Audition.STATUSES[0][0]
+                        with suppress_autotime(obj, "signed_in"):
+                            obj.signed_in = timezone.now()
+                        obj.save()
+                    else:
+                        send_auditions(Audition, obj)
+                        if obj.status == Audition.STATUSES[1][0]:
+                            messages.success(
+                                self.request,
+                                "You have been called to audition for {}!"
+                                .format(CastingMeta.objects.get(id=i)))
+                        else:
+                            messages.warning(
+                                self.request,
+                                "You have already signed in for {}!".format(
+                                    CastingMeta.objects.get(id=i)))
         response = super().get(*args, **kwargs)
         try:
             del self.request.session["show_ids"]
