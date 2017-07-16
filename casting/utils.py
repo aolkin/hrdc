@@ -1,4 +1,6 @@
 
+from django.contrib.auth.mixins import UserPassesTestMixin
+
 import contextlib
 
 def test_board(user):
@@ -6,6 +8,10 @@ def test_board(user):
 
 def test_pdsm(user):
     return user.is_authenticated() and user.is_pdsm
+
+class UserIsPdsmMixin(UserPassesTestMixin):
+    def test_func(self):
+        return test_pdsm(self.request.user)
 
 @contextlib.contextmanager
 def suppress_autotime(model, fields):

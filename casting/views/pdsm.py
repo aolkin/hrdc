@@ -1,24 +1,19 @@
 
-from django.views.generic.base import TemplateView, TemplateResponseMixin, View
+from django.views.generic.base import TemplateView, View
 from django.views.generic.detail import *
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse
 from django.conf.urls import url
 from django.http import HttpResponseRedirect
 
-from django.contrib.auth.mixins import UserPassesTestMixin
-from django.contrib.auth import get_user_model
 from django.contrib import messages
 
 from django.utils import timezone
 
 from ..models import *
 from . import get_current_slots, building_model
-from ..utils import test_pdsm
+from ..utils import UserIsPdsmMixin
 
-class StaffViewMixin(UserPassesTestMixin):
-    def test_func(self):
-        return test_pdsm(self.request.user)
-    
+class StaffViewMixin(UserIsPdsmMixin):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         current_url = self.request.resolver_match.url_name

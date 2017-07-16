@@ -1,29 +1,39 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.template.loader import render_to_string
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 
 from channels.generic.websockets import JsonWebsocketConsumer
+from model_utils import FieldTracker
 
+from django.utils import timezone
 import datetime
 
 class CastingReleaseMeta(models.Model):
     publish_callbacks = models.DateTimeField(null=True, blank=True)
+    publish_first_round_casts = models.DateTimeField(null=True, blank=True)
     publish_casts = models.DateTimeField(null=True, blank=True)
 
     STAGES = (
         (0, "Auditions"),
-        (1, "Callbacks"),
+        (1, "Callback Lists Released"),
         (2, "First-Round Casting Released"),
         (3, "Cast Lists Released"),
     )
-    stage = models.PositiveSmallIntegerField(default=0)
+    stage = models.PositiveSmallIntegerField(choices=STAGES, default=0)
     
     signing_opens = models.DateTimeField(null=True, blank=True)
     second_signing_opens = models.DateTimeField(null=True, blank=True)
 
+    tracker = FieldTracker(fields=("publish_callbacks",
+                                   "publish_first_round_casts",
+                                   "publish_casts",
+                                   "signing_opens",
+                                   "second_signing_opens"))
+    
     class Meta:
         verbose_name = "Casting Release Settings"
         verbose_name_plural = "Casting Release Settings"
@@ -55,7 +65,89 @@ class CastingReleaseMeta(models.Model):
                 return "(Unassociated {})".format(self._meta.verbose_name)
             else:
                 return "(New {})".format(self._meta.verbose_name)
-
+            
+    def clean(self):
+        if (self.publish_callbacks and
+            self.stage > 0 and self.publish_callbacks >= timezone.now()):
+            self.publish_callbacks = self.tracker.previous("publish_callbacks")
+            raise ValidationError(
+                { "publish_callbacks":
+                  "Callbacks have already been published, cannot set to "
+                  "publish at a future time." })
+        if self.publish_first_round_casts:
+            if not (self.publish_callbacks and
+                    self.publish_callbacks < self.publish_first_round_casts):
+                self.publish_first_round_casts = self.tracker.previous(
+                    "publish_first_round_casts")
+                self.publish_callbacks = self.tracker.previous(
+                    "publish_callbacks")
+                raise ValidationError(
+                    { "publish_first_round_casts":
+                      "First-round cast lists must be published after "
+                      "callback lists." })
+            if (self.stage > 1 and
+                self.publish_first_round_casts >= timezone.now()):
+                self.publish_first_round_casts = self.tracker.previous(
+                    "publish_first_round_casts")
+                raise ValidationError(
+                    { "publish_first_round_casts":
+                      "First-round cast lists have already been published, "
+                      "cannot set to publish at a future time." })
+        if self.publish_casts:
+            if not (self.publish_first_round_casts and
+                    self.publish_first_round_casts < self.publish_casts):
+                self.publish_first_round_casts = self.tracker.previous(
+                    "publish_first_round_casts")
+                self.publish_casts = self.tracker.previous("publish_casts")
+                raise ValidationError(
+                    { "publish_casts":
+                      "Cast lists must be published after first-round cast "
+                      "lists." })
+            if self.stage > 2 and self.publish_casts >= timezone.now():
+                self.publish_casts = self.tracker.previous("publish_casts")
+                raise ValidationError(
+                    { "publish_casts":
+                      "Cast lists have already been published, cannot "
+                      "set to publish at a future time." })
+            if not (self.signing_opens and self.second_signing_opens):
+                self.publish_casts = self.tracker.previous("publish_casts")
+                raise ValidationError(
+                    { "publish_casts":
+                      "Cannot publish casts without setting signing options."})
+            if (self.signing_opens and
+                (self.stage > 2 or (
+                    not self.tracker.has_changed("publish_casts") and
+                    self.publish_casts <= timezone.now())) and
+                self.tracker.has_changed("signing_opens")):
+                self.signing_opens = self.tracker.previous("signing_opens")
+                raise ValidationError(
+                    { "signing_opens":
+                      "Cast lists have already been published, cannot edit "
+                      "signing options." })
+            if self.second_signing_opens:
+                if ((self.stage > 2 or (
+                        not self.tracker.has_changed("publish_casts") and
+                        self.publish_casts <= timezone.now())) and
+                    self.tracker.has_changed("second_signing_opens")):
+                    self.second_signing_opens = self.tracker.previous(
+                        "second_signing_opens")
+                    raise ValidationError(
+                        { "second_signing_opens":
+                          "Cast lists have already been published, cannot "
+                          "edit signing options." })
+                if self.publish_casts >= self.second_signing_opens:
+                    self.signing_opens = self.signing_opens
+                    self.second_signing_opens = self.second_signing_opens
+                    raise ValidationError(
+                        { "second_signing_opens":
+                          "Second-round signing must open after casts have "
+                          "been published." })
+        if self.signing_opens and self.second_signing_opens:
+            if self.signing_opens >= self.second_signing_opens:
+                raise ValidationError(
+                { "second_signing_opens":
+                  "Second-round signing must open after first-round signing."})
+            
 class CastingMeta(models.Model):
     show = models.OneToOneField(settings.SHOW_MODEL, on_delete=models.CASCADE,
                                 related_name="casting_meta")
