@@ -25,3 +25,35 @@ table .btn {
 .pulse {
     transition: all .5s ease-in-out;
 }
+
+.card-deck.horizontal-scroll .card {
+    min-width: 300px;
+}
+
+.card-deck.horizontal-scroll .card:first-child {
+    min-width: 480px;
+}
+
+.card-deck.horizontal-scroll {
+    flex-flow: row nowrap;
+    overflow-x: auto;
+    padding: 0 1em;
+}
+
+.card>div>.form-group:last-child,
+.card>div>.form-group:last-child p.form-text {
+    margin-bottom: 0;
+}
+
+.blank-card>div {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.blank-card .card-action.btn-success {
+    pointer-events: all;
+}
+
+.card-action.hidden {
+    display: none;
+}

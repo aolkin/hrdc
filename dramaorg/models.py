@@ -194,3 +194,7 @@ class Show(Season):
     
     def people(self):
         return ", ".join([i.get_full_name() for i in self.staff.all()])
+
+    def user_is_staff(self, user):
+        return self.staff.filter(pk=user.pk).exists()
+

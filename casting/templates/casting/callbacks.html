@@ -1,0 +1,35 @@
+{% extends "casting/base.html" %}
+
+{% block extra_scripts %}
+{% include "casting/wsbridge.html" %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/2.1.0/jquery.scrollTo.min.js"></script>
+{% endblock %}
+
+{% load bounddata %}
+
+{% block content %}
+<h3 class="text-center">Callbacks for {{ object }}</h3>
+<div class="row justify-content-center">
+  <div class="card-deck horizontal-scroll">
+    <div class="card">
+      <div class="card-header">
+	<h4 class="card-title mb-0">Information for All Callbacks</h4>
+      </div>
+      <div class="card-block">
+	{% boundformgroup object "contact_email" %}
+	<div class="form-group">
+	  {% boundlabel object "callback_description" %}
+	  <textarea class="form-control" rows="6"
+		    {% boundattrs object "callback_description" %}
+		    >{{ object.callback_description }}</textarea>
+	  {% helpp object "callback_description" %}
+	</div>
+      </div>
+    </div>
+    {% for character in object.character_set.all %}
+    {% include "casting/pieces/callback_card.html" %}
+    {% endfor %}
+    {% include "casting/pieces/callback_card.html" with doblank=True character=character_blank %}
+  </div>
+</div>
+{% endblock %}

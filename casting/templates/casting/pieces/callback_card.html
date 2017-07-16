@@ -1,0 +1,28 @@
+{% load bounddata %}
+<div class="card {% if doblank %}blank-card" id="character-blank{% endif %}"
+     {% boundattrs character %}>
+  <div class="card-header">
+    <button {% boundattrs character %} data-toggle="tooltip"
+	    class="card-action badge btn float-right btn-danger {% if doblank %}hidden{% endif %}"
+	    title="Delete this character and remove all actors called back for it.">
+      &times;
+    </button>
+    <button {% boundattrs character %} data-toggle="tooltip"
+	    class="card-action badge btn float-right btn-success {% if not doblank %}hidden{% endif %}"
+	    title="Add a new character.">
+      +
+    </button>
+    {% boundformgroup character "name" %}
+  </div>
+  <div class="card-block">
+  </div>
+  <div class="card-footer">
+    <div class="form-group">
+      {% boundlabel character "callback_description" None "sr-only" %}
+      <textarea class="form-control form-control-sm" rows="3"
+		{% boundattrs character "callback_description" %}
+		>{{ character.callback_description }}</textarea>
+      <small>{% helpp character "callback_description" %}</small>
+    </div>
+  </div>
+</div>

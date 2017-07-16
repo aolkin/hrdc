@@ -3,7 +3,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.template.loader import render_to_string
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from channels.generic.websockets import JsonWebsocketConsumer
@@ -151,9 +151,17 @@ class CastingReleaseMeta(models.Model):
 class CastingMeta(models.Model):
     show = models.OneToOneField(settings.SHOW_MODEL, on_delete=models.CASCADE,
                                 related_name="casting_meta")
-    callback_description = models.TextField(blank=True)
+    callback_description = models.TextField(
+        blank=True, verbose_name="Callback Information",
+        help_text="Extra information about all callbacks (location, etc).")
+    callbacks_submitted = models.BooleanField(default=False)
     cast_list_description = models.TextField(blank=True)
-    contact_email = models.EmailField(blank=True)
+    first_cast_submitted = models.BooleanField(
+        default=False, verbose_name="First-round Cast List Submitted")
+    cast_submitted = models.BooleanField(
+        default=False, verbose_name="Full Cast List Submitted")
+    contact_email = models.EmailField(
+        blank=True, verbose_name="Show Contact Email")
     release_meta = models.ForeignKey(
         CastingReleaseMeta, verbose_name=CastingReleaseMeta._meta.verbose_name)
 
@@ -224,8 +232,10 @@ def send_auditions(sender, instance, *args, **kwargs):
             make_message("casting/pieces/audition_row.html"))
 
 class Character(AssociateShowMixin):
-    name = models.CharField(max_length=60)
-    callback_description = models.TextField(blank=True)
+    name = models.CharField(max_length=60, verbose_name="Character Name")
+    callback_description = models.TextField(
+        blank=True, verbose_name="Character Callback Information",
+        help_text="Extra information about callbacks for this character.")
     allowed_signers = models.PositiveSmallIntegerField(default=1)
     
     def __str__(self):
