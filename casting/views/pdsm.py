@@ -1,6 +1,5 @@
 
 from django.views.generic.base import TemplateView, View
-from django.views.generic.edit import UpdateView
 from django.views.generic.detail import *
 from django.urls import reverse
 from django.conf.urls import url
