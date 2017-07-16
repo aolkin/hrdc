@@ -25,6 +25,10 @@ let SUGGESTED_DOMAINS = [
     "gmail.com",
 ];
 
+function getPK() {
+    return Number(location.pathname.split("/").slice(-2, -1)[0]);
+}
+
 function suggestEmailDomains(q, cb) {
     let parts = q.split("@");
     if (parts[0] && parts.length === 2 && parts[1]) {
@@ -60,11 +64,14 @@ function initTooltips(parent) {
     parent.find('[data-toggle="tooltip"]').tooltip();
 }
 
+var bridge;
+
 $(function() {
     if (window.channels) {
-        const bridge = new channels.WebSocketBridge();
+        bridge = new channels.WebSocketBridge();
         bridge.connect(location.pathname + "ws/");
         bridge.listen(function(data, stream) {
+            console.log(data, stream);
             var el = $("#" + data.id);
             if (el.length < 1) {
                 el = $(data.element).attr("id", data.id);
@@ -84,6 +91,77 @@ $(function() {
                 }, 0);
             }
             initTooltips(el);
+        });
+        function updateBoundData(action, stream) {
+            if (action.action === "update") {
+                let els = $("[data-stream=" + stream +
+                            "][data-pk=" + action.pk + "]");
+                for (let field in action.data) {
+                    els.filter("[data-field=" + field + "]").val(
+                        action.data[field]);
+                }
+            } else if (action.action === "create") {
+                let blank = $("#" + stream + "-blank");
+                if (blank.length) {
+                    console.log(action, stream);
+                    let el = blank.clone().insertBefore(blank);
+                    el.removeAttr("id").removeAttr("hidden")
+                      .removeClass("blank-card").attr("data-pk", action.pk);
+                    el.find(".card-action").toggleClass("hidden");
+                    el.find("[data-pk]").attr("data-pk", action.pk);
+                    for (let field in action.data) {
+                        el.find("[data-field=" + field + "]").val(
+                            action.data[field]);
+                    }
+                    $(".card-deck").scrollTo(el, 500, {
+                        interrupt: true,
+                    });
+                    initTooltips(el);
+                } else {
+                    console.log("Attempted to create " + stream +
+                                "; missing blank.");
+                }
+            } else if (action.action === "delete") {
+                let el = $("div.card[data-pk=" + action.pk + "]").remove();
+            }
+        }
+        function sendBoundUpdate(e) {
+            let fields = {};
+            fields[$(this).data("field")] = $(this).val().replace(/\s*$/,"");
+            bridge.stream($(this).data("stream")).send({
+                action: "update",
+                pk: $(this).data("pk"),
+                data: fields,
+            });
+        }
+        const STREAMS = ["castingmeta", "character"];
+        for (let stream of STREAMS) {
+            bridge.demultiplex(stream, updateBoundData);
+        }
+        let delay = (function(){
+                         let timer = 0;
+                         return function(callback, ms){
+                             clearTimeout (timer);
+                             timer = setTimeout(callback, ms);
+                         };
+                     })();
+        $(document.body).on("blur", "[data-stream][data-pk][data-field]",
+                            sendBoundUpdate);
+        $(document.body).on("keyup", "[data-stream][data-pk][data-field]",
+                            function (e) {
+                                delay(sendBoundUpdate.bind(this), 500);
+                            });
+        $(document.body).on("click", ".card-action.btn-success", function(e) {
+            bridge.stream($(this).data("stream")).send({
+                action: "create",
+                data: { "show": getPK() },
+            });
+        });
+        $(document.body).on("click", ".card-action.btn-danger", function(e) {
+            bridge.stream($(this).data("stream")).send({
+                action: "delete",
+                pk: $(this).data("pk"),
+            });
         });
     }
 

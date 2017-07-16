@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django import forms
 from django.utils import timezone
+from django.utils.html import format_html
 from datetime import timedelta
-from django.contrib import messages
 
 from .models import *
 
@@ -182,10 +182,13 @@ class CallbackSlotAdmin(SlotAdmin):
 
 @admin.register(CastingMeta)
 class MetaAdmin(admin.ModelAdmin):
-    list_display = ('show', 'season', 'release_meta', 'contact_email')
+    list_display = ('show', 'season', 'release_meta', 'callbacks_submitted',
+                    'first_cast_submitted', 'cast_submitted')
     list_editable = ("release_meta",)
     exclude = ('callback_description', 'cast_list_description',
-               'contact_email')
+               'contact_email', 'callbacks_submitted', 'first_cast_submitted',
+               'cast_submitted')
+    readonly_fields = ('contact_email_link',)
     search_fields = ('show__title',)
     list_filter = ('show__season', 'show__year', 'release_meta', 'slot__day')
 
@@ -193,6 +196,10 @@ class MetaAdmin(admin.ModelAdmin):
         AuditionSlotAdmin,
         CallbackSlotAdmin,
     ]
+
+    def contact_email_link(self, obj):
+        return format_html('<a href="mailto:{0}">{0}</a>', obj.contact_email)
+    contact_email_link.short_description = "Staff-set Show Contact Email"
     
     def season(self, obj):
         return obj.show.seasonstr()

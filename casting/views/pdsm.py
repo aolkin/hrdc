@@ -1,9 +1,10 @@
 
 from django.views.generic.base import TemplateView, View
+from django.views.generic.edit import UpdateView
 from django.views.generic.detail import *
 from django.urls import reverse
 from django.conf.urls import url
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 
 from django.contrib import messages
 
@@ -24,7 +25,6 @@ class StaffViewMixin(UserIsPdsmMixin):
             "active": current_url == "index"
         }]
         
-        
         for show in [i.casting_meta for i in
                      self.request.user.show_set.current_season()
                      if hasattr(i, "casting_meta")]:
@@ -37,8 +37,8 @@ class StaffViewMixin(UserIsPdsmMixin):
             })
             submenu.append({
                 "name": "Callbacks",
-                "url": "#",
-                "active": False
+                "url": reverse("casting:callbacks", args=(show.pk,)),
+                "active": is_active and current_url == "callbacks"
             })
             submenu.append({
                 "name": "Cast List",
@@ -76,34 +76,41 @@ class TablingView(StaffViewMixin, DetailView):
             signed_in__date=timezone.localdate(),
             space__building=self.object)
         return context
-    
-class AuditionView(StaffViewMixin, DetailView):
-    template_name = "casting/audition.html"
-    model = CastingMeta
 
+class ShowStaffMixin(StaffViewMixin):
+    model = CastingMeta
+    
+    test_silent = False
+    
     def test_func(self):
         if super().test_func():
-            if self.get_object().show.staff.filter(pk=self.request.user.pk):
+            if self.get_object().show.user_is_staff(self.request.user):
                 return True
             else:
-                messages.error(self.request, "You are not a member of the "
-                               "executive staff of that show. Log in as a "
-                               "different user?")
+                if not self.test_silent:
+                    messages.error(self.request, "You are not a member of the "
+                                   "executive staff of that show. Log in as a "
+                                   "different user?")
         return False
+
+class AuditionView(ShowStaffMixin, DetailView):
+    template_name = "casting/audition.html"
 
 class AuditionStatusBase(StaffViewMixin, SingleObjectMixin, View):
     model = Audition
 
     def test_func(self):
         return (super().test_func() and
-                self.get_object().show.show.staff.filter(
-                    pk=self.request.user.pk))
+                self.get_object().show.show.user_is_staff(self.request.user))
     
     def get(self, *args, **kwargs):
         self.object = self.get_object()
         self.object.status = self.new_status
         self.object.save()
-        return HttpResponseRedirect(self.get_redirect_url())
+        if self.request.is_ajax():
+            return HttpResponse("success")
+        else:
+            return HttpResponseRedirect(self.get_redirect_url())
     
     def get_redirect_url(self):
         return reverse("casting:audition", args=(self.object.show.pk,))
@@ -113,14 +120,25 @@ class AuditionCallView(AuditionStatusBase):
 
 class AuditionDoneView(AuditionStatusBase):
     new_status = "done"
+
+class CallbackView(ShowStaffMixin, DetailView):
+    template_name = "casting/callbacks.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["character_blank"] = Character()
+        return context
     
 urlpatterns = [
     url('^$', IndexView.as_view(), name='index'),
     url('^building/(?P<pk>\d+)/$', TablingView.as_view(), name="tabling"),
     
-    url('^audition/(?P<pk>\d+)/$', AuditionView.as_view(), name="audition"),
-    url('^audition/(?P<pk>\d+)/call/$', AuditionCallView.as_view(),
+    url('^auditions/(?P<pk>\d+)/$', AuditionView.as_view(), name="audition"),
+    url('^auditions/(?P<pk>\d+)/call/$', AuditionCallView.as_view(),
         name="audition_call"),
-    url('^audition/(?P<pk>\d+)/done/$', AuditionDoneView.as_view(),
+    url('^auditions/(?P<pk>\d+)/done/$', AuditionDoneView.as_view(),
         name="audition_done"),
+    
+    url('^callbacks/(?P<pk>\d+)/$', CallbackView.as_view(),
+        name="callbacks"),
 ]
