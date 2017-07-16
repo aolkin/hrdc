@@ -5,7 +5,6 @@ from django.views.generic.edit import *
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q
 
-from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 
@@ -17,7 +16,7 @@ import datetime
 
 from ..models import *
 from . import get_current_slots, building_model
-from ..utils import test_pdsm, suppress_autotime
+from ..utils import UserIsPdsmMixin, suppress_autotime
 
 class SignInStartForm(forms.Form):
     email = forms.EmailField(
@@ -39,11 +38,8 @@ class SignInStartForm(forms.Form):
         self.building = instance
         super().__init__(**kwargs)
 
-class ActorSignInBase(UserPassesTestMixin, TemplateResponseMixin):
+class ActorSignInBase(UserIsPdsmMixin, TemplateResponseMixin):
     popout = False
-
-    def test_func(self):
-        return test_pdsm(self.request.user)
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
