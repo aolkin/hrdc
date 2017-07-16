@@ -64,6 +64,48 @@ function initTooltips(parent) {
     parent.find('[data-toggle="tooltip"]').tooltip();
 }
 
+function updateBoundData(action, stream) {
+    if (action.action === "update") {
+        let els = $("[data-stream=" + stream +
+                    "][data-pk=" + action.pk + "]");
+        for (let field in action.data) {
+            els.filter("[data-field=" + field + "]").val(
+                action.data[field]);
+        }
+    } else if (action.action === "create") {
+        let blank = $("#" + stream + "-blank");
+        if (blank.length) {
+            let el = blank.clone().insertBefore(blank);
+            el.removeAttr("id").removeAttr("hidden")
+              .removeClass("blank-card").attr("data-pk", action.pk);
+            el.find(".card-action").toggleClass("hidden");
+            el.find("[data-pk]").attr("data-pk", action.pk);
+            for (let field in action.data) {
+                el.find("[data-field=" + field + "]").val(
+                    action.data[field]);
+            }
+            $(".card-deck").scrollTo(el, 500, {
+                interrupt: true,
+            });
+            initTooltips(el);
+        } else {
+            console.log("Attempted to create " + stream +
+                        "; missing blank.");
+        }
+    } else if (action.action === "delete") {
+        let el = $("div.card[data-pk=" + action.pk + "]").remove();
+    }
+}
+function sendBoundUpdate(e) {
+    let fields = {};
+    fields[$(this).data("field")] = $(this).val().replace(/\s*$/,"");
+    bridge.stream($(this).data("stream")).send({
+        action: "update",
+        pk: $(this).data("pk"),
+        data: fields,
+    });
+}
+
 var bridge;
 
 $(function() {
@@ -92,48 +134,6 @@ $(function() {
             }
             initTooltips(el);
         });
-        function updateBoundData(action, stream) {
-            if (action.action === "update") {
-                let els = $("[data-stream=" + stream +
-                            "][data-pk=" + action.pk + "]");
-                for (let field in action.data) {
-                    els.filter("[data-field=" + field + "]").val(
-                        action.data[field]);
-                }
-            } else if (action.action === "create") {
-                let blank = $("#" + stream + "-blank");
-                if (blank.length) {
-                    console.log(action, stream);
-                    let el = blank.clone().insertBefore(blank);
-                    el.removeAttr("id").removeAttr("hidden")
-                      .removeClass("blank-card").attr("data-pk", action.pk);
-                    el.find(".card-action").toggleClass("hidden");
-                    el.find("[data-pk]").attr("data-pk", action.pk);
-                    for (let field in action.data) {
-                        el.find("[data-field=" + field + "]").val(
-                            action.data[field]);
-                    }
-                    $(".card-deck").scrollTo(el, 500, {
-                        interrupt: true,
-                    });
-                    initTooltips(el);
-                } else {
-                    console.log("Attempted to create " + stream +
-                                "; missing blank.");
-                }
-            } else if (action.action === "delete") {
-                let el = $("div.card[data-pk=" + action.pk + "]").remove();
-            }
-        }
-        function sendBoundUpdate(e) {
-            let fields = {};
-            fields[$(this).data("field")] = $(this).val().replace(/\s*$/,"");
-            bridge.stream($(this).data("stream")).send({
-                action: "update",
-                pk: $(this).data("pk"),
-                data: fields,
-            });
-        }
         const STREAMS = ["castingmeta", "character"];
         for (let stream of STREAMS) {
             bridge.demultiplex(stream, updateBoundData);

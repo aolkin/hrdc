@@ -8,9 +8,8 @@
 {% load bounddata %}
 
 {% block content %}
-<h3 class="text-center">Callbacks for {{ object }}</h3>
-<div class="row justify-content-center">
-  <div class="card-deck horizontal-scroll">
+<h2 class="text-center mb-3">Callbacks for {{ object }}</h2>
+  <div class="row card-deck horizontal-scroll">
     <div class="card">
       <div class="card-header">
 	<h4 class="card-title mb-0">Information for All Callbacks</h4>
@@ -30,6 +29,17 @@
     {% include "casting/pieces/callback_card.html" %}
     {% endfor %}
     {% include "casting/pieces/callback_card.html" with doblank=True character=character_blank %}
+</div>
+<p class="lead text-muted text-center mt-3">
+  Changes are automatically synced and saved.
+</p>
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <button class="btn btn-danger btn-lg btn-block text-center"
+	    data-toggle="tooltip"
+	    title="Once finalized, you cannot edit your list any further.">
+      Finalize Callback List
+    </button>
   </div>
 </div>
 {% endblock %}
