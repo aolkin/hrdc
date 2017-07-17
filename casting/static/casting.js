@@ -69,13 +69,13 @@ function initSelects(parent) {
     if (!parent) {
 	parent = $("li.stream-item:not(.blank)");
     }
-    parent.find('[data-select-src]').each(function(index, el) {
+    parent.find("[data-select-src]").each(function(index, el) {
         $(this).select2({
             placeholder: $(this).data("select-placeholder"),
             ajax: {
                 url: $(this).data("select-src"),
                 delay: 250,
-                processResults: function (data, params) {
+                processResults(data, params) {
                     return {
                         results: data
                     };
@@ -114,7 +114,7 @@ class DataBindingHandler {
                                        .appendTo(this);
                           this.val(data.id);
                           this.trigger("change");
-                      }).bind(el))
+                      }).bind(el));
             } else {
                 el.val(action.data[field]);
             }
@@ -147,12 +147,12 @@ class DataBindingHandler {
                     interrupt: true,
 		});
 	    }
-            initTooltips(el);
+	    initTooltips(el);
             if (action.data.character) {
-	        initSelects(el);
+		initSelects(el);
             }
         } else {
-            console.log("Attempted to create " + stream + "; missing blank.");
+            throw "Cannot create " + stream + " without blank.";
         }
     }
     do_delete(action, stream) {
@@ -182,7 +182,6 @@ $(function() {
         bridge = new channels.WebSocketBridge();
         bridge.connect(location.pathname + "ws/");
         bridge.listen(function(data, stream) {
-            console.log(data, stream);
             var el = $("#" + data.id);
             if (el.length < 1) {
                 el = $(data.element).attr("id", data.id);
@@ -208,13 +207,13 @@ $(function() {
         for (let stream of STREAMS) {
             bridge.demultiplex(stream, binder.updateBoundData);
         }
-        let delay = (function(){
-                         let timer = 0;
-                         return function(callback, ms){
-                             clearTimeout (timer);
-                             timer = setTimeout(callback, ms);
-                         };
-                     })();
+        let delay = (function() {
+            let timer = 0;
+            return function(callback, ms) {
+                clearTimeout (timer);
+                timer = setTimeout(callback, ms);
+            };
+        }());
         $(document.body).on("blur select2:select",
 			    "[data-stream][data-pk][data-field]",
                             sendBoundUpdate);

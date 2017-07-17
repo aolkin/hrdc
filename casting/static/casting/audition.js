@@ -1,4 +1,4 @@
-$(".btn-copy-excel").click(function(){
+$(document.body).on("click", ".btn-copy-excel", function(){
     var el = $(this).parent().siblings(".copyable");
     el.removeAttr("hidden");
     var target = el.children("textarea")[0];

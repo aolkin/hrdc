@@ -58,3 +58,7 @@ table .btn {
     padding: 0;
     margin-top: -1px;
 }
+
+.table-responsive tbody td {
+    white-space: nowrap;
+}
