@@ -1,11 +1,15 @@
 {% load bounddata %}
 <li class="list-group-item stream-item {% if doblank %}blank callback-blank{% endif %}" {% boundattrs callback %}>
   <div class="input-group input-group-sm">
-    <input type="number" hidden
-	   {% boundattrs callback "actor" value=callback.actor.pk %}>
-    <input type="text" class="form-control" data-only="typeahead"
-	   data-typeahead-href="{% url 'casting:callback_actors' object.pk %}"
-	   placeholder="Enter Actor Name..." value="{{ callback.actor }}">
+    <select class="form-control" {% boundattrs callback "actor" %}
+	    data-select-src="{% url 'casting:callback_actors' object.pk %}"
+	    data-select-placeholder="Enter Actor Name...">
+      {% if callback.actor %}
+      <option value="{{ callback.actor.pk }}" selected>
+	{{ callback.actor }}
+      </option>
+      {% endif %}
+    </select>
     <span class="input-group-btn">
       <button {% boundattrs callback %}
 	      class="btn btn-danger btn-delete btn-action {% if doblank %}hidden{% endif %}">
