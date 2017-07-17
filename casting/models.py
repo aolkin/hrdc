@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.template.loader import render_to_string
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -185,19 +185,14 @@ class AssociateShowMixin(models.Model):
 
     class Meta:
         abstract = True
-
-class AssociateActorMixin(models.Model):
-    actor = models.ForeignKey(get_user_model())
-
-    class Meta:
-        abstract = True    
     
-class Audition(AssociateShowMixin, AssociateActorMixin):
+class Audition(AssociateShowMixin):
     STATUSES = (
         ("waiting", "Waiting"),
         ("called", "Called"),
         ("done", "Auditioned")
     )
+    actor = models.ForeignKey(get_user_model())
     signed_in = models.DateTimeField(auto_now_add=True)
     status = models.CharField(default=STATUSES[0][0], max_length=20,
                               choices=STATUSES)
@@ -241,16 +236,20 @@ class Character(AssociateShowMixin):
     def __str__(self):
         return self.name
     
-class Callback(AssociateActorMixin):
+class Callback(models.Model):
     character = models.ForeignKey(Character)
+    actor = models.ForeignKey(get_user_model(), null=True)
 
     @property
     def show(self):
-        return self.character.show
+        return self.character and self.character.show
     
     def __str__(self):
-        return "{} for {} in {}".format(self.actor, self.character,
-                                        self.show)
+        try:
+            return "{} for {} in {}".format(self.actor, self.character,
+                                            self.show)
+        except ObjectDoesNotExist:
+            return "(Unnassigned Callback)"
     
 class Signing(Callback):
     order = models.PositiveSmallIntegerField()

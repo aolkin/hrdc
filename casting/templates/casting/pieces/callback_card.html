@@ -1,28 +1,31 @@
 {% load bounddata %}
-<div class="card {% if doblank %}blank-card" id="character-blank{% endif %}"
-     {% boundattrs character %}>
+<div class="card stream-item scroll-after-create {% if doblank %}blank character-blank{% endif %}" {% boundattrs character %}>
   <div class="card-header">
-    <button {% boundattrs character %} data-toggle="tooltip"
-	    class="card-action badge btn float-right btn-danger {% if doblank %}hidden{% endif %}"
-	    title="Delete this character and remove all actors called back for it.">
-      &times;
-    </button>
-    <button {% boundattrs character %} data-toggle="tooltip"
-	    class="card-action badge btn float-right btn-success {% if not doblank %}hidden{% endif %}"
-	    title="Add a new character.">
-      +
-    </button>
+      <button {% boundattrs character %} data-toggle="tooltip" tabindex="-1"
+	      class="btn-action badge btn float-right btn-danger btn-delete {% if doblank %}hidden{% endif %}"
+	      title="Delete this character and remove all actors called back for it.">
+	&times;
+      </button>
+      <button {% boundattrs character %} data-toggle="tooltip"
+	      class="btn-action badge btn float-right btn-success btn-create {% if not doblank %}hidden{% endif %}"
+	      data-extras="show" data-show="{{ object.pk }}"
+	      title="Add a new character." data-placement="left">
+	+
+      </button>
     {% boundformgroup character "name" %}
   </div>
-  <div class="card-block">
-  </div>
+  <ul class="card-block list-group list-group-flush">
+    {% for callback in character.callback_set.all %}
+    {% include "casting/pieces/callback_actor.html" %}
+    {% endfor %}
+    {% include "casting/pieces/callback_actor.html" with doblank=True callback=callback_blank %}
+  </ul>
   <div class="card-footer">
     <div class="form-group">
       {% boundlabel character "callback_description" None "sr-only" %}
       <textarea class="form-control form-control-sm" rows="3"
-		{% boundattrs character "callback_description" %}
+		{% boundattrs character "callback_description" placeholder="Extra information about callbacks for this character (date, time, etc)..." %}
 		>{{ character.callback_description }}</textarea>
-      <small>{% helpp character "callback_description" %}</small>
     </div>
   </div>
 </div>

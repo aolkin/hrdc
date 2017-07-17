@@ -37,6 +37,7 @@ class CallbackConsumer(WebsocketDemultiplexer):
     consumers = {
         "castingmeta": CastingMetaBinding.consumer,
         "character": CharacterBinding.consumer,
+        "callback": CallbackBinding.consumer,
     }
     
     def connection_groups(self, **kwargs):

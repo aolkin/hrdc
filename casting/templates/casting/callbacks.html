@@ -15,7 +15,7 @@
 	<h4 class="card-title mb-0">Information for All Callbacks</h4>
       </div>
       <div class="card-block">
-	{% boundformgroup object "contact_email" %}
+	{% boundformgroup object "contact_email" type="email" %}
 	<div class="form-group">
 	  {% boundlabel object "callback_description" %}
 	  <textarea class="form-control" rows="6"

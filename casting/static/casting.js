@@ -23,6 +23,7 @@ $("a[target=_popout]").click(function(e) {
 let SUGGESTED_DOMAINS = [
     "college.harvard.edu",
     "gmail.com",
+    "hrdctheater.com",
 ];
 
 function getPK() {
@@ -64,41 +65,116 @@ function initTooltips(parent) {
     parent.find('[data-toggle="tooltip"]').tooltip();
 }
 
-function updateBoundData(action, stream) {
-    if (action.action === "update") {
+function getTypeaheadResults(q, cb) {
+    let url = this.$element.data("typeahead-href");
+    $.getJSON(url, { "query": q }, function (data) {
+	cb(data);
+    });
+}
+
+function loadUserName(
+
+function initTypeaheads(parent) {
+    if (!parent) {
+	parent = $(document.body);
+    }
+    parent.find('[data-typeahead-href]').typeahead({
+	source: getTypeaheadResults,
+	minLength: 3,
+	delay: 100,
+	fitToElement: true,
+	afterSelect: function (item) {
+	    this.$element.data("real-value", item.id);
+	    this.$element.data("expected-value", item.name);
+	    let numinp = this.$element.siblings("[type=number]");
+	    if (numinp.length > 0) {
+		numinp.val(item.id).change();
+	    }
+	}
+    }).filter("[data-only=typeahead]").on("blur", function(e) {
+	
+    });
+}
+
+jQuery.fn.extend({
+    getVal: function getVal() {
+	if (this.data("real-value")) {
+	    if (this.data("expected-value")) {
+		if (this.data("expected-value") == this.val()) {
+		    return this.data("real-value");
+		}
+	    } else {
+		return this.data("real-value");
+	    }
+	}
+	return this.val();
+    },
+});
+    
+class DataBindingHandler {
+    constructor(stream) {
+        this.stream = stream;
+	this.updateBoundData = this.updateBoundData.bind(this);
+    }
+    
+    updateBoundData(action, stream) {
+	if (!this.stream || stream === this.stream) {
+	    let f = this["do_" + action.action];
+	    if (f) {
+		f(action, stream);
+	    }
+	}
+    }
+    
+    do_update(action, stream) {
         let els = $("[data-stream=" + stream +
                     "][data-pk=" + action.pk + "]");
         for (let field in action.data) {
             els.filter("[data-field=" + field + "]").val(
                 action.data[field]);
         }
-    } else if (action.action === "create") {
-        let blank = $("#" + stream + "-blank");
+    }
+    do_create(action, stream) {
+	let parent = (action.data.character ?
+		      $("[data-stream=character][data-pk=" +
+			action.data.character + "]") :
+		      $(document.body));
+        let blank = parent.find("." + stream + "-blank");
         if (blank.length) {
             let el = blank.clone().insertBefore(blank);
-            el.removeAttr("id").removeAttr("hidden")
-              .removeClass("blank-card").attr("data-pk", action.pk);
-            el.find(".card-action").toggleClass("hidden");
+            el.removeClass(stream + "-blank").removeClass("blank")
+		.attr("data-pk", action.pk);
+            el.find(".btn-action").toggleClass("hidden");
             el.find("[data-pk]").attr("data-pk", action.pk);
             for (let field in action.data) {
                 el.find("[data-field=" + field + "]").val(
                     action.data[field]);
             }
-            $(".card-deck").scrollTo(el, 500, {
-                interrupt: true,
-            });
+	    if (el.hasClass("scroll-after-create")) {
+		$(".card-deck").scrollTo(el, 500, {
+                    interrupt: true,
+		});
+	    }
             initTooltips(el);
+	    initTypeaheads(el);
         } else {
             console.log("Attempted to create " + stream +
                         "; missing blank.");
         }
-    } else if (action.action === "delete") {
-        let el = $("div.card[data-pk=" + action.pk + "]").remove();
+    }
+    do_delete(action, stream) {
+        let el = $(".stream-item[data-pk=" + action.pk + "][data-stream=" +
+		   stream + "]").remove();
     }
 }
+
 function sendBoundUpdate(e) {
     let fields = {};
-    fields[$(this).data("field")] = $(this).val().replace(/\s*$/,"");
+    let value = $(this).getVal();
+    if (value.replace) {
+	value = value.replace(/\s*$/,"");
+    }
+    fields[$(this).data("field")] = value;
     bridge.stream($(this).data("stream")).send({
         action: "update",
         pk: $(this).data("pk"),
@@ -134,9 +210,10 @@ $(function() {
             }
             initTooltips(el);
         });
-        const STREAMS = ["castingmeta", "character"];
+        const STREAMS = ["castingmeta", "character", "callback"];
+	const binder = new DataBindingHandler();
         for (let stream of STREAMS) {
-            bridge.demultiplex(stream, updateBoundData);
+            bridge.demultiplex(stream, binder.updateBoundData);
         }
         let delay = (function(){
                          let timer = 0;
@@ -145,19 +222,26 @@ $(function() {
                              timer = setTimeout(callback, ms);
                          };
                      })();
-        $(document.body).on("blur", "[data-stream][data-pk][data-field]",
+        $(document.body).on("blur change",
+			    "[data-stream][data-pk][data-field]",
                             sendBoundUpdate);
         $(document.body).on("keyup", "[data-stream][data-pk][data-field]",
                             function (e) {
                                 delay(sendBoundUpdate.bind(this), 500);
                             });
-        $(document.body).on("click", ".card-action.btn-success", function(e) {
+        $(document.body).on("click", ".btn-create", function(e) {
+	    let extra = { };
+	    if ($(this).data("extras")) {
+		for (let efield of $(this).data("extras").split(",")) {
+		    extra[efield] = $(this).data(efield);
+		}
+	    }
             bridge.stream($(this).data("stream")).send({
                 action: "create",
-                data: { "show": getPK() },
+                data: extra,
             });
         });
-        $(document.body).on("click", ".card-action.btn-danger", function(e) {
+        $(document.body).on("click", ".btn-delete", function(e) {
             bridge.stream($(this).data("stream")).send({
                 action: "delete",
                 pk: $(this).data("pk"),
@@ -166,6 +250,7 @@ $(function() {
     }
 
     initTooltips();
+    initTypeaheads();
 });
 
 $(document.body).on("click", "a.ajaxify", function(e){

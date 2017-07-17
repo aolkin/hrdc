@@ -1,10 +1,9 @@
-
 from django.views.generic.base import TemplateView, View
 from django.views.generic.detail import *
 from django.urls import reverse
 from django.conf.urls import url
-from django.http import HttpResponseRedirect, HttpResponse
-
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
+from django.db.models import Q
 from django.contrib import messages
 
 from django.utils import timezone
@@ -126,7 +125,33 @@ class CallbackView(ShowStaffMixin, DetailView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["character_blank"] = Character()
+        context["callback_blank"] = Callback()
         return context
+
+class CallbackActors(ShowStaffMixin, DetailView):
+    def get(self, *args, **kwargs):
+        terms = self.request.GET["query"].split(" ")
+        auditions = self.get_object().audition_set.all()
+        for term in terms:
+            q = Q(actor__first_name__contains=term)
+            q |= Q(actor__last_name__contains=term)
+            auditions = auditions.filter(q)
+        if auditions.exists():
+            actors = list(auditions.values("actor__id", "actor__first_name",
+                                           "actor__last_name"))
+            for i in actors:
+                i["id"] = i["actor__id"]
+                i["name"] = (i["actor__first_name"] + " " +
+                             i["actor__last_name"])
+        else:
+            users = get_user_model().objects.all()
+            for term in terms:
+                q = Q(first_name__contains=term) | Q(last_name__contains=term)
+                users = users.filter(q)
+            actors = list(users.values("id", "first_name", "last_name"))
+            for i in actors:
+                i["name"] = (i["first_name"] + " " + i["last_name"])
+        return JsonResponse(actors, safe=False)
     
 urlpatterns = [
     url('^$', IndexView.as_view(), name='index'),
@@ -140,4 +165,6 @@ urlpatterns = [
     
     url('^callbacks/(?P<pk>\d+)/$', CallbackView.as_view(),
         name="callbacks"),
+    url('^callbacks/(?P<pk>\d+)/actors/$', CallbackActors.as_view(),
+        name="callback_actors"),
 ]
