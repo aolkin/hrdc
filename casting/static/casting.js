@@ -65,58 +65,34 @@ function initTooltips(parent) {
     parent.find('[data-toggle="tooltip"]').tooltip();
 }
 
-function getTypeaheadResults(q, cb) {
-    let url = this.$element.data("typeahead-href");
-    $.getJSON(url, { "query": q }, function (data) {
-	cb(data);
-    });
-}
-
-function loadUserName(
-
-function initTypeaheads(parent) {
+function initSelects(parent) {
     if (!parent) {
-	parent = $(document.body);
+	parent = $("li.stream-item:not(.blank)");
     }
-    parent.find('[data-typeahead-href]').typeahead({
-	source: getTypeaheadResults,
-	minLength: 3,
-	delay: 100,
-	fitToElement: true,
-	afterSelect: function (item) {
-	    this.$element.data("real-value", item.id);
-	    this.$element.data("expected-value", item.name);
-	    let numinp = this.$element.siblings("[type=number]");
-	    if (numinp.length > 0) {
-		numinp.val(item.id).change();
-	    }
-	}
-    }).filter("[data-only=typeahead]").on("blur", function(e) {
-	
+    parent.find('[data-select-src]').each(function(index, el) {
+        $(this).select2({
+            placeholder: $(this).data("select-placeholder"),
+            ajax: {
+                url: $(this).data("select-src"),
+                delay: 250,
+                processResults: function (data, params) {
+                    return {
+                        results: data
+                    };
+                },
+                minimumInputLength: 1,
+                cache: true,
+            }
+        });
     });
 }
 
-jQuery.fn.extend({
-    getVal: function getVal() {
-	if (this.data("real-value")) {
-	    if (this.data("expected-value")) {
-		if (this.data("expected-value") == this.val()) {
-		    return this.data("real-value");
-		}
-	    } else {
-		return this.data("real-value");
-	    }
-	}
-	return this.val();
-    },
-});
-    
 class DataBindingHandler {
     constructor(stream) {
         this.stream = stream;
 	this.updateBoundData = this.updateBoundData.bind(this);
     }
-    
+
     updateBoundData(action, stream) {
 	if (!this.stream || stream === this.stream) {
 	    let f = this["do_" + action.action];
@@ -125,13 +101,23 @@ class DataBindingHandler {
 	    }
 	}
     }
-    
+
     do_update(action, stream) {
         let els = $("[data-stream=" + stream +
                     "][data-pk=" + action.pk + "]");
         for (let field in action.data) {
-            els.filter("[data-field=" + field + "]").val(
-                action.data[field]);
+            let el = els.filter("[data-field=" + field + "]");
+            if (el.is("select")) {
+                $.get("actor/" + action.data[field],
+                      (function(data) {
+                          $("<option>").text(data.text).attr("value", data.id)
+                                       .appendTo(this);
+                          this.val(data.id);
+                          this.trigger("change");
+                      }).bind(el))
+            } else {
+                el.val(action.data[field]);
+            }
         }
     }
     do_create(action, stream) {
@@ -144,10 +130,16 @@ class DataBindingHandler {
             let el = blank.clone().insertBefore(blank);
             el.removeClass(stream + "-blank").removeClass("blank")
 		.attr("data-pk", action.pk);
-            el.find(".btn-action").toggleClass("hidden");
-            el.find("[data-pk]").attr("data-pk", action.pk);
+            el.find(".btn-action[data-stream=" + stream +
+                    "]").toggleClass("hidden");
+            el.find("[data-pk][data-stream=" + stream +
+                    "]").attr("data-pk", action.pk);
+            if (action.model === "casting.character") {
+                el.find("[data-character]").data("character", action.pk);
+            }
             for (let field in action.data) {
-                el.find("[data-field=" + field + "]").val(
+                el.find("[data-field=" + field + "][data-stream=" + stream +
+                        "]").val(
                     action.data[field]);
             }
 	    if (el.hasClass("scroll-after-create")) {
@@ -156,10 +148,11 @@ class DataBindingHandler {
 		});
 	    }
             initTooltips(el);
-	    initTypeaheads(el);
+            if (action.data.character) {
+	        initSelects(el);
+            }
         } else {
-            console.log("Attempted to create " + stream +
-                        "; missing blank.");
+            console.log("Attempted to create " + stream + "; missing blank.");
         }
     }
     do_delete(action, stream) {
@@ -170,7 +163,7 @@ class DataBindingHandler {
 
 function sendBoundUpdate(e) {
     let fields = {};
-    let value = $(this).getVal();
+    let value = $(this).val();
     if (value.replace) {
 	value = value.replace(/\s*$/,"");
     }
@@ -222,7 +215,7 @@ $(function() {
                              timer = setTimeout(callback, ms);
                          };
                      })();
-        $(document.body).on("blur change",
+        $(document.body).on("blur select2:select",
 			    "[data-stream][data-pk][data-field]",
                             sendBoundUpdate);
         $(document.body).on("keyup", "[data-stream][data-pk][data-field]",
@@ -250,7 +243,7 @@ $(function() {
     }
 
     initTooltips();
-    initTypeaheads();
+    initSelects();
 });
 
 $(document.body).on("click", "a.ajaxify", function(e){

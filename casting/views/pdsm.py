@@ -128,20 +128,25 @@ class CallbackView(ShowStaffMixin, DetailView):
         context["callback_blank"] = Callback()
         return context
 
+ONLY_AUDITIONS = False
+    
 class CallbackActors(ShowStaffMixin, DetailView):
     def get(self, *args, **kwargs):
-        terms = self.request.GET["query"].split(" ")
+        if "term" in self.request.GET:
+            terms = self.request.GET["term"].split(" ")
+        else:
+            terms = ("",)
         auditions = self.get_object().audition_set.all()
         for term in terms:
             q = Q(actor__first_name__contains=term)
             q |= Q(actor__last_name__contains=term)
             auditions = auditions.filter(q)
-        if auditions.exists():
+        if ONLY_AUDITIONS or auditions.exists():
             actors = list(auditions.values("actor__id", "actor__first_name",
                                            "actor__last_name"))
             for i in actors:
                 i["id"] = i["actor__id"]
-                i["name"] = (i["actor__first_name"] + " " +
+                i["text"] = (i["actor__first_name"] + " " +
                              i["actor__last_name"])
         else:
             users = get_user_model().objects.all()
@@ -150,8 +155,18 @@ class CallbackActors(ShowStaffMixin, DetailView):
                 users = users.filter(q)
             actors = list(users.values("id", "first_name", "last_name"))
             for i in actors:
-                i["name"] = (i["first_name"] + " " + i["last_name"])
+                i["text"] = (i["first_name"] + " " + i["last_name"])
         return JsonResponse(actors, safe=False)
+
+class ActorName(UserIsPdsmMixin, BaseDetailView):
+    model = get_user_model()
+
+    def get(self, *args, **kwargs):
+        user = self.get_object()
+        return JsonResponse({
+            "id": user.pk,
+            "text": user.get_full_name(),
+        })
     
 urlpatterns = [
     url('^$', IndexView.as_view(), name='index'),
@@ -167,4 +182,6 @@ urlpatterns = [
         name="callbacks"),
     url('^callbacks/(?P<pk>\d+)/actors/$', CallbackActors.as_view(),
         name="callback_actors"),
+    url('^callbacks/\d+/actor/(?P<pk>\d+)$', ActorName.as_view(),
+        name="callback_actor_name"),
 ]
