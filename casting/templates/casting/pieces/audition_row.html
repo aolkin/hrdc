@@ -1,5 +1,8 @@
 {% load bt %}
-<td>{{ audition.signed_in }}</td>
+<td class="align-middle">
+  <span class="text-nowrap">{{ audition.signed_in|date:"F j" }}</span>,
+  <span class="text-nowrap">{{ audition.signed_in|date:"g:i A" }}</span>
+</td>
 <td>{{ audition.actor.get_full_name }}</td>
 <td class="text-primary">{{ audition.actor.email|break_punctuation }}</td>
 <td>{{ audition.actor.pretty_phone }}</td>
