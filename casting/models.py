@@ -239,6 +239,7 @@ class Character(AssociateShowMixin):
 class Callback(models.Model):
     character = models.ForeignKey(Character)
     actor = models.ForeignKey(get_user_model(), null=True)
+    notified = models.BooleanField(default=False)
 
     @property
     def show(self):
@@ -254,6 +255,8 @@ class Callback(models.Model):
 class Signing(Callback):
     order = models.PositiveSmallIntegerField()
     response = models.NullBooleanField()
+    notified_first = models.BooleanField(default=False)
+    notified_second = models.BooleanField(default=False)
 
     class Meta:
         ordering = ("character__show", "character", "order")

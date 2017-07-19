@@ -1,0 +1,57 @@
+{% extends "casting/public/base.html" %}
+
+{% block title %}{{ object }} | Callbacks{% endblock %}
+
+{% block content %}
+<h2 class="text-center">{{ object }} Callbacks</h2>
+<div class="row justify-content-center">
+  <div class="col-md-8 text-center">
+    {% if object.release_meta.stage < 1 and not user_is_staff %}
+    <div class="alert alert-danger">
+      <big>Callbacks have not yet been released for this show!</big>
+    </div>
+    {% else %}
+    {% if not object.callbacks_submitted %}
+    <div class="alert alert-danger">
+      <strong>This is a preview!</strong>
+      You have not yet submitted your callback list.
+      <br><small>Please go
+	<a href="{% url 'casting:callbacks' object.pk %}">here</a>
+	to edit entries or submit.
+      </small>
+    </div>
+    {% endif %}
+    <p class="lead">{{ object.callback_description }}</p>
+  </div>
+</div>
+<div class="container-fluid limited-container-1200">
+  <div class="row justify-content-center">
+    {% for character in object.character_set.all %}
+    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 col-xl-3 mb-4">
+      <div class="card">
+	<div class="card-header text-center p-2">
+	  <h5 class="card-title mb-0">{{ character }}</h5>
+	</div>
+	<ul class="list-group list-group-flush">
+	  {% for cb in character.callback_set.all %}
+	  <li class="list-group-item">{{ cb.actor }}</li>
+	  {% endfor %}
+	</ul>
+	{% if character.callback_description %}
+	<div class="card-footer py-2 px-3">
+	  <small class="text-muted">
+	    {{ character.callback_description }}
+	  </small>
+	</div>
+	{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+<p class="text-center"><big>Please email 
+    <a href="mailto:{{ object.contact_email }}" class="font-italic">
+      {{ object.contact_email }}</a> with any questions.</big>
+</p>
+{% endblock %}

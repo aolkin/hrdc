@@ -162,14 +162,16 @@ class DataBindingHandler {
 }
 
 function sendBoundUpdate(e) {
-    let fields = {};
-    let value = $(this).val();
-    fields[$(this).data("field")] = value;
-    bridge.stream($(this).data("stream")).send({
-        action: "update",
-        pk: $(this).data("pk"),
-        data: fields,
-    });
+    if ($(this).data("pk")) {
+        let fields = {};
+        let value = $(this).val();
+        fields[$(this).data("field")] = value;
+        bridge.stream($(this).data("stream")).send({
+            action: "update",
+            pk: $(this).data("pk"),
+            data: fields,
+        });
+    }
 }
 
 var bridge;
@@ -183,7 +185,7 @@ $(function() {
             if (el.length < 1) {
                 el = $(data.element).attr("id", data.id);
                 $(data.container).append(el);
-                
+
 		$(window).scrollTo(el, 500, {
                     interrupt: true,
 		});
