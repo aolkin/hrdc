@@ -164,9 +164,6 @@ class DataBindingHandler {
 function sendBoundUpdate(e) {
     let fields = {};
     let value = $(this).val();
-    if (value.replace) {
-	value = value.replace(/\s*$/,"");
-    }
     fields[$(this).data("field")] = value;
     bridge.stream($(this).data("stream")).send({
         action: "update",
@@ -186,6 +183,10 @@ $(function() {
             if (el.length < 1) {
                 el = $(data.element).attr("id", data.id);
                 $(data.container).append(el);
+                
+		$(window).scrollTo(el, 500, {
+                    interrupt: true,
+		});
             }
             el.html(data.html);
             if (data.pulse) {

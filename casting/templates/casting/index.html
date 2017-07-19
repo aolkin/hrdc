@@ -6,14 +6,14 @@
 {% block content %}
 {% if request.user.show_set.exists %}
 <h3 class="text-center">Your Shows registered for Common Casting</h3>
-<table class="table table-responsive table-striped">
+<table class="table table-responsive bt-table-responsive table-striped">
   <thead>
     <tr>
-      <th>Show</th>
-      <th>Season</th>
-      <th>Administrative Staff
+      <th class="table-col-md">Show</th>
+      <th class="table-col-sm table-col-desktop">Season</th>
+      <th class="table-col-lg">Administrative Staff
 	<small class="text-muted">has access to this site</small></th>
-      <th>Show Contact Email</th>
+      <th class="table-col-md">Show Contact Email</th>
     </tr>
   </thead>
   <tbody>

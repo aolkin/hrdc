@@ -1,25 +1,27 @@
 {% extends "casting/base.html" %}
 
+{% load bt %}
+
 {% block extra_scripts %}{% include "casting/wsbridge.html" %}{% endblock %}
 
 {% block title %}{{ object }} | Casting{% endblock %}
 
 {% block content %}
 <h2 class="text-center">{{ object }}</h2>
-<table class="table table-responsive table-striped mt-3">
+<table class="table table-responsive bt-table-responsive table-striped mt-3">
   <thead>
     <tr>
-      <th>Sign-In Time</th>
+      <th class="table-col-sm table-col-desktop">Sign-In Time</th>
       <th>Name</th>
       <th>Email</th>
-      <th>Phone</th>
-      <th>PGPs</th>
+      <th class="table-col-sm">Phone</th>
+      <th class="table-col-xs">PGPs</th>
       <th></th>
-      <th>Status</th>
+      <th class="table-col-sm table-col-desktop">Status</th>
     </tr>
   </thead>
   <tbody>
-    {% for audition in object.audition_set.all %}
+    {% for audition in object.audition_set.all|order_by:"signed_in" %}
     <tr id="audition-{{ audition.pk }}">
       {% include "casting/pieces/audition_row.html" %}
     </tr>

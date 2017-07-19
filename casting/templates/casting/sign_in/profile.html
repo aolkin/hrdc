@@ -13,7 +13,11 @@
   </div>
 </div>
 <p class="text-center text-muted">To change this, please
-  <a href="{% url 'casting:sign_in_start' request.session.building %}">
+  <a {% if request.session.popout %}
+     href="{% url 'casting:sign_in_start_popout' request.session.building %}"
+     {% else %}
+     href="{% url 'casting:sign_in_start' request.session.building %}"
+     {% endif %}>
     start over</a>.
 </p>
 <p class="lead text-center">

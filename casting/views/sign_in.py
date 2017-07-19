@@ -123,13 +123,15 @@ class ActorSignInDone(ActorSignInBase, TemplateView):
                         "You have already auditioned for {}!".format(
                             CastingMeta.objects.get(id=i)))
                 else:
-                    if obj.space_id != space:
+                    if (obj.space_id != space or
+                        obj.signed_in.date() != timezone.localdate()):
                         obj.space_id = space
                         obj.status = Audition.STATUSES[0][0]
                         with suppress_autotime(obj, "signed_in"):
                             obj.signed_in = timezone.now()
                         obj.save()
                     else:
+                        print(obj.space, obj.space.building)
                         send_auditions(Audition, obj)
                         if obj.status == Audition.STATUSES[1][0]:
                             messages.success(

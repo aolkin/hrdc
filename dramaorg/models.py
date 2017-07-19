@@ -7,7 +7,7 @@ from django.db.models.signals import post_save
 from django.contrib.auth.signals import user_logged_in
 from django.dispatch import receiver
 
-import hashlib, base64, uuid, datetime
+import hashlib, base64, uuid, datetime, re
 
 from config import config
 
@@ -73,7 +73,18 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         self.token_expiry = timezone.now()
         if save:
             self.save()
-    
+
+    def pretty_phone(self, partial=""):
+        phone = partial or re.sub(r'\D', '', self.phone)
+        if len(phone) > 10:
+            return "+{} {}".format(phone[:-10], self.pretty_phone(phone[-10:]))
+        elif len(phone) > 7:
+            return "({}) {}".format(phone[:-7], self.pretty_phone(phone[-7:]))
+        elif len(phone) > 4:
+            return "{}-{}".format(phone[:-4], self.pretty_phone(phone[-4:]))
+        else:
+            return phone
+            
     @property
     def is_initialized(self):
         return bool(self.first_name and self.last_name and self.phone)

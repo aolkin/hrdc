@@ -2,7 +2,6 @@
 from django.urls import reverse
 
 from django.core.mail import EmailMultiAlternatives
-from anymail.message import attach_inline_image_file
 
 from config import config
 
