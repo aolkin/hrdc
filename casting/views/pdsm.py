@@ -1,7 +1,8 @@
 from django.views.generic.base import TemplateView, View
+from django.views.generic.edit import UpdateView
 from django.views.generic.detail import *
-from django.urls import reverse
-from django.conf.urls import url
+from django.urls import reverse, reverse_lazy
+from django.conf.urls import url, include
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.db.models import Q
 from django.contrib import messages
@@ -91,6 +92,30 @@ class ShowStaffMixin(StaffViewMixin):
                                    "different user?")
         return False
 
+class ShowEditor(ShowStaffMixin, UpdateView):
+    fields = ("contact_email",)
+    success_url = reverse_lazy("casting:index")
+    template_name = "casting/show_editor.html"
+    
+    def post(self, *args, **kwargs):
+        if self.test_func():
+            return super().post(*args, **kwargs)
+        else:
+            messages.error(self.request,
+                           "You do not have access to that show.")
+            return HttpResponseRedirect(reverse("login"))
+        
+    def get(self, *args, **kwargs):
+        if not self.request.is_ajax():
+            return HttpResponseRedirect(reverse("casting:index"))
+        else:
+            return super().get(*args, **kwargs)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["legal"] = self.test_func()
+        return context
+    
 class AuditionView(ShowStaffMixin, DetailView):
     template_name = "casting/audition.html"
 
@@ -170,18 +195,20 @@ class ActorName(UserIsPdsmMixin, BaseDetailView):
     
 urlpatterns = [
     url('^$', IndexView.as_view(), name='index'),
+    url(r'^edit/show/(?P<pk>\d+)/$', ShowEditor.as_view(), name="edit_show"),
+    
     url('^building/(?P<pk>\d+)/$', TablingView.as_view(), name="tabling"),
-    
-    url('^auditions/(?P<pk>\d+)/$', AuditionView.as_view(), name="audition"),
-    url('^auditions/(?P<pk>\d+)/call/$', AuditionCallView.as_view(),
-        name="audition_call"),
-    url('^auditions/(?P<pk>\d+)/done/$', AuditionDoneView.as_view(),
-        name="audition_done"),
-    
-    url('^callbacks/(?P<pk>\d+)/$', CallbackView.as_view(),
-        name="callbacks"),
-    url('^callbacks/(?P<pk>\d+)/actors/$', CallbackActors.as_view(),
-        name="callback_actors"),
+
+    url(r'^auditions/(?P<pk>\d+)/', include([
+        url('^$', AuditionView.as_view(), name="audition"),
+        url('^call/$', AuditionCallView.as_view(), name="audition_call"),
+        url('^done/$', AuditionDoneView.as_view(), name="audition_done")
+    ])),
+
+    url(r'^callbacks/(?P<pk>\d+)/', include([
+        url('^$', CallbackView.as_view(), name="callbacks"),
+        url('^actors/$', CallbackActors.as_view(), name="callback_actors"),
+    ])),
     url('^callbacks/\d+/actor/(?P<pk>\d+)$', ActorName.as_view(),
         name="callback_actor_name"),
 ]
