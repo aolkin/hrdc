@@ -72,7 +72,7 @@ class TablingView(StaffViewMixin, DetailView):
         context = super().get_context_data(*args, **kwargs)
         context["auditions"] = Audition.objects.filter(
             signed_in__date=timezone.localdate(),
-            space__building=self.object)
+            space__building=self.object).order_by("signed_in")
         return context
 
 class ShowStaffMixin(StaffViewMixin):
