@@ -176,24 +176,30 @@ class CallbackSubmitView(ShowStaffMixin, View):
                 if not cb.actor:
                     cb.delete()
                 elif cb.actor.pk in actors:
-                    messages.error(
+                    cb.delete()
+                    messages.warning(
                         self.request,
-                        "{} is called for {} multiple times.".format(
-                            cb.actor, c))
+                        "{} is called for {} multiple times; ".format(
+                            cb.actor, c) + "removing duplicate.")
                     clean = False
                 else:
                     actors.append(cb.actor.pk)
             if len(actors) < 1:
                 if not (c.name or c.callback_description):
+                    messages.info(self.request,
+                                  "Found empty character; removing.")
                     c.delete()
                 else:
                     messages.error(
-                        self.request, "No one is called for {}.".format(
-                            c.name if c.name else "<Unnamed Character>"))
+                        self.request, "No one is called for {}.".format(c))
                     clean = False
-        if self.object.character_set.filter(name="").exists():
+        if not self.object.character_set.exists():
             messages.error(self.request,
-                           "One or more characters are missing names.")
+                           "No callbacks have been listed!")
+            clean = False
+        if self.object.character_set.filter(name="").exists():
+            messages.warning(self.request,
+                             "One or more characters are missing names.")
             clean = False
         return clean
     

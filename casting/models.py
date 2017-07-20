@@ -238,7 +238,7 @@ class Character(AssociateShowMixin):
     allowed_signers = models.PositiveSmallIntegerField(default=1)
     
     def __str__(self):
-        return self.name
+        return self.name if self.name else "<Unnamed Character>"
     
 class Callback(models.Model):
     character = models.ForeignKey(Character)
