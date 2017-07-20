@@ -174,7 +174,7 @@ class CastingMeta(models.Model):
 
     @property
     def callbacks_released(self):
-        self.callbacks_submitted and self.release_meta.stage > 0
+        return self.callbacks_submitted and self.release_meta.stage > 0
     
     @property
     def audition_slots(self):
