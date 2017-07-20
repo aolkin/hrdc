@@ -19,18 +19,28 @@ class CallbackView(DetailView):
             self.request.user)
         menu = context["sidebar_menu"] = {}
         submenu = menu[self.object.show.seasonstr() + " Callbacks"] = []
-        filter_args = {
-            "callbacks_submitted": True
-        }
         if self.request.user.is_authenticated() and self.request.user.is_board:
-            del filter_args["callbacks_submitted"]
-        for i in CastingMeta.objects.filter(
-                show__year=self.object.show.year,
-                show__season=self.object.show.season, **filter_args):
+            filter_args = {}
+        else:
+            filter_args = {
+                "callbacks_submitted": True,
+                "release_meta__stage__gt": 0,
+            }
+        shows = CastingMeta.objects.filter(
+            show__year=self.object.show.year,
+            show__season=self.object.show.season, **filter_args)
+        if shows.exists():
+            for i in shows:
+                submenu.append({
+                    "name": i,
+                    "url": reverse("casting:view_callbacks", args=(i.pk,)),
+                    "active": self.object.pk == i.pk
+                })
+        else:
             submenu.append({
-                "name": i,
-                "url": reverse("casting:view_callbacks", args=(i.pk,)),
-                "active": self.object.pk == i.pk
+                "name": self.object,
+                "active": True,
+                "url": ""
             })
         return context
 
