@@ -39,11 +39,13 @@ class StaffViewMixin(UserIsPdsmMixin):
                 "url": reverse("casting:callbacks", args=(show.pk,)),
                 "active": is_active and current_url == "callbacks"
             })
-            submenu.append({
-                "name": "Cast List",
-                "url": "#",
-                "active": False
-            })
+            if show.release_meta.stage > 0:
+                submenu.append({
+                    "name": ("Cast List" if show.release_meta.stage > 1 else
+                             "First-Round Casting"),
+                    "url": "#",
+                    "active": False
+                })
         return context
 
 class IndexView(StaffViewMixin, TemplateView):
@@ -76,7 +78,7 @@ class TablingView(StaffViewMixin, DetailView):
             space__building=self.object).order_by("signed_in")
         return context
 
-class ShowStaffMixin(StaffViewMixin):
+class ShowStaffMixin(StaffViewMixin, SingleObjectMixin):
     model = CastingMeta
     
     test_silent = False
@@ -153,6 +155,82 @@ class CallbackView(ShowStaffMixin, DetailView):
         context["callback_blank"] = Callback()
         return context
 
+    def get(self, *args, **kwargs):
+        obj = self.get_object()
+        if "CALLBACK_SUBMIT_ERRORS" in self.request.session:
+            del self.request.session["CALLBACK_SUBMIT_ERRORS"]
+        if "CALLBACK_SUBMIT_FLOW" in self.request.session:
+            del self.request.session["CALLBACK_SUBMIT_FLOW"]
+        if obj.callbacks_submitted:
+            return HttpResponseRedirect(reverse('casting:view_callbacks',
+                                                args=(obj.pk,)))
+        else:
+            return super().get(*args, **kwargs)
+    
+class CallbackSubmitView(ShowStaffMixin, View):
+    def clean_callbacks(self):
+        clean = True
+        for c in self.object.character_set.all():
+            actors = []
+            for cb in c.callback_set.all().select_related("actor"):
+                if not cb.actor:
+                    cb.delete()
+                elif cb.actor.pk in actors:
+                    messages.error(
+                        self.request,
+                        "{} is called for {} multiple times.".format(
+                            cb.actor, c))
+                    clean = False
+                else:
+                    actors.append(cb.actor.pk)
+            if len(actors) < 1:
+                if not (c.name or c.callback_description):
+                    c.delete()
+                else:
+                    messages.error(
+                        self.request, "No one is called for {}.".format(
+                            c.name if c.name else "<Unnamed Character>"))
+                    clean = False
+        if self.object.character_set.filter(name="").exists():
+            messages.error(self.request,
+                           "One or more characters are missing names.")
+            clean = False
+        return clean
+    
+    def get(self, *args, **kwargs):
+        self.object = self.get_object()
+        if self.clean_callbacks():
+            self.request.session["CALLBACK_SUBMIT_FLOW"] = self.object.pk
+        else:
+            self.request.session["CALLBACK_SUBMIT_ERRORS"] = self.object.pk
+        return HttpResponseRedirect(reverse("casting:view_callbacks",
+                                            args=(self.object.pk,)))
+
+    def post(self, *args, **kwargs):
+        self.object = self.get_object()
+        if ("CALLBACK_SUBMIT_FLOW" in self.request.session and
+            self.request.session["CALLBACK_SUBMIT_FLOW"] == self.object.pk):
+            del self.request.session["CALLBACK_SUBMIT_FLOW"]
+            if self.clean_callbacks():
+                if "CALLBACK_SUBMIT_ERRORS" in self.request.session:
+                    del self.request.session["CALLBACK_SUBMIT_ERRORS"]
+                self.object.callbacks_submitted = True
+                self.object.save(update_fields=("callbacks_submitted",))
+                messages.success(
+                    self.request,
+                    "Submitted callback list for {} successfully!".format(
+                        self.object))
+            else:
+                self.request.session["CALLBACK_SUBMIT_ERRORS"] = self.object.pk
+            return HttpResponseRedirect(reverse("casting:view_callbacks",
+                                                args=(self.object.pk,)))
+        else:
+            messages.error(self.request,
+                           "Failed to submit callback list, please try again.")
+            return HttpResponseRedirect(reverse("casting:callbacks",
+                                                args=(self.object.pk,)))
+        
+# Disable the default behavior and only display actors who auditioned
 ONLY_AUDITIONS = False
     
 class CallbackActors(ShowStaffMixin, DetailView):
@@ -208,6 +286,7 @@ urlpatterns = [
     url(r'^callbacks/(?P<pk>\d+)/', include([
         url('^$', CallbackView.as_view(), name="callbacks"),
         url('^actors/$', CallbackActors.as_view(), name="callback_actors"),
+        url('^submit/$', CallbackSubmitView.as_view(), name="callback_submit"),
     ])),
     url('^callbacks/\d+/actor/(?P<pk>\d+)$', ActorName.as_view(),
         name="callback_actor_name"),

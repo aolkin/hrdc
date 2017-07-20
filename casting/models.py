@@ -171,7 +171,11 @@ class CastingMeta(models.Model):
 
     def __str__(self):
         return str(self.show)
-        
+
+    @property
+    def callbacks_released(self):
+        self.callbacks_submitted and self.release_meta.stage > 0
+    
     @property
     def audition_slots(self):
         return self.slot_set.filter(type=Slot.TYPES[0][0])
