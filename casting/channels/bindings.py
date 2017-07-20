@@ -37,6 +37,10 @@ class CharacterBinding(AssociatedShowBinding):
         show = CastingMeta.objects.get(pk=data["show"])
         if show.show.user_is_staff(self.user):
             super().create(data)
+
+    def delete(self, pk):
+        if not self.model.objects.get(pk=pk).show.callbacks_submitted:
+            super().delete(pk)
     
 class CallbackBinding(AssociatedShowBinding):
     model = Callback
@@ -44,6 +48,8 @@ class CallbackBinding(AssociatedShowBinding):
     fields = ("actor", "character")
 
     def update(self, pk, data):
+        if self.model.objects.get(pk=pk).character.show.callbacks_submitted:
+            return False
         try:
             int(data["actor"])
             super().update(pk, data)
@@ -52,5 +58,5 @@ class CallbackBinding(AssociatedShowBinding):
             
     def create(self, data):
         show = Character.objects.get(pk=data["character"]).show
-        if show.show.user_is_staff(self.user):
+        if show.show.user_is_staff(self.user) and not show.callbacks_submitted:
             super().create(data)

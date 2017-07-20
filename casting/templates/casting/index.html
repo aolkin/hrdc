@@ -13,35 +13,58 @@
       <th class="table-col-sm table-col-desktop">Season</th>
       <th class="table-col-lg">Administrative Staff
 	<small class="text-muted">has access to this site</small></th>
+      <th class="table-col-sm">Status</th>
       <th class="table-col-md">Show Contact Email</th>
     </tr>
   </thead>
   <tbody>
     {% for show in request.user.show_set.all %}
     {% if show.casting_meta %}
+    {% with meta=show.casting_meta %}
     <tr>
       <td>{{ show.title }}</td>
       <td>{{ show.seasonstr }}</td>
       <td>{{ show.people }}</td>
+      {% if meta.release_meta.stage == 0 %}
+      {% if meta.callbacks_submitted %}
+      <td>Callbacks submitted.</td>
+      {% else %}
+      <td class="text-danger">Waiting for callbacks.</td>
+      {% endif %}
+      {% elif meta.release_meta.stage == 1 %}
+      {% if meta.first_cast_submitted %}
+      <td>First-round casting submitted.</td>
+      {% else %}
+      <td class="text-danger">Waiting for first-round casting.</td>
+      {% endif %}
+      {% elif meta.release_meta.stage == 2 %}
+      {% if meta.cast_submitted %}
+      <td>Cast list submitted.</td>
+      {% else %}
+      <td class="text-danger">Waiting for cast list.</td>
+      {% endif %}
+      {% else %}
+      <td class="text-warning">Cast list published.</td>
+      {% endif %}
       <td>
-	{% if show.casting_meta.contact_email %}
-	<a href="mailto:{{ show.casting_meta.contact_email }}">
-	  {{ show.casting_meta.contact_email }}</a>
-	<a href="{% url 'casting:edit_show' show.casting_meta.pk %}"
+	{% if meta.contact_email %}
+	<a href="mailto:{{ meta.contact_email }}">
+	  {{ meta.contact_email }}</a>
+	<a href="{% url 'casting:edit_show' meta.pk %}"
 	   data-toggle="modal"
-	   data-target="#edit-show-{{ show.casting_meta.pk }}">
+	   data-target="#edit-show-{{ meta.pk }}">
 	  (edit)
 	</a>
 	{% else %}
 	<b>&lt;missing&gt;</b>
-	<a href="{% url 'casting:edit_show' show.casting_meta.pk %}"
+	<a href="{% url 'casting:edit_show' meta.pk %}"
 	   data-toggle="modal"
-	   data-target="#edit-show-{{ show.casting_meta.pk }}">
+	   data-target="#edit-show-{{ meta.pk }}">
 	  (set)
 	</a>
 	{% endif %}
 	<div class="modal fade edit-show-modal"
-	     id="edit-show-{{ show.casting_meta.pk }}" tabindex="-1">
+	     id="edit-show-{{ meta.pk }}" tabindex="-1">
 	  <div class="modal-dialog" role="document">
 	    <div class="modal-content">
 	      <div class="modal-header">
@@ -63,6 +86,7 @@
 	</div>
       </td>
     </tr>
+    {% endwith %}
     {% endif %}
     {% endfor %}
 </table>

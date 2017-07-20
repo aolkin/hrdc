@@ -4,22 +4,41 @@
 
 {% block content %}
 <h2 class="text-center">{{ object }} Callbacks</h2>
+{% if object.callbacks_released or user_is_staff %}
 <div class="row justify-content-center">
   <div class="col-md-8 text-center">
-    {% if object.release_meta.stage < 1 and not user_is_staff %}
-    <div class="alert alert-danger">
-      <big>Callbacks have not yet been released for this show!</big>
+    {% if user_is_staff %}
+    {% if object.callbacks_submitted %}
+    <div class="alert alert-info">
+      <strong>Callbacks submitted!</strong>
+      Your callback list has been submitted and can no longer be changed.
     </div>
     {% else %}
-    {% if not object.callbacks_submitted %}
     <div class="alert alert-danger">
+      {% if request.session.CALLBACK_SUBMIT_FLOW == object.pk %}
+      <form action="{% url 'casting:callback_submit' object.pk %}"
+	    method="POST">
+	{% csrf_token %}
+	<p class="lead">
+	  Please confirm your callback lists below.
+	  Note that once you have submitted, you CANNOT MAKE CHANGES.
+	</p>
+	<button type="submit" class="btn btn-danger btn-block">Submit</button>
+      </form>
+      {% else %}
+      {% if request.session.CALLBACK_SUBMIT_ERRORS == object.pk %}
+      Your callback list has errors. Please fix them and try again.<br>
+      {% else %}
       <strong>This is a preview!</strong>
-      You have not yet submitted your callback list.
-      <br><small>Please go
+      You have not yet submitted your callback list.<br>
+      {% endif %}
+      <small>Please go
 	<a href="{% url 'casting:callbacks' object.pk %}">here</a>
-	to edit entries or submit.
+	to edit entries and submit.
       </small>
+      {% endif %}
     </div>
+    {% endif %}
     {% endif %}
     <p class="lead">{{ object.callback_description }}</p>
   </div>
@@ -30,7 +49,13 @@
     <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 col-xl-3 mb-4">
       <div class="card">
 	<div class="card-header text-center p-2">
-	  <h5 class="card-title mb-0">{{ character }}</h5>
+	  <h5 class="card-title mb-0">
+	    {% if character.name or not user_is_staff %}
+	    {{ character.name }}
+	    {% else %}
+	    <span class="text-danger">&lt;Unnamed Character&gt;</span>
+	    {% endif %}
+	  </h5>
 	</div>
 	<ul class="list-group list-group-flush">
 	  {% for cb in character.callback_set.all %}
@@ -49,9 +74,34 @@
     {% endfor %}
   </div>
 </div>
+{% elif request.user.is_authenticated and request.user.is_board %}
+<div class="row justify-content-center">
+  <div class="col-md-8 text-center">
+    {% if object.callbacks_submitted %}
+    <div class="alert alert-info">
+      <big>Callbacks have been submitted, but not yet been released for
+	this show!</big>
+    </div>
+    {% else %}
+    <div class="alert alert-warning">
+      <big>Callbacks have not yet been submitted for this show!</big>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% else %}
+<div class="row justify-content-center">
+  <div class="col-md-8 text-center">
+    <div class="alert alert-danger">
+      <big>Callbacks have not yet been released for this show!</big>
+    </div>
+  </div>
+</div>
 {% endif %}
+{% if object.contact_email %}
 <p class="text-center"><big>Please email 
     <a href="mailto:{{ object.contact_email }}" class="font-italic">
       {{ object.contact_email }}</a> with any questions.</big>
 </p>
+{% endif %}
 {% endblock %}

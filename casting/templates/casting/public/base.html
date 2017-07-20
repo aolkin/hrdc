@@ -1,3 +1,9 @@
 {% extends "bt/sidebar.html" %}
 
 {% block title %}Common Casting{% endblock %}
+
+{% block extra_header %}
+{% if request.user.is_authenticated %}
+{% include "dramaorg/user_dropdown.html" %}
+{% endif %}
+{% endblock %}
