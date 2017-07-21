@@ -40,6 +40,13 @@ table .btn {
     padding: 0 1em;
 }
 
+.card-deck.horizontal-scroll .card.deck-margin-fixer {
+    min-width: auto;
+    width: 0px;
+    margin-left: -10px;
+    border-color: transparent;
+}
+
 .card>div>.form-group:last-child,
 .card>div>.form-group:last-child p.form-text {
     margin-bottom: 0;
@@ -86,4 +93,9 @@ table .btn {
 
 .limited-container-1200 {
     max-width: 1200px;
+}
+
+.fa.badge {
+    font-size: 0.8rem;
+    padding: 0.4em 0.4em 0.3em .4em;
 }

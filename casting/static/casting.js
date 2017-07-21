@@ -205,7 +205,7 @@ $(function() {
             }
             initTooltips(el);
         });
-        const STREAMS = ["castingmeta", "character", "callback"];
+        const STREAMS = ["castingmeta", "character", "callback", "signing"];
 	const binder = new DataBindingHandler();
         for (let stream of STREAMS) {
             bridge.demultiplex(stream, binder.updateBoundData);

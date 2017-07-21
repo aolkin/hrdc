@@ -41,10 +41,9 @@ class StaffViewMixin(UserIsPdsmMixin):
             })
             if show.release_meta.stage > 0:
                 submenu.append({
-                    "name": ("Cast List" if show.release_meta.stage > 1 else
-                             "First-Round Casting"),
-                    "url": "#",
-                    "active": False
+                    "name": "Cast List",
+                    "url": reverse("casting:cast_list", args=(show.pk,)),
+                    "active": is_active and current_url == "cast_list"
                 })
         return context
 
@@ -146,15 +145,22 @@ class AuditionCallView(AuditionStatusBase):
 class AuditionDoneView(AuditionStatusBase):
     new_status = "done"
 
-class CallbackView(ShowStaffMixin, DetailView):
-    template_name = "casting/callbacks.html"
-
+class ActorListView(ShowStaffMixin, DetailView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["character_blank"] = Character()
-        context["callback_blank"] = Callback()
         return context
 
+class CallbackView(ActorListView):
+    template_name = "casting/callbacks.html"
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["callback_blank"] = Callback()
+        context["characters"] = self.object.character_set.filter(
+            added_for_signing=False)
+        return context
+    
     def get(self, *args, **kwargs):
         obj = self.get_object()
         if "CALLBACK_SUBMIT_ERRORS" in self.request.session:
@@ -169,8 +175,11 @@ class CallbackView(ShowStaffMixin, DetailView):
     
 class CallbackSubmitView(ShowStaffMixin, View):
     def clean_callbacks(self):
+        if self.object.callbacks_submitted:
+            messages.error(self.request, "Callbacks already submitted!")
+            return False
         clean = True
-        for c in self.object.character_set.all():
+        for c in self.object.character_set.filter(added_for_signing=False):
             actors = []
             for cb in c.callback_set.all().select_related("actor"):
                 if not cb.actor:
@@ -193,11 +202,13 @@ class CallbackSubmitView(ShowStaffMixin, View):
                     messages.error(
                         self.request, "No one is called for {}.".format(c))
                     clean = False
-        if not self.object.character_set.exists():
+        if not self.object.character_set.filter(
+                added_for_signing=False).exists():
             messages.error(self.request,
                            "No callbacks have been listed!")
             clean = False
-        if self.object.character_set.filter(name="").exists():
+        if self.object.character_set.filter(added_for_signing=False,
+                                            name="").exists():
             messages.warning(self.request,
                              "One or more characters are missing names.")
             clean = False
@@ -239,7 +250,7 @@ class CallbackSubmitView(ShowStaffMixin, View):
 # Disable the default behavior and only display actors who auditioned
 ONLY_AUDITIONS = False
     
-class CallbackActors(ShowStaffMixin, DetailView):
+class ShowActors(ShowStaffMixin, DetailView):
     def get(self, *args, **kwargs):
         if "term" in self.request.GET:
             terms = self.request.GET["term"].split(" ")
@@ -267,6 +278,14 @@ class CallbackActors(ShowStaffMixin, DetailView):
                 i["text"] = (i["first_name"] + " " + i["last_name"])
         return JsonResponse(actors, safe=False)
 
+class CastListView(ActorListView):
+    template_name = "casting/cast_list.html"
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["signing_blank"] = Signing()
+        return context
+    
 class ActorName(UserIsPdsmMixin, BaseDetailView):
     model = get_user_model()
 
@@ -279,21 +298,30 @@ class ActorName(UserIsPdsmMixin, BaseDetailView):
     
 urlpatterns = [
     url('^$', IndexView.as_view(), name='index'),
-    url(r'^edit/show/(?P<pk>\d+)/$', ShowEditor.as_view(), name="edit_show"),
+    
+    url(r'^show/(?P<pk>\d+)/', include([
+        url(r'^edit/$', ShowEditor.as_view(), name="edit_show"),
+
+        url('^actors/$', ShowActors.as_view(), name="show_actors"),
+        
+        url(r'^auditions/', include([
+            url('^$', AuditionView.as_view(), name="audition"),
+            url('^call/$', AuditionCallView.as_view(), name="audition_call"),
+            url('^done/$', AuditionDoneView.as_view(), name="audition_done")
+        ])),
+        
+        url(r'^callbacks/', include([
+            url('^$', CallbackView.as_view(), name="callbacks"),
+            url('^submit/$', CallbackSubmitView.as_view(),
+                name="callback_submit"),
+        ])),
+        
+        url(r'^cast/', include([
+            url('^$', CastListView.as_view(), name="cast_list"),
+        ])),
+    ])),
+    url('^show/\d+/[a-z]+/actor/(?P<pk>\d+)$', ActorName.as_view(),
+        name="casting_actor_name"),
     
     url('^building/(?P<pk>\d+)/$', TablingView.as_view(), name="tabling"),
-
-    url(r'^auditions/(?P<pk>\d+)/', include([
-        url('^$', AuditionView.as_view(), name="audition"),
-        url('^call/$', AuditionCallView.as_view(), name="audition_call"),
-        url('^done/$', AuditionDoneView.as_view(), name="audition_done")
-    ])),
-
-    url(r'^callbacks/(?P<pk>\d+)/', include([
-        url('^$', CallbackView.as_view(), name="callbacks"),
-        url('^actors/$', CallbackActors.as_view(), name="callback_actors"),
-        url('^submit/$', CallbackSubmitView.as_view(), name="callback_submit"),
-    ])),
-    url('^callbacks/\d+/actor/(?P<pk>\d+)$', ActorName.as_view(),
-        name="callback_actor_name"),
 ]

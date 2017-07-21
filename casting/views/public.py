@@ -1,5 +1,5 @@
 from django.views.generic.detail import DetailView
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.urls import reverse
 
 from ..models import *
@@ -45,6 +45,8 @@ class CallbackView(DetailView):
         return context
 
 urlpatterns = [
-    url(r'^callbacks/(?P<pk>\d+)/', CallbackView.as_view(),
-        name="view_callbacks"),
+    url(r'^show/(?P<pk>\d+)/', include([
+        url(r'^callbacks/$', CallbackView.as_view(),
+            name="view_callbacks"),
+    ])),
 ]

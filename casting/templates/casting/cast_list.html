@@ -1,0 +1,61 @@
+{% extends "casting/base.html" %}
+
+{% block extra_scripts %}
+{% include "casting/wsbridge.html" %}
+{% endblock %}
+
+{% block title %}Edit Cast of {{ object }}{% endblock %}
+
+{% load bounddata %}
+
+{% block content %}
+<h2 class="text-center mb-3">Cast of {{ object }}</h2>
+<div class="row card-deck horizontal-scroll">
+    <div class="card">
+      <div class="card-header">
+	<h4 class="card-title mb-0">Show Information</h4>
+      </div>
+      <div class="card-block">
+	{% boundformgroup object "contact_email" type="email" %}
+	<div class="form-group">
+	  {% boundlabel object "cast_list_description" %}
+	  <textarea class="form-control" rows="6"
+		    {% boundattrs object "cast_list_description" %}
+		    >{{ object.cast_list_description }}</textarea>
+	  {% helpp object "cast_list_description" %}
+	</div>
+      </div>
+    </div>
+    {% for character in object.character_set.all %}
+    {% include "casting/pieces/cast_card.html" %}
+    {% endfor %}
+    {% if not object.first_cast_submitted %}
+    {% include "casting/pieces/cast_card.html" with doblank=True character=character_blank %}
+    {% endif %}
+    <div class="card deck-margin-fixer"></div>
+</div>
+<p class="lead text-muted text-center mt-3">
+  Changes are automatically synced and saved.
+</p>
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <p>To cast ensemble roles, increase the number of actors allowed to sign
+      for a given character. You must do this before submitting your
+      first-round casting.</p>
+  </div>
+</div>
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <a href="{% url 'casting:callback_submit' object.pk %}"
+       class="btn btn-danger btn-lg btn-block text-center"
+       data-toggle="tooltip"
+       title="Once submitted, you cannot edit your {% if object.first_cast_submitted %}cast list{% else %}first-round casting or adjust the number of actors allowed to sign for a character{% endif %} any further.">
+      {% if object.first_cast_submitted %}
+      Finalize Cast List
+      {% else %}
+      Submit First-Round Casting
+      {% endif %}
+    </a>
+  </div>
+</div>
+{% endblock %}
