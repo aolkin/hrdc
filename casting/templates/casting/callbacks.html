@@ -26,10 +26,11 @@
 	</div>
       </div>
     </div>
-    {% for character in object.character_set.all %}
+    {% for character in characters %}
     {% include "casting/pieces/callback_card.html" %}
     {% endfor %}
     {% include "casting/pieces/callback_card.html" with doblank=True character=character_blank %}
+    <div class="card deck-margin-fixer"></div>
 </div>
 <p class="lead text-muted text-center mt-3">
   Changes are automatically synced and saved.

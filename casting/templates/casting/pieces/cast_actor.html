@@ -1,0 +1,29 @@
+{% load bounddata %}
+<li class="list-group-item stream-item {% if doblank %}blank signing-blank{% endif %}" {% boundattrs signing %}>
+  <div class="input-group input-group-sm">
+    {% boundinput signing "order" type="hidden" %}
+    <select class="form-control" {% boundattrs signing "actor" %}
+	    data-select-src="{% url 'casting:show_actors' object.pk %}"
+	    data-select-placeholder="Enter Actor Name...">
+      {% if signing.actor %}
+      <option value="{{ signing.actor.pk }}" selected>
+	{{ signing.actor }}
+      </option>
+      {% endif %}
+    </select>
+    <span class="input-group-btn">
+      <!--<button {% boundattrs signing %}
+	      class="btn btn-primary btn-decrease btn-action {% if doblank %}hidden{% endif %} fa fa-chevron-down"></button>
+      <button {% boundattrs signing %}
+	      class="btn btn-primary btn-increase btn-action {% if doblank %}hidden{% endif %} fa fa-chevron-up"></button>-->
+      <button {% boundattrs signing %}
+	      class="btn btn-danger btn-delete btn-action {% if doblank %}hidden{% endif %} fa fa-times"></button>
+      {% if doblank %}
+      <button {% boundattrs signing %} data-extras="character"
+	      data-character="{{ character.pk }}"
+	      class="btn btn-success btn-create btn-action fa fa-plus">
+      </button>
+      {% endif %}
+    </span>
+  </div>
+</li>

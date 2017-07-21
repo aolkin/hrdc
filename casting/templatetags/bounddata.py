@@ -1,7 +1,7 @@
 from django import template
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils.text import slugify
-from django.utils.html import format_html
+from django.utils.html import format_html, mark_safe
 
 register = template.Library()
 
@@ -16,6 +16,8 @@ def getattrs(obj, field=None):
         out["name"] = obj._meta.get_field(field).verbose_name.title()
         try:
             out["value"] = getattr(obj, field)
+            if out["value"] is None or out["value"] is False:
+                out["value"] = ""
         except ObjectDoesNotExist:
             out["value"] = ""
     else:
@@ -34,12 +36,18 @@ def boundattrs(obj=None, field=None, attrs=None, **kwargs):
     if attrs["field"]:
         out += format_html('placeholder="{}" ',
                            attrs.get("placeholder", None) or attrs["name"])
-        out += format_html('value="{}" ', attrs["value"] or "")
+        out += format_html('value="{}" ', attrs["value"])
         out += format_html('data-field="{}" ', attrs["field"])
+    for i, j in [(i[5:], j) for i, j in attrs.items()
+                 if i.startswith("attr_")]:
+        if j != False:
+            out += format_html('{}="{}" ' , i, j)
     return out
 
 @register.simple_tag
-def boundinput(obj=None, field=None, classes="", attrs=None):
+def boundinput(obj=None, field=None, classes="", attrs=None, **kwargs):
+    attrs = attrs or getattrs(obj, field)
+    attrs.update(kwargs)
     attrs.setdefault("type", "text")
     return format_html('<input type="{}" class="form-control {}" {}>',
                        attrs["type"], classes, boundattrs(obj, field,
@@ -53,20 +61,24 @@ def boundlabel(obj=None, field=None, label=None, classes="", attrs=None):
                        classes, label or attrs["name"])
 
 @register.simple_tag
-def helpp(obj, field, classes=""):
+def helpp(obj, field, classes="", small=False):
     helpt = obj._meta.get_field(field).help_text
     if helpt:
-        return format_html('<p class="form-text text-muted {}">{}</p>',
-                           classes, helpt)
+        out = format_html('<p class="form-text text-muted {}">{}</p>',
+                          classes, helpt)
+        return mark_safe("<small>{}</small>".format(out)) if small else out
     else:
         return ""
 
 @register.simple_tag
-def boundformgroup(obj, field, label=None, classes="", **kwargs):
+def boundformgroup(obj, field, label=None, small=False, classes="", **kwargs):
     attrs = getattrs(obj, field)
     attrs.update(kwargs)
+    if small:
+        classes +=" form-control-sm"
     return format_html('<div class="form-group">{} {} {}</div>',
-                       boundlabel(label=label, attrs=attrs),
-                       boundinput(attrs=attrs),
-                       helpp(obj, field))
+                       boundlabel(label=label, attrs=attrs) if
+                       label != False else "",
+                       boundinput(classes=classes, attrs=attrs),
+                       helpp(obj, field, small=small))
     

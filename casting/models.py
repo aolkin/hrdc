@@ -155,7 +155,9 @@ class CastingMeta(models.Model):
         blank=True, verbose_name="Callback Information",
         help_text="Extra information about all callbacks (location, etc).")
     callbacks_submitted = models.BooleanField(default=False)
-    cast_list_description = models.TextField(blank=True)
+    cast_list_description = models.TextField(
+        blank=True, verbose_name="Cast List Information",
+        help_text="Extra information to display with the cast list.")
     first_cast_submitted = models.BooleanField(
         default=False, verbose_name="First-round Cast List Submitted")
     cast_submitted = models.BooleanField(
@@ -235,16 +237,28 @@ class Character(AssociateShowMixin):
     callback_description = models.TextField(
         blank=True, verbose_name="Character Callback Information",
         help_text="Extra information about callbacks for this character.")
-    allowed_signers = models.PositiveSmallIntegerField(default=1)
+    allowed_signers = models.PositiveSmallIntegerField(
+        default=1, help_text="Number of actors allowed to sign.")
+    added_for_signing = models.BooleanField(default=False)
+
+    @property
+    def editable(self):
+        if self.show.first_cast_submitted:
+            return False
+        if self.show.callbacks_submitted:
+            return self.added_for_signing
+        return True
     
     def __str__(self):
         return self.name if self.name else "<Unnamed Character>"
-    
-class Callback(models.Model):
+
+class ActorMapping(models.Model):
     character = models.ForeignKey(Character)
     actor = models.ForeignKey(get_user_model(), null=True)
-    notified = models.BooleanField(default=False)
 
+    class Meta:
+        abstract = True
+    
     @property
     def show(self):
         return self.character and self.character.show
@@ -254,13 +268,18 @@ class Callback(models.Model):
             return "{} for {} in {}".format(self.actor, self.character,
                                             self.show)
         except ObjectDoesNotExist:
-            return "(Unnassigned Callback)"
+            return "(Unnassigned {})".format(self.__class__.__name__)
     
-class Signing(Callback):
-    order = models.PositiveSmallIntegerField()
+class Callback(ActorMapping):
+    notified = models.BooleanField(default=False)
+    
+class Signing(ActorMapping):
+    order = models.PositiveSmallIntegerField(default=0)
     response = models.NullBooleanField()
     notified_first = models.BooleanField(default=False)
     notified_second = models.BooleanField(default=False)
+
+    #tracker = FieldTracker(fields=("order",))
 
     class Meta:
         ordering = ("character__show", "character", "order")

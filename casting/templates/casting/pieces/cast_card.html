@@ -1,27 +1,24 @@
 {% load bounddata %}
 <div class="card stream-item scroll-after-create {% if doblank %}blank character-blank{% endif %}" {% boundattrs character %}>
   <div class="card-header">
+    {% if doblank or character.added_for_signing %}
       <button {% boundattrs character %} data-toggle="tooltip" tabindex="-1"
 	      class="btn-action badge btn float-right btn-danger btn-delete {% if doblank %}hidden{% endif %} fa fa-times"
-	      title="Delete this character and remove all actors called back for it."> </button>
+	      title="Delete this character and remove all actors called back for it."></button>
+      {% endif %}
       <button {% boundattrs character %} data-toggle="tooltip"
 	      class="btn-action badge btn float-right btn-success btn-create {% if not doblank %}hidden{% endif %} fa fa-plus"
 	      data-extras="show" data-show="{{ object.pk }}"
-	      title="Add a new character." data-placement="left"> </button>
+	      title="Add a new character." data-placement="left"></button>
     {% boundformgroup character "name" %}
   </div>
   <ul class="card-block list-group list-group-flush">
-    {% for callback in character.callback_set.all %}
-    {% include "casting/pieces/callback_actor.html" %}
+    {% for signing in character.signing_set.all %}
+    {% include "casting/pieces/cast_actor.html" %}
     {% endfor %}
-    {% include "casting/pieces/callback_actor.html" with doblank=True callback=callback_blank %}
+    {% include "casting/pieces/cast_actor.html" with doblank=True signing=signing_blank %}
   </ul>
   <div class="card-footer">
-    <div class="form-group">
-      {% boundlabel character "callback_description" None "sr-only" %}
-      <textarea class="form-control form-control-sm" rows="3"
-		{% boundattrs character "callback_description" placeholder="Extra information about callbacks for this character (date, time, etc)..." %}
-		>{{ character.callback_description }}</textarea>
-    </div>
+      {% boundformgroup character "allowed_signers" False attr_min="1" attr_max="99" type="number" small=True attr_readonly=object.first_cast_submitted %}
   </div>
 </div>

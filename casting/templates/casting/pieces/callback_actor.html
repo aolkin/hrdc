@@ -2,7 +2,7 @@
 <li class="list-group-item stream-item {% if doblank %}blank callback-blank{% endif %}" {% boundattrs callback %}>
   <div class="input-group input-group-sm">
     <select class="form-control" {% boundattrs callback "actor" %}
-	    data-select-src="{% url 'casting:callback_actors' object.pk %}"
+	    data-select-src="{% url 'casting:show_actors' object.pk %}"
 	    data-select-placeholder="Enter Actor Name...">
       {% if callback.actor %}
       <option value="{{ callback.actor.pk }}" selected>
@@ -12,13 +12,11 @@
     </select>
     <span class="input-group-btn">
       <button {% boundattrs callback %}
-	      class="btn btn-danger btn-delete btn-action {% if doblank %}hidden{% endif %}">
-	&times;</button>
+	      class="btn btn-danger btn-delete btn-action {% if doblank %}hidden{% endif %} fa fa-times"></button>
       {% if doblank %}
       <button {% boundattrs callback %} data-extras="character"
 	      data-character="{{ character.pk }}"
-	      class="btn btn-success btn-create btn-action {% if not doblank %}hidden{% endif %}">
-	+</button>
+	      class="btn btn-success btn-create btn-action {% if not doblank %}hidden{% endif %} fa fa-plus"></button>
       {% endif %}
     </span>
   </div>
