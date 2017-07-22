@@ -15,10 +15,6 @@ class SigningAdmin(admin.ModelAdmin):
                    'character__show__show__season')
     search_fields = ('actor__first_name', 'actor__last_name',
                      'character__name')
-
-    def order_num(self, instance):
-        return instance.order + 1
-    order_num.short_description = "Signing Order"
     
     def get_actions(self, request):
         actions = super().get_actions(request)
