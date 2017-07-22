@@ -40,7 +40,9 @@ def boundattrs(obj=None, field=None, attrs=None, **kwargs):
         out += format_html('data-field="{}" ', attrs["field"])
     for i, j in [(i[5:], j) for i, j in attrs.items()
                  if i.startswith("attr_")]:
-        if j != False:
+        if j == True:
+            out += format_html("{}", i)
+        elif j != False:
             out += format_html('{}="{}" ' , i, j)
     return out
 

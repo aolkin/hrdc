@@ -1,0 +1,163 @@
+{% extends "casting/public/base.html" %}
+
+{% load humanize %}
+
+{% block title %}{{ object }} | Casting{% endblock %}
+
+{% block content %}
+<h3 class="text-center">
+  {% if not object.cast_list_released or user_is_staff and object.cast_submitted %} First-Round {% endif %}
+  Cast List for:
+</h3>
+<h2 class="text-center">{{ object }}</h2>
+{% if object.cast_list_released or user_is_staff or allow_view_first_cast %}
+<div class="row justify-content-center">
+  <div class="col-md-8 text-center">
+    {% if user_is_staff %}
+    {% if object.cast_submitted %}
+    <div class="alert alert-info">
+      <strong>Cast List submitted!</strong>
+      Your cast list has been submitted and can no longer be changed.
+    </div>
+    {% else %}
+    <div class="alert alert-danger">
+      {% if request.session.CAST_SUBMIT_FLOW == object.pk %}
+      <form action="{% url 'casting:cast_submit' object.pk %}"
+	    method="POST">
+	{% csrf_token %}
+	{% if object.first_cast_submitted %}
+	<p class="lead">
+	  Please confirm your cast lists below.
+	  Note that once you have submitted, you CANNOT MAKE CHANGES.
+	</p>
+	<button type="submit" class="btn btn-danger btn-block">Submit</button>
+	{% else %}
+	<p class="lead">
+	  Please confirm your first-round casting below.
+	  Note that once you have submitted, you cannot change the first
+	  actors up to the number allowed to sign for that character.
+	</p>
+	<button type="submit" class="btn btn-danger btn-block">
+	  Submit First-Round Casting</button>
+	{% endif %}
+      </form>
+      {% else %}
+      {% if request.session.CAST_SUBMIT_ERRORS == object.pk %}
+      Your cast list has errors. Please fix them and try again.<br>
+      {% else %}
+      <strong>This is a preview!</strong>
+      You have not yet submitted your cast list.<br>
+      {% endif %}
+      <small>Please go
+	<a href="{% url 'casting:cast_list' object.pk %}">here</a>
+	to edit and submit it.
+      </small>
+      {% endif %}
+    </div>
+    {% endif %}
+    {% endif %}
+    <p class="lead">{{ object.cast_list_description }}</p>
+  </div>
+</div>
+<div class="container-fluid limited-container-1200">
+  <div class="row justify-content-center">
+    {% for character in object.character_set.all %}
+    <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 col-xl-3 mb-4">
+      <div class="card">
+	<div class="card-header text-center p-2">
+	  <h5 class="card-title mb-0">
+	    {% if character.name or not user_is_staff %}
+	    {{ character.name }}
+	    {% else %}
+	    <span class="text-danger">&lt;Unnamed Character&gt;</span>
+	    {% endif %}
+	  </h5>
+	</div>
+	<ul class="list-group list-group-flush">
+	  {% for signing in character.signing_set.all %}
+	  <li class="list-group-item signing-item">
+	    <div class="signing-count w-100">
+	      {% if signing.signable %}
+	      {% if signing.response is True %}
+	      <span
+		 class="badge badge-success badge-pill pull-right fa fa-check"
+		 title="Accepted" data-toggle="tooltip"> </span>
+	      {% elif signing.response is False %}
+	      <span class="badge badge-danger pull-right fa fa-times"
+		    title="Rejected" data-toggle="tooltip"> </span>
+	      {% else %}
+	      <span class="badge badge-default pull-right fa fa-question"
+		    title="No Response" data-toggle="tooltip"> </span>
+	      {% endif %}
+	      {% else %}
+	      <span class="badge badge-default pull-right fa fa-ban"
+		    title="Blocked" data-toggle="tooltip"> </span>
+	      {% endif %}
+	      {{ signing.actor }}
+	    </span>
+	  </li>
+	  {% endfor %}
+	</ul>
+	{% if character.allowed_signers != 1 %}
+	<div class="card-footer py-2 px-3">
+	  <small class="text-muted">
+	    {{ character.allowed_signers|apnumber|capfirst }} actors can sign
+	    for this part.
+	  </small>
+	</div>
+	{% endif %}
+	{% if character.actors %}
+	<div class="card-footer py-2 px-3">
+	  <small>
+	    <span class="text-muted">This role has been filled by</span>
+	    {% for actor in character.actors %}
+	    {{ actor }}
+	    {% if forloop.revcounter0 == 1 %}
+	    and
+	    {% elif not forloop.last %},
+	    {% endif %}
+	    {% endfor %}
+	  </small>
+	</div>
+	{% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% elif request.user.is_authenticated and request.user.is_board %}
+<div class="row justify-content-center">
+  <div class="col-md-8 text-center">
+    {% if object.cast_submitted %}
+    <div class="alert alert-info">
+      <big>The cast list for this show has been submitted, but not yet
+	released.</big>
+    </div>
+    {% elif object.first_cast_submitted  %}
+    <div class="alert alert-info">
+      <big>First-round casting for this show has been submitted, but not yet
+	released.</big>
+    </div>
+    {% else %}
+    <div class="alert alert-warning">
+      <big>The cast list has not yet been submitted for this show!</big>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% else %}
+<div class="row justify-content-center">
+  <div class="col-md-8 text-center">
+    <div class="alert alert-danger">
+      <big>Casting has not yet been released for this show!</big>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% if object.contact_email %}
+<p class="text-center"><big>Please email 
+    <a href="mailto:{{ object.contact_email }}" class="font-italic">
+      {{ object.contact_email }}</a> with any questions.</big>
+</p>
+{% endif %}
+{% endblock %}

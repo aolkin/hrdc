@@ -2,20 +2,28 @@
 <div class="card stream-item scroll-after-create {% if doblank %}blank character-blank{% endif %}" {% boundattrs character %}>
   <div class="card-header">
     {% if doblank or character.added_for_signing %}
-      <button {% boundattrs character %} data-toggle="tooltip" tabindex="-1"
-	      class="btn-action badge btn float-right btn-danger btn-delete {% if doblank %}hidden{% endif %} fa fa-times"
-	      title="Delete this character and remove all actors cast as it.">
-      </button>
-      {% endif %}
-      <button {% boundattrs character %} data-toggle="tooltip"
-	      class="btn-action badge btn float-right btn-success btn-create {% if not doblank %}hidden{% endif %} fa fa-plus"
-	      data-extras="show" data-show="{{ object.pk }}"
-	      title="Add a new character." data-placement="left"> </button>
-    {% boundformgroup character "name" attr_readonly=object.first_cast_submitted %}
+    <button {% boundattrs character %} data-toggle="tooltip" tabindex="-1"
+	    class="btn-action badge btn float-right btn-danger btn-delete {% if doblank %}hidden{% endif %} fa fa-times"
+	    title="Delete this character and remove all actors cast as it.">
+    </button>
+    {% endif %}
+    <button {% boundattrs character %} data-toggle="tooltip"
+	    class="btn-action badge btn float-right btn-success btn-create {% if not doblank %}hidden{% endif %} fa fa-plus"
+	    data-extras="show" data-show="{{ object.pk }}"
+	    title="Add a new character." data-placement="left"> </button>
+    {% if doblank or character.editable %}
+    {% boundformgroup character "name" %}
+    {% else %}
+    {% boundformgroup character "name" attr_readonly=True %}
+    {% endif %}
   </div>
-  <ul class="card-block list-group list-group-flush">
+  <ul class="list-group list-group-flush {% if not object.first_cast_submitted %}card-block{% endif %}">
     {% for signing in character.signing_set.all %}
     {% include "casting/pieces/cast_actor.html" %}
+    {% if object.first_cast_submitted and forloop.counter == character.allowed_signers %}
+  </ul>
+  <ul class="card-block list-group list-group-flush">
+    {% endif %}
     {% endfor %}
     {% include "casting/pieces/cast_actor.html" with doblank=True signing=signing_blank %}
   </ul>

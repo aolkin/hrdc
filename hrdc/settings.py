@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'config',
     'basetemplates',
     'hrdc',
+    'django.contrib.humanize',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

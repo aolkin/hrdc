@@ -3,6 +3,7 @@
   <div class="input-group input-group-sm">
     <span class="input-group-addon signing-count"></span>
     {% boundinput signing "order" type="hidden" %}
+    {% if doblank or signing.editable %}
     <select class="form-control" {% boundattrs signing "actor" %}
 	    data-select-src="{% url 'casting:show_actors' object.pk %}"
 	    data-select-placeholder="Enter Actor Name...">
@@ -29,6 +30,9 @@
 	      class="btn btn-success btn-create btn-action fa fa-plus">
       </button>
     </span>
+    {% endif %}
+    {% else %}
+    {% boundinput signing "actor" attr_readonly=True %}
     {% endif %}
   </div>
 </li>
