@@ -248,7 +248,7 @@ class CallbackSubmitView(ShowStaffMixin, View):
                                                 args=(self.object.pk,)))
 
 class CastSubmitView(ShowStaffMixin, View):
-    def clean_cast(self):
+    def clean_cast(self, warn=True):
         if self.object.cast_submitted:
             messages.error(self.request, "Cast list already submitted!")
             return False
@@ -279,7 +279,7 @@ class CastSubmitView(ShowStaffMixin, View):
                     "Either cast more or decrease the number of allowed " +
                     "signers.")
                 clean = False
-            elif len(actors) == c.allowed_signers:
+            elif len(actors) == c.allowed_signers and warn:
                 messages.warning(
                     self.request,
                     "No alternates have been provided for {}.".format(c))
@@ -307,15 +307,20 @@ class CastSubmitView(ShowStaffMixin, View):
         if ("CAST_SUBMIT_FLOW" in self.request.session and
             self.request.session["CAST_SUBMIT_FLOW"] == self.object.pk):
             del self.request.session["CAST_SUBMIT_FLOW"]
-            if self.clean_cast():
+            if self.clean_cast(False):
                 if "CAST_SUBMIT_ERRORS" in self.request.session:
                     del self.request.session["CAST_SUBMIT_ERRORS"]
-                #self.object.callbacks_submitted = True
-                #self.object.save(update_fields=("callbacks_submitted",))
-                messages.warning(
+                if self.object.first_cast_submitted:
+                    self.object.cast_submitted = True
+                else:
+                    self.object.first_cast_submitted = True
+                self.object.save(update_fields=("first_cast_submitted",
+                                                "cast_submitted"))
+                messages.success(
                     self.request,
-                    "Submitted cast list for {} successfully!".format(
-                        self.object))
+                    "Submitted {} for {} successfully!".format(
+                        "cast list" if self.object.cast_submitted else
+                        "first-round casting", self.object))
             else:
                 self.request.session["CAST_SUBMIT_ERRORS"] = self.object.pk
             return HttpResponseRedirect(reverse("casting:view_cast",
@@ -364,7 +369,19 @@ class CastListView(ActorListView):
         context = super().get_context_data(*args, **kwargs)
         context["signing_blank"] = Signing()
         return context
-    
+       
+    def get(self, *args, **kwargs):
+        obj = self.get_object()
+        if "CAST_SUBMIT_ERRORS" in self.request.session:
+            del self.request.session["CAST_SUBMIT_ERRORS"]
+        if "CAST_SUBMIT_FLOW" in self.request.session:
+            del self.request.session["CAST_SUBMIT_FLOW"]
+        if obj.cast_submitted:
+            return HttpResponseRedirect(reverse('casting:view_cast',
+                                                args=(obj.pk,)))
+        else:
+            return super().get(*args, **kwargs)
+ 
 class ActorName(UserIsPdsmMixin, BaseDetailView):
     model = get_user_model()
 
