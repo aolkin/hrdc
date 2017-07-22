@@ -35,16 +35,18 @@
     If this is in error, please contact an HRDC Board member.
     {% endif %}
   </p>
-  <p>
-    This site is designed primarily for executive staff members on HRDC shows.
-    However, you may still:
-  </p>
-  <h3>
-    <a href="{% url 'dramaorg:profile' %}">edit your profile</a>
-  </h3>
+  <h2>
+    <a href="{% url 'casting:public_index' %}">View Callback and Cast Lists</a>
+  </h2>
   <h4>or</h4>
-  <h3>
-    <a href="{% url 'dramaorg:password_change' %}">change your password</a>
+  <h3 class="row justify-content-center">
+    <a class="col-sm text-right" href="{% url 'dramaorg:profile' %}">
+      edit your profile
+    </a>
+    |
+    <a class="col-sm text-left" href="{% url 'dramaorg:password_change' %}">
+      change your password
+    </a>
   </h3>
 </div>
 {% endif %}

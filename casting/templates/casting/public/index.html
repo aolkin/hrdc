@@ -1,0 +1,36 @@
+{% extends "bt/default.html" %}
+
+{% load drama %}
+
+{% block extra_header %}
+{% if user.is_authenticated %}
+{% include "dramaorg/user_dropdown.html" %}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+{% for i in shows %}
+{% if i.2 %}
+<h3 class="text-center mt-5">
+  {{ i.0 }} Lists
+</h3>
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    {% for show in i.2 %}
+    <a href="{% url i.1 show.pk %}"
+       class="list-group-item list-group-item-action bg-{{ i.3 }} text-white">
+	<h5 class="mb-0 w-100 text-center">{{ show }}</h5>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endfor %}
+
+<div class="row justify-content-center mt-5">
+  <div class="text-muted">current season:</div>
+</div>
+<div class="row justify-content-center">
+  <h4 class="display-4 text-muted">{% current_season %}</h4>
+</div>
+{% endblock %}

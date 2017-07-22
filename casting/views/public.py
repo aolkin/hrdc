@@ -1,5 +1,6 @@
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
+from django.views.generic.base import TemplateView
 from django.conf.urls import url, include
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -11,16 +12,21 @@ from ..models import *
 
 from . import show_model
 
-class PublicView(DetailView):
-    model = CastingMeta
-
+class FixHeaderUrlMixin:
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         if self.request.user.is_authenticated():
             if self.request.user.is_pdsm:
                 context["BT_header_url"] = 'casting:index'
         else:
-            context["BT_header_url"] = None
+            context["BT_header_url"] = 'casting:public_index'
+        return context
+
+class PublicView(FixHeaderUrlMixin, DetailView):
+    model = CastingMeta
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
         context["user_is_staff"] = self.object.show.user_is_staff(
             self.request.user)
         context["sidebar_menu"] = {}
@@ -117,29 +123,21 @@ class CastView(PublicView):
 
 SIGNING_ACTOR_KEY = "SIGNING_ACTOR_TOKEN_PK_SESSION_KEY"
     
-class SigningView(ListView):
+class SigningView(FixHeaderUrlMixin, ListView):
     template_name = "casting/public/sign.html"
     model = Signing
 
     def get_actor(self):
-        if self.request.user.is_authenticated():
-            return self.request.user
-        elif SIGNING_ACTOR_KEY in self.request.session:
+        if SIGNING_ACTOR_KEY in self.request.session:
             return get_user_model().objects.get(
                 pk=self.request.session[SIGNING_ACTOR_KEY])
+        elif self.request.user.is_authenticated():
+            return self.request.user
         else:
             return None
-
-    def dispatch(self, *args, **kwargs):
-        self.request.session.cycle_key()
-        return super().dispatch(*args, **kwargs)
         
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        if self.request.user.is_authenticated():
-            context["BT_header_url"] = 'casting:index'
-        else:
-            context["BT_header_url"] = None
         context["actor"] = self.get_actor()
         return context
             
@@ -168,6 +166,22 @@ def actor_token_auth(request, token):
     user = get_user_model().objects.get(login_token=token)
     request.session[SIGNING_ACTOR_KEY] = user.pk
     return HttpResponseRedirect(reverse("casting:signing"))
+
+class IndexView(FixHeaderUrlMixin, TemplateView):
+    template_name = "casting/public/index.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["shows"] = (("Callback", "casting:view_callbacks", [], "info"),
+                            ("Cast", "casting:view_cast", [], "primary"))
+        shows = show_model.objects.current_season().filter(
+            casting_meta__isnull=False)
+        for show in [i.casting_meta for i in shows]:
+            if show.callbacks_released and show.release_meta.stage < 3:
+                context["shows"][0][2].append(show)
+            if show.cast_list_released:
+                context["shows"][1][2].append(show)
+        return context
     
 urlpatterns = [
     url(r'^show/(?P<pk>\d+)/', include([
@@ -178,6 +192,7 @@ urlpatterns = [
         url(r'^cast/popout/$', CastView.as_view(popout=True),
             name="view_cast_popout"),
     ])),
+    url(r'^$', IndexView.as_view(), name="public_index"),
     url(r'^sign/$', SigningView.as_view(), name="signing"),
     url(r'^t/([A-Za-z0-9+-]{86})/$', actor_token_auth, name="actor_token"),
 ]
