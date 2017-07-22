@@ -108,13 +108,21 @@ class DataBindingHandler {
         for (let field in action.data) {
             let el = els.filter("[data-field=" + field + "]");
             if (el.is("select")) {
-                $.get("actor/" + action.data[field],
-                      (function(data) {
-                          $("<option>").text(data.text).attr("value", data.id)
-                                       .appendTo(this);
-                          this.val(data.id);
-                          this.trigger("change");
-                      }).bind(el));
+		if (action.data[field]) {
+                    $.get("actor/" + action.data[field],
+			  (function(data) {
+                              $("<option>").text(data.text)
+				  .attr("value", data.id).appendTo(this);
+                              this.val(data.id);
+                              this.trigger("change");
+			  }).bind(el)).fail((function() {
+			      alert("Failed to load actor name.");
+			      location.reload();
+			  }).bind(el));
+		} else {
+		    el.val(null);
+		    el.trigger("change");
+		}
             } else {
                 el.val(action.data[field]);
             }
@@ -130,6 +138,14 @@ class DataBindingHandler {
             let el = blank.clone().insertBefore(blank);
             el.removeClass(stream + "-blank").removeClass("blank")
 		.attr("data-pk", action.pk);
+	    let createbtn = el.find(".btn-action.btn-create[data-stream=" +
+				    stream + "]");
+	    if (createbtn.parent().is(".input-group-btn") &&
+		!createbtn.siblings().is("button")) {
+		createbtn.parent().remove();
+	    } else {
+		createbtn.remove();
+	    }
             el.find(".btn-action[data-stream=" + stream +
                     "]").toggleClass("hidden");
             el.find("[data-pk][data-stream=" + stream +

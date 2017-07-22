@@ -4,13 +4,14 @@
     {% if doblank or character.added_for_signing %}
       <button {% boundattrs character %} data-toggle="tooltip" tabindex="-1"
 	      class="btn-action badge btn float-right btn-danger btn-delete {% if doblank %}hidden{% endif %} fa fa-times"
-	      title="Delete this character and remove all actors called back for it."></button>
+	      title="Delete this character and remove all actors cast as it.">
+      </button>
       {% endif %}
       <button {% boundattrs character %} data-toggle="tooltip"
 	      class="btn-action badge btn float-right btn-success btn-create {% if not doblank %}hidden{% endif %} fa fa-plus"
 	      data-extras="show" data-show="{{ object.pk }}"
-	      title="Add a new character." data-placement="left"></button>
-    {% boundformgroup character "name" %}
+	      title="Add a new character." data-placement="left"> </button>
+    {% boundformgroup character "name" attr_readonly=object.first_cast_submitted %}
   </div>
   <ul class="card-block list-group list-group-flush">
     {% for signing in character.signing_set.all %}

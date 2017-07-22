@@ -27,11 +27,14 @@ table .btn {
 }
 
 .card-deck.horizontal-scroll .card {
-    min-width: 300px;
+    min-width: 18rem;
+}
+.view-cast_list .card-deck.horizontal-scroll .card {
+    min-width: 20rem;
 }
 
 .card-deck.horizontal-scroll .card:first-child {
-    min-width: 480px;
+    min-width: 30rem;
 }
 
 .card-deck.horizontal-scroll {
@@ -98,4 +101,51 @@ table .btn {
 .fa.badge {
     font-size: 0.8rem;
     padding: 0.4em 0.4em 0.3em .4em;
+}
+
+.input-group-btn>.btn-increase,
+.input-group-btn>.btn-decrease {
+    height: 0.5rem;
+    padding: 0 0.5rem !important;
+    z-index: 3 !important;
+    margin-left: -0.2rem !important;
+}
+
+.input-group-btn>.btn-decrease {
+    margin-top: -0.2rem;
+    border-top-left-radius: 0.5em !important;
+    border-top-right-radius: 0.5em !important;
+}
+.input-group-btn>.btn-increase {
+    margin-bottom: -0.2rem;
+    border-bottom-left-radius: 0.5em !important;
+    border-bottom-right-radius: 0.5em !important;
+}
+
+.card-block>.list-group-item:first-of-type .btn-decrease,
+.card-block>.list-group-item:nth-last-of-type(2) .btn-increase {
+    background-color: #cadced;
+    border-color: #cadced;
+    pointer-events: none;
+}
+
+.card-block.list-group {
+    counter-reset: signing-counter;
+}
+.card-block.list-group .list-group-item.blank .signing-count {
+    display: none;
+}
+.card-block.list-group .list-group-item .signing-count:before {
+    content: counter(signing-counter) ".";
+    counter-increment: signing-counter;
+    width: 1rem;
+    text-align: right;
+}
+
+.input-group>span.select2-container .select2-selection {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.input-group>span.select2-container:not(:first-of-type) .select2-selection {
+    border-radius: 0;
 }
