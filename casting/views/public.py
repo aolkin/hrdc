@@ -1,8 +1,15 @@
 from django.views.generic.detail import DetailView
+from django.views.generic.list import ListView
 from django.conf.urls import url, include
+from django.contrib.auth import get_user_model
 from django.urls import reverse
+from django.http import HttpResponseRedirect, HttpResponseForbidden
+
+from django import forms
 
 from ..models import *
+
+from . import show_model
 
 class PublicView(DetailView):
     model = CastingMeta
@@ -61,9 +68,12 @@ class CallbackView(PublicView):
 
 class CastView(PublicView):
     template_name = "casting/public/cast.html"
+    popout = False
     
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
+        context["base_template"] = ("bt/default.html" if self.popout else
+                                    "casting/public/base.html")
         context["allow_view_first_cast"] = (
             self.object.first_cast_released and
             self.request.user.is_authenticated() and self.request.user.is_pdsm)
@@ -101,13 +111,73 @@ class CastView(PublicView):
                 "active": True,
                 "url": ""
             })
+        if self.popout:
+            del context["sidebar_menu"]
         return context
 
+SIGNING_ACTOR_KEY = "SIGNING_ACTOR_TOKEN_PK_SESSION_KEY"
+    
+class SigningView(ListView):
+    template_name = "casting/public/sign.html"
+    model = Signing
+
+    def get_actor(self):
+        if self.request.user.is_authenticated():
+            return self.request.user
+        elif SIGNING_ACTOR_KEY in self.request.session:
+            return get_user_model().objects.get(
+                pk=self.request.session[SIGNING_ACTOR_KEY])
+        else:
+            return None
+
+    def dispatch(self, *args, **kwargs):
+        self.request.session.cycle_key()
+        return super().dispatch(*args, **kwargs)
+        
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        if self.request.user.is_authenticated():
+            context["BT_header_url"] = 'casting:index'
+        else:
+            context["BT_header_url"] = None
+        context["actor"] = self.get_actor()
+        return context
+            
+    def get_queryset(self):
+        shows = show_model.objects.current_season().filter(
+            casting_meta__isnull=False).filter(
+                casting_meta__release_meta__stage__gte=3,
+                casting_meta__cast_submitted=True)
+        qs = super().get_queryset().filter(
+            actor=self.get_actor(), character__show__show__in=shows).order_by(
+                "character__show", "order")
+        return qs
+
+    def post(self, *args, **kwargs):
+        signings = [(int(x.split("-")[-1]), int(y)) for x, y in
+                    self.request.POST.items() if
+                    x.startswith("signing-response-") and y]
+        for pk, r in signings:
+            obj = Signing.objects.get(pk=pk)
+            if obj.response == None:
+                obj.response = r
+                obj.save()
+        return HttpResponseRedirect(reverse("casting:signing"))
+
+def actor_token_auth(request, token):
+    user = get_user_model().objects.get(login_token=token)
+    request.session[SIGNING_ACTOR_KEY] = user.pk
+    return HttpResponseRedirect(reverse("casting:signing"))
+    
 urlpatterns = [
     url(r'^show/(?P<pk>\d+)/', include([
         url(r'^callbacks/$', CallbackView.as_view(),
             name="view_callbacks"),
         url(r'^cast/$', CastView.as_view(),
             name="view_cast"),
+        url(r'^cast/popout/$', CastView.as_view(popout=True),
+            name="view_cast_popout"),
     ])),
+    url(r'^sign/$', SigningView.as_view(), name="signing"),
+    url(r'^t/([A-Za-z0-9+-]{86})/$', actor_token_auth, name="actor_token"),
 ]

@@ -1,0 +1,87 @@
+{% extends "bt/default.html" %}
+
+{% load humanize %}
+
+{% block title %}Signing | Common Casting{% endblock %}
+
+{% block content %}
+{% if actor %}
+<h4 class="text-center mb-3">Welcome, {{ actor }}</h4>
+{% else %}
+<h3 class="text-center">
+  Please log in again or click the link in your email to log in automatically.
+</h3>
+{% endif %}
+{% if object_list and actor %}
+<h2 class="text-center">Roles Offered to You</h2>
+<div class="row justify-content-center">
+  <div class="col-lg-6 col-md-8 col-sm-10">
+    <p class="lead text-center">
+      Accept or reject the roles you've been cast as below:
+    </p>
+    <p class="lead text-center">
+      <small>You may also leave any number of roles without a response and
+	return to them later.</small>
+    </p>
+    <p class="text-center mb-0">
+      <!-- Actor help -->
+    </p>
+    <form method="POST">
+      {% csrf_token %}
+      {% for i in object_list %}
+      {% ifchanged i.show %}
+      <h4 class="mb-3 mt-5">
+	<a href="{% url 'casting:view_cast' i.show.pk %}" target="_popout"
+	   data-toggle="tooltip" title="Click to view the entire cast list...">
+	  {{ i.show }}
+	</a>
+      </h4>
+      {{ i.show.cast_list_description|linebreaks }}
+      {% endifchanged %}
+      <div class="form-group row">
+	<label class="col-7 push-5 mt-1 text-right">
+	  <big>
+	    <strong>{{ i.character }}</strong>
+	    <span class="text-muted">{{ i.order_num|ordinal }} Choice</span>
+	  </big>
+	</label>
+	{% if i.signable %}
+	<select class="form-control custom-select col-5 pull-7"
+		name="signing-response-{{ i.pk }}" 
+		{% if i.response is not None %}disabled>
+	  <option selected>{{ i.get_response_display }}</option>
+	  {% else %}>
+	  <option value="1">Accept this Role</option>
+	  <option value="0">Reject this Role</option>
+	  <option selected value="">No Response</option>
+	  {% endif %}
+	</select>
+	{% else %}
+	<div class="col-5 pull-7">
+	  <div class="form-control-static text-danger">
+	    <div class="fa fa-exclamation-triangle pull-left mt-1"> </div>
+	    <div class="ml-4">This role has already been taken.</div>
+	  </div>
+	</div>
+	{% endif %}
+	{% if i.character.allowed_signers > 1 %}
+	<div class="form-text text-muted text-right w-100 mt-0">
+	  {{ i.character.allowed_signers|apnumber|capfirst }} actors can
+	  accept this role.
+	</div>
+	{% endif %}
+      </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-block btn-primary"
+	      data-toggle="tooltip"
+	      title="Please double-check your responses before submitting, as they cannot be changed later.">
+	Submit Responses
+      </button>
+    </form>
+  </div>
+</div>
+{% elif actor %}
+<h2 class="text-center">You have not been cast in any shows at this time.</h2>
+<h3 class="text-center">Please check back later.</h3>
+{% endif %}
+{% endblock %}

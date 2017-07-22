@@ -266,6 +266,10 @@ class Character(AssociateShowMixin):
     @property
     def actors(self):
         responses = self.signing_set.filter(response=True)
+        if responses:
+            if self.signing_set.filter(order__lt=responses[0].order,
+                                       response__isnull=True):
+                return None
         if len(responses) >= self.allowed_signers:
             signers = list([i.actor for i in responses])
             if len(signers) > self.allowed_signers:
@@ -301,10 +305,18 @@ class Callback(ActorMapping):
     
 class Signing(ActorMapping):
     order = models.PositiveSmallIntegerField(default=0)
-    response = models.NullBooleanField()
+    response = models.NullBooleanField(choices=(
+        (True, "Accept this Role"),
+        (False, "Reject this Role"),
+        (None, "No Response"),
+    ))
     notified_first = models.BooleanField(default=False)
     notified_second = models.BooleanField(default=False)
 
+    def order_num(self):
+        return self.order + 1
+    order_num.short_description = "Signing Order"
+    
     @property
     def editable(self):
         if self.show.cast_submitted:
