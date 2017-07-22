@@ -41,7 +41,7 @@ class CharacterBinding(AssociatedShowBinding):
     
     def has_permission(self, user, action, pk):
         perm = super().has_permission(user, action, pk)
-        if pk:
+        if pk and action == "delete":
             obj = self.model.objects.get(pk=pk)
             if obj.show.callbacks_submitted:
                 return perm and obj.added_for_signing
@@ -58,9 +58,13 @@ class CharacterBinding(AssociatedShowBinding):
 
     def update(self, pk, data):
         obj = self.model.objects.get(pk=pk)
-        if "allowed_signers" in data:
-            if obj.show.first_cast_submitted:
+        if "allowed_signers" in data and obj.show.first_cast_submitted:
                 data["allowed_signers"] = obj.allowed_signers
+        if obj.show.callbacks_submitted and not obj.added_for_signing:
+            if "name" in data:
+                del data["name"]
+            if "callback_description" in data:
+                del data["callback_description"]
         super().update(pk, data)
 
 class CallbackBinding(AssociatedShowBinding):
@@ -97,28 +101,27 @@ class SigningBinding(AssociatedShowBinding):
         perm = super().has_permission(user, action, pk)
         if pk:
             obj = self.model.objects.get(pk=pk)
-            if obj.character.show.cast_submitted:
+            if not obj.editable:
                 return False
-            if obj.character.show.first_cast_submitted:
-                if obj.order < obj.character.allowed_signers:
-                    return False
-                if "order" in data and int(
-                        data["order"]) < obj.character.allowed_signers:
-                    return False
         return perm
     
     def update(self, pk, data):
         obj = self.model.objects.get(pk=pk)
         if "order" in data:
             order = int(data["order"])
-            if (order >= len(self.model.objects.get(character=obj.character))
-                or order < 0):
+            if (obj.character.show.first_cast_submitted and
+                order < obj.character.allowed_signers):
+                return False
+            if order >= len(self.model.objects.filter(
+                    character=obj.character)) or order < 0:
                 data["order"] = obj.order
             else:
                 old = self.model.objects.get(character=obj.character,
                                              order=order)
-                old.order = obj.order
+                data["actor"] = old.actor_id
+                old.actor = obj.actor
                 old.save()
+                del data["order"]
         super().update(pk, data)
             
     def create(self, data):
@@ -127,12 +130,3 @@ class SigningBinding(AssociatedShowBinding):
             data["order"] = len(self.model.objects.filter(
                 character_id=data["character"]))
             super().create(data)
-
-    def delete(self, pk):
-        obj = self.model.objects.get(pk=pk)
-        shifts = self.model.objects.filter(character=obj.character,
-                                           order__gt=obj.order)
-        for signing in shifts:
-            signing.order -= 1
-            signing.save()
-        super().delete(pk)

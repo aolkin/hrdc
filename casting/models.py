@@ -3,7 +3,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.template.loader import render_to_string
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 
 from channels.generic.websockets import JsonWebsocketConsumer
@@ -279,11 +279,26 @@ class Signing(ActorMapping):
     notified_first = models.BooleanField(default=False)
     notified_second = models.BooleanField(default=False)
 
-    #tracker = FieldTracker(fields=("order",))
-
+    @property
+    def editable(self):
+        if self.show.cast_submitted:
+            return False
+        if self.show.first_cast_submitted:
+            return self.order >= self.character.allowed_signers
+        return True
+    
     class Meta:
         ordering = ("character__show", "character", "order")
 
+@receiver(pre_delete)
+def shift_signings(sender, instance, **kwargs):
+    if sender == Signing:
+        shifts = Signing.objects.filter(character=instance.character,
+                                        order__gt=instance.order)
+        for signing in shifts:
+            signing.order -= 1
+            signing.save()
+        
 STANDARD_TIMES = (
     datetime.time(hour=18),
     datetime.time(hour=21),
