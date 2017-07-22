@@ -11,7 +11,7 @@ def test_pdsm(user):
 
 class UserIsPdsmMixin(UserPassesTestMixin):
     def test_func(self):
-        return test_pdsm(self.request.user)
+        return test_pdsm(self.request.user) or test_board(self.request.user)
 
 @contextlib.contextmanager
 def suppress_autotime(model, fields):

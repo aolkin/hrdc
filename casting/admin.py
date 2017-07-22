@@ -8,10 +8,17 @@ from .models import *
 
 @admin.register(Signing)
 class SigningAdmin(admin.ModelAdmin):
-    list_display = ('show', 'character', 'actor', 'response')
+    list_display = ('show', 'character', 'order_num', 'actor', 'response')
     list_editable = ('response',)
     list_display_links = None
-    search_fields = ('actor', 'show', 'character')
+    list_filter = ('character__show', 'character__show__show__year',
+                   'character__show__show__season')
+    search_fields = ('actor__first_name', 'actor__last_name',
+                     'character__name')
+
+    def order_num(self, instance):
+        return instance.order + 1
+    order_num.short_description = "Signing Order"
     
     def get_actions(self, request):
         actions = super().get_actions(request)
@@ -183,8 +190,9 @@ class CallbackSlotAdmin(SlotAdmin):
 @admin.register(CastingMeta)
 class MetaAdmin(admin.ModelAdmin):
     list_display = ('show', 'season', 'release_meta', 'callbacks_submitted',
-                    'first_cast_submitted', 'cast_submitted')
-    list_editable = ("release_meta",)
+                    'first_cast_submitted', 'cast_submitted', 'edit_slots')
+    list_display_links = ('edit_slots',)
+    list_editable = ('show', 'release_meta',)
     exclude = ('callback_description', 'cast_list_description',
                'contact_email', 'callbacks_submitted', 'first_cast_submitted',
                'cast_submitted')
@@ -194,9 +202,12 @@ class MetaAdmin(admin.ModelAdmin):
 
     inlines = [
         AuditionSlotAdmin,
-        CallbackSlotAdmin,
+        #CallbackSlotAdmin,
     ]
 
+    def edit_slots(self, instance):
+        return "edit slots"
+    
     def contact_email_link(self, obj):
         return format_html('<a href="mailto:{0}">{0}</a>', obj.contact_email)
     contact_email_link.short_description = "Staff-set Show Contact Email"

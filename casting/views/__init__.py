@@ -13,6 +13,7 @@ def get_current_slots():
         start__lte=timezone.localtime(),
         end__gte=timezone.localtime())
 
+show_model = apps.get_model(settings.SHOW_MODEL)
 building_model = apps.get_model(settings.BUILDING_MODEL)
 
 @user_passes_test(test_board)

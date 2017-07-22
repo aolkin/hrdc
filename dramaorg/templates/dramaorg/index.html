@@ -27,28 +27,6 @@
   </tr>
   {% endfor %}
 </table>
-
-{% if all_indexes %}
-<h3 class="text-center mt-5">
-  HRDC Apps
-  <br><small class="text-muted">administrative tasks for your shows</small>
-</h3>
-<div class="row justify-content-center">
-  <div class="col-md-6">
-    {% for index in all_indexes %}
-    <a href="{{ index.0 }}" class="list-group-item list-group-item-action">
-      <div class="d-flex w-100 justify-content-between">
-	<h5 class="mb-0">{{ index.1 }}</h5>
-	{% if index.2 %}
-	<small class="text-muted">{{ index.2 }}</small>
-	{% endif %}
-      </div>
-    </a>
-    {% endfor %}
-  </div>
-</div>
-{% endif %}
-
 {% else %}
 <div class="text-center">
   <p class="lead">
@@ -69,6 +47,29 @@
     <a href="{% url 'dramaorg:password_change' %}">change your password</a>
   </h3>
 </div>
+{% endif %}
+
+{% if request.user.is_pdsm or request.user.is_board %}
+{% if all_indexes %}
+<h3 class="text-center mt-5">
+  HRDC Apps
+  <br><small class="text-muted">administrative tasks for your shows</small>
+</h3>
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    {% for index in all_indexes %}
+    <a href="{{ index.0 }}" class="list-group-item list-group-item-action">
+      <div class="d-flex w-100 justify-content-between">
+	<h5 class="mb-0">{{ index.1 }}</h5>
+	{% if index.2 %}
+	<small class="text-muted">{{ index.2 }}</small>
+	{% endif %}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
 {% endif %}
 
 {% if user.is_board %}

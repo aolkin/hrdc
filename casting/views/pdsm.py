@@ -11,7 +11,7 @@ from django.contrib import messages
 from django.utils import timezone
 
 from ..models import *
-from . import get_current_slots, building_model
+from . import get_current_slots, building_model, show_model
 from ..utils import UserIsPdsmMixin
 from . import public
 
@@ -66,6 +66,14 @@ class IndexView(StaffViewMixin, TemplateView):
                 space__building=b["pk"]).distinct().values_list(
                     "show__show__title")
             b["slots"] = ", ".join([i[0] for i in shows])
+            
+        context["first_cast_lists"] = []
+        shows = show_model.objects.current_season().filter(
+            casting_meta__isnull=False)
+        for show in shows:
+            if (show.casting_meta.first_cast_submitted and
+                show.casting_meta.release_meta.stage == 2):
+                context["first_cast_lists"].append(show.casting_meta)
         return context
 
 class TablingView(StaffViewMixin, DetailView):
@@ -332,9 +340,10 @@ class CastSubmitView(SubmitView):
                     "signers.")
                 clean = False
             elif len(actors) == c.allowed_signers and warn:
-                messages.warning(
-                    self.request,
-                    "No alternates have been provided for {}.".format(c))
+                if self.object.first_cast_submitted:
+                    messages.warning(
+                        self.request,
+                        "No alternates have been provided for {}.".format(c))
         if not self.object.character_set.filter().exists():
             messages.error(self.request,
                            "No characters have been cast!")
