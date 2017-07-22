@@ -43,8 +43,7 @@ class CharacterBinding(AssociatedShowBinding):
         perm = super().has_permission(user, action, pk)
         if pk and action == "delete":
             obj = self.model.objects.get(pk=pk)
-            if obj.show.callbacks_submitted:
-                return perm and obj.added_for_signing
+            return perm and obj.editable
         return perm
             
     def create(self, data):
