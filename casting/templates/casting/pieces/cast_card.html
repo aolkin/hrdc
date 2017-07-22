@@ -1,11 +1,13 @@
 {% load bounddata %}
 <div class="card stream-item scroll-after-create {% if doblank %}blank character-blank{% endif %}" {% boundattrs character %}>
   <div class="card-header">
+    {% if not object.first_cast_submitted %}
     {% if doblank or character.added_for_signing %}
     <button {% boundattrs character %} data-toggle="tooltip" tabindex="-1"
 	    class="btn-action badge btn float-right btn-danger btn-delete {% if doblank %}hidden{% endif %} fa fa-times"
 	    title="Delete this character and remove all actors cast as it.">
     </button>
+    {% endif %}
     {% endif %}
     <button {% boundattrs character %} data-toggle="tooltip"
 	    class="btn-action badge btn float-right btn-success btn-create {% if not doblank %}hidden{% endif %} fa fa-plus"

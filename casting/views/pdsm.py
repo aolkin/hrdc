@@ -5,6 +5,7 @@ from django.urls import reverse, reverse_lazy
 from django.conf.urls import url, include
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.db.models import Q
+from django.shortcuts import render
 from django.contrib import messages
 
 from django.utils import timezone
@@ -12,6 +13,7 @@ from django.utils import timezone
 from ..models import *
 from . import get_current_slots, building_model
 from ..utils import UserIsPdsmMixin
+from . import public
 
 class StaffViewMixin(UserIsPdsmMixin):
     def get_context_data(self, *args, **kwargs):
@@ -145,12 +147,25 @@ class AuditionCallView(AuditionStatusBase):
 class AuditionDoneView(AuditionStatusBase):
     new_status = "done"
 
+def clear_session_vars(session, name):
+    for i in ("{}_SUBMIT_ERRORS", "{}_SUBMIT_FLOW"):
+        var = i.format(name)
+        if var in session:
+            del session[var]
+                
 class ActorListView(ShowStaffMixin, DetailView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["character_blank"] = Character()
         return context
 
+    def inline_public(self, view):
+        view.object = self.object
+        view.request = self.request
+        ctx = view.get_context_data()
+        ctx["sidebar_menu"] = self.get_context_data()["sidebar_menu"]
+        return render(self.request, view.template_name, ctx)
+                
 class CallbackView(ActorListView):
     template_name = "casting/callbacks.html"
     
@@ -162,19 +177,72 @@ class CallbackView(ActorListView):
         return context
     
     def get(self, *args, **kwargs):
-        obj = self.get_object()
-        if "CALLBACK_SUBMIT_ERRORS" in self.request.session:
-            del self.request.session["CALLBACK_SUBMIT_ERRORS"]
-        if "CALLBACK_SUBMIT_FLOW" in self.request.session:
-            del self.request.session["CALLBACK_SUBMIT_FLOW"]
-        if obj.callbacks_submitted:
-            return HttpResponseRedirect(reverse('casting:view_callbacks',
-                                                args=(obj.pk,)))
+        clear_session_vars(self.request.session, "CALLBACK")
+        self.object = self.get_object()
+        if self.object.callbacks_submitted:
+            return self.inline_public(public.CallbackView())
         else:
             return super().get(*args, **kwargs)
     
-class CallbackSubmitView(ShowStaffMixin, View):
-    def clean_callbacks(self):
+class CastListView(ActorListView):
+    template_name = "casting/cast_list.html"
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["signing_blank"] = Signing()
+        return context
+       
+    def get(self, *args, **kwargs):
+        clear_session_vars(self.request.session, "CAST")
+        self.object = self.get_object()
+        if self.object.cast_submitted:
+            return self.inline_public(public.CastView())
+        else:
+            return super().get(*args, **kwargs)
+            
+class SubmitView(ShowStaffMixin, View): 
+    def get(self, *args, **kwargs):
+        self.object = self.get_object()
+        clear_session_vars(self.request.session, self.var_name)
+        if self.clean():
+            self.request.session["{}_SUBMIT_FLOW".format(
+                self.var_name)] = self.object.pk
+        else:
+            self.request.session["{}_SUBMIT_ERRORS".format(
+                self.var_name)] = self.object.pk
+        return HttpResponseRedirect(reverse(self.redirect_url,
+                                            args=(self.object.pk,)))
+        
+    def post(self, *args, **kwargs):
+        self.object = self.get_object()
+        if ("{}_SUBMIT_FLOW".format(self.var_name) in self.request.session and
+            self.request.session["{}_SUBMIT_FLOW".format(
+                self.var_name)] == self.object.pk):
+            del self.request.session["{}_SUBMIT_FLOW".format(self.var_name)]
+            if self.clean(False):
+                if "{}_SUBMIT_ERRORS".format(
+                        self.var_name) in self.request.session:
+                    del self.request.session["{}_SUBMIT_ERRORs".format(
+                        self.var_name)]
+                self.do_save()
+            else:
+                self.request.session["{}_SUBMIT_ERRORS".format(
+                    self.var_name)] = self.object.pk
+            return HttpResponseRedirect(reverse(self.edit_url,
+                                                args=(self.object.pk,)))
+        else:
+            messages.error(self.request,
+                           "Failed to submit {}, please try again.".format(
+                               self.verbose_name))
+            return HttpResponseRedirect(reverse(self.edit_url,
+                                                args=(self.object.pk,)))
+
+class CallbackSubmitView(SubmitView):
+    var_name = "CALLBACK"
+    redirect_url = "casting:view_callbacks"
+    edit_url = "casting:callbacks"
+    
+    def clean(self, warn=True):
         if self.object.callbacks_submitted:
             messages.error(self.request, "Callbacks already submitted!")
             return False
@@ -213,42 +281,21 @@ class CallbackSubmitView(ShowStaffMixin, View):
                              "One or more characters are missing names.")
             clean = False
         return clean
+
+    def do_save(self):
+        self.object.callbacks_submitted = True
+        self.object.save(update_fields=("callbacks_submitted",))
+        messages.success(
+            self.request,
+            "Submitted callback list for {} successfully!".format(
+                self.object))
+
+class CastSubmitView(SubmitView):
+    var_name = "CAST"
+    redirect_url = "casting:view_cast"
+    edit_url = "casting:cast_list"
     
-    def get(self, *args, **kwargs):
-        self.object = self.get_object()
-        if self.clean_callbacks():
-            self.request.session["CALLBACK_SUBMIT_FLOW"] = self.object.pk
-        else:
-            self.request.session["CALLBACK_SUBMIT_ERRORS"] = self.object.pk
-        return HttpResponseRedirect(reverse("casting:view_callbacks",
-                                            args=(self.object.pk,)))
-
-    def post(self, *args, **kwargs):
-        self.object = self.get_object()
-        if ("CALLBACK_SUBMIT_FLOW" in self.request.session and
-            self.request.session["CALLBACK_SUBMIT_FLOW"] == self.object.pk):
-            del self.request.session["CALLBACK_SUBMIT_FLOW"]
-            if self.clean_callbacks():
-                if "CALLBACK_SUBMIT_ERRORS" in self.request.session:
-                    del self.request.session["CALLBACK_SUBMIT_ERRORS"]
-                self.object.callbacks_submitted = True
-                self.object.save(update_fields=("callbacks_submitted",))
-                messages.success(
-                    self.request,
-                    "Submitted callback list for {} successfully!".format(
-                        self.object))
-            else:
-                self.request.session["CALLBACK_SUBMIT_ERRORS"] = self.object.pk
-            return HttpResponseRedirect(reverse("casting:view_callbacks",
-                                                args=(self.object.pk,)))
-        else:
-            messages.error(self.request,
-                           "Failed to submit callback list, please try again.")
-            return HttpResponseRedirect(reverse("casting:callbacks",
-                                                args=(self.object.pk,)))
-
-class CastSubmitView(ShowStaffMixin, View):
-    def clean_cast(self, warn=True):
+    def clean(self, warn=True):
         if self.object.cast_submitted:
             messages.error(self.request, "Cast list already submitted!")
             return False
@@ -272,6 +319,11 @@ class CastSubmitView(ShowStaffMixin, View):
                     messages.info(self.request,
                                   "Found empty character; removing.")
                     c.delete()
+                else:
+                    messages.error(
+                        self.request,
+                        "No actors have been cast as {}.".format(c))
+                    clean = False
             elif len(actors) < c.allowed_signers:
                 messages.error(
                     self.request,
@@ -292,44 +344,19 @@ class CastSubmitView(ShowStaffMixin, View):
                              "One or more characters are missing names.")
             clean = False
         return clean
-    
-    def get(self, *args, **kwargs):
-        self.object = self.get_object()
-        if self.clean_cast():
-            self.request.session["CAST_SUBMIT_FLOW"] = self.object.pk
-        else:
-            self.request.session["CAST_SUBMIT_ERRORS"] = self.object.pk
-        return HttpResponseRedirect(reverse("casting:view_cast",
-                                            args=(self.object.pk,)))
 
-    def post(self, *args, **kwargs):
-        self.object = self.get_object()
-        if ("CAST_SUBMIT_FLOW" in self.request.session and
-            self.request.session["CAST_SUBMIT_FLOW"] == self.object.pk):
-            del self.request.session["CAST_SUBMIT_FLOW"]
-            if self.clean_cast(False):
-                if "CAST_SUBMIT_ERRORS" in self.request.session:
-                    del self.request.session["CAST_SUBMIT_ERRORS"]
-                if self.object.first_cast_submitted:
-                    self.object.cast_submitted = True
-                else:
-                    self.object.first_cast_submitted = True
-                self.object.save(update_fields=("first_cast_submitted",
-                                                "cast_submitted"))
-                messages.success(
-                    self.request,
-                    "Submitted {} for {} successfully!".format(
-                        "cast list" if self.object.cast_submitted else
-                        "first-round casting", self.object))
-            else:
-                self.request.session["CAST_SUBMIT_ERRORS"] = self.object.pk
-            return HttpResponseRedirect(reverse("casting:view_cast",
-                                                args=(self.object.pk,)))
+    def do_save(self):
+        if self.object.first_cast_submitted:
+            self.object.cast_submitted = True
         else:
-            messages.error(self.request,
-                           "Failed to submit cast list, please try again.")
-            return HttpResponseRedirect(reverse("casting:cast_list",
-                                                args=(self.object.pk,)))
+            self.object.first_cast_submitted = True
+        self.object.save(update_fields=("first_cast_submitted",
+                                        "cast_submitted"))
+        messages.success(
+            self.request,
+            "Submitted {} for {} successfully!".format(
+                "cast list" if self.object.cast_submitted else
+                "first-round casting", self.object))
 
 # Disable the default behavior and only display actors who auditioned
 ONLY_AUDITIONS = False
@@ -361,26 +388,6 @@ class ShowActors(ShowStaffMixin, DetailView):
             for i in actors:
                 i["text"] = (i["first_name"] + " " + i["last_name"])
         return JsonResponse(actors, safe=False)
-
-class CastListView(ActorListView):
-    template_name = "casting/cast_list.html"
-    
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        context["signing_blank"] = Signing()
-        return context
-       
-    def get(self, *args, **kwargs):
-        obj = self.get_object()
-        if "CAST_SUBMIT_ERRORS" in self.request.session:
-            del self.request.session["CAST_SUBMIT_ERRORS"]
-        if "CAST_SUBMIT_FLOW" in self.request.session:
-            del self.request.session["CAST_SUBMIT_FLOW"]
-        if obj.cast_submitted:
-            return HttpResponseRedirect(reverse('casting:view_cast',
-                                                args=(obj.pk,)))
-        else:
-            return super().get(*args, **kwargs)
  
 class ActorName(UserIsPdsmMixin, BaseDetailView):
     model = get_user_model()
