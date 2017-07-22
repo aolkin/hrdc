@@ -5,12 +5,12 @@
 {% block title %}{{ object }} | Casting{% endblock %}
 
 {% block content %}
+{% if object.cast_list_released or user_is_staff or allow_view_first_cast %}
 <h3 class="text-center">
-  {% if not object.cast_list_released or user_is_staff and object.cast_submitted %} First-Round {% endif %}
+  {% if not show_all_actors %} First-Round {% endif %}
   Cast List for:
 </h3>
 <h2 class="text-center">{{ object }}</h2>
-{% if object.cast_list_released or user_is_staff or allow_view_first_cast %}
 <div class="row justify-content-center">
   <div class="col-md-8 text-center">
     {% if user_is_staff %}
@@ -20,6 +20,11 @@
       Your cast list has been submitted and can no longer be changed.
     </div>
     {% else %}
+    {% if object.first_cast_submitted %}
+    <div class="alert alert-info">
+      Your first-round casting has been submitted and can no longer be changed.
+    </div>
+    {% endif %}
     <div class="alert alert-danger">
       {% if request.session.CAST_SUBMIT_FLOW == object.pk %}
       <form action="{% url 'casting:cast_submit' object.pk %}"
@@ -35,7 +40,8 @@
 	<p class="lead">
 	  Please confirm your first-round casting below.
 	  Note that once you have submitted, you cannot change the first
-	  actors up to the number allowed to sign for that character.
+	  actors up to the number allowed to sign for that character, nor the
+	  number allowed to sign.
 	</p>
 	<button type="submit" class="btn btn-danger btn-block">
 	  Submit First-Round Casting</button>
@@ -75,8 +81,10 @@
 	</div>
 	<ul class="list-group list-group-flush">
 	  {% for signing in character.signing_set.all %}
+	  {% if show_all_actors or signing.order < character.allowed_signers %}
 	  <li class="list-group-item signing-item">
 	    <div class="signing-count w-100">
+	      {% if object.cast_submitted %}
 	      {% if signing.signable %}
 	      {% if signing.response is True %}
 	      <span
@@ -93,9 +101,11 @@
 	      <span class="badge badge-default pull-right fa fa-ban"
 		    title="Blocked" data-toggle="tooltip"> </span>
 	      {% endif %}
+	      {% endif %}
 	      {{ signing.actor }}
-	    </span>
+	    </div>
 	  </li>
+	  {% endif %}
 	  {% endfor %}
 	</ul>
 	{% if character.allowed_signers != 1 %}
@@ -126,6 +136,11 @@
   </div>
 </div>
 {% elif request.user.is_authenticated and request.user.is_board %}
+<h3 class="text-center">
+  {% if not object.cast_submitted %} First-Round {% endif %}
+  Cast List for:
+</h3>
+<h2 class="text-center">{{ object }}</h2>
 <div class="row justify-content-center">
   <div class="col-md-8 text-center">
     {% if object.cast_submitted %}
@@ -149,7 +164,7 @@
 <div class="row justify-content-center">
   <div class="col-md-8 text-center">
     <div class="alert alert-danger">
-      <big>Casting has not yet been released for this show!</big>
+      <big>Casting has not yet been released for {{ object }}</big>
     </div>
   </div>
 </div>
