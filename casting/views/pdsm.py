@@ -246,7 +246,86 @@ class CallbackSubmitView(ShowStaffMixin, View):
                            "Failed to submit callback list, please try again.")
             return HttpResponseRedirect(reverse("casting:callbacks",
                                                 args=(self.object.pk,)))
-        
+
+class CastSubmitView(ShowStaffMixin, View):
+    def clean_cast(self):
+        if self.object.cast_submitted:
+            messages.error(self.request, "Cast list already submitted!")
+            return False
+        clean = True
+        for c in self.object.character_set.all():
+            actors = []
+            for signing in c.signing_set.all().select_related("actor"):
+                if not signing.actor:
+                    signing.delete()
+                elif signing.actor.pk in actors:
+                    signing.delete()
+                    messages.info(
+                        self.request,
+                        "{} is cast as {} multiple times; ".format(
+                            signing.actor, c) + "removing duplicate.")
+                    clean = False
+                else:
+                    actors.append(signing.actor.pk)
+            if len(actors) < 1:
+                if (not c.name) and c.allowed_signers == 1:
+                    messages.info(self.request,
+                                  "Found empty character; removing.")
+                    c.delete()
+            elif len(actors) < c.allowed_signers:
+                messages.error(
+                    self.request,
+                    "Not enough actors have been cast as {}. ".format(c) +
+                    "Either cast more or decrease the number of allowed " +
+                    "signers.")
+                clean = False
+            elif len(actors) == c.allowed_signers:
+                messages.warning(
+                    self.request,
+                    "No alternates have been provided for {}.".format(c))
+        if not self.object.character_set.filter().exists():
+            messages.error(self.request,
+                           "No characters have been cast!")
+            clean = False
+        if self.object.character_set.filter(name="").exists():
+            messages.error(self.request,
+                             "One or more characters are missing names.")
+            clean = False
+        return clean
+    
+    def get(self, *args, **kwargs):
+        self.object = self.get_object()
+        if self.clean_cast():
+            self.request.session["CAST_SUBMIT_FLOW"] = self.object.pk
+        else:
+            self.request.session["CAST_SUBMIT_ERRORS"] = self.object.pk
+        return HttpResponseRedirect(reverse("casting:view_cast",
+                                            args=(self.object.pk,)))
+
+    def post(self, *args, **kwargs):
+        self.object = self.get_object()
+        if ("CAST_SUBMIT_FLOW" in self.request.session and
+            self.request.session["CAST_SUBMIT_FLOW"] == self.object.pk):
+            del self.request.session["CAST_SUBMIT_FLOW"]
+            if self.clean_cast():
+                if "CAST_SUBMIT_ERRORS" in self.request.session:
+                    del self.request.session["CAST_SUBMIT_ERRORS"]
+                #self.object.callbacks_submitted = True
+                #self.object.save(update_fields=("callbacks_submitted",))
+                messages.warning(
+                    self.request,
+                    "Submitted cast list for {} successfully!".format(
+                        self.object))
+            else:
+                self.request.session["CAST_SUBMIT_ERRORS"] = self.object.pk
+            return HttpResponseRedirect(reverse("casting:view_cast",
+                                                args=(self.object.pk,)))
+        else:
+            messages.error(self.request,
+                           "Failed to submit cast list, please try again.")
+            return HttpResponseRedirect(reverse("casting:cast_list",
+                                                args=(self.object.pk,)))
+
 # Disable the default behavior and only display actors who auditioned
 ONLY_AUDITIONS = False
     
@@ -318,6 +397,7 @@ urlpatterns = [
         
         url(r'^cast/', include([
             url('^$', CastListView.as_view(), name="cast_list"),
+            url('^submit/$', CastSubmitView.as_view(), name="cast_submit"),
         ])),
     ])),
     url('^show/\d+/[a-z]+/actor/(?P<pk>\d+)$', ActorName.as_view(),

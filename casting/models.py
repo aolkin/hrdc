@@ -179,6 +179,14 @@ class CastingMeta(models.Model):
         return self.callbacks_submitted and self.release_meta.stage > 0
     
     @property
+    def first_cast_released(self):
+        return self.first_cast_submitted and self.release_meta.stage > 1
+    
+    @property
+    def cast_list_released(self):
+        return self.cast_submitted and self.release_meta.stage > 2
+    
+    @property
     def audition_slots(self):
         return self.slot_set.filter(type=Slot.TYPES[0][0])
     
@@ -238,16 +246,34 @@ class Character(AssociateShowMixin):
         blank=True, verbose_name="Character Callback Information",
         help_text="Extra information about callbacks for this character.")
     allowed_signers = models.PositiveSmallIntegerField(
-        default=1, help_text="Number of actors allowed to sign.")
+        default=1,
+        help_text="Number of actors allowed to sign for this character.")
     added_for_signing = models.BooleanField(default=False)
 
     @property
     def editable(self):
-        if self.show.first_cast_submitted:
-            return False
-        if self.show.callbacks_submitted:
-            return self.added_for_signing
+        if self.show:
+            if self.show.first_cast_submitted:
+                return False
+            if self.show.callbacks_submitted:
+                return self.added_for_signing
         return True
+
+    @property
+    def uneditable(self):
+        return not self.editable
+
+    @property
+    def actors(self):
+        responses = self.signing_set.filter(response=True)
+        if len(responses) >= self.allowed_signers:
+            signers = list([i.actor for i in responses])
+            if len(signers) > self.allowed_signers:
+                return signers[:self.allowed_signers]
+            else:
+                return signers
+        else:
+            return None
     
     def __str__(self):
         return self.name if self.name else "<Unnamed Character>"
@@ -286,6 +312,17 @@ class Signing(ActorMapping):
         if self.show.first_cast_submitted:
             return self.order >= self.character.allowed_signers
         return True
+    
+    @property
+    def uneditable(self):
+        return not self.editable
+
+    @property
+    def signable(self):
+        signed = len(Signing.objects.filter(character=self.character,
+                                            order__lt=self.order,
+                                            response=True))
+        return signed < self.character.allowed_signers
     
     class Meta:
         ordering = ("character__show", "character", "order")

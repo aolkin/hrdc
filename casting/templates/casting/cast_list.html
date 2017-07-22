@@ -37,6 +37,7 @@
 <p class="lead text-muted text-center mt-3">
   Changes are automatically synced and saved.
 </p>
+{% if not object.first_cast_submitted %}
 <div class="row justify-content-center">
   <div class="col-md-8">
     <p>To cast ensemble roles, increase the number of actors allowed to sign
@@ -44,9 +45,10 @@
       first-round casting.</p>
   </div>
 </div>
+{% endif %}
 <div class="row justify-content-center">
   <div class="col-md-6">
-    <a href="{% url 'casting:callback_submit' object.pk %}"
+    <a href="{% url 'casting:cast_submit' object.pk %}"
        class="btn btn-danger btn-lg btn-block text-center"
        data-toggle="tooltip"
        title="Once submitted, you cannot edit your {% if object.first_cast_submitted %}cast list{% else %}first-round casting or adjust the number of actors allowed to sign for a character{% endif %} any further.">

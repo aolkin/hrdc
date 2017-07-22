@@ -115,9 +115,6 @@ class DataBindingHandler {
 				  .attr("value", data.id).appendTo(this);
                               this.val(data.id);
                               this.trigger("change");
-			  }).bind(el)).fail((function() {
-			      alert("Failed to load actor name.");
-			      location.reload();
 			  }).bind(el));
 		} else {
 		    el.val(null);

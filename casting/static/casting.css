@@ -64,7 +64,7 @@ table .btn {
     display: none;
 }
 
-.card-block.list-group-flush {
+.card>.list-group-flush {
     padding: 0;
     margin-top: -1px;
 }
@@ -129,13 +129,13 @@ table .btn {
     pointer-events: none;
 }
 
-.card-block.list-group {
+.card {
     counter-reset: signing-counter;
 }
-.card-block.list-group .list-group-item.blank .signing-count {
+.list-group .list-group-item.blank .signing-count {
     display: none;
 }
-.card-block.list-group .list-group-item .signing-count:before {
+.list-group .list-group-item .signing-count:before {
     content: counter(signing-counter) ".";
     counter-increment: signing-counter;
     width: 1rem;
@@ -148,4 +148,20 @@ table .btn {
 }
 .input-group>span.select2-container:not(:first-of-type) .select2-selection {
     border-radius: 0;
+}
+
+.card.stream-item .form-control[readonly] {
+    background: transparent;
+}
+
+.input-group-sm span.select2-container {
+    font-size: .925rem;
+}
+
+.signing-item span.badge.fa {
+    height: 1.4rem;
+}
+
+.signing-item span.badge.fa:not(.badge-pill) {
+    width: 1.4rem;
 }
