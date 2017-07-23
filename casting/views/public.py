@@ -80,6 +80,7 @@ class CastView(PublicView):
         context = super().get_context_data(*args, **kwargs)
         context["base_template"] = ("bt/default.html" if self.popout else
                                     "casting/public/base.html")
+        context["popout"] = self.popout
         context["allow_view_first_cast"] = (
             self.object.first_cast_released and
             self.request.user.is_authenticated() and self.request.user.is_pdsm)

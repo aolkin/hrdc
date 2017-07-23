@@ -30,6 +30,7 @@
       {% csrf_token %}
       {% for i in object_list %}
       {% ifchanged i.show %}
+      <a name="{{ i.show.pk }}"></a>
       <h4 class="mb-3 mt-5">
 	<a href="{% url 'casting:view_cast' i.show.pk %}" target="_popout"
 	   data-toggle="tooltip" title="Click to view the entire cast list...">
