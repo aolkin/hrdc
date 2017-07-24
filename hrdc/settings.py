@@ -34,6 +34,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]', ".ngrok.io"]
 INSTALLED_APPS = [
     'suit',
     'config',
+    'emailtracker',
     'basetemplates',
     'hrdc',
     'django.contrib.humanize',
@@ -157,7 +158,8 @@ ANYMAIL = {
     "MAILGUN_API_KEY": "key-1113ec6d3ccf6f9419ef02fb6e3cf18c",
     "MAILGUN_SENDER_DOMAIN": "aolkin.me"
 }
-EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
+#EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 DEFAULT_FROM_EMAIL = "Development Application <devtest@aolkin.me>"
 
