@@ -101,12 +101,14 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     def is_staff(self):
         return self.is_board or self.is_superuser
     
-    def get_full_name(self):
+    def get_full_name(self, use_email=True):
         full_name = '{} {}'.format(self.first_name, self.last_name).strip()
         if full_name:
             return full_name
-        else:
+        elif use_email:
             return "<{}>".format(self.email)
+        else:
+            return ""
     get_full_name.short_description = "Full Name"
     get_full_name.admin_order_field = "first_name"
     
