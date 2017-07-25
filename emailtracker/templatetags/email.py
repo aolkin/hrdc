@@ -12,5 +12,4 @@ def image(context, fn, alt="Image"):
 def href(context, url, text, *args, **kwargs):
     return { "url": reverse(url, args=args, kwargs=kwargs),
              "text": text,
-             "is_html": context["IS_HTML"] }
-    
+             "is_html": context.get("IS_HTML", True) }
