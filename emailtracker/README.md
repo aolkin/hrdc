@@ -6,13 +6,15 @@ Found in `emailtracker.tools`:
 
 `reschedule_all(name=None)`
 
-`queue_msg(msg, name, ident="")`
+`queue_msg(msg, name, ident="", silent=True)`
+
+If silent is True, will not raise Exception is message has been sent already.
 
 For the following, kwargs will be used to construct the email.
 
-`queue_email(name, ident="", **kwargs)`
+`queue_email(name, ident="", silent=True, **kwargs)`
 
-`render_to_queue(template, name, ident="", context={}, **kwargs)`
+`render_to_queue(template, name, ident="", context={}, silent=True, **kwargs)`
 
 `render_for_user(user, *args, **kwargs)`
 

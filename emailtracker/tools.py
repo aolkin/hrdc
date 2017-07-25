@@ -20,12 +20,13 @@ def reschedule_all(name=None):
         send_queued.delay(i[0])
     return len(pks)
 
-def queue_msg(msg, name, ident=""):
+def queue_msg(msg, name, ident="", silent=True):
     obj, created = QueuedEmail.objects.get_or_create(
-        name=name, ident=ident, to=extract_address(msg.to[0]))
+        name=name, ident=str(ident), to=extract_address(msg.to[0]))
     if obj.sent:
-        raise EmailSent(
-            "Attempting to queue message that has already been sent.")
+        if not silent:
+            raise EmailSent(
+                "Attempting to queue message that has already been sent.")
     else:
         obj.set_msg(msg)
         obj.save()
@@ -35,12 +36,13 @@ def _fix_to(kwargs):
     if type(kwargs["to"]) not in ("list", "tuple"):
         kwargs["to"] = [kwargs["to"]]
         
-def queue_email(name, ident="", **kwargs):
+def queue_email(name, ident="", silent=True, **kwargs):
     _fix_to(kwargs)
     msg = AnymailMessage(**kwargs)
-    return queue_msg(msg, name, ident)
+    return queue_msg(msg, name, ident, silent)
 
-def render_to_queue(template, name, ident="", context={}, **kwargs):
+def render_to_queue(template, name, ident="", context={}, silent=True,
+                    **kwargs):
     _fix_to(kwargs)
     msg = AnymailMessage(**kwargs)
     context["MESSAGE"] = msg
@@ -53,10 +55,13 @@ def render_to_queue(template, name, ident="", context={}, **kwargs):
     context["IS_HTML"] = True
     msg.attach_alternative(template.render(context), 'text/html')
 
-    return queue_msg(msg, name, ident)
+    return queue_msg(msg, name, ident, silent=silent)
 
 def render_for_user(user, *args, **kwargs):
-    context = kwargs.setdefault("context", {})
+    if len(args) > 3:
+        context = args[3]
+    else:
+        context = kwargs.setdefault("context", {})
     context["user"] = user
     kwargs["to"] = email_from_user(user)
     return render_to_queue(*args, **kwargs)

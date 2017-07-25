@@ -161,7 +161,7 @@ ANYMAIL = {
 #EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-DEFAULT_FROM_EMAIL = "Development Application <devtest@aolkin.me>"
+DEFAULT_FROM_EMAIL = "HRDC Apps (Dev) <hrdcdev@aolkin.me>"
 
 CONFIGURATION_APP_TITLE = "Global Settings"
 
@@ -173,6 +173,8 @@ LOGIN_URL = "dramaorg:login"
 LOGOUT_URL = "dramaorg:logout"
 LOGIN_REDIRECT_URL = "dramaorg:index"
 LOGOUT_REDIRECT_URL = LOGIN_URL
+
+LOGO_PATH = os.path.join(BASE_DIR, "hrdc/static/logo.png")
 
 BT_SITE_TITLE = "HRDC Apps"
 BT_FAVICON_URL = "https://hrdctheater.com/wp-content/uploads/2016/02/cropped-HRDC-Logo-2-32x32.png"
@@ -191,3 +193,11 @@ CASTING_IS_COMMON = True
 
 ACTIVE_SEASON_KEY = "season"
 ACTIVE_YEAR_KEY = "year"
+
+CELERY_BEAT_SCHEDULE = {
+    'update-casting-releases': {
+        'task': 'casting.tasks.update_releases',
+        'schedule': 10.0,
+        'relative': True,
+    }
+}
