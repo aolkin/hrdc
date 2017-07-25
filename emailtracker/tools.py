@@ -1,10 +1,13 @@
 from django.contrib.auth import get_user_model
 from anymail.message import AnymailMessage
 from django.template.loader import get_template
+import logging
 
 from .models import *
 from .utils import *
 from .tasks import *
+
+logger = logging.getLogger("emailtracker.tools")
 
 class EmailSent(RuntimeError): pass
 
@@ -37,7 +40,7 @@ def queue_email(name, ident="", **kwargs):
     msg = AnymailMessage(**kwargs)
     return queue_msg(msg, name, ident)
 
-def render_to_queue(template, name, ident="", context={}, images={}, **kwargs):
+def render_to_queue(template, name, ident="", context={}, **kwargs):
     _fix_to(kwargs)
     msg = AnymailMessage(**kwargs)
     context["MESSAGE"] = msg
@@ -52,14 +55,18 @@ def render_to_queue(template, name, ident="", context={}, images={}, **kwargs):
 
     return queue_msg(msg, name, ident)
 
-def render_for_user(user, *args, adjust_ident=True, **kwargs):
+def render_for_user(user, *args, **kwargs):
     context = kwargs.setdefault("context", {})
     context["user"] = user
-    context["to"] = email_from_user(user)
-    if adjust_ident:
-        kwargs["ident"] = kwargs.get("ident", "") + "-" + user.email
+    kwargs["to"] = email_from_user(user)
     return render_to_queue(*args, **kwargs)
 
-def render_for_users(users, *args, **kwargs):
+def render_for_users(users, *args, allow_failure=False, **kwargs):
     for u in users:
-        queue_for_user(u, *args, **kwargs)
+        try:
+            render_for_user(u, *args, **kwargs)
+        except Exception as e:
+            if allow_failure:
+                logger.error(e)
+            else:
+                raise e
