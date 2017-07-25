@@ -22,8 +22,14 @@ class CastingReleaseMeta(models.Model):
         (1, "Callback Lists Released"),
         (2, "First-Round Casting Released"),
         (3, "Cast Lists Released"),
+        (4, "Signing Open"),
+        (5, "Alternate Signing Open"),
     )
     stage = models.PositiveSmallIntegerField(choices=STAGES, default=0)
+    prevent_advancement = models.BooleanField(
+        default=False,
+        help_text="If this is set, the stage will not advance until it is "
+        "cleared again, regardless of set times.")
     
     signing_opens = models.DateTimeField(null=True, blank=True)
     second_signing_opens = models.DateTimeField(null=True, blank=True)

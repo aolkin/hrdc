@@ -99,8 +99,8 @@ the option to sign regardless of first-round actors.
 class CastingReleaseAdmin(admin.ModelAdmin):
     form = CastingReleaseForm
     fieldsets = (
-        (None, {
-            "fields": ("associated_with", "stage")
+        ("Casting Release Status", {
+            "fields": ("associated_with", "stage", "prevent_advancement")
         }),
         ("List Publishing", {
             "fields": ("publish_callbacks", "publish_first_round_casts",
