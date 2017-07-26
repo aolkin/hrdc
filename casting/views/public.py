@@ -1,4 +1,4 @@
-from django.views.generic.detail import DetailView
+from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.views.generic.list import ListView
 from django.views.generic.base import TemplateView
 from django.conf.urls import url, include
@@ -171,18 +171,31 @@ def actor_token_auth(request, token):
 class IndexView(FixHeaderUrlMixin, TemplateView):
     template_name = "casting/public/index.html"
 
+    def get_shows(self):
+        return map(lambda x: x.casting_meta,
+                   show_model.objects.current_season().filter(
+                       casting_meta__isnull=False))
+    
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["shows"] = (("Callback", "casting:view_callbacks", [], "info"),
                             ("Cast", "casting:view_cast", [], "primary"))
-        shows = show_model.objects.current_season().filter(
-            casting_meta__isnull=False)
-        for show in [i.casting_meta for i in shows]:
+        for show in self.get_shows():
             if show.callbacks_released and show.release_meta.stage < 3:
                 context["shows"][0][2].append(show)
             if show.cast_list_released:
                 context["shows"][1][2].append(show)
         return context
+
+class PKIndexView(SingleObjectMixin, IndexView):
+    model = CastingReleaseMeta
+
+    def dispatch(self, *args, **kwargs):
+        self.object = self.get_object()
+        return super().dispatch(*args, **kwargs)
+    
+    def get_shows(self):
+        return self.get_object().castingmeta_set.all()
     
 urlpatterns = [
     url(r'^show/(?P<pk>\d+)/', include([
@@ -194,6 +207,7 @@ urlpatterns = [
             name="view_cast_popout"),
     ])),
     url(r'^$', IndexView.as_view(), name="public_index"),
+    url(r'^(?P<pk>\d+)/$', PKIndexView.as_view(), name="public_index_pk"),
     url(r'^sign/$', SigningView.as_view(), name="signing"),
     url(r'^t/([A-Za-z0-9+-]{86})/$', actor_token_auth, name="actor_token"),
 ]

@@ -158,8 +158,8 @@ ANYMAIL = {
     "MAILGUN_API_KEY": "key-1113ec6d3ccf6f9419ef02fb6e3cf18c",
     "MAILGUN_SENDER_DOMAIN": "aolkin.me"
 }
-#EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 
 DEFAULT_FROM_EMAIL = "HRDC Apps (Dev) <hrdcdev@aolkin.me>"
 
@@ -184,10 +184,13 @@ BT_BOOTSTRAP_JS_INTEGRITY = "sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzy
 BT_TETHER_VERSION = "1.4.0"
 BT_TETHER_INTEGRITY = "sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb"
 
-BT_FOOTER_OWNER = "Harvard-Radcliffe Dramatic Club"
-BT_FOOTER_SITE = "http://hrdctheater.com"
+FOOTER_OWNER = "Harvard-Radcliffe Dramatic Club"
+FOOTER_SITE = "http://hrdctheater.com"
 BT_HEADER_IMAGE = "logo.png"
 BT_HEADER_URL = "dramaorg:index"
+
+GROUP_LOCATION = "Harvard"
+SITE_URL = "http://localhost:8000"
 
 CASTING_IS_COMMON = True
 
@@ -201,3 +204,6 @@ CELERY_BEAT_SCHEDULE = {
         'relative': True,
     }
 }
+
+QUEUED_EMAIL_TEMP = None
+QUEUED_EMAIL_DEBUG = False
