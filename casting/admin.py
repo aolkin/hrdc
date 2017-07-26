@@ -119,6 +119,8 @@ class CastingReleaseAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj):
         readonly = list(self.readonly_fields)
+        if not obj:
+            return readonly
         if obj.stage > 2 or (
                 not obj.tracker.has_changed("publish_casts") and
                 is_locked(obj.publish_casts)):
@@ -185,10 +187,9 @@ class CallbackSlotAdmin(SlotAdmin):
 
 @admin.register(CastingMeta)
 class MetaAdmin(admin.ModelAdmin):
-    list_display = ('show', 'season', 'release_meta', 'callbacks_submitted',
-                    'first_cast_submitted', 'cast_submitted', 'edit_slots')
-    list_display_links = ('edit_slots',)
-    list_editable = ('show', 'release_meta',)
+    list_display = ('show', 'season', 'casting_release_stage',
+                    'callbacks_submitted', 'first_cast_submitted',
+                    'cast_submitted')
     exclude = ('callback_description', 'cast_list_description',
                'contact_email', 'callbacks_submitted', 'first_cast_submitted',
                'cast_submitted')
@@ -201,8 +202,11 @@ class MetaAdmin(admin.ModelAdmin):
         #CallbackSlotAdmin,
     ]
 
-    def edit_slots(self, instance):
-        return "edit slots"
+    def get_readonly_fields(self, request, obj):
+        if obj:
+            return ["show"] + list(self.readonly_fields)
+        else:
+            return self.readonly_fields
     
     def contact_email_link(self, obj):
         return format_html('<a href="mailto:{0}">{0}</a>', obj.contact_email)
@@ -210,3 +214,6 @@ class MetaAdmin(admin.ModelAdmin):
     
     def season(self, obj):
         return obj.show.seasonstr()
+
+    def casting_release_stage(self, instance):
+        return instance.release_meta.get_stage_display()

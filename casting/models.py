@@ -41,8 +41,7 @@ class CastingReleaseMeta(models.Model):
                                    "second_signing_opens"))
     
     class Meta:
-        verbose_name = "Casting Release Settings"
-        verbose_name_plural = "Casting Release Settings"
+        verbose_name = "Casting Release Group"
 
     @property
     def association(self):
@@ -174,8 +173,7 @@ class CastingMeta(models.Model):
         CastingReleaseMeta, verbose_name=CastingReleaseMeta._meta.verbose_name)
 
     class Meta:
-        verbose_name = "Casting Information"
-        verbose_name_plural = "Casting Information"
+        verbose_name = "Casting-Enabled Show"
 
     def __str__(self):
         return str(self.show)
