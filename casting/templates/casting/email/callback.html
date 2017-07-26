@@ -1,0 +1,74 @@
+{% extends "casting/email/base.html" %}
+{% load email %}
+{% load bt %}
+
+{% block body %}
+<table cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="center">
+      <h1 style="margin-bottom: 4px; margin-top: 18px;">You have been called back!</h1>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      You have been called back for the following shows:
+    </td>
+  </tr>
+  {% for cb in callbacks %}
+  {% ifchanged cb.show %}
+  {% if not forloop.first %}
+      </table>
+    </td>
+  <tr>
+  {% endif %}
+  <tr>
+    <td>
+      <table cellspacing="0" cellpadding="0" width="100%" style="max-width: 400px" align="center">
+	<tr>
+	  <td align="center">
+	    <h2 style="margin-bottom: 4px;">{{ cb.show }}</h2>
+	  </td>
+	</tr>
+	<tr>
+	  <td style="font-style: italic; padding-bottom: 4px; padding-top: 4px; font-size: 1.2em">
+	    <em>{{ cb.show.callback_description }}</em>
+	  </td>
+	</tr>
+	<tr>
+	  <td align="center" style="padding-top: 4px; padding-bottom: 8px;">
+	    With questions, please email <a href="mailto:{{ cb.show.contact_email }}">{{ cb.show.contact_email }}</a>.
+	  </td>
+	</tr>
+	{% endifchanged %}
+	<tr>
+	  <td style="padding-top: 4px;">
+	    <strong style="font-size: 1.2em;">{{ cb.character }}</strong>
+	    <p style="margin-left: 20px; margin-bottom: 4px; margin-top: 4px; font-style: italic; font-size: 1.1em;">
+	      <em>{{ cb.character.callback_description }}</em></p>
+	  </td>
+	</tr>
+	{% if forloop.last %}
+      </table>
+    </td>
+  </tr>
+  {% endif %}
+  {% endfor %}
+  <style>
+    .special-link {
+    text-decoration: none;
+    color: #666666;
+    }
+    .special-link:hover {
+    text-decoration: underline;
+    color: #333333;
+    }
+  </style>
+  <tr>
+    <td align="center">
+      <a href="{% setting 'SITE_URL' %}{% url 'casting:public_index_pk' crm.pk %}" class="special-link">
+	view all callback lists for this season
+      </a>
+    </td>
+  </tr>
+</table>
+{% endblock %}

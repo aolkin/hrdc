@@ -20,6 +20,10 @@ def reschedule_all(name=None):
         send_queued.delay(i[0])
     return len(pks)
 
+def exists(name, ident, to):
+    return QueuedEmail.objects.filter(
+        name=name, ident=str(ident), to=extract_address(to)).exists()
+
 def queue_msg(msg, name, ident="", silent=True):
     obj, created = QueuedEmail.objects.get_or_create(
         name=name, ident=str(ident), to=extract_address(msg.to[0]))
@@ -46,6 +50,7 @@ def render_to_queue(template, name, ident="", context={}, silent=True,
     _fix_to(kwargs)
     msg = AnymailMessage(**kwargs)
     context["MESSAGE"] = msg
+    context["SUBJECT"] = kwargs.get("subject", "")
     
     template = get_template(template)
     

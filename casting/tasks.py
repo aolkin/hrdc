@@ -20,7 +20,7 @@ def get_crm(crm_pk):
 @shared_task(ignore_result=True)
 def release_callbacks(pk):
     crm = get_crm(pk)
-    if crm and crm.stage == 0:
+    if crm and crm.stage == 0 and not crm.prevent_advancement:
         shows = list(map(lambda x: x["pk"],
                          crm.castingmeta_set.filter(
                              callbacks_submitted=True).values("pk")))
@@ -32,9 +32,11 @@ def release_callbacks(pk):
         for i in cbs:
             actor_cbs[i.actor].append(i)
         for actor, acbs in actor_cbs.items():
-            render_for_user(actor, "castingemail/callback.html", "callbacks",
-                            crm.pk, { "callbacks": acbs },
+            render_for_user(actor, "casting/email/callback.html", "callbacks",
+                            crm.pk, { "callbacks": acbs, "crm": crm },
                             subject="Your {} Callbacks".format(crm))
+        crm.stage = 1
+        crm.save()
     
 @shared_task(ignore_result=True)
 def release_first_round(pk):
