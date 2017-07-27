@@ -6,3 +6,9 @@ from importlib import import_module
 def send_queued(pk):
     email = import_module('emailtracker.models').QueuedEmail.objects.get(pk=pk)
     email.send()
+
+@shared_task(ignore_result=True)
+def send_missing():
+    n = import_module('emailtracker.tools').reschedule_all()
+    if n:
+        print("{} unset emails rescheduled.".format(n))

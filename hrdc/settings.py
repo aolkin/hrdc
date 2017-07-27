@@ -158,7 +158,6 @@ ANYMAIL = {
     "MAILGUN_API_KEY": "key-1113ec6d3ccf6f9419ef02fb6e3cf18c",
     "MAILGUN_SENDER_DOMAIN": "aolkin.me"
 }
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 
 DEFAULT_FROM_EMAIL = "HRDC Apps (Dev) <hrdcdev@aolkin.me>"
@@ -202,8 +201,13 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'casting.tasks.update_releases',
         'schedule': 10.0,
         'relative': True,
-    }
+    },
+    'send-missed-emails': {
+        'task': 'emailtracker.tasks.send_missing',
+        'schedule': 60.0 * 10.0,
+        'relative': False,
+    },
 }
 
 QUEUED_EMAIL_TEMP = None
-QUEUED_EMAIL_DEBUG = False
+QUEUED_EMAIL_DEBUG = True
