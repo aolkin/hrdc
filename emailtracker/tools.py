@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from anymail.message import AnymailMessage
 from django.template.loader import get_template
-import logging
+import logging, bleach, re
 
 from .models import *
 from .utils import *
@@ -12,7 +12,7 @@ logger = logging.getLogger("emailtracker.tools")
 class EmailSent(RuntimeError): pass
 
 def reschedule_all(name=None):
-    emails = QueuedEmail.objects.filter(sent=False)
+    emails = QueuedEmail.objects.filter(sent=None).exclude(status="<Missing>")
     if name:
         emails = emails.filter(name=name)
     pks = emails.values_list("pk")
@@ -45,6 +45,9 @@ def queue_email(name, ident="", silent=True, **kwargs):
     msg = AnymailMessage(**kwargs)
     return queue_msg(msg, name, ident, silent)
 
+NEWLINE_COLLAPSE_RE = re.compile('\n\\W*\n')
+WHITESPACE_COLLAPSE_RE = re.compile('[ \t]{2,}')
+
 def render_to_queue(template, name, ident="", context={}, silent=True,
                     **kwargs):
     _fix_to(kwargs)
@@ -53,9 +56,14 @@ def render_to_queue(template, name, ident="", context={}, silent=True,
     context["SUBJECT"] = kwargs.get("subject", "")
     
     template = get_template(template)
-    
+
     context["IS_HTML"] = False
-    msg.body = template.render(context)
+    text = bleach.clean(
+        template.render(context),
+        tags=[], strip=True)
+    text = NEWLINE_COLLAPSE_RE.sub('\n\n', text)
+    text = WHITESPACE_COLLAPSE_RE.sub('', text)
+    msg.body = text.strip()
     
     context["IS_HTML"] = True
     msg.attach_alternative(template.render(context), 'text/html')

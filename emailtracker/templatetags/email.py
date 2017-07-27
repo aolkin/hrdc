@@ -1,4 +1,5 @@
 from django import template
+from django.conf import settings
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.text import mark_safe
@@ -22,6 +23,9 @@ def image(context, fn, alt="Image", **kwargs):
 
 @register.inclusion_tag("emailtracker/href.html", takes_context=True)
 def href(context, url, text, *args, **kwargs):
-    return { "url": reverse(url, args=args, kwargs=kwargs),
+    url = reverse(url, args=args)
+    args = " ".join(['{}={}'.format(i, j) for i, j in kwargs.items()])
+    return { "url": settings.SITE_URL + url,
              "text": text,
-             "is_html": context.get("IS_HTML", True) }
+             "is_html": context.get("IS_HTML", True),
+             "args": args }

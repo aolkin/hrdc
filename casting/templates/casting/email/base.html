@@ -3,7 +3,9 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {% if IS_HTML %}
     <title>{{ SUBJECT }}</title>
+    {% endif %}
   </head>
   {% load bt %}
   {% load email %}
@@ -24,7 +26,7 @@
 	<td>
 	  <table cellpadding="0">
       <tr>
-	<td align="center" style="text-align: center; padding-bottom: 6px;">You are receiving this email because you are participating in Common Casting at {% setting "GROUP_LOCATION" %}.</td>
+	<td align="center" style="text-align: center; padding-bottom: 6px;">You received this email because you are participating in Common Casting at {% setting "GROUP_LOCATION" %}.</td>
       </tr>
       <tr>
 	<td>{% block header %}
@@ -37,9 +39,10 @@
       </tr>
       <tr>
 	<td align="center" style="padding-top: 20px;">{% block footer %}
-	  &copy;{% now "Y" %} {% setting "FOOTER_OWNER" %}
 	  {% setting 'FOOTER_SITE' as footer_site %}
-	  | <a href="{{ footer_site }}" style="color: #666666">
+	  &copy;{% now "Y" %} {% setting "FOOTER_OWNER" %}
+	  {% if IS_HTML %}|{% endif %}
+	  <a href="{{ footer_site }}" style="color: #666666">
 	    {{ footer_site|cut:"http://"|cut:"https://" }}
 	  </a>
 	  {% endblock %}</td>

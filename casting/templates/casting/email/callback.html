@@ -6,7 +6,9 @@
 <table cellpadding="0" cellspacing="0" width="100%">
   <tr>
     <td align="center">
+      {% if IS_HTML %}
       <h1 style="margin-bottom: 4px; margin-top: 18px;">You have been called back!</h1>
+      {% endif %}
     </td>
   </tr>
   <tr>
@@ -34,11 +36,13 @@
 	    <em>{{ cb.show.callback_description }}</em>
 	  </td>
 	</tr>
+	{% if cb.show.contact_email %}
 	<tr>
 	  <td align="center" style="padding-top: 4px; padding-bottom: 8px;">
 	    With questions, please email <a href="mailto:{{ cb.show.contact_email }}">{{ cb.show.contact_email }}</a>.
 	  </td>
 	</tr>
+	{% endif %}
 	{% endifchanged %}
 	<tr>
 	  <td style="padding-top: 4px;">
@@ -53,6 +57,7 @@
   </tr>
   {% endif %}
   {% endfor %}
+  {% if IS_HTML %}
   <style>
     .special-link {
     text-decoration: none;
@@ -63,11 +68,10 @@
     color: #333333;
     }
   </style>
+  {% endif %}
   <tr>
     <td align="center">
-      <a href="{% setting 'SITE_URL' %}{% url 'casting:public_index_pk' crm.pk %}" class="special-link">
-	view all callback lists for this season
-      </a>
+      {% href 'casting:public_index_pk' 'view all callback lists for this season' crm.pk class='special-link' %}
     </td>
   </tr>
 </table>
