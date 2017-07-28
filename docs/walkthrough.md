@@ -1,6 +1,5 @@
----
-title: Online Common Casting
----
+# Common Casting Online
+{:.no_toc}
 
 * TOC
 {:toc}
