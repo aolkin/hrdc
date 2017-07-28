@@ -1,12 +1,13 @@
 
 from django.urls import reverse
+from django.conf import settings
 
 from django.core.mail import EmailMultiAlternatives
 
 from config import config
 
 def send_invite(user):
-    url = (config.get("root_url","http://localhost:8000") +
+    url = (settings.SITE_URL +
            reverse("dramaorg:token_reset", args=(user.login_token,)))
     msg = EmailMultiAlternatives(
         subject="Please activate your account",
@@ -15,7 +16,7 @@ def send_invite(user):
     msg.send()
 
 def send_reset(user):
-    url = (config.get("root_url","http://localhost:8000") +
+    url = (settings.SITE_URL +
            reverse("dramaorg:token_reset", args=(user.login_token,)))
     msg = EmailMultiAlternatives(
         subject="Reset your password",
