@@ -29,13 +29,13 @@
       {% if meta.callbacks_submitted %}
       <td>Callbacks submitted.</td>
       {% else %}
-      <td class="text-danger">Waiting for callbacks.</td>
+      <td class="text-danger">Waiting for callback lists.</td>
       {% endif %}
       {% elif meta.release_meta.stage == 1 %}
       {% if meta.first_cast_submitted %}
       <td>First-round casting submitted.</td>
       {% else %}
-      <td class="text-danger">Waiting for first-round casting.</td>
+      <td class="text-danger">Waiting for first-round cast lists.</td>
       {% endif %}
       {% elif meta.release_meta.stage == 2 %}
       {% if meta.cast_submitted %}
@@ -105,12 +105,14 @@
 {% endif %}
 
 {% if user.is_board %}
+{% comment %}
 <h4 class="text-center mt-5">
   <a href="{% url 'casting:admin' %}">
     Common Casting Administration
     <small class="text-muted">for board members</small>
   </a>
 </h4>
+{% endcomment %}
 <h5 class="text-center text-muted">Please use the
   <a href="{% url 'admin:casting_castingmeta_changelist' %}">site admin</a>
   to edit or add shows</h5>
