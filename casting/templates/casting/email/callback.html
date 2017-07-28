@@ -31,11 +31,13 @@
 	    <h2 style="margin-bottom: 4px;">{{ cb.show }}</h2>
 	  </td>
 	</tr>
+	{% if cb.show.callback_description %}
 	<tr>
 	  <td style="font-style: italic; padding-bottom: 4px; padding-top: 4px; font-size: 1.2em">
 	    <em>{{ cb.show.callback_description }}</em>
 	  </td>
 	</tr>
+	{% endif %}
 	{% if cb.show.contact_email %}
 	<tr>
 	  <td align="center" style="padding-top: 4px; padding-bottom: 8px;">

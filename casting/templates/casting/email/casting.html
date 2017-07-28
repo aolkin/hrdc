@@ -1,0 +1,100 @@
+{% extends "casting/email/base.html" %}
+{% load email %}
+{% load bt %}
+{% load humanize %}
+
+{% block body %}
+<table cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="center">
+      {% if IS_HTML %}
+      <h1 style="margin-bottom: 4px; margin-top: 18px;">You have been cast!</h1>
+      {% endif %}
+    </td>
+  </tr>
+  <tr>
+    <td style="padding-left: 60px; padding-right: 60px;">
+      <ul>
+	<li>The signing period opens {{ crm.signing_opens|naturalday }} at {{ crm.signing_opens|date:"g:i A" }}.</li>
+	<li>At {{ crm.second_signing_opens|date:"g:i A" }} {{ crm.second_signing_opens|naturalday }}, any roles unclaimed by their first-cast actor will be automatically offered to the first alternate.</li>
+	<li>You may sign for all roles {% href 'casting:actor_token' 'here' user.login_token %} once the signing period opens.</li>
+	<li>In the meantime, please reach out to the staffs of shows you are considering if you have any questions. <em>Remember: They cannot contact you!</em></li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      You have been offered roles in the following shows:
+    </td>
+  </tr>
+  {% for role in signings %}
+  {% ifchanged role.show %}
+  {% if not forloop.first %}
+      </table>
+    </td>
+  <tr>
+  {% endif %}
+  <tr>
+    <td>
+      <table cellspacing="0" cellpadding="0" width="100%" style="max-width: 400px" align="center">
+	<tr>
+	  <td align="center">
+	    <h2 style="margin-bottom: 4px;">{{ role.show }}</h2>
+	  </td>
+	</tr>
+	{% if role.show.cast_list_description %}
+	<tr>
+	  <td style="font-style: italic; padding-bottom: 4px; padding-top: 4px; font-size: 1.2em">
+	    <em>{{ role.show.cast_list_description }}</em>
+	  </td>
+	</tr>
+	{% endif %}
+	{% if role.show.contact_email %}
+	<tr>
+	  <td align="center" style="padding-top: 4px; padding-bottom: 4px;">
+	    With questions, please email <a href="mailto:{{ role.show.contact_email }}">{{ role.show.contact_email }}</a>.
+	  </td>
+	</tr>
+	{% endif %}
+	<tr>
+	  <td align="center" style="padding-top: 4px; padding-bottom: 8px;">
+	    {% href 'casting:view_cast' 'view complete cast list' role.show.pk class='special-link' %}
+	  </td>
+	</tr>
+	{% endifchanged %}
+	<tr>
+	  <td style="padding-top: 4px;">
+	    <strong style="font-size: 1.2em;">
+	      {{ role.character }} {% if role.order %}({{ role.order|ordinal }} alternate){% endif %}
+	    </strong>
+	    {% if role.character.allowed_signers != 1 %}
+	    <p style="margin-left: 20px; margin-bottom: 4px; margin-top: 4px; font-style: italic;">
+	      <em>{{ role.character.allowed_signers|apnumber|capfirst }} actor{{ role.character.allowed_signers|pluralize }} are allowed to sign for this role.</em></p>
+	    {% endif %}
+	  </td>
+	</tr>
+	{% if forloop.last %}
+      </table>
+    </td>
+  </tr>
+  {% endif %}
+  {% endfor %}
+  {% if IS_HTML %}
+  <style>
+    .special-link {
+    text-decoration: none;
+    color: #666666;
+    }
+    .special-link:hover {
+    text-decoration: underline;
+    color: #333333;
+    }
+  </style>
+  {% endif %}
+  <tr>
+    <td align="center" style="padding-top: 20px;">
+      {% href 'casting:public_index_pk' 'view all cast lists for this season' crm.pk class='special-link' %}
+    </td>
+  </tr>
+</table>
+{% endblock %}

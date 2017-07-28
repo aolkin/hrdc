@@ -26,7 +26,8 @@
 	<td>
 	  <table cellpadding="0">
       <tr>
-	<td align="center" style="text-align: center; padding-bottom: 6px;">You received this email because you are participating in Common Casting at {% setting "GROUP_LOCATION" %}.</td>
+	<td align="center" style="text-align: center; padding-bottom: 6px;">
+	  This email was sent to {{ user }}. You received this email because you are participating in Common Casting at {% setting "GROUP_LOCATION" %}.</td>
       </tr>
       <tr>
 	<td>{% block header %}

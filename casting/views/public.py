@@ -1,14 +1,17 @@
 from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.views.generic.list import ListView
+from django.views.generic.edit import FormView
 from django.views.generic.base import TemplateView
 from django.conf.urls import url, include
 from django.contrib.auth import get_user_model
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.http import HttpResponseRedirect, HttpResponseForbidden
+from django.contrib import messages
 
 from django import forms
 
 from ..models import *
+from ..tasks import signing_email
 
 from . import show_model
 
@@ -139,13 +142,27 @@ class SigningView(FixHeaderUrlMixin, ListView):
         
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
+        all_shows = show_model.objects.current_season().filter(
+            casting_meta__isnull=False)
+        unpublished = all_shows.filter(
+            casting_meta__release_meta__stage__lt=4)
+        seconds = all_shows.filter(casting_meta__release_meta__stage__lt=5)
+        context["unpublished"] = []
+        context["seconds"] = []
+        for key, qs in (("unpublished", unpublished),
+                        ("seconds", seconds)):
+            for i in qs.distinct().values_list(
+                    "casting_meta__release_meta").order_by(
+                        "casting_meta__release_meta__signing_opens"):
+                context[key].append(
+                    CastingReleaseMeta.objects.get(pk=i[0]))
         context["actor"] = self.get_actor()
         return context
             
     def get_queryset(self):
         shows = show_model.objects.current_season().filter(
             casting_meta__isnull=False).filter(
-                casting_meta__release_meta__stage__gte=3,
+                casting_meta__release_meta__stage__gte=4,
                 casting_meta__cast_submitted=True)
         qs = super().get_queryset().filter(
             actor=self.get_actor(), character__show__show__in=shows).order_by(
@@ -164,9 +181,13 @@ class SigningView(FixHeaderUrlMixin, ListView):
         return HttpResponseRedirect(reverse("casting:signing"))
 
 def actor_token_auth(request, token):
-    user = get_user_model().objects.get(login_token=token)
-    request.session[SIGNING_ACTOR_KEY] = user.pk
-    return HttpResponseRedirect(reverse("casting:signing"))
+    try:
+        user = get_user_model().objects.get(login_token=token)
+        request.session[SIGNING_ACTOR_KEY] = user.pk
+    except Exception:
+        messages.error(request, "Please request a new signing link.")
+    finally:
+        return HttpResponseRedirect(reverse("casting:signing"))
 
 class IndexView(FixHeaderUrlMixin, TemplateView):
     template_name = "casting/public/index.html"
@@ -196,6 +217,32 @@ class PKIndexView(SingleObjectMixin, IndexView):
     
     def get_shows(self):
         return self.get_object().castingmeta_set.all()
+
+class RequestLinkForm(forms.Form):
+    email = forms.EmailField()
+
+    def clean_email(self):
+        actor = get_user_model().objects.filter(
+            email=self.cleaned_data["email"])
+        if actor:
+            self.actor = actor[0]
+        else:
+            raise ValidationError(
+                "Could not find anyone with this email address.")
+        return self.cleaned_data["email"]
+    
+    def send_link(self):
+        signing_email.delay(self.actor.pk)
+    
+class RequestLinkView(FixHeaderUrlMixin, FormView):
+    template_name = "casting/public/request-link.html"
+    form_class = RequestLinkForm
+    success_url = reverse_lazy('casting:request_link')
+    
+    def form_valid(self, form):
+        form.send_link()
+        messages.success(self.request, "Link sent!")
+        return super().form_valid(form)
     
 urlpatterns = [
     url(r'^show/(?P<pk>\d+)/', include([
@@ -209,5 +256,6 @@ urlpatterns = [
     url(r'^$', IndexView.as_view(), name="public_index"),
     url(r'^(?P<pk>\d+)/$', PKIndexView.as_view(), name="public_index_pk"),
     url(r'^sign/$', SigningView.as_view(), name="signing"),
+    url(r'^getlink/$', RequestLinkView.as_view(), name="request_link"),
     url(r'^t/([A-Za-z0-9+-]{86})/$', actor_token_auth, name="actor_token"),
 ]

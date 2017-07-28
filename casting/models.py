@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.template.loader import render_to_string
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
+from django.contrib.humanize.templatetags import humanize
 
 from channels.generic.websockets import JsonWebsocketConsumer
 from model_utils import FieldTracker
@@ -305,7 +306,7 @@ class ActorMapping(models.Model):
             return "(Unnassigned {})".format(self.__class__.__name__)
     
 class Callback(ActorMapping):
-    notified = models.BooleanField(default=False)
+    pass
     
 class Signing(ActorMapping):
     order = models.PositiveSmallIntegerField(default=0)
@@ -314,12 +315,18 @@ class Signing(ActorMapping):
         (False, "Reject this Role"),
         (None, "No Response"),
     ))
-    notified_first = models.BooleanField(default=False)
-    notified_second = models.BooleanField(default=False)
+    timed_out = models.BooleanField(default=False)
 
     def order_num(self):
         return self.order + 1
-    order_num.short_description = "Signing Order"
+
+    def order_title(self):
+        if self.order:
+            return humanize.ordinal(self.order) + " Alternate"
+        else:
+            return "First Choice"
+    order_title.short_description = "Casting Preference Order"
+    order_title.admin_order_field = "order"
     
     @property
     def editable(self):
@@ -342,7 +349,7 @@ class Signing(ActorMapping):
     
     class Meta:
         ordering = ("character__show", "character", "order")
-
+        
 @receiver(pre_delete)
 def shift_signings(sender, instance, **kwargs):
     if sender == Signing:
@@ -351,7 +358,14 @@ def shift_signings(sender, instance, **kwargs):
         for signing in shifts:
             signing.order -= 1
             signing.save()
-        
+
+@receiver(post_save)
+def notify_alternates(sender, instance, *args, **kwargs):
+    if sender == Signing:
+        if instance.response == False:
+            from .tasks import notify_alternates
+            notify_alternates.delay(instance.pk)
+
 STANDARD_TIMES = (
     datetime.time(hour=18),
     datetime.time(hour=21),

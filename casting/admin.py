@@ -8,13 +8,22 @@ from .models import *
 
 @admin.register(Signing)
 class SigningAdmin(admin.ModelAdmin):
-    list_display = ('show', 'character', 'order_num', 'actor', 'response')
-    list_editable = ('response',)
-    list_display_links = None
+    list_display = ('show', 'character', 'order_title', 'actor', 'response')
+    list_display_links = ('response',)
     list_filter = ('character__show', 'character__show__show__year',
                    'character__show__show__season')
     search_fields = ('actor__first_name', 'actor__last_name',
                      'character__name')
+    
+    fieldsets = (
+        ("Role", {
+            "fields": ("show", "character", "order_title")
+        }),
+        ("Signature", {
+            "fields": ("actor", "response"),
+        }),
+    )
+    readonly_fields = ("show", "character", "order_title", "actor")
     
     def get_actions(self, request):
         actions = super().get_actions(request)

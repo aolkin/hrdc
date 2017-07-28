@@ -143,7 +143,7 @@
       {% if request.user.is_authenticated %}
       click <a href="{% url 'casting:signing' %}#{{ object.pk }}">here</a>
       {% else %}
-      click the link emailed to you
+      click the link in the notification email you received
       {% endif %}
       to sign for your role.
     </p>
