@@ -74,6 +74,8 @@ def release_casting(pk):
             for i in signings:
                 actor_roles[i.actor].append(i)
             for actor, roles in actor_roles.items():
+                if not actor.login_token:
+                    actor.new_token()
                 render_for_user(actor, "casting/email/casting.html",
                                 "casting", crm.pk,
                                 { "signings": roles, "crm": crm },
@@ -127,6 +129,10 @@ def open_second_signing(pk):
 @shared_task(ignore_result=True)
 def notify_alternates(pk):
     signing = get_model("Signing").objects.get(pk=pk)
+    previous = get_model("Signing").objects.filter(
+        character=signing.character, order__lt=signing.order, response=False)
+    if len(previous) != signing.order:
+        return
     alternates = get_model("Signing").objects.filter(
         character=signing.character, order__gt=signing.order).exclude(
             response=False).select_related("character", "character__show")
