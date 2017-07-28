@@ -1,13 +1,22 @@
-# HRDC Apps - Common Casting
+---
+title: Online Common Casting
+---
 
 * TOC
 {:toc}
+
+# Introduction
+
+This document intends to serve as both an instruction manual for the web
+application, as well as a description of the functionality and service it
+provides. The numerous screenshots included should both help in understanding
+how to use it, as well as quickly show everything it does.
 
 ## General Concepts
 
 ### Permissions
 
-Their are a few different permission levels that will be referenced throughout
+There are a few different permission levels that will be referenced throughout
 this document:
 
 The lowest is that of an unauthenticated user, who can only browse released
@@ -33,7 +42,7 @@ for actors and edit user profiles directly.
 The current season, relevant throughout the system, must be manually set and
 changed by the site superuser.
 
-# Backend - Setting Things Up
+# Setting Things Up
 
 ## Setting up a show
 
@@ -42,7 +51,7 @@ To set up a show for common casting, go to the site admin and select
 it, or click "Add Casting-Enabled Show" to create a new one.
 
 A casting-enabled show is simply a show that is linked to a casting-release
-group, as wel as a number of audition slots. As such, the new/edit screen
+group, as well as a number of audition slots. As such, the new/edit screen
 provides a way to select an existing show and existing casting release group,
 or create new ones via the small green plus buttons.
 
@@ -95,7 +104,7 @@ shows, it will be listed based on the season of those shows.
 Casting-enabled shows should have a number of audition slots. An audition slot
 is fairly self-explanatory. The categorization of spaces within buildings is
 important, because when the system generates the list of shows to sign into
-in the sign-in form, it it by building.
+in the sign-in form, it is by building.
 
 Note: 12:00 AM is basically 00:00 AM, so a slot from 9:00 PM to 12:00 AM
 will be nonexisting. Instead, use 11:59 PM.
@@ -116,9 +125,9 @@ responded as having rejected those roles at the given time.
 
 ![Blank Casting Release Group](images/05.png)
 
-# Frontend - PDSM Interface
+# Casting - PDSM Interface
 
-Upon navigating to the common casting home page, PDSMs, are presented with a
+Upon navigating to the common casting home page, PDSMs are presented with a
 list of shows they are working on. They can work on individual aspects of
 casting a given show by clicking the links in the sidebar.
 
@@ -261,14 +270,17 @@ the first-round cast lists are not viewable publicly.
 ### Final Cast Lists
 
 After submitting their first-round cast lists, PDSMs can edit their alternates
-before submitting their final cast list.
+before submitting their final cast list, in a process very similar to the
+above. Once cast lists are released, they replace callbacks on the public site.
 
 ![Cast List Input](images/17.png)
 
-The submission and release process are again very similar to the above, except
-that all actors who have been cast will be emailed notifications listing all
-roles they have been cast as. Once cast lists are released, they replace
-callbacks on the public site.
+# Actors' Interface
+
+## Casting
+
+When cast lists are released, all actors who have been cast will be emailed
+notifications listing all roles they have been cast as.
 
 ![Casting Notification](images/18.png)
 
