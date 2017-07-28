@@ -1,5 +1,12 @@
 # HRDC Apps - Common Casting
 
+* TOC
+{:toc}
+
+## General Concepts
+
+### Permissions
+
 Their are a few different permission levels that will be referenced throughout
 this document:
 
@@ -21,12 +28,12 @@ The highest, "superuser", would belong to the President, and possibly one or
 two other board members. They can do almost anything, including sign onto shows
 for actors and edit user profiles directly.
 
-> NOTE: Current Season
->
-> The current season, relevant throughout the system, must be manually set and
-> changed by the site superuser.
+### Current Season
 
-# Backend/Admin - Setting Things Up
+The current season, relevant throughout the system, must be manually set and
+changed by the site superuser.
+
+# Backend - Setting Things Up
 
 ## Setting up a show
 
