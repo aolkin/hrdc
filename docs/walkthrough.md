@@ -214,6 +214,7 @@ release group's stage. When this is done, callback lists will be visible to
 anyone, without logging in.
 
 ![Callback List List](images/13.png)
+
 ![Callback List](images/14.png)
 
 ## Cast Lists
