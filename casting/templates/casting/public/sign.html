@@ -11,6 +11,13 @@
 <h3 class="text-center">
   Please log in again or click the link in your email to log in automatically.
 </h3>
+<h4 class="text-center">
+  If you cannot find the link or it does not work, please
+  <a href="{% url 'casting:request_link' %}">request a new signing link</a>.
+</h4>
+<h5 class="text-center">
+  If you are still unable to sign, please contact the board immediately.
+</h5>
 {% endif %}
 {% if object_list and actor %}
 <h2 class="text-center">Roles Offered to You</h2>
@@ -19,10 +26,18 @@
     <p class="lead text-center">
       Accept or reject the roles you've been cast as below:
     </p>
-    <p class="lead text-center">
+    <p class="lead text-center only-small">
       <small>You may also leave any number of roles without a response and
 	return to them later.</small>
     </p>
+    {% if seconds %}
+    <div class="text-center alert alert-warning">
+      If you do not sign for a role for which you are first-choice cast by
+      {{ seconds.0.second_signing_opens|date:"g:i A" }}
+      {{ seconds.0.second_signing_opens|naturalday }}, it will automatically be
+      offered to its first alternate.
+    </div>
+    {% endif %}
     <p class="text-center mb-0">
       <!-- Actor help -->
     </p>
@@ -43,10 +58,18 @@
 	<label class="col-7 push-5 mt-1 text-right">
 	  <big>
 	    <strong>{{ i.character }}</strong>
-	    <span class="text-muted">{{ i.order_num|ordinal }} Choice</span>
+	    <span class="text-muted">{{ i.order_title }}</span>
 	  </big>
 	</label>
 	{% if i.signable %}
+	{% if i.timed_out %}
+	<div class="col-5 pull-7">
+	  <div class="form-control-static text-danger">
+	    <div class="fa fa-exclamation-triangle pull-left mt-1"> </div>
+	    <div class="ml-4">This role has been offered to alternates.</div>
+	  </div>
+	</div>
+	{% else %}
 	<select class="form-control custom-select col-5 pull-7"
 		name="signing-response-{{ i.pk }}" 
 		{% if i.response is not None %}disabled>
@@ -57,6 +80,7 @@
 	  <option selected value="">No Response</option>
 	  {% endif %}
 	</select>
+	{% endif %}
 	{% else %}
 	<div class="col-5 pull-7">
 	  <div class="form-control-static text-danger">
@@ -81,6 +105,9 @@
     </form>
   </div>
 </div>
+{% elif unpublished %}
+<h2 class="text-center">The signing period has not yet begun!</h2>
+<h3 class="text-center">Please come back {{ unpublished.0.signing_opens|naturaltime }}.</h3>
 {% elif actor %}
 <h2 class="text-center">You have not been cast in any shows at this time.</h2>
 <h3 class="text-center">Please check back later.</h3>

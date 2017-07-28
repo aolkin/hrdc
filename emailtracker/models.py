@@ -74,12 +74,12 @@ class QueuedEmail(models.Model):
             fd, fn = mkstemp(".eml.txt", "debug-",
                              dir=EMAIL_TEMP_DIR, text=True)
             write(fd, msg.body.encode())
-            print("Email body written to: {}".format(fn))
+            print("Email (to {}) body written to: {}".format(self.to, fn))
             if len(msg.alternatives) > 0:
                 fd, fn = mkstemp(".eml.html", prefix="debug-",
                                  dir=EMAIL_TEMP_DIR, text=True)
                 write(fd, msg.alternatives[0][0].encode())
-                print("Email HTML written to: {}".format(fn))
+                print("Email (to {}) HTML written to: {}".format(self.to, fn))
             self.status = "<DEBUG>"
         else:
             try:

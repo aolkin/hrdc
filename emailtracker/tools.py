@@ -20,9 +20,19 @@ def reschedule_all(name=None):
         send_queued.delay(i[0])
     return len(pks)
 
-def exists(name, ident, to):
+def _query(name, ident, to):
     return QueuedEmail.objects.filter(
-        name=name, ident=str(ident), to=extract_address(to)).exists()
+        name=name, ident=str(ident), to=extract_address(to))
+
+def exists(*args, **kwargs):
+    return _query(*args, **kwargs).exists()
+
+def get(*args, **kwargs):
+    obj = _query(*args, **kwargs)
+    if obj.exists():
+        return obj[0]
+    else:
+        return None
 
 def queue_msg(msg, name, ident="", silent=True):
     obj, created = QueuedEmail.objects.get_or_create(
@@ -34,7 +44,7 @@ def queue_msg(msg, name, ident="", silent=True):
     else:
         obj.set_msg(msg)
         obj.save()
-        send_queued.delay(obj.pk)
+        return send_queued.delay(obj.pk)
 
 def _fix_to(kwargs):
     if type(kwargs["to"]) not in ("list", "tuple"):
@@ -50,6 +60,13 @@ WHITESPACE_COLLAPSE_RE = re.compile('[ \t]{2,}')
 
 def render_to_queue(template, name, ident="", context={}, silent=True,
                     **kwargs):
+    existing = get(name, ident, kwargs["to"])
+    if existing and existing.sent:
+        if silent:
+            return
+        else:
+            raise EmailSent("Attempting to render and queue email that has "
+                            "already been sent.")
     _fix_to(kwargs)
     msg = AnymailMessage(**kwargs)
     context["MESSAGE"] = msg

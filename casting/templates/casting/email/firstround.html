@@ -1,0 +1,46 @@
+{% extends "casting/email/base.html" %}
+{% load email %}
+{% load bt %}
+
+{% block body %}
+<table cellpadding="0" cellspacing="8" width="100%">
+  <tr>
+    <td align="center">
+      {% if IS_HTML %}
+      <h1 style="margin-bottom: 4px; margin-top: 18px;">First-Round Casts Released for {{ crm }}</h1>
+      {% endif %}
+    </td>
+  </tr>
+  {% if IS_HTML %}
+  <style>
+    .special-link {
+    text-decoration: none;
+    color: #666666;
+    }
+    .special-link:hover {
+    text-decoration: underline;
+    color: #333333;
+    }
+  </style>
+  {% endif %}
+  <tr>
+    <td align="center">
+      First-round cast lists have been released for {{ crm }}.
+      As an administrative staff member of a show this season, you may log in
+      and view them, or use the links below:
+    </td>
+  </tr>
+  {% for show in crm.castingmeta_set.all %}
+  <tr>
+    <td align="center">
+      {% href 'casting:view_cast' show show.pk %}
+    </td>
+  </tr>
+  {% endfor %}
+  <tr>
+    <td align="center" style="padding-top: 8px;">
+      {% href 'casting:index' 'view all first-round cast lists' class='special-link' %}
+    </td>
+  </tr>
+</table>
+{% endblock %}

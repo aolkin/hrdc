@@ -165,3 +165,7 @@ table .btn {
 .signing-item span.badge.fa:not(.badge-pill) {
     width: 1.4rem;
 }
+
+p.lead.only-small {
+    line-height: 1.2;
+}
