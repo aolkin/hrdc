@@ -6,9 +6,10 @@
 <td>{{ audition.actor.get_full_name }}</td>
 <td class="text-primary">{{ audition.actor.email|break_punctuation }}</td>
 <td>{{ audition.actor.pretty_phone }}</td>
+<td>{{ audition.actor.year }}</td>
 <td>{{ audition.actor.pgps|break_punctuation }}</td>
 <td class="copyable" hidden>
-  <textarea>{{ audition.actor.get_full_name }}	{{ audition.actor.email }}	{{ audition.actor.phone }}	{{ audition.actor.pgps }}</textarea>
+  <textarea>{{ audition.actor.get_full_name }}	{{ audition.actor.email }}	{{ audition.actor.phone }}	{{ audition.actor.year }}	{{ audition.actor.pgps }}</textarea>
 </td>
 <td class="align-middle">
   <button class="btn btn-secondary btn-sm btn-copy-excel"

@@ -39,6 +39,8 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     last_name = models.CharField(max_length=60)
     email = models.CharField(max_length=254, unique=True, db_index=True)
     phone = models.CharField(max_length=20, verbose_name="Phone Number")
+    year = models.PositiveSmallIntegerField(blank=True, null=True,
+                                            verbose_name="Graduation Year")
     pgps = models.CharField(max_length=20, blank=True,
                             verbose_name="Preferred Gender Pronouns")
 

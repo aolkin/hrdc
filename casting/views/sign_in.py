@@ -87,15 +87,16 @@ class ActorSignInStart(ActorSignInBase, BaseUpdateView):
         self.actor_is_initialized = actor.is_initialized
         return FormView.form_valid(self, form)
 
-PROFILE_FIELDS = ["first_name", "last_name", "phone",]
+PROFILE_FIELDS = ["first_name", "last_name", "phone"]
 PROFILE_WIDGETS = dict(zip(PROFILE_FIELDS, [
     forms.TextInput(attrs={ "autocomplete": "off" }) for i in range(len(
         PROFILE_FIELDS))]))
+PROFILE_WIDGETS["year"] = forms.NumberInput()
 
 class ActorProfileForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
-        fields = PROFILE_FIELDS + ["pgps"]
+        fields = PROFILE_FIELDS + ["year", "pgps"]
         widgets = PROFILE_WIDGETS
     
 class ActorSignInProfile(ActorSignInBase, BaseUpdateView):
