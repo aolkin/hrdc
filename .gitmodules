@@ -1,6 +1,6 @@
 [submodule "config"]
 	path = config
-	url = https://github.com/baryon5/config.git
+	url = https://github.com/aolkin/config.git
 [submodule "basetemplates"]
 	path = basetemplates
-	url = https://github.com/baryon5/basetemplates.git
+	url = https://github.com/aolkin/basetemplates.git
