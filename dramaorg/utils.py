@@ -1,4 +1,4 @@
-from django.db.utils import OperationalError
+from django.db.utils import OperationalError, ProgrammingError
 from django.db.models import Q
 
 from django.contrib.auth.decorators import user_passes_test
@@ -12,6 +12,8 @@ def get_admin_group():
         return auth.Group.objects.get_or_create(
             name=settings.ADMIN_GROUP_NAME)[0]
     except OperationalError:
+        return None
+    except ProgrammingError:
         return None
     
 def add_change_permissions(*models):
