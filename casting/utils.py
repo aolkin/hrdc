@@ -4,10 +4,10 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 import contextlib
 
 def test_board(user):
-    return user.is_authenticated() and user.is_board
+    return user.is_authenticated and user.is_board
 
 def test_pdsm(user):
-    return user.is_authenticated() and user.is_pdsm
+    return user.is_authenticated and user.is_pdsm
 
 class UserIsPdsmMixin(UserPassesTestMixin):
     def test_func(self):

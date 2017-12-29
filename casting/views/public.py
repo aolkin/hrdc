@@ -18,7 +18,7 @@ from . import show_model
 class FixHeaderUrlMixin:
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             if self.request.user.is_pdsm:
                 context["BT_header_url"] = 'casting:index'
         else:
@@ -33,7 +33,7 @@ class PublicView(FixHeaderUrlMixin, DetailView):
         context["user_is_staff"] = self.object.show.user_is_staff(
             self.request.user)
         context["sidebar_menu"] = {}
-        if self.request.user.is_authenticated() and self.request.user.is_pdsm:
+        if self.request.user.is_authenticated and self.request.user.is_pdsm:
             submenu = context["sidebar_menu"]["Common Casting"] = []
             submenu.append({
                 "name": "Home",
@@ -50,7 +50,7 @@ class CallbackView(PublicView):
             added_for_signing=False)
         menu = context["sidebar_menu"]
         submenu = menu[self.object.show.seasonstr() + " Callbacks"] = []
-        if self.request.user.is_authenticated() and self.request.user.is_board:
+        if self.request.user.is_authenticated and self.request.user.is_board:
             filter_args = {}
         else:
             filter_args = {
@@ -86,15 +86,15 @@ class CastView(PublicView):
         context["popout"] = self.popout
         context["allow_view_first_cast"] = (
             self.object.first_cast_released and
-            self.request.user.is_authenticated() and self.request.user.is_pdsm)
+            self.request.user.is_authenticated and self.request.user.is_pdsm)
         context["show_all_actors"] = ((self.object.first_cast_submitted and
                                        context["user_is_staff"]) or
                                       self.object.cast_list_released)
         menu = context["sidebar_menu"]
         submenu = menu[self.object.show.seasonstr() + " Cast Lists"] = []
-        if self.request.user.is_authenticated() and self.request.user.is_board:
+        if self.request.user.is_authenticated and self.request.user.is_board:
             filter_args = {}
-        elif (self.request.user.is_authenticated() and
+        elif (self.request.user.is_authenticated and
               self.request.user.is_pdsm):
             filter_args = {
                 "first_cast_submitted": True,
@@ -135,7 +135,7 @@ class SigningView(FixHeaderUrlMixin, ListView):
         if SIGNING_ACTOR_KEY in self.request.session:
             return get_user_model().objects.get(
                 pk=self.request.session[SIGNING_ACTOR_KEY])
-        elif self.request.user.is_authenticated():
+        elif self.request.user.is_authenticated:
             return self.request.user
         else:
             return None
