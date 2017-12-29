@@ -17,6 +17,15 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
+            name='CastingMeta',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('callback_description', models.TextField(blank=True)),
+                ('cast_list_description', models.TextField(blank=True)),
+                ('contact_email', models.EmailField(blank=True, max_length=254)),
+            ],
+        ),
+        migrations.CreateModel(
             name='Audition',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
@@ -38,16 +47,6 @@ class Migration(migrations.Migration):
             options={
                 'abstract': False,
             },
-        ),
-        migrations.CreateModel(
-            name='CastingMeta',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('callback_description', models.TextField(blank=True)),
-                ('cast_list_description', models.TextField(blank=True)),
-                ('contact_email', models.EmailField(blank=True, max_length=254)),
-                ('callback_location', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dramaorg.Space')),
-            ],
         ),
         migrations.CreateModel(
             name='CastingReleaseMeta',
@@ -74,7 +73,6 @@ class Migration(migrations.Migration):
                 ('callback_description', models.TextField(blank=True, help_text='Extra information about callbacks for this character.', verbose_name='Character Callback Information')),
                 ('allowed_signers', models.PositiveSmallIntegerField(default=1)),
                 ('show', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='casting.CastingMeta')),
-                ('added_during_callbacks', models.BooleanField(default=True)),
             ],
             options={
                 'abstract': False,
@@ -98,7 +96,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='castingmeta',
             name='release_meta',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='casting.CastingReleaseMeta'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='casting.CastingReleaseMeta', verbose_name='Casting Release Settings'),
         ),
         migrations.AddField(
             model_name='castingmeta',
@@ -112,33 +110,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelOptions(
             name='castingmeta',
-            options={'verbose_name': 'Show'},
-        ),
-        migrations.AlterField(
-            model_name='castingmeta',
-            name='release_meta',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='casting.CastingReleaseMeta', verbose_name='Casting Release Settings'),
-        ),
-        migrations.AlterModelOptions(
-            name='castingmeta',
-            options={'verbose_name': 'Casting Information for Show'},
-        ),
-        migrations.RemoveField(
-            model_name='castingmeta',
-            name='callback_location',
-        ),
-        migrations.AddField(
-            model_name='castingmeta',
-            name='callback_slots',
-            field=models.ManyToManyField(blank=True, to='casting.Slot'),
-        ),
-        migrations.AlterModelOptions(
-            name='castingmeta',
             options={'verbose_name': 'Casting Information', 'verbose_name_plural': 'Casting Information'},
-        ),
-        migrations.RemoveField(
-            model_name='castingmeta',
-            name='callback_slots',
         ),
         migrations.AddField(
             model_name='audition',
@@ -193,10 +165,6 @@ class Migration(migrations.Migration):
             options={
                 'ordering': ('character__show', 'character', 'order'),
             },
-        ),
-        migrations.RemoveField(
-            model_name='character',
-            name='added_during_callbacks',
         ),
         migrations.AddField(
             model_name='character',
