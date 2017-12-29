@@ -144,7 +144,7 @@ class Building(models.Model):
         
 class Space(models.Model):
     name = models.CharField(max_length=150)
-    building = models.ForeignKey(Building)
+    building = models.ForeignKey(Building, on_delete=models.CASCADE)
     include_building_name = models.BooleanField(
         default=True, help_text="uncheck this to hide the building name when "+
         "displaying the full name of the space")
@@ -196,7 +196,7 @@ class Season(models.Model):
 class Show(Season):
     title = models.CharField(max_length=150)
     staff = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
-    space = models.ForeignKey(Space)
+    space = models.ForeignKey(Space, null=True, on_delete=models.SET_NULL)
     
     slug = models.SlugField(unique=True, db_index=True)
     invisible = models.BooleanField(default=False)
