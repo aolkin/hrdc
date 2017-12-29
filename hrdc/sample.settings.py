@@ -21,18 +21,18 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '100lj0ceb%u-^n*)a%8xh()iml9neaz4jn!h548$#z7nf9!56)'
+SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]', ".ngrok.io"]
+ALLOWED_HOSTS = []
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'suit',
+    #'suit',
     'config',
     'emailtracker',
     'basetemplates',
@@ -155,12 +155,12 @@ SPACE_MODEL = "dramaorg.Space"
 BUILDING_MODEL = "dramaorg.Building"
 
 ANYMAIL = {
-    "MAILGUN_API_KEY": "key-1113ec6d3ccf6f9419ef02fb6e3cf18c",
-    "MAILGUN_SENDER_DOMAIN": "aolkin.me"
+    "MAILGUN_API_KEY": "",
+    "MAILGUN_SENDER_DOMAIN": ""
 }
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 
-DEFAULT_FROM_EMAIL = "HRDC Apps (Dev) <hrdcdev@aolkin.me>"
+DEFAULT_FROM_EMAIL = "HRDC Apps <user@domain.com>"
 
 CONFIGURATION_APP_TITLE = "Global Settings"
 
@@ -177,11 +177,11 @@ LOGO_PATH = os.path.join(BASE_DIR, "hrdc/static/logo.png")
 
 BT_SITE_TITLE = "HRDC Apps"
 BT_FAVICON_URL = "https://hrdctheater.com/wp-content/uploads/2016/02/cropped-HRDC-Logo-2-32x32.png"
-BT_BOOTSTRAP_VERSION = "4.0.0-alpha.6"
-BT_BOOTSTRAP_CSS_INTEGRITY = "sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ"
-BT_BOOTSTRAP_JS_INTEGRITY = "sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn"
-BT_TETHER_VERSION = "1.4.0"
-BT_TETHER_INTEGRITY = "sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb"
+BT_BOOTSTRAP_VERSION = "4.0.0-beta.3"
+BT_BOOTSTRAP_CSS_INTEGRITY = "sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy"
+BT_BOOTSTRAP_JS_INTEGRITY = "sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4"
+BT_POPPER_VERSION = "1.12.9"
+BT_POPPER_INTEGRITY = "sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
 
 FOOTER_OWNER = "Harvard-Radcliffe Dramatic Club"
 FOOTER_SITE = "http://hrdctheater.com"
