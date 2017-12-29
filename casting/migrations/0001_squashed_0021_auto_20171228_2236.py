@@ -8,14 +8,11 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    replaces = [('casting', '0001_initial_squashed_0014_auto_20170710_2300'), ('casting', '0002_auto_20170710_2310'), ('casting', '0003_auto_20170711_2201'), ('casting', '0004_castingreleasemeta_stage'), ('casting', '0005_auto_20170715_1055'), ('casting', '0006_auto_20170715_1533'), ('casting', '0007_auto_20170715_1650'), ('casting', '0008_auto_20170715_1659'), ('casting', '0009_auto_20170716_0135'), ('casting', '0010_auto_20170716_2252'), ('casting', '0011_auto_20170719_0309'), ('casting', '0012_auto_20170720_1729'), ('casting', '0013_auto_20170720_1731'), ('casting', '0014_signing'), ('casting', '0015_auto_20170720_1933'), ('casting', '0016_auto_20170724_0118'), ('casting', '0017_castingreleasemeta_prevent_advancement'), ('casting', '0018_auto_20170725_2104'), ('casting', '0019_auto_20170726_0133'), ('casting', '0020_auto_20170727_2059'), ('casting', '0021_auto_20171228_2236')]
-
     initial = True
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('dramaorg', '__first__'),
-        ('dramaorg', '0003_auto_20170712_2005'),
     ]
 
     operations = [

@@ -12,8 +12,8 @@ import dramaorg.models
 
 class Migration(migrations.Migration):
 
-    replaces = [('dramaorg', '0001_initial'), ('dramaorg', '0002_user_token_expiry'), ('dramaorg', '0003_user_pgps_squashed_0007_auto_20170710_1249'), ('dramaorg', '0004_auto_20170710_1549'), ('dramaorg', '0005_groupproxy'), ('dramaorg', '0006_auto_20170710_1835'), ('dramaorg', '0007_space_include_building_name'), ('dramaorg', '0008_auto_20170710_2203')]
-
+    initial = True
+    
     dependencies = [
         ('auth', '0008_alter_user_username_max_length'),
     ]
@@ -65,6 +65,14 @@ class Migration(migrations.Migration):
             field=models.CharField(blank=True, max_length=20, verbose_name='Preferred Gender Pronouns'),
         ),
         migrations.CreateModel(
+            name='Building',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('name', models.CharField(max_length=150)),
+                ('address', models.TextField(blank=True)),
+            ],
+        ),
+        migrations.CreateModel(
             name='Space',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
@@ -97,14 +105,6 @@ class Migration(migrations.Migration):
             bases=('auth.group',),
             managers=[
                 ('objects', django.contrib.auth.models.GroupManager()),
-            ],
-        ),
-        migrations.CreateModel(
-            name='Building',
-            fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=150)),
-                ('address', models.TextField(blank=True)),
             ],
         ),
     ]
