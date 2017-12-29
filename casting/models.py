@@ -171,7 +171,8 @@ class CastingMeta(models.Model):
     contact_email = models.EmailField(
         blank=True, verbose_name="Show Contact Email")
     release_meta = models.ForeignKey(
-        CastingReleaseMeta, verbose_name=CastingReleaseMeta._meta.verbose_name)
+        CastingReleaseMeta, verbose_name=CastingReleaseMeta._meta.verbose_name,
+        on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = "Casting-Enabled Show"
@@ -200,7 +201,7 @@ class CastingMeta(models.Model):
         return self.slot_set.filter(type=Slot.TYPES[1][0])
     
 class AssociateShowMixin(models.Model):
-    show = models.ForeignKey(CastingMeta)
+    show = models.ForeignKey(CastingMeta, on_delete=models.CASCADE)
 
     class Meta:
         abstract = True
@@ -211,11 +212,12 @@ class Audition(AssociateShowMixin):
         ("called", "Called"),
         ("done", "Auditioned")
     )
-    actor = models.ForeignKey(get_user_model())
+    actor = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     signed_in = models.DateTimeField(auto_now_add=True)
     status = models.CharField(default=STATUSES[0][0], max_length=20,
                               choices=STATUSES)
-    space = models.ForeignKey(settings.SPACE_MODEL, blank=True, null=True)
+    space = models.ForeignKey(settings.SPACE_MODEL, blank=True, null=True,
+                              on_delete=models.SET_NULL)
 
     def __str__(self):
         return "{} for {}".format(self.actor, self.show)
@@ -288,8 +290,9 @@ class Character(AssociateShowMixin):
         return self.name if self.name else "<Unnamed Character>"
 
 class ActorMapping(models.Model):
-    character = models.ForeignKey(Character)
-    actor = models.ForeignKey(get_user_model(), null=True)
+    character = models.ForeignKey(Character, on_delete=models.CASCADE)
+    actor = models.ForeignKey(get_user_model(), null=True,
+                              on_delete=models.CASCADE)
 
     class Meta:
         abstract = True
@@ -395,8 +398,8 @@ class SlotManager(models.Manager):
         return self.filter(type=Slot.TYPES[1][0])
 
 class Slot(models.Model):
-    show = models.ForeignKey(CastingMeta)
-    space = models.ForeignKey(settings.SPACE_MODEL)
+    show = models.ForeignKey(CastingMeta, on_delete=models.CASCADE)
+    space = models.ForeignKey(settings.SPACE_MODEL, on_delete=models.CASCADE)
     day = models.DateField()
     start = models.TimeField(choices=TIME_CHOICES)
     end = models.TimeField(choices=TIME_CHOICES)
