@@ -163,7 +163,10 @@ class Space(models.Model):
             return self.name
     
     def __str__(self):
-        return self.name
+        return self.full_name()
+
+    class Meta:
+        unique_together = (("name", "building"),)
     
 def _get_year():
     return timezone.now().year
