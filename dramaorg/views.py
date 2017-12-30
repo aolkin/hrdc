@@ -178,9 +178,17 @@ class ResetView(FormView):
 
 class ProfileView(LoginRequiredMixin, UpdateView):
     model = User
-    fields = ['first_name', 'last_name', 'pgps', 'phone', 'email']
+    fields = ['first_name', 'last_name', 'pgps', 'phone', 'affiliation',
+              'year', 'email']
     template_name = "dramaauth/user_profile.html"
 
+    def get(self, *args, **kwargs):
+        if self.request.GET.get("next", None):
+            messages.add_message(
+                self.request, messages.WARNING,
+                "Please fill out your missing profile information.")
+        return super().get(*args, **kwargs)
+    
     def get_object(self, queryset=None):
         return self.request.user
 

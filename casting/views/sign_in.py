@@ -1,6 +1,7 @@
 
 from django.views.generic.base import *
 from django.views.generic.edit import *
+from django.http import JsonResponse
 
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q
@@ -87,11 +88,18 @@ class ActorSignInStart(ActorSignInBase, BaseUpdateView):
         self.actor_is_initialized = actor.is_initialized
         return FormView.form_valid(self, form)
 
-PROFILE_FIELDS = ["first_name", "last_name", "phone"]
+PROFILE_FIELDS = ["first_name", "last_name", "phone", "affiliation"]
 PROFILE_WIDGETS = dict(zip(PROFILE_FIELDS, [
     forms.TextInput(attrs={ "autocomplete": "off" }) for i in range(len(
         PROFILE_FIELDS))]))
 PROFILE_WIDGETS["year"] = forms.NumberInput()
+
+def autocomplete_affiliation(request):
+    qs = get_user_model().objects.filter(
+        affiliation__startswith=request.GET.get("q", ""))
+    return JsonResponse(list(
+        [i for l in qs.distinct().values_list("affiliation") for i in l]),
+                        safe=False)
 
 class ActorProfileForm(forms.ModelForm):
     class Meta:
@@ -161,5 +169,7 @@ urlpatterns = [
         name="sign_in_start_popout"),
     url(r'^profile/$', ActorSignInProfile.as_view(),
         name="sign_in_profile"),
+    url(r'^profile/affiliations/$', autocomplete_affiliation,
+        name="autocomplete_affiliation"),
     url(r'^done/$', ActorSignInDone.as_view(),
         name="sign_in_done")]

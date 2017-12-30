@@ -52,6 +52,18 @@ $("input[type=email]").typeahead({
     autoSelect: true
 });
 
+function suggestAffiliation(q, cb) {
+    $.getJSON("affiliations/",
+              { "q": q }).done(cb);
+}
+
+$("input[name=affiliation]").typeahead({
+    minLength: 0,
+    source: suggestAffiliation,
+    fitToElement: true,
+    autoSelect: true
+});
+
 $("a[href][data-autoreset]").each(function(index, el) {
     setTimeout((function(){
         location.assign($(this).attr("href"));
