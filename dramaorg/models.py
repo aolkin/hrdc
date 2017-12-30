@@ -39,8 +39,10 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     last_name = models.CharField(max_length=60)
     email = models.CharField(max_length=254, unique=True, db_index=True)
     phone = models.CharField(max_length=20, verbose_name="Phone Number")
-    year = models.PositiveSmallIntegerField(blank=True, null=True,
+    year = models.PositiveSmallIntegerField(null=True,
                                             verbose_name="Graduation Year")
+    affiliation = models.CharField(max_length=160,
+                                   verbose_name="School or Affiliation")
     pgps = models.CharField(max_length=20, blank=True,
                             verbose_name="Preferred Gender Pronouns")
 
@@ -86,10 +88,15 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
             return "{}-{}".format(phone[:-4], self.pretty_phone(phone[-4:]))
         else:
             return phone
-            
+
+    @property
+    def affiliationyear(self):
+        return "{} ({})".format(self.affiliation, self.year)
+        
     @property
     def is_initialized(self):
-        return bool(self.first_name and self.last_name and self.phone)
+        return bool(self.first_name and self.last_name and self.phone and
+                    self.affiliation and self.year)
 
     @property
     def is_board(self):

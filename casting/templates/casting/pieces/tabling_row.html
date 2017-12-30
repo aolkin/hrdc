@@ -4,6 +4,7 @@
 </td>
 <td>{{ audition.actor.get_full_name }}</td>
 <td>{{ audition.actor.pgps|break_punctuation }}</td>
+<td>{{ audition.actor.affiliationyear|break_punctuation }}</td>
 <td>{{ audition.show }}</td>
 <td class="align-middle {% if audition.status == "called"%}bg-primary text-white text-uppercase{% elif audition.status == "done"%}text-success{% endif %}">
   {{ audition.get_status_display }}

@@ -29,13 +29,15 @@ def clear_tokens(modeladmin, request, queryset):
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     fieldsets = (
-        (None, {'fields': (('first_name', 'last_name'), 'pgps')}),
+        (None, {'fields': (('first_name', 'last_name'), 'pgps',
+                           ('affiliation', 'year'))}),
         ('Contact Info', {'fields': ('email', 'phone')}),
         ('Permissions', {'fields': ('is_active', 'is_superuser', 'groups')}),
         ('Information', {'fields': ('last_login', 'date_joined', 'password')}),
     )
     staff_fieldsets = (
-        (None, {'fields': ('first_name', 'last_name', 'pgps', 'email', 'phone',
+        (None, {'fields': (('first_name', 'last_name'), 'pgps',
+                           ('affiliation', 'year'), 'email', 'phone',
                            'groups', 'is_active', 'password')}),
     )
     add_fieldsets = (
@@ -46,13 +48,13 @@ class UserAdmin(BaseUserAdmin):
     )
     add_form = UserCreationForm
     add_form_template = "dramaadmin/invite_user.html"
-    list_display = ('get_full_name', 'email', 'phone', 'is_pdsm', 'is_board',
-                    'is_active')
-    list_filter = ('is_active','is_superuser')
+    list_display = ('get_full_name', 'email', 'phone', 'affiliationyear',
+                    'is_pdsm', 'is_board', 'is_active')
+    list_filter = ('is_active','is_superuser', 'affiliation', 'year')
     search_fields = ('email', 'first_name', 'last_name',)
     readonly_fields = ('last_login', 'date_joined')
     staff_readonly = ('email', 'first_name', 'last_name', 'pgps',
-                      'phone', 'groups')
+                      'phone', 'groups', 'affiliation', 'year')
     actions = [generate_tokens, clear_tokens] if settings.DEBUG else []
     ordering = ('email',)
     save_as_continue = True
