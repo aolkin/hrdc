@@ -23,7 +23,6 @@ $("a[target=_popout]").click(function(e) {
 let SUGGESTED_DOMAINS = [
     "college.harvard.edu",
     "gmail.com",
-    "hrdctheater.com",
 ];
 
 function getPK() {
