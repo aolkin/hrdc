@@ -19,7 +19,8 @@ def image(context, fn, alt="Image", **kwargs):
     if cid:
         return { "src": "cid:" + cid, "alt": alt, "attrs": attrs }
     else:
-        return { "alt": alt, "src": static(fn.rpartition("/static/")[-1]),
+        return { "alt": alt, "src": settings.SITE_URL + 
+                 static(fn.rpartition("/static/")[-1]),
                  "attrs": attrs }
 
 @register.inclusion_tag("emailtracker/href.html", takes_context=True)
