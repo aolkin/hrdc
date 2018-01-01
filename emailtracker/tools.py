@@ -71,6 +71,8 @@ def render_to_queue(template, name, ident="", context={}, silent=True,
                             "already been sent.")
     _fix_to(kwargs)
     msg = AnymailMessage(**kwargs)
+    if "tags" in kwargs:
+        msg.tags = kwargs["tags"]
     context["MESSAGE"] = msg
     context["SUBJECT"] = kwargs.get("subject", "")
     
