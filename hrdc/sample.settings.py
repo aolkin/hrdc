@@ -187,6 +187,8 @@ FOOTER_SITE = "http://hrdctheater.com"
 BT_HEADER_IMAGE = "logo.png"
 BT_HEADER_URL = "dramaorg:index"
 
+BT_JS_FILES = ["profilefields.js"]
+
 GROUP_LOCATION = "Harvard"
 SITE_URL = "http://localhost:8000"
 
