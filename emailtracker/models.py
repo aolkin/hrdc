@@ -96,7 +96,7 @@ class QueuedEmail(models.Model):
             if hasattr(msg, "anymail_status"):
                 self.msg_id = str(msg.anymail_status.message_id)
                 if self.to in msg.anymail_status.recipients:
-                    self.status = msg.anymail_status.recipients[self.to]
+                    self.status = msg.anymail_status.recipients[self.to].status
                 else:
                     self.status = "<Unknown>"
             else:
