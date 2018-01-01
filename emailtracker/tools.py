@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from anymail.message import AnymailMessage
 from django.template.loader import get_template
+from django.db import transaction
 import logging, bleach, re
 
 from .models import *
@@ -44,7 +45,8 @@ def queue_msg(msg, name, ident="", silent=True):
     else:
         obj.set_msg(msg)
         obj.save()
-        return send_queued.delay(obj.pk)
+        transaction.on_commit(lambda id=obj.pk: send_queued.delay(id))
+        return True
 
 def _fix_to(kwargs):
     if type(kwargs["to"]) not in ("list", "tuple"):
