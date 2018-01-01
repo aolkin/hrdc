@@ -1,8 +1,10 @@
 var SUGGESTED_DOMAINS = [];
 
-$.getJSON("/autocomplete/",
-          { "key": "email_domain"}).done(function(data) {
-    SUGGESTED_DOMAINS = data;
+$(function() {
+    $.getJSON("/autocomplete/",
+              { "key": "email_domain"}).done(function(data) {
+        SUGGESTED_DOMAINS = data;
+    });
 });
 
 function suggestEmailDomains(q, cb) {
