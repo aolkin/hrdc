@@ -33,10 +33,10 @@ class QueuedEmail(models.Model):
     msg = models.TextField()
 
     msg_id = models.CharField(max_length=80)
-    status = models.CharField(max_length=20)
+    status = models.CharField(max_length=255)
     
-    name = models.CharField(max_length=20)
-    ident = models.CharField(max_length=60)
+    name = models.CharField(max_length=40)
+    ident = models.CharField(max_length=80)
 
     sent = models.DateTimeField(null=True)
     added = models.DateTimeField(auto_now_add=True)
