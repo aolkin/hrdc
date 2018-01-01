@@ -10,7 +10,8 @@ register = template.Library()
 @register.inclusion_tag("emailtracker/image.html", takes_context=True)
 def image(context, fn, alt="Image", **kwargs):
     if context.get("IS_HTML", True):
-        cid = context["MESSAGE"].attach_inline_image_file(fn)
+        # Force hotlinking images
+        cid = None # context["MESSAGE"].attach_inline_image_file(fn)
     else:
         return { "noimage": True }
     attrs = mark_safe(" ".join([format_html('{}="{}"', i, j) for i, j
