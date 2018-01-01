@@ -12,9 +12,9 @@ import time
 
 def activate(user):
     render_for_user(user, "dramaemail/activate.html",
-                    "activate", user.pk,
+                    "activate", user.pk, tags=["auth", "activate"],
                     subject="Welcome to {}".format(settings.BT_SITE_TITLE))
     
 def send_reset(user):
-    render_for_user(user, "dramaemail/reset.html",
-                    "reset", time.time(), subject="Password Reset")
+    render_for_user(user, "dramaemail/reset.html", "reset", time.time(),
+                    tags=["auth", "reset"], subject="Password Reset")

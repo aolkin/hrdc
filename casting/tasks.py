@@ -44,7 +44,8 @@ def release_callbacks(pk):
                 render_for_user(actor, "casting/email/callback.html",
                                 "callbacks", crm.pk,
                                 { "callbacks": acbs, "crm": crm },
-                                subject="Your {} Callbacks".format(crm))
+                                subject="Your {} Callbacks".format(crm),
+                                tags=["casting", "callbacks"])
         crm.stage = 1
         crm.save()
     
@@ -57,7 +58,8 @@ def release_first_round(pk):
             render_for_user(user, "casting/email/firstround.html",
                                 "first-round", crm.pk,
                                 { "crm": crm },
-                                subject="{} First-Round Casting".format(crm))
+                                subject="{} First-Round Casting".format(crm),
+                                tags=["casting", "first_round"])
         crm.stage = 2
         crm.save()
 
@@ -79,7 +81,8 @@ def release_casting(pk):
                 render_for_user(actor, "casting/email/casting.html",
                                 "casting", crm.pk,
                                 { "signings": roles, "crm": crm },
-                                subject="Your {} Roles".format(crm))
+                                subject="Your {} Roles".format(crm),
+                                tags=["casting", "cast_list"])
         crm.stage = 3
         crm.save()
 
@@ -88,7 +91,8 @@ def signing_email(pk):
     actor = get_user_model().objects.get(pk=pk)
     return render_for_user(actor, "casting/email/signing-link.html",
                            "requested-link", timezone.now(),
-                           subject="Requested Casting Signing Link")
+                           subject="Requested Casting Signing Link",
+                           tags=["casting", "signing_link"])
 
 @shared_task(ignore_result=True)
 def open_signing(pk):
@@ -103,7 +107,8 @@ def open_signing(pk):
             render_for_user(actor, "casting/email/signing.html",
                             "signing", crm.pk,
                             { "firstroles": firstroles, "crm": crm },
-                            subject="Sign for {} Roles Now".format(crm))
+                            subject="Sign for {} Roles Now".format(crm),
+                            tags=["casting", "signing_notif"])
         crm.stage = 4
         crm.save()
 
@@ -143,7 +148,8 @@ def notify_alternates(pk):
                                { "role": alternates[0] },
                                subject="{} in {} Now Available".format(
                                    alternates[0].character,
-                                   alternates[0].character.show))
+                                   alternates[0].character.show),
+                                tags=["casting", "role_available"])
       
 @shared_task(ignore_result=True)
 def update_releases(scheduled=True):
