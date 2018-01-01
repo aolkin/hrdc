@@ -94,13 +94,6 @@ PROFILE_WIDGETS = dict(zip(PROFILE_FIELDS, [
         PROFILE_FIELDS))]))
 PROFILE_WIDGETS["year"] = forms.NumberInput()
 
-def autocomplete_affiliation(request):
-    qs = get_user_model().objects.filter(
-        affiliation__startswith=request.GET.get("q", ""))
-    return JsonResponse(list(
-        [i for l in qs.distinct().values_list("affiliation") for i in l]),
-                        safe=False)
-
 class ActorProfileForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
@@ -169,7 +162,5 @@ urlpatterns = [
         name="sign_in_start_popout"),
     url(r'^profile/$', ActorSignInProfile.as_view(),
         name="sign_in_profile"),
-    url(r'^profile/affiliations/$', autocomplete_affiliation,
-        name="autocomplete_affiliation"),
     url(r'^done/$', ActorSignInDone.as_view(),
         name="sign_in_done")]

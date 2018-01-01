@@ -20,48 +20,9 @@ $("a[target=_popout]").click(function(e) {
                 "popout", "width=800,height=600");
 });
 
-let SUGGESTED_DOMAINS = [
-    "college.harvard.edu",
-    "gmail.com",
-];
-
 function getPK() {
     return Number(location.pathname.split("/").slice(-2, -1)[0]);
 }
-
-function suggestEmailDomains(q, cb) {
-    let parts = q.split("@");
-    if (parts[0] && parts.length === 2 && parts[1]) {
-        let matches = [];
-        for (let domain of SUGGESTED_DOMAINS) {
-            if (domain.startsWith(parts[1])) {
-                matches.push(parts[0] + "@" + domain);
-            }
-        }
-        cb(matches);
-    } else {
-        return [];
-    }
-}
-
-$("input[type=email]").typeahead({
-    minLength: 2,
-    source: suggestEmailDomains,
-    fitToElement: true,
-    autoSelect: true
-});
-
-function suggestAffiliation(q, cb) {
-    $.getJSON("affiliations/",
-              { "q": q }).done(cb);
-}
-
-$("input[name=affiliation]").typeahead({
-    minLength: 0,
-    source: suggestAffiliation,
-    fitToElement: true,
-    autoSelect: true
-});
 
 $("a[href][data-autoreset]").each(function(index, el) {
     setTimeout((function(){
