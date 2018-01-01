@@ -1,0 +1,40 @@
+{% extends "dramaemail/base.html" %}
+{% load email %}
+{% load bt %}
+{% load humanize %}
+
+{% block body %}
+<table cellpadding="0" cellspacing="8" width="100%">
+  <tr>
+    <td align="center">
+      {% if IS_HTML %}
+      <h2 style="margin-bottom: 4px; margin-top: 18px;">Password Reset</h2>
+      {% endif %}
+    </td>
+  </tr>
+  {% if IS_HTML %}
+  <style>
+    .special-link {
+    text-decoration: none;
+    color: #666666;
+    }
+    .special-link:hover {
+    text-decoration: underline;
+    color: #333333;
+    }
+  </style>
+  {% endif %}
+  <tr>
+    <td style="font-size: 1.2em">
+      You (or someone posing as you) requested a password reset for your
+      {% setting 'BT_SITE_TITLE' %} account. If this was you, use the link
+      below, otherwise you may ignore this email.
+    </td>
+  </tr>
+  <tr>
+    <td style="font-size: 1.1em;">
+      {% href 'dramaorg:token_reset' 'Click here to reset your password' user.login_token %}
+    </td>
+  </tr>
+</table>
+{% endblock %}

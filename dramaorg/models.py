@@ -131,7 +131,7 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 def invite_user(sender, instance, created, raw, **kwargs):
     if sender == User and created and not instance.has_usable_password():
         if instance.source == "default":
-            email.send_invite(instance)
+            email.activate(instance)
 
 @receiver(user_logged_in)
 def clear_token_on_user(sender, request, user, **kwargs):

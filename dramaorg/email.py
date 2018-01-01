@@ -4,23 +4,17 @@ from django.conf import settings
 
 from django.core.mail import EmailMultiAlternatives
 
+from emailtracker.tools import render_for_user
+
 from config import config
 
-def send_invite(user):
-    url = (settings.SITE_URL +
-           reverse("dramaorg:token_reset", args=(user.login_token,)))
-    msg = EmailMultiAlternatives(
-        subject="Please activate your account",
-        body="Click to activate your account: {}".format(url),
-        to=[user.email])
-    msg.send()
+import time
 
+def activate(user):
+    render_for_user(user, "dramaemail/activate.html",
+                    "activate", user.pk,
+                    subject="Welcome to {}".format(settings.BT_SITE_TITLE))
+    
 def send_reset(user):
-    url = (settings.SITE_URL +
-           reverse("dramaorg:token_reset", args=(user.login_token,)))
-    msg = EmailMultiAlternatives(
-        subject="Reset your password",
-        body="A password reset was requested."
-        "Please click here to reset your password: {}".format(url),
-        to=[user.email])
-    msg.send()
+    render_for_user(user, "dramaemail/reset.html",
+                    "reset", time.time(), subject="Password Reset")
