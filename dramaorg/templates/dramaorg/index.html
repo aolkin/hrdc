@@ -2,6 +2,7 @@
 
 {% load bootstrap %}
 {% load drama %}
+{% load config %}
 
 {% block title %}Your Shows{% endblock %}
 
@@ -30,23 +31,22 @@
 {% else %}
 <div class="text-center">
   <p class="lead">
-    You are not a member of the executive staff on any shows.
+    You are not a member of the executive staff of any shows in this system.
     {% if not user.is_board %}
-    If this is in error, please contact an HRDC Board member.
+    If this is incorrect, please contact the
+    <a href="mailto:{% option 'site_contact_email' %}">
+      {% option 'site_contact_name' %}</a>.
     {% endif %}
   </p>
+  {% if lists_available %}
   <h2>
     <a href="{% url 'casting:public_index' %}">View Callback and Cast Lists</a>
   </h2>
-  <h4>or</h4>
-  <h3 class="row justify-content-center">
-    <a class="col-sm text-right" href="{% url 'dramaorg:profile' %}">
-      edit your profile
-    </a>
-    |
-    <a class="col-sm text-left" href="{% url 'dramaorg:password_change' %}">
-      change your password
-    </a>
+  {% endif %}
+  <h3 class="justify-content-center">You may 
+    <a class="" href="{% url 'dramaorg:profile' %}">edit your profile</a> or
+    <a class="" href="{% url 'dramaorg:password_change' %}">
+      change your password</a>.
   </h3>
 </div>
 {% endif %}

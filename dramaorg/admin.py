@@ -79,10 +79,10 @@ class UserAdmin(BaseUserAdmin):
             
 @admin.register(Show)
 class ShowAdmin(admin.ModelAdmin):
-    list_display = ('title', 'seasonstr', 'space', 'people', 'invisible')
-    list_filter = ('season', 'year', 'staff', 'invisible', 'space')
-    list_editable = ('invisible',)
-    filter_horizontal = ('staff',)
+    list_display = ('title', 'seasonstr', 'space', 'people') #, 'invisible')
+    list_filter = ('season', 'year', 'space') #, 'invisible')
+    #list_editable = ('invisible',)
+    autocomplete_fields = ('staff',)
     fields = ('title', ('season', 'year'), 'space', 'staff', 'slug')
     exclude = ('invisible',)
     search_fields = ('title',)
