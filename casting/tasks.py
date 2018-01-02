@@ -20,12 +20,14 @@ def get_crm(crm_pk):
     else:
         return crm
 
-def get_shows(crm, arg):
+def get_shows(crm, arg, returnqs=False):
     test_kwargs = { arg: False }
     if crm.castingmeta_set.filter(**test_kwargs).exists():
         raise UnsubmittedShows("Some shows have not submitted yet; waiting.")
     kwargs = { arg: True }
     metas = crm.castingmeta_set.filter(**kwargs)
+    if returnqs:
+        return metas
     if metas.exists():
         return list(map(lambda x: x["pk"], metas.values("pk")))
     
@@ -53,7 +55,8 @@ def release_callbacks(pk):
 def release_first_round(pk):
     crm = get_crm(pk)
     if crm and crm.stage == 1:
-        for i in crm.castingmeta_set.all().distinct().values("show__staff"):
+        for i in get_shows(crm, "first_cast_submitted",
+                           True).distinct().values("show__staff"):
             user = get_user_model().objects.get(pk=i["show__staff"])
             render_for_user(user, "casting/email/firstround.html",
                                 "first-round", crm.pk,

@@ -20,13 +20,13 @@
     {% for show in shows %}
     <div class="row mb-2 justify-content-center">
       <div class="col-md-9">
-	<label class="custom-control custom-checkbox">
+	<div class="custom-control custom-checkbox">
 	  <input class="custom-control-input" type="checkbox"
 		 name="shows" value="{{ show.1 }}:{{ show.2 }}"
 		 id="show-{{ show.1 }}">
-	  <span class="custom-control-indicator"></span>
-	  <span class="custom-control-description">{{ show.0 }}</span>
-	</label>
+	  <label class="custom-control-label"
+		 for="show-{{ show.1 }}">{{ show.0 }}</label>
+	</div>
       </div>
     </div>
     {% endfor %}

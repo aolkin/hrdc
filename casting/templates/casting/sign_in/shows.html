@@ -1,12 +1,11 @@
 <div class="row mb-2 justify-content-center">
   <div class="col-md-9 custom-controls-stacked">
     {% for show in shows %}
-    <label class="custom-control custom-checkbox">
+    <div class="custom-control custom-checkbox">
       <input class="custom-control-input" type="checkbox"
 	     disabled checked>
-      <span class="custom-control-indicator"></span>
-      <span class="custom-control-description">{{ show }}</span>
-    </label>
+      <label class="custom-control-label">{{ show }}</label>
+    </div>
     {% empty %}
   </div>
 </div>

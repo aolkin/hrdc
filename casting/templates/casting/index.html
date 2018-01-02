@@ -2,6 +2,7 @@
 
 {% load bootstrap %}
 {% load drama %}
+{% load config %}
 
 {% block content %}
 {% if request.user.show_set.exists %}
@@ -12,7 +13,7 @@
       <th class="table-col-md">Show</th>
       <th class="table-col-sm table-col-desktop">Season</th>
       <th class="table-col-lg">Administrative Staff
-	<small class="text-muted">has access to this site</small></th>
+	<small class="text-muted">has access to this portal</small></th>
       <th class="table-col-sm">Status</th>
       <th class="table-col-md">Show Contact Email</th>
     </tr>
@@ -92,7 +93,9 @@
 </table>
 {% if not user.is_board %}
 <p class="text-muted text-center">If any of this information is incorrect or
-  shows are missing from your dashboard, please contact a board member.</p>
+  shows are missing from your dashboard, please contact 
+  <a href="mailto:{% option 'site_contact_email' %}">
+    {% option 'site_contact_name' %}</a>.</p>
 {% endif %}
 
 {% else %}

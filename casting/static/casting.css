@@ -1,12 +1,17 @@
-.audition-sign-in-shows .custom-control-description {
+.audition-sign-in-shows .custom-control-label {
     font-size: 1.5em;
 }
 .audition-sign-in-shows .custom-control {
     padding-left: 3rem;
 }
-.audition-sign-in-shows .custom-control-indicator {
-    height: 2rem;
-    width: 2rem;
+.audition-sign-in-shows .custom-control-label::after,
+.audition-sign-in-shows .custom-control-label::before {
+    height: 1.75rem;
+    width: 1.75rem;
+}
+
+.custom-control-input:checked:disabled~.custom-control-label::before {
+    background-color: #e9ecef;
 }
 
 .view-audition .copyable * {
@@ -55,7 +60,7 @@ table .btn {
     margin-bottom: 0;
 }
 
-.blank > * > *:not(.btn-create):not(.input-group-btn) {
+.blank > * > *:not(.btn-create):not(.input-group-append) {
     opacity: 0.5;
     pointer-events: none;
 }
@@ -103,21 +108,29 @@ table .btn {
     padding: 0.4em 0.4em 0.3em .4em;
 }
 
-.input-group-btn>.btn-increase,
-.input-group-btn>.btn-decrease {
-    height: 0.5rem;
+.list-group-item select.form-control.select2-hidden-accessible~.input-group-append {
+    margin-left: -2px;
+}
+
+.reordering-buttons {
+    display: flex;
+    flex-direction: column;
+}
+
+.reordering-buttons>button {
+    height: 1.4rem;
     padding: 0 0.5rem !important;
     z-index: 3 !important;
     margin-left: -0.2rem !important;
 }
 
-.input-group-btn>.btn-decrease {
-    margin-top: -0.2rem;
+.input-group-append>.btn-decrease {
+    margin-top: -0.5rem;
     border-top-left-radius: 0.5em !important;
     border-top-right-radius: 0.5em !important;
 }
-.input-group-btn>.btn-increase {
-    margin-bottom: -0.2rem;
+.input-group-append>.btn-increase {
+    margin-bottom: -0.5rem;
     border-bottom-left-radius: 0.5em !important;
     border-bottom-right-radius: 0.5em !important;
 }
@@ -127,6 +140,18 @@ table .btn {
     background-color: #cadced;
     border-color: #cadced;
     pointer-events: none;
+}
+
+.card-deck.horizontal-scroll>.card>.card-footer:last-child {
+    bottom: 0;
+    position: absolute;
+    width: 100%;
+    height: 100px;
+}
+
+.card-deck.horizontal-scroll>.card>.card-block.list-group.list-group-flush {
+    margin-bottom: 100px;
+    overflow: auto;
 }
 
 .card {
@@ -146,8 +171,12 @@ table .btn {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }
-.input-group>span.select2-container:not(:first-of-type) .select2-selection {
+.input-group>span.select2-container:nth-child(4) .select2-selection {
     border-radius: 0;
+}
+
+span.select2-selection.select2-selection--single {
+    height: 100%;
 }
 
 .card.stream-item .form-control[readonly] {
