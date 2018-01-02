@@ -3,336 +3,138 @@ title: HRDC Apps
 description: PDSM Manual
 ---
 
-# HRDC Apps Introduction
-{:.no_toc}
-
 * TOC
 {:toc}
 
-# Introduction
+# Welcome to HRDC Apps
 
-This document intends to serve as both an instruction manual for the web
-application, as well as a description of the functionality and service it
-provides. The numerous screenshots included should both help in understanding
-how to use it, as well as quickly show everything it does.
+To make common casting more efficient, the HRDC is now using a new online
+system to faciliate audition tabling, as well as cast and callback list
+publishing.
 
-## General Concepts
+## Help and Support
 
-### Permissions
+If you run into problems or have a question about how to use this site, please
+email [support@app.hrdctheater.com](mailto:support@app.hrdctheater.com).
 
-There are a few different permission levels that will be referenced throughout
-this document:
+If you encounter an error, please include when the error occurred, and as much
+specific information about what happened as possible.
 
-The lowest is that of an unauthenticated user, who can only browse released
-callbacks and cast lists.
+## Account Activation
 
-Next, actors can sign for their shows via a link they receive via email,
-or if they create a password they can log in and edit their profile.
+If you are casting your show through common casting, you will be using this
+system, located at [app.hrdctheater.com](https://app.hrdctheater.com/). In
+order to create an account, you must be invited by a board member. As part of
+your common casting registration, the campus liaison will invite you and you
+will receive an email from "HRDC Apps" allowing you to activate your account.
 
-"PDSM"s are anyone who is a staff member of any show. They can use the
-common casting site for their shows, and also view first-round cast lists.
+**You must open this email and fill out your user profile to be able to manage
+your show's auditions and casting!**
 
-Regardless of their status as a PDSM, a user can also be a "board member",
-part of a group of users, which the "superuser" can add other users to.
-Board members can use most of the admin site to set up and edit shows, casting
-release information, and view the status of the above.
+> Note: if you have been invited, but the invite link no longer works or you
+> cannot find the email, you may go to
+> ["Forgot password?"](https://app.hrdctheater.com/reset/) to set a password
+> and activate your account.
 
-The highest, "superuser", would belong to the President, and possibly one or
-two other board members. They can do almost anything, including sign onto shows
-for actors and edit user profiles directly.
+Once you log in, you should see a list of shows you are a member of the
+executive staff on (Producer, Director, or Stage Manager). If anything is
+missing or incorrect, please contact the campus liaison.
 
-### Current Season
+# Common Casting Online
 
-The current season, relevant throughout the system, must be manually set and
-changed by the site superuser.
+The [Common Casting Portal](https://app.hrdctheater.com/casting/staff/) will
+be how you access auditioners' information, and also how you submit your
+callback and cast lists. Lists will also be published to the site, and actors
+will sign via it as well.
 
-# Setting Things Up
+![Common Casting Home](pdsm_images/cchome.png)
 
-## Setting up a show
+## Auditions
 
-To set up a show for common casting, go to the site admin and select
-"Casting-Enabled Shows". From there, you may click on an existing show to edit
-it, or click "Add Casting-Enabled Show" to create a new one.
+When actors sign in, instead of filling out a paper form, they will input all
+of their contact information electronically, reducing time spent and paper
+used, especially when actors audition for many shows.
 
-A casting-enabled show is simply a show that is linked to a casting-release
-group, as well as a number of audition slots. As such, the new/edit screen
-provides a way to select an existing show and existing casting release group,
-or create new ones via the small green plus buttons.
+In order to access this information, click the "Auditions" link under one of
+your shows. As actors sign in, they will instantly appear in this table. You
+can even easily copy their contact information into your own spreadsheet by
+clicking the "copy" button, which will copy it to the clipboard in Excel-ready
+format.
 
-![Blank Casting-Enabled Show](images/01.png)
+When you bring an actor into your audition room, make sure to hit the "call"
+button to mark that you have them, and hit "done" when they leave so that
+everyone else knows you are done with them.
 
-### Show
+### Audition Tabling
 
-Upon clicking the plus button to create a new show, a window will pop out
-allowing entry of the show's title, season, and space.
+When auditions are currently happening, a list of building with auditions will
+appear at the bottom of the dashboard. Clicking on a building will allow you
+to see the list of actors who have signed in for that location, and also allow
+you to open the actor sign-in form.
 
-![Blank Show](images/02.png)
-
-> Note on spaces:
->
-> Shows, auditions, etc must all take place in spaces.
->
-> New spaces can also be created trivially, at which time they must also be
-> assigned to a new or existing building. At this time, the address data of a
-> building is unused. Disable "include building name" if the name of the space
-> should stand alone.
-
-![New Space](images/03.png)
-
-Additionally, one or more staff members must be chosen for the show.
-If necessary, new ones can be invited by email. Their names will will not show
-up in the system until they have logged in for the first time and created
-their profile.
-
-The "slug" field typically does not need to be adjusted manually, unless a
-show is being set up with the same name as a previous show. (Slugs must be
-unique across the entire system).
-
-### Casting Release Group
-
-In addition to the Show, a Casting Release Group object must be chosen.
-
-To create a new one, just click the green plus button again. These can be saved
-immediately, without adding any information, although the information will
-need to be added later then. For more information, see "Setting up a casting
-release group".
-
-![New Casting Release Group](images/04.png)
-
-When selecting an existing group, note that if that group is only attached to
-one show already, it will be listed as that show. If it is attached to multiple
-shows, it will be listed based on the season of those shows.
-
-### Slots
-
-Casting-enabled shows should have a number of audition slots. An audition slot
-is fairly self-explanatory. The categorization of spaces within buildings is
-important, because when the system generates the list of shows to sign into
-in the sign-in form, it is by building.
-
-Note: 12:00 AM is basically 00:00 AM, so a slot from 9:00 PM to 12:00 AM
-will be nonexisting. Instead, use 11:59 PM.
-
-## Setting up a casting release group
-
-A casting release group keeps track of the stage of the casting process, and
-controls the automatic release and distribution of callback and cast lists.
-
-NOTE: Heed the warnings on the editing page. You must double-check yourself.
-
-Once dates and times are set, the group's stage will automatically advance at
-the given time, allowing actors or PDSMs to view additional pages and sending
-email notifications as appropriate.
-
-WARNING: "second signing opens" will mark all first-cast actors who have not
-responded as having rejected those roles at the given time.
-
-![Blank Casting Release Group](images/05.png)
-
-# Casting - PDSM Interface
-
-Upon navigating to the common casting home page, PDSMs are presented with a
-list of shows they are working on. They can work on individual aspects of
-casting a given show by clicking the links in the sidebar.
-
-Additionally, for PDSMs or Board Members, if audition slots are currently
-happening, a list of buildings will be displayed.
-
-![Common Casting PDSM Home](images/06.png)
-
-## Tabling and Actor Sign In
-
-Upon navigating to the tabling page for a given building, the "Actor Sign-In
-Form" may be opened. It can be presented to actors directly, for them to sign
-in, or not.
-
-> Actor Sign-In
->
-> The sign-in form first asks actors for their email, as well as which shows
-> they are interested in auditioning for. If they have signed in before, the
-> system recognizes their email address and immediately signs them in. If not,
-> they are asked to enter their name, phone number, and PGPs, after which they
-> will be signed in.
-
-As actors sign in, they will instantly appear in the tabling list.
-
-![Tabling List](images/07.png)
-
-## Holding Auditions
-
-In the audition room, PDSMs can view the "Auditions" page for their show, which
-lists every actor that has signed in to audition for their show. Just like the
-tabling page, actors will instantly appear on the auditions page when they
-sign in.
-
-![Auditions List](images/08.png)
-
-The auditions page provides two useful features:
-
-The "copy" button instantly copies the actor's name, email, phone number, and
-PGPs to the clipboard, ready to be pasted into a Google Docs or Excel
-spreadsheet.
-
-The "call" button, when clicked, updates the audition status to "called". This
-update will show up instantly for anyone tabling in that building, as well as
-any other PDSMs viewing the show's auditions page. After "call"-ing an actor,
-the button will change to "done", allowing a PDSM to mark the actor as having
-auditioned (an update that again, will be instantly reflected everywhere).
+If you are tabling, you will present this form to actors for them to sign in.
+If they have auditioned before, they can sign in quickly, otherwise they
+will have to fill out their contact information.
 
 ## Callbacks
 
-After holding auditions, PDSMs must enter callback information.
+To submit your callback list, click the "Callbacks" link for a show. Any number
+of staff members may edit the list simultaneously, as all changes will be
+automatically and instantly synchronized.
 
-The system allows PDSMs to enter text that will be displayed above the entire
-callback list, a contact email, and a separate piece of text to be displayed
-with each character listing. This allows PDSMs to provide information about
-callback location and timing.
+Please provide all information about locations, dates, and times in the
+appropriate text boxes, and remember, once you submit, **none of it can be
+changed!**
 
-For each "Character" they add, PDSMs can then use the dropdown to search for
-actors who signed-in to audition for their show to call back. While the system
-will let PDSMs select actors who did not audition for their show if they type
-enough of the name, it will not accept actors who are not in the system.
+To list more characters, scroll to the right and click the plus icon in the
+corner. Then, click the plus icon below to list as many actors as you need. You
+will be able to search by name and call back any actor who auditioned for your
+show.
 
-All information inputted on this page is instantly and automatically saved,
-and will also be synced to anyone else who is editing at the same time (much
-like Google Docs).
+When callbacks are released, actors will be emailed automatically with the
+callback information you input, and the lists will be visible publicly online.
 
-![Callback List Input](images/09.png)
-
-### Callback Submission
-
-When they have entered all of their callbacks, PDSMs must press the submit
-button to preview their callback list. The preview page displays the callback
-list exactly as it will appear to actors. From there, PDSMs can submit their
-callback list, after which they will no longer be able to edit it.
-
-![Callback Submission](images/10.png)
-
-In the admin interface, board members can then see which shows have and have
-not submitted their callback lists.
-
-![Callback Submission Admin](images/11.png)
-
-### Callback Release
-
-When the previously-set time passes, all submitted callback lists will be
-published (in fact, if a callback list has not been submitted yet, the
-publishing will wait for it).
-
-![Callback Email](images/12.png)
-
-Callback release will first automatically email every actor who was called
-back with a list of all of their callbacks, then it will update the casting
-release group's stage. When this is done, callback lists will be visible to
-anyone, without logging in.
-
-![Callback List List](images/13.png)
-
-![Callback List](images/14.png)
+![Callback List Editor](pdsm_images/callbacks.png)
 
 ## Cast Lists
 
-Once callback lists have been released, PDSMs can create their cast lists.
-The interface for doing so is very similar to the callback list interface,
-except that the ordering of the list of actors matters, and as such the
-interface includes buttons to re-arrange the ordering.
+Once callbacks have been released, you will be able to edit your cast list.
+You will also submit your first-round casting choices using the same page.
+The editor is very similar to that for callbacks, except now your casting
+choices can be reordered. (Note that, once you submit your first-round casting,
+you will not be able to move or change it.)
 
-![Cast List Input](images/15.png)
+To cast ensemble roles, increase the number of actors that can sign for a
+given role using the inputs at the bottom of the boxes. There is no limit to
+this, so you may set it to the number of actors you cast for the part.
+However, note that again, you cannot change this after submitting your
+first-round cast.
 
-However, instead of allowing additional information to be listed with each
-character, PDSMs can change the number of actors allowed to sign. This is
-designed for casting ensemble roles; if it is increased, the first n actors
-will be allowed to sign.
-
-NOTE: While additional characters can be added, characters for which callbacks
-were listed cannot be removed or edited, and must have actors cast as them.
+> You may enter your entire cast list at any time, submitting your first-round
+> cast list will only lock in your characters, first choices, and number of
+> signers, nothing else.
 
 ### First-Round Cast Lists
 
-The submission and release procedure for cast lists functions very similarly to
-callbacks, except that there are two stages. The first time through the
-submission procedure, only the first-choice actors will be listed.
-
-![First-Round Cast List Submission](images/16.png)
-
-Once first-round casting has been submitted, of course, it cannot be changed,
-and will be locked on the cast list editing page. Additionally, new characters
-cannot be added, nor can the number of allowable signers be changed after
-first-round casting is submitted.
-
-Though it is not recommended, PDSMs can submit their final cast list as soon as
-they submit their first-round cast list.
-
-### First-Round Cast List Release
-
-Very similarly to callback release, after the given time passes, PDSMs will be
-emailed a notification that first-round cast lists have been released, allowing
-them to browse all first-round cast lists for the season. Additionally,
-links will appear on the Common Casting home page for PDSMs. Unlike callbacks,
-the first-round cast lists are not viewable publicly.
-
-### Final Cast Lists
-
-After submitting their first-round cast lists, PDSMs can edit their alternates
-before submitting their final cast list, in a process very similar to the
-above. Once cast lists are released, they replace callbacks on the public site.
-
-![Cast List Input](images/17.png)
-
-# Actors' Interface
-
-## Casting
-
-When cast lists are released, all actors who have been cast will be emailed
-notifications listing all roles they have been cast as.
-
-![Casting Notification](images/18.png)
-
-Once published, the cast lists also display icons indicating whether actors
-have signed for their roles. (Note: these do not update live, the page must be
-refreshed.)
-
-![Public Cast List](images/19.png)
+When first-round cast lists are released, you will receive an email
+notification from the website. You may then sign in and view first-round cast
+lists for the rest of the season.
 
 ## Signing
 
-Until the signing period opens, the signing page is disabled, telling actors
-when it will open. When the signing period begins, all actors are emailed
-again reminding them the signing period is now open, and the signing page is
-enabled.
+When cast lists have been released, actors will receive emails notifying them
+of their roles and allowing them to sign online. When they sign, that will show
+up immediately on the online cast list.
 
-![Signing Notification](images/20.png)
-
-To sign, actors must click the link emailed to him. Unless they have set a
-password, that is the only way for them to identify themselves to the system
-and ensure the signing process is secure. After clicking that link, actors
-simply select whether they are accepting or rejecting each role offered to
-them. They can submit with only some choices made, and come back to others
-later, but cannot change decisions once submitted.
-
-> Note: if an actor has trouble signing, the superuser can edit and set
-> signing responses in the admin interface. This overrides everything else,
-> so be careful.
-
-![Signing Page](images/21.png)
-
-If a role is no longer available to an actor, because an earlier choice has
-accepted it, that will be visible when they go to sign and they will no longer
-be able to sign for that role.
-
-On the other hand, when an actor rejects a role for which they are the current
-first-choice, the next actor in line receives a notification email reminding
-them that it is now available for them to claim.
-
-![Rejected Role Notification](images/22.png)
-
-As actors sign on to shows, the icons on the cast list will update to reflect
-their signing.
-
-![Signed Cast List](images/23.png)
+*Warning: if you refresh too aggressively, you could get temporarily blocked
+from the site. Be nice :)*
 
 ### Second-Round Signing
 
-When the second signing time passes, all first-choice roles which have not been
-accepted are automatically marked as having been rejected, notifying the next
-in line and allowing them to sign.
+When the signing period ends, all first choice actors who have not signed will
+automatically lose their roles to the next available alternate.
+
+### Signing Issues
+
+If an actor does not receive an email or is unable to sign for some reason,
+they must contact the campus liaison for help or to sign for them.
