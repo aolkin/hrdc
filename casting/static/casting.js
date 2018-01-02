@@ -109,7 +109,7 @@ class DataBindingHandler {
 		.attr("data-pk", action.pk);
 	    let createbtn = el.find(".btn-action.btn-create[data-stream=" +
 				    stream + "]");
-	    if (createbtn.parent().is(".input-group-btn") &&
+	    if (createbtn.parent().is(".input-group-append") &&
 		!createbtn.siblings().is("button")) {
 		createbtn.parent().remove();
 	    } else {

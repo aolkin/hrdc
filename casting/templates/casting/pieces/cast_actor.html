@@ -1,7 +1,9 @@
 {% load bounddata %}
 <li class="list-group-item stream-item {% if doblank %}blank signing-blank{% endif %}" {% boundattrs signing %}>
   <div class="input-group input-group-sm">
-    <span class="input-group-addon signing-count"></span>
+    <div class="input-group-prepend">
+      <span class="input-group-text signing-count"></span>
+    </div>
     {% boundinput signing "order" type="hidden" %}
     {% if doblank or signing.editable %}
     <select class="form-control" {% boundattrs signing "actor" %}
@@ -13,18 +15,18 @@
       </option>
       {% endif %}
     </select>
-    <span class="input-group-btn">
+    <span class="input-group-append reordering-buttons">
       <button {% boundattrs signing %}
 	      class="btn btn-primary btn-decrease btn-action {% if doblank %}hidden{% endif %} fa fa-chevron-up"></button>
       <button {% boundattrs signing %}
 	      class="btn btn-primary btn-increase btn-action {% if doblank %}hidden{% endif %} fa fa-chevron-down"></button>
     </span>
-    <span class="input-group-btn">
+    <span class="input-group-append">
       <button {% boundattrs signing %}
 	      class="btn btn-danger btn-delete btn-action {% if doblank %}hidden{% endif %} fa fa-times"></button>
     </span>
     {% if doblank %}
-    <span class="input-group-btn">
+    <span class="input-group-append">
       <button {% boundattrs signing %} data-extras="character"
 	      data-character="{{ character.pk }}"
 	      class="btn btn-success btn-create btn-action fa fa-plus">
