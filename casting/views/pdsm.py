@@ -10,6 +10,8 @@ from django.contrib import messages
 
 from django.utils import timezone
 
+from config import config
+
 from ..models import *
 from . import get_current_slots, building_model, show_model
 from ..utils import UserIsPdsmMixin
@@ -366,9 +368,6 @@ class CastSubmitView(SubmitView):
             "Submitted {} for {} successfully!".format(
                 "cast list" if self.object.cast_submitted else
                 "first-round casting", self.object))
-
-# Disable the default behavior and only display actors who auditioned
-ONLY_AUDITIONS = False
     
 class ShowActors(ShowStaffMixin, DetailView):
     def get(self, *args, **kwargs):
@@ -381,7 +380,8 @@ class ShowActors(ShowStaffMixin, DetailView):
             q = Q(actor__first_name__contains=term)
             q |= Q(actor__last_name__contains=term)
             auditions = auditions.filter(q)
-        if ONLY_AUDITIONS or auditions.exists():
+        if config.get("only_auditioners",
+                      "no").lower() == "yes" or auditions.exists():
             actors = list(auditions.values("actor__id", "actor__first_name",
                                            "actor__last_name"))
             for i in actors:

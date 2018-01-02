@@ -66,7 +66,7 @@ class ActorSignInStart(ActorSignInBase, BaseUpdateView):
         context = super().get_context_data(*args, **kwargs)
         self.request.session["popout"] = self.popout
         if self.show_all:
-            q = Q(day=timezone.localdate(), start__gte=datetime.time(hour=9))
+            q = Q(day=timezone.localdate())
             q |= Q(day=timezone.localdate() - datetime.timedelta(days=1),
                    end__gt=datetime.time(hour=21))
             slots = Slot.objects.auditions().filter(

@@ -54,7 +54,7 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ('email', 'first_name', 'last_name',)
     readonly_fields = ('last_login', 'date_joined')
     staff_readonly = ('email', 'first_name', 'last_name', 'pgps',
-                      'phone', 'groups', 'affiliation', 'year')
+                      'phone', 'groups', 'affiliation', 'year', 'is_active')
     actions = [generate_tokens, clear_tokens] if settings.DEBUG else []
     ordering = ('email',)
     save_as_continue = True
