@@ -165,6 +165,8 @@ class PasswordResetForm(forms.Form):
         for user in users:
             user.new_token(expiring=True)
             send_reset(user)
+            return True
+        return False
 
 class ResetView(FormView):
     form_class = PasswordResetForm
@@ -172,9 +174,13 @@ class ResetView(FormView):
     template_name = "dramaauth/reset_password_form.html"
 
     def form_valid(self, form):
-        form.send()
-        messages.success(self.request, "Password reset email sent.")
-        return super().form_valid(form)
+        if form.send():
+            messages.success(self.request, "Password reset email sent.")
+            return super().form_valid(form)
+        else:
+            messages.error(self.request, "Unable to find an account with " +
+                           "that email, please contact the administrator.")
+            return super().form_invalid(form)
 
 class ProfileView(LoginRequiredMixin, UpdateView):
     model = User
