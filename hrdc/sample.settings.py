@@ -175,7 +175,7 @@ LOGOUT_REDIRECT_URL = LOGIN_URL
 LOGO_PATH = os.path.join(BASE_DIR, "hrdc/static/logo.png")
 
 BT_SITE_TITLE = "HRDC Apps"
-BT_FAVICON_URL = "https://hrdctheater.com/wp-content/uploads/2016/02/cropped-HRDC-Logo-2-32x32.png"
+BT_FAVICON_URL = STATIC_URL + "icon.png"
 BT_BOOTSTRAP_VERSION = "4.0.0-beta.3"
 BT_BOOTSTRAP_CSS_INTEGRITY = "sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy"
 BT_BOOTSTRAP_JS_INTEGRITY = "sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4"
