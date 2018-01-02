@@ -35,8 +35,8 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     USERNAME_FIELD = "email"
     EMAIL_FIELD = "email"
 
-    first_name = models.CharField(max_length=60)
-    last_name = models.CharField(max_length=60)
+    first_name = models.CharField(max_length=80, db_index=True)
+    last_name = models.CharField(max_length=80, db_index=True)
     email = models.CharField(max_length=254, unique=True, db_index=True)
     phone = models.CharField(max_length=20, verbose_name="Phone Number")
     year = models.PositiveSmallIntegerField(null=True,
@@ -125,7 +125,11 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     def get_short_name(self):
         return self.first_name.strip()
 
-    __str__ = get_full_name
+    def __str__(self):
+        if self.is_board:
+            return self.get_full_name() + " ({})".format(
+                get_admin_group().name)
+        return self.get_full_name()
 
 @receiver(post_save)
 def invite_user(sender, instance, created, raw, **kwargs):
@@ -207,7 +211,8 @@ class Season(models.Model):
 class Show(Season):
     title = models.CharField(max_length=150)
     staff = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
-    space = models.ForeignKey(Space, null=True, on_delete=models.SET_NULL)
+    space = models.ForeignKey(Space, null=True, on_delete=models.SET_NULL,
+                              verbose_name="Venue")
     
     slug = models.SlugField(unique=True, db_index=True)
     invisible = models.BooleanField(default=False)
@@ -220,6 +225,7 @@ class Show(Season):
     
     def people(self):
         return ", ".join([i.get_full_name() for i in self.staff.all()])
+    people.short_description = "Exec Staff"
 
     def user_is_staff(self, user):
         return self.staff.filter(pk=user.pk).exists()
