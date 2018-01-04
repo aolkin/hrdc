@@ -13,6 +13,8 @@ from model_utils import FieldTracker
 from django.utils import timezone
 import datetime
 
+from dramaorg.models import Season
+
 class CastingReleaseMeta(models.Model):
     publish_callbacks = models.DateTimeField(null=True, blank=True)
     publish_first_round_casts = models.DateTimeField(null=True, blank=True)
@@ -159,11 +161,13 @@ class CastingMeta(models.Model):
                                 related_name="casting_meta")
     callback_description = models.TextField(
         blank=True, verbose_name="Callback Information",
-        help_text="Extra information about all callbacks (location, etc).")
+        help_text="Extra information about all callbacks " +
+        "(location, date, etc).")
     callbacks_submitted = models.BooleanField(default=False)
     cast_list_description = models.TextField(
         blank=True, verbose_name="Cast List Information",
-        help_text="Extra information to display with the cast list.")
+        help_text="Extra information to display with the cast list. " +
+        "Include shows you cannot share actors with here.")
     first_cast_submitted = models.BooleanField(
         default=False, verbose_name="First-round Cast List Submitted")
     cast_submitted = models.BooleanField(
@@ -205,7 +209,14 @@ class AssociateShowMixin(models.Model):
 
     class Meta:
         abstract = True
-    
+
+class ActorSeasonMeta(Season):
+    actor = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    conflicts = models.TextField()
+
+    def __str__(self):
+        return "{} Meta for {}".format(self.seasonstr(), self.actor)
+        
 class Audition(AssociateShowMixin):
     STATUSES = (
         ("waiting", "Waiting"),
@@ -214,11 +225,22 @@ class Audition(AssociateShowMixin):
     )
     actor = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     signed_in = models.DateTimeField(auto_now_add=True)
+    sign_in_complete = models.BooleanField(default=False)
     status = models.CharField(default=STATUSES[0][0], max_length=20,
                               choices=STATUSES)
     space = models.ForeignKey(settings.SPACE_MODEL, blank=True, null=True,
                               on_delete=models.SET_NULL)
+    tech_interest = models.TextField(
+        null=True, blank=True, default=None, verbose_name="Technical Interests")
 
+    @property
+    def actorseasonmeta(self):
+        if not hasattr(self, "_cached_actorseasonmeta"):
+            self._cached_actorseasonmeta, created = (
+                ActorSeasonMeta.objects.get_or_create_in_season(
+                    self.show.show, actor_id=self.actor_id))
+        return self._cached_actorseasonmeta
+    
     def __str__(self):
         return "{} for {}".format(self.actor, self.show)
 
@@ -229,7 +251,7 @@ STATUS_CLASSES = {
 }       
 @receiver(post_save)
 def send_auditions(sender, instance, *args, **kwargs):
-    if sender == Audition:
+    if sender == Audition and instance.actor.is_initialized:
         def make_message(template, status="waiting"):
             return {
                 "container": "table tbody",

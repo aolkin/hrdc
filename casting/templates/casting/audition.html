@@ -23,9 +23,11 @@
   </thead>
   <tbody>
     {% for audition in object.audition_set.all|order_by:"signed_in" %}
+    {% if audition.sign_in_complete %}
     <tr id="audition-{{ audition.pk }}">
       {% include "casting/pieces/audition_row.html" %}
     </tr>
+    {% endif %}
     {% endfor %}
   </tbody>
 </table>
