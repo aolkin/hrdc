@@ -32,13 +32,13 @@
 	{% csrf_token %}
 	{% if object.first_cast_submitted %}
 	<p class="lead">
-	  Please confirm your cast lists below.
+	  Please re-read and confirm your cast lists below.
 	  Note that once you have submitted, you CANNOT MAKE CHANGES.
 	</p>
 	<button type="submit" class="btn btn-danger btn-block">Submit</button>
 	{% else %}
 	<p class="lead">
-	  Please confirm your first-round casting below.
+	  Please re-read and confirm your first-round casting below.
 	  Note that once you have submitted, you cannot change the first
 	  actors up to the number allowed to sign for that character, nor the
 	  number allowed to sign.
@@ -167,7 +167,7 @@
       <big>The cast list for this show has been submitted, but not yet
 	released.</big>
     </div>
-    {% elif object.first_cast_submitted  %}
+    {% elif object.first_cast_submitted %}
     <div class="alert alert-info">
       <big>First-round casting for this show has been submitted, but not yet
 	released.</big>

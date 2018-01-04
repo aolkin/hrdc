@@ -185,6 +185,11 @@ class SeasonManager(models.Manager):
             year=config.get(settings.ACTIVE_YEAR_KEY, None),
             season=config.get(settings.ACTIVE_SEASON_KEY, None))
 
+    def get_or_create_in_season(self, season, *args, **kwargs):
+        kwargs["year"] = season.year
+        kwargs["season"] = season.season
+        return super().get_or_create(*args, **kwargs)
+
 class Season(models.Model):    
     SEASONS = (
         (0, "Winter"),
