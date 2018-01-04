@@ -35,6 +35,7 @@ function initTooltips(parent) {
         parent = $(document.body);
     }
     parent.find('[data-toggle="tooltip"]').tooltip();
+    parent.find('[data-toggle="popover"]').popover();
 }
 
 function initSelects(parent) {
