@@ -56,7 +56,7 @@ class UserAdmin(BaseUserAdmin):
     staff_readonly = ('email', 'first_name', 'last_name', 'pgps',
                       'phone', 'groups', 'affiliation', 'year', 'is_active')
     actions = [generate_tokens, clear_tokens] if settings.DEBUG else []
-    ordering = ('email',)
+    ordering = ('date_joined',)
     save_as_continue = True
 
     def get_initialized(self, obj):
