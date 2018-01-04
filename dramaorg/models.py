@@ -91,9 +91,9 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 
     def affiliationyear(self):
         return "{} ({})".format(self.affiliation, self.year)
-    affiliationyear.short_description = "Affiliation (Year)"
+    affiliationyear.short_description = "Affiliation"
     affiliationyear.admin_order_field = "year"
-        
+    
     @property
     def is_initialized(self):
         return bool(self.first_name and self.last_name and self.phone and
