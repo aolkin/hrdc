@@ -48,8 +48,8 @@ class UserAdmin(BaseUserAdmin):
     )
     add_form = UserCreationForm
     add_form_template = "dramaadmin/invite_user.html"
-    list_display = ('get_full_name', 'email', 'phone', 'affiliationyear',
-                    'is_pdsm', 'is_board', 'is_active')
+    list_display = ('__str__', 'email', 'phone', 'affiliationyear',
+                    'get_pdsm', 'has_password', 'get_active')
     list_filter = ('is_active','is_superuser', 'affiliation', 'year')
     search_fields = ('email', 'first_name', 'last_name',)
     readonly_fields = ('last_login', 'date_joined')
@@ -58,6 +58,31 @@ class UserAdmin(BaseUserAdmin):
     actions = [generate_tokens, clear_tokens] if settings.DEBUG else []
     ordering = ('email',)
     save_as_continue = True
+
+    def get_initialized(self, obj):
+        return obj.is_initialized
+    get_initialized.boolean = True
+    get_initialized.short_description = "Profile"
+
+    def get_board(self, obj):
+        return obj.is_board
+    get_board.boolean = True
+    get_board.short_description = "Board"
+
+    def get_pdsm(self, obj):
+        return obj.is_pdsm
+    get_pdsm.boolean = True
+    get_pdsm.short_description = "PDSM"
+
+    def get_active(self, obj):
+        return obj.is_active
+    get_active.boolean = True
+    get_active.short_description = "Enabled"
+    
+    def has_password(self, obj):
+        return obj.has_usable_password()
+    has_password.boolean = True
+    has_password.short_description = "Has PW"
     
     def get_readonly_fields(self, request, obj):
         if obj:
