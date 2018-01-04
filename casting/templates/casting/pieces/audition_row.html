@@ -4,19 +4,36 @@
   <span class="text-nowrap">{{ audition.signed_in|date:"g:i A" }}</span>
 </td>
 <td>{{ audition.actor.get_full_name }}</td>
-<td class="text-primary">{{ audition.actor.email|break_punctuation }}</td>
-<td>{{ audition.actor.pretty_phone }}</td>
-<td title="{{ audition.actor.affiliation }}"
-    data-toggle="tooltip">{{ audition.actor.year }}</td>
 <td>{{ audition.actor.pgps|break_punctuation }}</td>
 <td class="copyable" hidden>
-  <textarea>{{ audition.actor.get_full_name }}	{{ audition.actor.email }}	{{ audition.actor.phone }}	{{ audition.actor.year }}	{{ audition.actor.pgps }}</textarea>
+  <textarea>{{ audition.actor.get_full_name }}	{{ audition.actor.email }}	{{ audition.actor.phone }}	{{ audition.actor.affiliation }}	{{ audition.actor.year }}	{{ audition.actor.pgps }}</textarea>
 </td>
 <td class="align-middle">
   <button class="btn btn-secondary btn-sm btn-copy-excel"
-	  title="Copy actor information to clipboard for spreadsheets"
+	  title="Copy actor information to clipboard for spreadsheets (includes email and phone)"
 	  data-toggle="tooltip">
     copy</button>
+  <a class="btn btn-primary btn-sm" tabindex="0" role="button"
+     data-toggle="popover" data-html="true" data-trigger="focus"
+     data-title="Contact and Other Information" data-placement="top"
+     data-content="
+<div>{{ audition.actor.get_full_name }}
+<span class=&quot;text-muted&quot;>
+{% if audition.actor.pgps %}({{ audition.actor.pgps }}){% endif %}
+</span><br>
+{{ audition.actor.affiliationyear }}<br>
+<span class=&quot;text-primary&quot;>{{ audition.actor.email }}</span><br>
+{{ audition.actor.pretty_phone }}</div>
+<div class=&quot;pre-wrap&quot;>
+<span class=&quot;text-danger&quot;>Conflicts:</span>
+{{ audition.actorseasonmeta.conflicts }}</div>
+{% if audition.tech_interest %}
+<div class=&quot;pre-wrap mb-2&quot;>
+<span class=&quot;text-info&quot;>Tech Interest:</span>
+{{ audition.tech_interest }}</div>
+{% endif %}
+">
+    more info</a>
 </td>
 <td class="align-middle {% if audition.status == "done" %}text-success{% endif %}">
   {{ audition.get_status_display }}
