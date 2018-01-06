@@ -117,12 +117,6 @@ class ShowAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("title",)}
     save_as_continue = False
 
-    def get_readonly_fields(self, request, obj):
-        if obj:
-            if request.user.is_superuser:
-                return self.readonly_fields
-        return []
-
 @admin.register(Building)
 class BuildingAdmin(admin.ModelAdmin):
     def has_module_permission(self, request):
