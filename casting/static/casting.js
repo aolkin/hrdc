@@ -166,6 +166,18 @@ $(function() {
     if (window.channels) {
         bridge = new channels.WebSocketBridge();
         bridge.connect(location.pathname + "ws/");
+
+	bridge.socket.addEventListener('close', function() {
+	    $(document.body).append(
+		'<nav class="navbar fixed-top navbar-danger bg-danger ' +
+		    'justify-content-center">' +
+		    '<span class="navbar-text text-light">' +
+		    'You have disconnected from ' +
+		    'the server and may miss ' +
+		    'some updates. Please <a class="text-white" href="">' +
+		    'refresh this page</a>.</span></nav>');
+	})
+
         bridge.listen(function(data, stream) {
             var el = $("#" + data.id);
             if (el.length < 1) {
