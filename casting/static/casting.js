@@ -160,6 +160,16 @@ function sendBoundUpdate(e) {
     }
 }
 
+function notifyDisconnect() {
+    $(document.body).append(
+	'<nav class="navbar fixed-top navbar-danger bg-danger ' +
+	    'justify-content-center">' +
+	    '<span class="navbar-text text-light">' +
+	    'You have disconnected from the server and may miss ' +
+	    'some updates. Please <a class="text-white" href="">' +
+	    'refresh this page</a>.</span></nav>');
+}
+
 var bridge;
 
 $(function() {
@@ -167,16 +177,8 @@ $(function() {
         bridge = new channels.WebSocketBridge();
         bridge.connect(location.pathname + "ws/");
 
-	bridge.socket.addEventListener('close', function() {
-	    $(document.body).append(
-		'<nav class="navbar fixed-top navbar-danger bg-danger ' +
-		    'justify-content-center">' +
-		    '<span class="navbar-text text-light">' +
-		    'You have disconnected from ' +
-		    'the server and may miss ' +
-		    'some updates. Please <a class="text-white" href="">' +
-		    'refresh this page</a>.</span></nav>');
-	})
+	bridge.socket.addEventListener('close', notifyDisconnect);
+        window.addEventListener('offline', notifyDisconnect);
 
         bridge.listen(function(data, stream) {
             var el = $("#" + data.id);

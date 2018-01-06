@@ -14,7 +14,7 @@
 	  data-toggle="tooltip">
     copy</button>
   <a class="btn btn-primary btn-sm" tabindex="0" role="button"
-     data-toggle="popover" data-html="true" data-trigger="focus"
+     data-toggle="popover" data-html="true"
      data-title="Contact and Other Information" data-placement="top"
      data-content="
 <div>{{ audition.actor.get_full_name }}
@@ -37,12 +37,17 @@
 </td>
 <td class="align-middle {% if audition.status == "done" %}text-success{% endif %}">
   {{ audition.get_status_display }}
+  {% if audition.status == "called" %}
+  at {{ audition.called_time|date:"g:i A" }}
+  {% endif %}
   {% if audition.show.release_meta.stage < 1 %}
-  {% if audition.status == "waiting" %}
+  {% if audition.busy %}
+  <div class="text-muted text-right">Busy with <i>{{ audition.busy.show }}</div>
+  <div class="text-muted text-right">(since {{ audition.busy.called_time|date:"g:i A" }})</i></div>
+  {% elif audition.status == "waiting" %}
   <a href="{% url 'casting:audition_call' audition.pk %}"
      class="btn btn-primary btn-sm ajaxify">call</a>
-  {% endif %}
-  {% if audition.status == "called" %}
+  {% elif audition.status == "called" %}
   <a href="{% url 'casting:audition_done' audition.pk %}"
      class="btn btn-success btn-sm ajaxify">done</a>
   {% endif %}

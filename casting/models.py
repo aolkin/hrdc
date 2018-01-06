@@ -228,6 +228,9 @@ class Audition(AssociateShowMixin):
     sign_in_complete = models.BooleanField(default=False)
     status = models.CharField(default=STATUSES[0][0], max_length=20,
                               choices=STATUSES)
+    called_time = models.DateTimeField(null=True)
+    done_time = models.DateTimeField(null=True)
+    busy = models.ForeignKey("self", null=True, on_delete=models.SET_NULL)
     space = models.ForeignKey(settings.SPACE_MODEL, blank=True, null=True,
                               on_delete=models.SET_NULL)
     tech_interest = models.TextField(
@@ -245,9 +248,9 @@ class Audition(AssociateShowMixin):
         return "{} for {}".format(self.actor, self.show)
 
 STATUS_CLASSES = {
-    "waiting": "bg-warning",
-    "called": "bg-primary",
-    "done": "bg-success",
+    Audition.STATUSES[0][0]: "bg-warning",
+    Audition.STATUSES[1][0]: "bg-primary",
+    Audition.STATUSES[2][0]: "bg-success",
 }       
 @receiver(post_save)
 def send_auditions(sender, instance, *args, **kwargs):
@@ -260,6 +263,21 @@ def send_auditions(sender, instance, *args, **kwargs):
                 "id": "audition-{}".format(instance.pk),
                 "html": render_to_string(template, { "audition": instance })
             }
+        if instance.status == Audition.STATUSES[1][0]:
+            for aud in Audition.objects.filter(
+                    actor_id=instance.actor_id,
+                    space__building=instance.space.building,
+                    signed_in__date=instance.signed_in).exclude(
+                        id=instance.id):
+                aud.busy = instance
+                aud.save()
+        elif instance.status == Audition.STATUSES[2][0]:
+            for aud in Audition.objects.filter(actor_id=instance.actor_id,
+                                               busy=instance):
+                aud.busy = None
+                aud.save()
+        if not instance.sign_in_complete:
+            return
         if instance.space:
             JsonWebsocketConsumer.group_send(
                 "auditions-building-{}".format(instance.space.building.pk),

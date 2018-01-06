@@ -184,9 +184,10 @@ class ActorSignInDone(ActorSignInBase, TemplateView):
     template_name = "casting/sign_in/done.html"
     
     def get(self, *args, **kwargs):
-        Audition.objects.filter(
-            id__in=self.request.session.get("audition_ids", [])).update(
-                sign_in_complete=True)
+        for i in Audition.objects.filter(
+            id__in=self.request.session.get("audition_ids", [])):
+            i.sign_in_complete=True
+            i.save()
         # Email sign-in confirmation here
         response = super().get(*args, **kwargs)
         try:
