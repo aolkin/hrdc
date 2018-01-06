@@ -142,10 +142,12 @@ class AuditionStatusBase(StaffViewMixin, SingleObjectMixin, View):
     
     def get(self, *args, **kwargs):
         self.object = self.get_object()
-        self.object.status = self.new_status
-        self.object.save()
+        if not self.object.busy:
+            self.object.status = self.new_status
+            setattr(self.object, self.new_status + "_time", timezone.now())
+            self.object.save()
         if self.request.is_ajax():
-            return HttpResponse("success")
+            return HttpResponse("success" if not self.object.busy else "failed")
         else:
             return HttpResponseRedirect(self.get_redirect_url())
     

@@ -8,4 +8,8 @@
 <td>{{ audition.show }}</td>
 <td class="align-middle {% if audition.status == "called"%}bg-primary text-white text-uppercase{% elif audition.status == "done"%}text-success{% endif %}">
   {{ audition.get_status_display }}
+  {% if audition.status == "called" %}
+  <span class="text-lowercase">at</span>
+  {{ audition.called_time|date:"g:i A" }}
+  {% endif %}
 </td>
