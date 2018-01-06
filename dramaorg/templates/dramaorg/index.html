@@ -16,6 +16,8 @@
     <tr>
       <th class="table-col-md">Show</th>
       <th class="table-col-sm table-col-desktop">Season</th>
+      <th class="table-col-xs">Residency</th>
+      <th class="table-col-sm">Venue</th>
       <th class="table-col-lg">Administrative Staff</th>
     </tr>
   </thead>
@@ -24,10 +26,20 @@
   <tr>
     <td>{{ show.title }}</td>
     <td>{{ show.seasonstr }}</td>
+    <td>{{ show.residency_starts|date:"M j" }}
+      {% if show.residency_starts != show.residency_ends %}-
+      {{ show.residency_ends|date:"M j" }}{% endif %}</td>
+    <td>{{ show.space }}</td>
     <td>{{ show.people }}</td>
   </tr>
   {% endfor %}
 </table>
+{% if not user.is_board %}
+<p class="text-muted text-center">If any of this information is incorrect or
+  shows are missing from your dashboard, please contact
+  <a href="mailto:{% option 'site_contact_email' %}">
+    {% option 'site_contact_name' %}</a>.</p>
+{% endif %}
 {% else %}
 <div class="text-center">
   <p class="lead">

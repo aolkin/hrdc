@@ -7,6 +7,8 @@ from django.db.models.signals import post_save
 from django.contrib.auth.signals import user_logged_in
 from django.dispatch import receiver
 
+from django.core.exceptions import ValidationError
+
 import hashlib, base64, uuid, datetime, re
 
 from config import config
@@ -218,12 +220,19 @@ class Show(Season):
     staff = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
     space = models.ForeignKey(Space, null=True, on_delete=models.SET_NULL,
                               verbose_name="Venue")
+
+    residency_starts = models.DateField(null=True)
+    residency_ends = models.DateField(null=True)
     
     slug = models.SlugField(unique=True, db_index=True)
     invisible = models.BooleanField(default=False)
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+
+    @property
+    def residency_length(self):
+        return self.residency_ends - self.residency_starts
     
     def __str__(self):
         return self.title
@@ -235,3 +244,7 @@ class Show(Season):
     def user_is_staff(self, user):
         return self.staff.filter(pk=user.pk).exists()
 
+    def clean(self):
+        if self.residency_ends < self.residency_starts:
+            raise ValidationError("Residency cannot end before it begins!")
+        return super().clean()

@@ -108,11 +108,20 @@ class ShowAdmin(admin.ModelAdmin):
     list_filter = ('season', 'year', 'space') #, 'invisible')
     #list_editable = ('invisible',)
     autocomplete_fields = ('staff',)
-    fields = ('title', ('season', 'year'), 'space', 'staff', 'slug')
+    fields = ('title', ('season', 'year'), 'space',
+              ('residency_starts', 'residency_ends'), 'staff', 'slug',
+              ('created', 'modified'))
+    readonly_fields = "created", "modified"
     exclude = ('invisible',)
     search_fields = ('title',)
     prepopulated_fields = {"slug": ("title",)}
     save_as_continue = False
+
+    def get_readonly_fields(self, request, obj):
+        if obj:
+            if request.user.is_superuser:
+                return self.readonly_fields
+        return []
 
 @admin.register(Building)
 class BuildingAdmin(admin.ModelAdmin):
