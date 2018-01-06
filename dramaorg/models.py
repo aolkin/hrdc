@@ -245,6 +245,7 @@ class Show(Season):
         return self.staff.filter(pk=user.pk).exists()
 
     def clean(self):
-        if self.residency_ends < self.residency_starts:
+        if (self.residency_starts and self.residency_ends and
+            self.residency_ends < self.residency_starts):
             raise ValidationError("Residency cannot end before it begins!")
         return super().clean()
