@@ -1,22 +1,26 @@
-var SUGGESTED_DOMAINS = [];
-
-$(function() {
-    $.getJSON("/autocomplete/",
-              { "key": "email_domain"}).done(function(data) {
-        SUGGESTED_DOMAINS = data;
-    });
-});
+var suggested_domains;
 
 function suggestEmailDomains(q, cb) {
     let parts = q.split("@");
     if (parts[0] && parts.length === 2 && parts[1]) {
         let matches = [];
-        for (let domain of SUGGESTED_DOMAINS) {
-            if (domain.startsWith(parts[1])) {
-                matches.push(parts[0] + "@" + domain);
+	function doCB() {
+	    for (let domain of suggested_domains) {
+		if (domain.startsWith(parts[1])) {
+                    matches.push(parts[0] + "@" + domain);
+		}
             }
-        }
-        cb(matches);
+            cb(matches);
+	}
+        if (suggested_domains) {
+	    doCB();
+	} else {
+	    $.getJSON("/autocomplete/",
+		      { "key": "email_domain"}).done(function(data) {
+			  suggested_domains = data;
+			  doCB();
+		      });
+	}
     } else {
         return [];
     }
