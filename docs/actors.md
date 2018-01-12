@@ -19,8 +19,8 @@ in.
 
 The sign-in form first asks for your email and which shows you would like to
 audition for. It will then ask you to provide your contact information, any
-conflicts for the semester, and whether you might be interested in a
-technical or backstage job on this show if you are not cast. If you have
+conflicts for the semester, and whether or not you might be interested in a
+technical or backstage job on each show if you are not cast. If you have
 auditioned for other shows via this system previously, you will not need to
 enter that information again; the system will remember it. As such, you can
 always return later and sign in to audition for more shows easily.
@@ -75,11 +75,11 @@ responses, you may **not** change them and will be subject to the normal
 penalties if you then drop the show.
 
 Also note that you will lose any first-choice roles you have been given if
-you do not respond to them by the end of the signing period, and we cannot help
+you do not accept them by the end of the signing period, and we cannot help
 you if you run into problems at the last minute.
 
 If the link in your casting email notification does not work, you may
-[request a new link](https://app.hrdctheater.com/casting/actor/getlink/) to be
+[get a new link](https://app.hrdctheater.com/casting/actor/getlink/)
 emailed to you. If you are still unable to sign, please contact the
 [campus liason](mailto:campus@hrdctheater.com) immediately.
 
