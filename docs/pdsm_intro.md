@@ -9,8 +9,8 @@ description: PDSM Manual
 # Welcome to HRDC Apps
 
 To make common casting more efficient, the HRDC is now using a new online
-system to faciliate audition tabling, as well as cast and callback list
-publishing.
+system to faciliate audition tabling, cast and callback list publishing, and
+signing.
 
 ## Help and Support
 
