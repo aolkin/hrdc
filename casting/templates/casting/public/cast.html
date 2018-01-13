@@ -36,6 +36,9 @@
 	  Note that once you have submitted, you CANNOT MAKE CHANGES.
 	</p>
 	<button type="submit" class="btn btn-danger btn-block">Submit</button>
+	<a href="{% url 'casting:cast_list' object.pk %}"
+	   class="btn btn-primary btn-block">
+	  Go Back and Make Changes</a>
 	{% else %}
 	<p class="lead">
 	  Please re-read and confirm your first-round casting below.
@@ -45,6 +48,9 @@
 	</p>
 	<button type="submit" class="btn btn-danger btn-block">
 	  Submit First-Round Casting</button>
+	<a href="{% url 'casting:cast_list' object.pk %}"
+	   class="btn btn-primary btn-block">
+	  Go Back and Make Changes</a>
 	{% endif %}
       </form>
       {% else %}
@@ -67,7 +73,7 @@
 </div>
 <div class="container-fluid limited-container-1200">
   <div class="row justify-content-center">
-    {% for character in object.character_set.all %}
+    {% for character in characters %}
     <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 col-xl-3 mb-4">
       <div class="card">
 	<div class="card-header text-center p-2">

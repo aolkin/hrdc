@@ -27,7 +27,9 @@
       </div>
     </div>
     {% for character in object.character_set.all %}
+    {% if not character.hidden_for_signing %}
     {% include "casting/pieces/cast_card.html" %}
+    {% endif %}
     {% endfor %}
     {% if not object.first_cast_submitted %}
     {% include "casting/pieces/cast_card.html" with doblank=True character=character_blank %}
@@ -51,7 +53,7 @@
     <a href="{% url 'casting:cast_submit' object.pk %}"
        class="btn btn-danger btn-lg btn-block text-center"
        data-toggle="tooltip"
-       title="Once submitted, you cannot edit your {% if object.first_cast_submitted %}cast list{% else %}first-round casting or adjust the number of actors allowed to sign for a character{% endif %} any further.">
+       title="Once submitted, you cannot edit your {% if object.first_cast_submitted %}cast list{% else %}first-round casting, add characters, or adjust the number of actors allowed to sign for a character{% endif %} any further.">
       {% if object.first_cast_submitted %}
       Finalize Cast List
       {% else %}

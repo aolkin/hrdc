@@ -25,6 +25,9 @@
 	  Note that once you have submitted, you CANNOT MAKE CHANGES.
 	</p>
 	<button type="submit" class="btn btn-danger btn-block">Submit</button>
+	<a href="{% url 'casting:callbacks' object.pk %}"
+	   class="btn btn-primary btn-block">
+	  Go Back and Make Changes</a>
       </form>
       {% else %}
       {% if request.session.CALLBACK_SUBMIT_ERRORS == object.pk %}
