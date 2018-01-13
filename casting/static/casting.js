@@ -78,6 +78,9 @@ class DataBindingHandler {
     do_update(action, stream) {
         let els = $("[data-stream=" + stream +
                     "][data-pk=" + action.pk + "]");
+        if (action.data.hidden_for_signing) {
+            els.remove();
+        }
         for (let field in action.data) {
             let el = els.filter("[data-field=" + field + "]");
             if (el.is("select")) {
@@ -240,6 +243,16 @@ $(function() {
             bridge.stream($(this).data("stream")).send({
                 action: "delete",
                 pk: $(this).data("pk"),
+            });
+        });
+        $(document.body).on("click", ".btn-hide", function(e) {
+            console.log("Hide");
+            bridge.stream($(this).data("stream")).send({
+                action: "update",
+                pk: $(this).data("pk"),
+                data: {
+                    "hidden_for_signing": true,
+                },
             });
         });
     }

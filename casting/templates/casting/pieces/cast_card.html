@@ -7,6 +7,11 @@
 	    class="btn-action badge btn float-right btn-danger btn-delete {% if doblank %}hidden{% endif %} fa fa-times"
 	    title="Delete this character and remove all actors cast as it.">
     </button>
+    {% else %}
+    <button {% boundattrs character %} data-toggle="tooltip" tabindex="-1"
+	    class="btn-action badge btn float-right btn-danger btn-hide fa fa-times"
+	    title="Remove this character from the cast list.">
+    </button>
     {% endif %}
     {% endif %}
     <button {% boundattrs character %} data-toggle="tooltip"

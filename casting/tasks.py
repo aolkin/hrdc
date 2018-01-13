@@ -73,8 +73,9 @@ def release_casting(pk):
         shows = get_shows(crm, "cast_submitted")
         if shows:
             signings = get_model("Signing").objects.filter(
-                character__show__in=shows).order_by("character__show",
-                                                    "order")
+                character__show__in=shows,
+                character__hidden_for_signing=False).order_by(
+                    "character__show", "order")
             actor_roles = defaultdict(list)
             for i in signings:
                 actor_roles[i.actor].append(i)
@@ -102,7 +103,8 @@ def open_signing(pk):
     crm = get_crm(pk)
     if crm and crm.stage == 3:
         signings = get_model("Signing").objects.filter(
-            character__show__in=get_shows(crm, "cast_submitted"))
+            character__show__in=get_shows(crm, "cast_submitted"),
+            character__hidden_for_signing=False)
         actors = [get_user_model().objects.get(pk=i[0]) for i in
                   signings.distinct().values_list("actor")]
         for actor in actors:

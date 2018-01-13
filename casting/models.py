@@ -35,7 +35,8 @@ class CastingReleaseMeta(models.Model):
         "cleared again, regardless of set times.")
     
     signing_opens = models.DateTimeField(null=True, blank=True)
-    second_signing_opens = models.DateTimeField(null=True, blank=True)
+    second_signing_opens = models.DateTimeField(
+        null=True, blank=True, verbose_name="Signing closes")
 
     tracker = FieldTracker(fields=("publish_callbacks",
                                    "publish_first_round_casts",
@@ -296,6 +297,7 @@ class Character(AssociateShowMixin):
         default=1,
         help_text="Number of actors allowed to sign for this character.")
     added_for_signing = models.BooleanField(default=False)
+    hidden_for_signing = models.BooleanField(default=False)
 
     @property
     def editable(self):

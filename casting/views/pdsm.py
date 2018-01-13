@@ -313,7 +313,8 @@ class CastSubmitView(SubmitView):
             messages.error(self.request, "Cast list already submitted!")
             return False
         clean = True
-        for c in self.object.character_set.all():
+        characters = self.object.character_set.filter(hidden_for_signing=False)
+        for c in characters.all():
             actors = []
             for signing in c.signing_set.all().select_related("actor"):
                 if not signing.actor:
@@ -349,11 +350,11 @@ class CastSubmitView(SubmitView):
                     messages.warning(
                         self.request,
                         "No alternates have been provided for {}.".format(c))
-        if not self.object.character_set.filter().exists():
+        if not characters.exists():
             messages.error(self.request,
                            "No characters have been cast!")
             clean = False
-        if self.object.character_set.filter(name="").exists():
+        if characters.filter(name="").exists():
             messages.error(self.request,
                              "One or more characters are missing names.")
             clean = False

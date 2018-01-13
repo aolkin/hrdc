@@ -90,6 +90,8 @@ class CastView(PublicView):
         context["show_all_actors"] = ((self.object.first_cast_submitted and
                                        context["user_is_staff"]) or
                                       self.object.cast_list_released)
+        context["characters"] = self.object.character_set.filter(
+            hidden_for_signing=False)
         menu = context["sidebar_menu"]
         submenu = menu[self.object.show.seasonstr() + " Cast Lists"] = []
         if self.request.user.is_authenticated and self.request.user.is_board:
