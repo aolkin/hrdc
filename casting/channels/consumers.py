@@ -13,7 +13,7 @@ class TablingConsumer(JsonWebsocketConsumer):
         return ["auditions-building-{}".format(kwargs["building"])]
 
     def connect(self, message, **kwargs):
-        if not test_pdsm(message.user) or test_board(message.user):
+        if not (test_pdsm(message.user) or test_board(message.user)):
             message.reply_channel.send({"close": True})
             return False
         super().connect(message, **kwargs)
