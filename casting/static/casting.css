@@ -202,3 +202,8 @@ p.lead.only-small {
 .pre-wrap {
     white-space: pre-wrap;
 }
+
+.tech-interest-icon {
+    margin-left: -1.5em;
+    padding-right: .3em;
+}

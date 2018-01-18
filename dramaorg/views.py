@@ -184,8 +184,8 @@ class ResetView(FormView):
 
 class ProfileView(LoginRequiredMixin, UpdateView):
     model = User
-    fields = ['first_name', 'last_name', 'pgps', 'phone', 'affiliation',
-              'year', 'email']
+    fields = ['first_name', 'last_name', 'pgps', 'gender_pref', 'phone',
+              'affiliation', 'year', 'email']
     template_name = "dramaauth/user_profile.html"
 
     def get(self, *args, **kwargs):

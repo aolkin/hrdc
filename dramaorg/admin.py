@@ -29,14 +29,16 @@ def clear_tokens(modeladmin, request, queryset):
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     fieldsets = (
-        (None, {'fields': (('first_name', 'last_name'), 'pgps',
+        (None, {'fields': (('first_name', 'last_name'),
+                           ('pgps', 'gender_pref'),
                            ('affiliation', 'year'))}),
         ('Contact Info', {'fields': ('email', 'phone')}),
         ('Permissions', {'fields': ('is_active', 'is_superuser', 'groups')}),
         ('Information', {'fields': ('last_login', 'date_joined', 'password')}),
     )
     staff_fieldsets = (
-        (None, {'fields': (('first_name', 'last_name'), 'pgps',
+        (None, {'fields': (('first_name', 'last_name'),
+                           ('pgps', 'gender_pref'),
                            ('affiliation', 'year'), 'email', 'phone',
                            'groups', 'is_active', 'password')}),
     )
@@ -53,8 +55,9 @@ class UserAdmin(BaseUserAdmin):
     list_filter = ('is_active','is_superuser', 'affiliation', 'year')
     search_fields = ('email', 'first_name', 'last_name',)
     readonly_fields = ('last_login', 'date_joined')
-    staff_readonly = ('email', 'first_name', 'last_name', 'pgps',
-                      'phone', 'groups', 'affiliation', 'year', 'is_active')
+    staff_readonly = ('email', 'first_name', 'last_name',
+                      'pgps', 'gender_pref', 'phone', 'groups',
+                      'affiliation', 'year', 'is_active')
     actions = [generate_tokens, clear_tokens] if settings.DEBUG else []
     ordering = ('date_joined',)
     save_as_continue = True

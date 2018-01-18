@@ -148,7 +148,7 @@ PROFILE_WIDGETS["year"] = forms.NumberInput()
 class ActorProfileForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
-        fields = PROFILE_FIELDS + ["year", "pgps"]
+        fields = PROFILE_FIELDS + ["year", "pgps", "gender_pref"]
         widgets = PROFILE_WIDGETS
     
 class ActorSignInProfile(ActorSignInBase, BaseUpdateView):
