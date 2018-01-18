@@ -6,9 +6,13 @@
 <td>{{ audition.actor.get_full_name }}</td>
 <td>{{ audition.actor.pgps|break_punctuation }}</td>
 <td class="copyable" hidden>
-  <textarea>{{ audition.actor.get_full_name }}	{{ audition.actor.email }}	{{ audition.actor.phone }}	{{ audition.actor.affiliation }}	{{ audition.actor.year }}	{{ audition.actor.pgps }}</textarea>
+  <textarea>{{ audition.actor.get_full_name }}	{{ audition.actor.email }}	{{ audition.actor.phone }}	{{ audition.actor.affiliation }}	{{ audition.actor.year }}	{{ audition.actor.pgps }}	{{ audition.actor.gender_pref }}</textarea>
 </td>
 <td class="align-middle">
+  {% if audition.tech_interest %}
+  <i class="fa fa-wrench tech-interest-icon" data-toggle="tooltip"
+     title="This actor may have expressed backstage/technical interest (click &quot;more info&quot; for details)"></i>
+  {% endif %}
   <button class="btn btn-secondary btn-sm btn-copy-excel"
 	  title="Copy actor information to clipboard for spreadsheets (includes email and phone)"
 	  data-toggle="tooltip">
@@ -24,6 +28,9 @@
 {{ audition.actor.affiliationyear }}<br>
 <span class=&quot;text-primary&quot;>{{ audition.actor.email }}</span><br>
 {{ audition.actor.pretty_phone }}</div>
+{% if audition.actor.gender_pref %}<div class=&quot;mt-2&quot;>
+<span class=&quot;text-primary&quot;>Preferred Stage Gender:</span>
+{{ audition.actor.gender_pref }}</div>{% endif %}
 <div class=&quot;pre-wrap&quot;>
 <span class=&quot;text-danger&quot;>Conflicts:</span>
 {{ audition.actorseasonmeta.conflicts }}</div>

@@ -47,6 +47,8 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
                                    verbose_name="School or Affiliation")
     pgps = models.CharField(max_length=20, blank=True,
                             verbose_name="Preferred Gender Pronouns")
+    gender_pref = models.CharField(max_length=30, blank=True,
+                                   verbose_name="Preferred Stage Gender")
 
     source = models.CharField(default="default", editable=False,
                               max_length=20)
