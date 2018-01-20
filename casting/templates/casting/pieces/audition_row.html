@@ -46,6 +46,8 @@
   {{ audition.get_status_display }}
   {% if audition.status == "called" %}
   at {{ audition.called_time|date:"g:i A" }}
+  {% elif audition.status == "done" %}
+  (took {{ audition.audition_minutes }} mins)
   {% endif %}
   {% if audition.show.release_meta.stage < 1 %}
   {% if audition.busy %}
@@ -54,7 +56,9 @@
   {% elif audition.status == "waiting" %}
   <a href="{% url 'casting:audition_call' audition.pk %}"
      class="btn btn-primary btn-sm ajaxify">call</a>
-  {% elif audition.status == "called" %}
+  {% elif audition.status == "called" %}<br>
+  <a href="{% url 'casting:audition_cancel' audition.pk %}"
+     class="btn btn-danger btn-sm ajaxify">cancel</a>
   <a href="{% url 'casting:audition_done' audition.pk %}"
      class="btn btn-success btn-sm ajaxify">done</a>
   {% endif %}

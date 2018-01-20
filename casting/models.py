@@ -3,7 +3,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.template.loader import render_to_string
-from django.db.models.signals import post_save, pre_delete
+from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
 from django.contrib.humanize.templatetags import humanize
 
@@ -186,6 +186,13 @@ class CastingMeta(models.Model):
         return str(self.show)
 
     @property
+    def audition_avg(self):
+        avg = Audition.objects.filter(
+            show=self, audition_length__isnull=False).aggregate(
+                Avg("audition_length"))["audition_length__avg"]
+        return int(avg / 60)
+    
+    @property
     def callbacks_released(self):
         return self.callbacks_submitted and self.release_meta.stage > 0
     
@@ -217,7 +224,7 @@ class ActorSeasonMeta(Season):
 
     def __str__(self):
         return "{} Meta for {}".format(self.seasonstr(), self.actor)
-        
+     
 class Audition(AssociateShowMixin):
     STATUSES = (
         ("waiting", "Waiting"),
@@ -231,6 +238,7 @@ class Audition(AssociateShowMixin):
                               choices=STATUSES)
     called_time = models.DateTimeField(null=True)
     done_time = models.DateTimeField(null=True)
+    audition_length = models.DurationField(null=True)
     busy = models.ForeignKey("self", null=True, on_delete=models.SET_NULL)
     space = models.ForeignKey(settings.SPACE_MODEL, blank=True, null=True,
                               on_delete=models.SET_NULL)
@@ -244,6 +252,9 @@ class Audition(AssociateShowMixin):
                 ActorSeasonMeta.objects.get_or_create_in_season(
                     self.show.show, actor_id=self.actor_id))
         return self._cached_actorseasonmeta
+
+    def audition_minutes(self):
+        return int(self.audition_length.seconds / 60)
     
     def __str__(self):
         return "{} for {}".format(self.actor, self.show)
@@ -252,7 +263,13 @@ STATUS_CLASSES = {
     Audition.STATUSES[0][0]: "bg-warning",
     Audition.STATUSES[1][0]: "bg-primary",
     Audition.STATUSES[2][0]: "bg-success",
-}       
+}
+
+@receiver(pre_save)
+def update_audition_length(sender, instance, *args, **kwargs):
+    if sender == Audition and instance.done_time:
+        instance.audition_length = instance.done_time - instance.called_time
+        
 @receiver(post_save)
 def send_auditions(sender, instance, *args, **kwargs):
     if sender == Audition and instance.actor.is_initialized:
@@ -272,7 +289,7 @@ def send_auditions(sender, instance, *args, **kwargs):
                         id=instance.id):
                 aud.busy = instance
                 aud.save()
-        elif instance.status == Audition.STATUSES[2][0]:
+        else:
             for aud in Audition.objects.filter(actor_id=instance.actor_id,
                                                busy=instance):
                 aud.busy = None

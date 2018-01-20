@@ -159,6 +159,9 @@ class AuditionCallView(AuditionStatusBase):
 
 class AuditionDoneView(AuditionStatusBase):
     new_status = "done"
+    
+class AuditionCancelView(AuditionStatusBase):
+    new_status = "waiting"
 
 def clear_session_vars(session, name):
     for i in ("{}_SUBMIT_ERRORS", "{}_SUBMIT_FLOW"):
@@ -423,6 +426,8 @@ urlpatterns = [
         url(r'^auditions/', include([
             url('^$', AuditionView.as_view(), name="audition"),
             url('^call/$', AuditionCallView.as_view(), name="audition_call"),
+            url('^cancel/$', AuditionCancelView.as_view(),
+                name="audition_cancel"),
             url('^done/$', AuditionDoneView.as_view(), name="audition_done")
         ])),
         
