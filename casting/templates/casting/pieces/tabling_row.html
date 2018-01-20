@@ -11,5 +11,9 @@
   {% if audition.status == "called" %}
   <span class="text-lowercase">at</span>
   {{ audition.called_time|date:"g:i A" }}
+  {% elif audition.status == "done" %}
+  <span class="text-lowercase">
+    (took {{ audition.audition_minutes }} mins)
+  </span>
   {% endif %}
 </td>

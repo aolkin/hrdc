@@ -190,7 +190,7 @@ class CastingMeta(models.Model):
         avg = Audition.objects.filter(
             show=self, audition_length__isnull=False).aggregate(
                 Avg("audition_length"))["audition_length__avg"]
-        return int(avg / 60)
+        return round(avg / 60)
     
     @property
     def callbacks_released(self):
@@ -254,7 +254,7 @@ class Audition(AssociateShowMixin):
         return self._cached_actorseasonmeta
 
     def audition_minutes(self):
-        return int(self.audition_length.seconds / 60)
+        return round(self.audition_length.seconds / 60)
     
     def __str__(self):
         return "{} for {}".format(self.actor, self.show)
