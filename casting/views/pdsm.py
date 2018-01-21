@@ -382,7 +382,8 @@ class ShowActors(ShowStaffMixin, DetailView):
             terms = self.request.GET["term"].split(" ")
         else:
             terms = ("",)
-        auditions = self.get_object().audition_set.filter(sign_in_complete=True)
+        auditions = self.get_object().audition_set.filter(
+            sign_in_complete=True)
         for term in terms:
             q = Q(actor__first_name__contains=term)
             q |= Q(actor__last_name__contains=term)
