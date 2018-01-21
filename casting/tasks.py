@@ -37,16 +37,21 @@ def release_callbacks(pk):
     if crm and crm.stage == 0:
         shows = get_shows(crm, "callbacks_submitted")
         if shows:
+            actor_cbs = { i.actor: [] for i in get_model(
+                "Audition").objects.filter(
+                    show__in=shows, sign_in_complete=True).select_related(
+                        "actor") }
             cbs = get_model("Callback").objects.filter(
                 character__show__in=shows).order_by("character__show")
-            actor_cbs = defaultdict(list)
             for i in cbs:
+                if not (i.actor in actor_cbs):
+                    actor_cbs[i.actor] = []
                 actor_cbs[i.actor].append(i)
             for actor, acbs in actor_cbs.items():
                 render_for_user(actor, "casting/email/callback.html",
                                 "callbacks", crm.pk,
                                 { "callbacks": acbs, "crm": crm },
-                                subject="Your {} Callbacks".format(crm),
+                                subject="{} Callbacks Released".format(crm),
                                 tags=["casting", "callbacks"])
         crm.stage = 1
         crm.save()
