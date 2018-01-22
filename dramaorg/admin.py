@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.admin import GroupAdmin
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, Permission
 
 from django import forms
 
@@ -133,5 +133,6 @@ class SpaceAdmin(admin.ModelAdmin):
     list_display_links = None
     search_fields = ('name', 'building__name')
 
-admin.site.unregister(Group)
-admin.site.register(GroupProxy, GroupAdmin)
+#admin.site.unregister(Group)
+#admin.site.register(GroupProxy, GroupAdmin)
+admin.site.register(Permission)
