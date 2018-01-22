@@ -7,10 +7,14 @@ from ..models import *
 
 from ..utils import *
 
+from config import config
+from datetime import timedelta
+
 def get_current_slots():
     return Slot.objects.auditions().filter(
         day=timezone.localdate(),
-        start__lte=timezone.localtime(),
+        start__lte=timezone.localtime() + timedelta(
+            minutes=config.get_float("casting_advance_signin_minutes", 0)),
         end__gte=timezone.localtime())
 
 show_model = apps.get_model(settings.SHOW_MODEL)
