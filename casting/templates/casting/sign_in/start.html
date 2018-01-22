@@ -9,15 +9,16 @@
   <p class="lead">
     Enter your email and select the shows you wish to audition for to begin.
   </p>
-  <p class="lead">
-    <big>Shows currently holding auditions at {{ object }}:</big>
-  </p>
 </div>
 <div class="row justify-content-center">
   <form method="POST" class="col-lg-6 col-md-8 audition-sign-in-shows">
     {% csrf_token %}
     {{ form|bootstrap_inline }}
+    <p class="lead text-center">
+      Shows currently holding auditions at {{ object }}:
+    </p>
     {% for show in shows %}
+    {% ifchanged show.1 %}
     <div class="row mb-2 justify-content-center">
       <div class="col-md-9">
 	<div class="custom-control custom-checkbox">
@@ -29,6 +30,7 @@
 	</div>
       </div>
     </div>
+    {% endifchanged %}
     {% endfor %}
     <button type="submit" class="btn btn-primary btn-block">Sign In</button>
   </form>

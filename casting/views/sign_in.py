@@ -84,9 +84,8 @@ class ActorSignInStart(ActorSignInBase, BaseUpdateView):
                 q, space__building=self.object)
         else:
             slots = get_current_slots().filter(space__building=self.object)
-        context["shows"] = slots.distinct().values_list("show__show__title",
-                                                        "show__id",
-                                                        "space__id")
+        context["shows"] = slots.order_by("show_id", "start").values_list(
+            "show__show__title", "show_id", "space_id")
         return context
     
     def form_valid(self, form):
