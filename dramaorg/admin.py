@@ -133,5 +133,5 @@ class SpaceAdmin(admin.ModelAdmin):
     list_display_links = None
     search_fields = ('name', 'building__name')
 
-admin.register(GroupProxy, GroupAdmin)
 admin.site.unregister(Group)
+admin.site.register(GroupProxy, GroupAdmin)
