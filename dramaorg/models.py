@@ -145,12 +145,6 @@ def invite_user(sender, instance, created, raw, **kwargs):
 def clear_token_on_user(sender, request, user, **kwargs):
     user.clear_token()
 
-class GroupProxy(auth.models.Group):
-    class Meta:
-        proxy = True
-        verbose_name = auth.models.Group._meta.verbose_name
-        verbose_name_plural = auth.models.Group._meta.verbose_name_plural
-
 class Building(models.Model):
     name = models.CharField(max_length=150)
     address = models.TextField(blank=True)
@@ -251,3 +245,10 @@ class Show(Season):
             self.residency_ends < self.residency_starts):
             raise ValidationError("Residency cannot end before it begins!")
         return super().clean()
+
+    
+class GroupProxy(auth.models.Group):
+    class Meta:
+        proxy = True
+        verbose_name = auth.models.Group._meta.verbose_name
+        verbose_name_plural = auth.models.Group._meta.verbose_name_plural
