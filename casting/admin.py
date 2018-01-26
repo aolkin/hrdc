@@ -222,7 +222,7 @@ class MetaAdmin(admin.ModelAdmin):
     contact_email_link.short_description = "Staff-set Show Contact Email"
 
     def auditioners(self, obj):
-        return obj.audition_set.filter(status="done").count()
+        return obj.audition_set.filter(sign_in_complete=True).count()
     
     def season(self, obj):
         return obj.show.seasonstr()
