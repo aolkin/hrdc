@@ -198,7 +198,7 @@ class CallbackSlotAdmin(SlotAdmin):
 class MetaAdmin(admin.ModelAdmin):
     list_display = ('show', 'season', 'casting_release_stage',
                     'callbacks_submitted', 'first_cast_submitted',
-                    'cast_submitted')
+                    'cast_submitted', 'auditioners')
     exclude = ('callback_description', 'cast_list_description',
                'contact_email', 'callbacks_submitted', 'first_cast_submitted',
                'cast_submitted')
@@ -220,6 +220,9 @@ class MetaAdmin(admin.ModelAdmin):
     def contact_email_link(self, obj):
         return format_html('<a href="mailto:{0}">{0}</a>', obj.contact_email)
     contact_email_link.short_description = "Staff-set Show Contact Email"
+
+    def auditioners(self, obj):
+        return obj.audition_set.filter(status="done").count()
     
     def season(self, obj):
         return obj.show.seasonstr()
