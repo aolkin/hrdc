@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Avg
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
@@ -164,15 +165,16 @@ class CastingMeta(models.Model):
         blank=True, verbose_name="Callback Information",
         help_text="Extra information about all callbacks " +
         "(location, date, etc).")
-    callbacks_submitted = models.BooleanField(default=False)
+    callbacks_submitted = models.BooleanField(default=False,
+                                              verbose_name="Callbacks")
     cast_list_description = models.TextField(
         blank=True, verbose_name="Cast List Information",
         help_text="Extra information to display with the cast list. " +
         "Include shows you cannot share actors with here.")
     first_cast_submitted = models.BooleanField(
-        default=False, verbose_name="First-round Cast List Submitted")
+        default=False, verbose_name="First-round Cast")
     cast_submitted = models.BooleanField(
-        default=False, verbose_name="Full Cast List Submitted")
+        default=False, verbose_name="Full Cast")
     contact_email = models.EmailField(
         blank=True, verbose_name="Show Contact Email")
     release_meta = models.ForeignKey(
