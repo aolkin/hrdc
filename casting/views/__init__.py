@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.shortcuts import redirect
 from django.apps import apps
 
 from ..models import *
@@ -22,6 +23,12 @@ building_model = apps.get_model(settings.BUILDING_MODEL)
 
 @user_passes_test(test_board)
 def admin(request):
+    cm = show_model.objects.current_season().filter(
+        casting_meta__isnull=False)[0].casting_meta
+    if cm.release_meta.stage < 1:
+        return redirect("casting:view_callbacks", cm.pk)
+    else:
+        return redirect("casting:view_cast", cm.pk)
     return render(request, "bt/default.html")
 admin.verbose_name = "Common Casting"
 admin.help_text = "administer Common Casting"
