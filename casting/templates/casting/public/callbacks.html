@@ -4,7 +4,7 @@
 
 {% block content %}
 <h2 class="text-center">{{ object }} Callbacks</h2>
-{% if request.user.is_authenticated and request.user.is_board %}
+{% if not object.callbacks_released and request.user.is_authenticated and request.user.is_board %}
 <div class="row justify-content-center">
   <div class="col-md-8 text-center">
     {% if object.callbacks_submitted %}
