@@ -4,7 +4,23 @@
 
 {% block content %}
 <h2 class="text-center">{{ object }} Callbacks</h2>
-{% if object.callbacks_released or user_is_staff %}
+{% if request.user.is_authenticated and request.user.is_board %}
+<div class="row justify-content-center">
+  <div class="col-md-8 text-center">
+    {% if object.callbacks_submitted %}
+    <div class="alert alert-info">
+      <big>Callbacks have been submitted, but not yet been released for
+	this show!</big>
+    </div>
+    {% else %}
+    <div class="alert alert-warning">
+      <big>Callbacks have not yet been submitted for this show!</big>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% if object.callbacks_released or user_is_staff or request.user.is_board %}
 <div class="row justify-content-center">
   <div class="col-md-8 text-center">
     {% if user_is_staff %}
@@ -63,7 +79,13 @@
 	</div>
 	<ul class="list-group list-group-flush">
 	  {% for cb in character.callback_set.all %}
-	  <li class="list-group-item">{{ cb.actor }}</li>
+	  <li class="list-group-item">
+	    {% if object.callbacks_released or user_is_staff %}
+	    {{ cb.actor }}
+	    {% else %}
+	    <span class="text-muted">[Actor Hidden]</span>
+	    {% endif %}
+	  </li>
 	  {% endfor %}
 	</ul>
 	{% if character.callback_description %}
@@ -76,21 +98,6 @@
       </div>
     </div>
     {% endfor %}
-  </div>
-</div>
-{% elif request.user.is_authenticated and request.user.is_board %}
-<div class="row justify-content-center">
-  <div class="col-md-8 text-center">
-    {% if object.callbacks_submitted %}
-    <div class="alert alert-info">
-      <big>Callbacks have been submitted, but not yet been released for
-	this show!</big>
-    </div>
-    {% else %}
-    <div class="alert alert-warning">
-      <big>Callbacks have not yet been submitted for this show!</big>
-    </div>
-    {% endif %}
   </div>
 </div>
 {% else %}
