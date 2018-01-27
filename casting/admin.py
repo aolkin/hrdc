@@ -199,9 +199,24 @@ class MetaAdmin(admin.ModelAdmin):
     list_display = ('show', 'season', 'casting_release_stage',
                     'callbacks_submitted', 'first_cast_submitted',
                     'cast_submitted', 'auditioners')
-    exclude = ('callback_description', 'cast_list_description',
-               'contact_email', 'callbacks_submitted', 'first_cast_submitted',
-               'cast_submitted')
+    #exclude = ('callback_description', 'cast_list_description',
+     #          'contact_email', 'callbacks_submitted', 'first_cast_submitted',
+      #         'cast_submitted')
+    fieldsets = (
+        ("", {
+            "fields": ('release_meta', 'show')
+        }),
+        ("Information", {
+            "fields": ('contact_email_link',)
+        }),
+        ("Submitted Lists", {
+            "fields": (('callbacks_submitted', 'first_cast_submitted',
+                        'cast_submitted'),),
+            "description": """<p class="text-white bg-danger rounded p-1 mt-1">
+            When this page is saved, the values of these checkboxes will
+            overwrite any submissions PDSMs may have made.</p>"""
+        })
+    )
     readonly_fields = ('contact_email_link',)
     search_fields = ('show__title',)
     list_filter = ('show__season', 'show__year', 'release_meta', 'slot__day')
@@ -212,10 +227,14 @@ class MetaAdmin(admin.ModelAdmin):
     ]
 
     def get_readonly_fields(self, request, obj):
+        fields = list(self.readonly_fields)
+        if not request.user.is_superuser:
+            fields += ['callbacks_submitted', 'first_cast_submitted',
+                       'cast_submitted']
         if obj:
-            return ["show"] + list(self.readonly_fields)
+            return ["show"] + fields
         else:
-            return self.readonly_fields
+            return self.fields
     
     def contact_email_link(self, obj):
         return format_html('<a href="mailto:{0}">{0}</a>', obj.contact_email)
