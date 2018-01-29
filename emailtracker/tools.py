@@ -16,10 +16,13 @@ def reschedule_all(name=None):
     emails = QueuedEmail.objects.filter(sent=None).exclude(status="<Missing>")
     if name:
         emails = emails.filter(name=name)
-    pks = emails.values_list("pk")
-    for i in pks:
-        send_queued.delay(i[0])
-    return len(pks)
+    for i in emails:
+        if i.get_msg():
+            send_queued.delay(i.pk)
+        else:
+            i.status = "<Missing>"
+            i.save()
+    return len(emails)
 
 def _query(name, ident, to):
     return QueuedEmail.objects.filter(
