@@ -380,6 +380,7 @@ class Signing(ActorMapping):
         (None, "No Response"),
     ))
     timed_out = models.BooleanField(default=False)
+    alternate_notified = models.BooleanField(default=False)
 
     def order_num(self):
         return self.order + 1

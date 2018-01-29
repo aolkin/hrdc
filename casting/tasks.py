@@ -151,20 +151,35 @@ def notify_alternates(pk):
     signing = get_model("Signing").objects.get(pk=pk)
     previous = get_model("Signing").objects.filter(
         character=signing.character, order__lt=signing.order, response=False)
-    if len(previous) != signing.order:
+    if len(previous) < max(
+            0, signing.order - signing.character.allowed_signers):
         return
     alternates = get_model("Signing").objects.filter(
-        character=signing.character, order__gt=signing.order).exclude(
+        character=signing.character, alternate_notified=False,
+        order__gt=signing.character.allowed_signers - 1).exclude(
             response=False).select_related("character", "character__show")
     if alternates.exists():
-        return render_for_user(alternates[0].actor,
-                               "casting/email/role-available.html",
-                               "role-available", pk,
-                               { "role": alternates[0] },
-                               subject="{} in {} Now Available".format(
-                                   alternates[0].character,
-                                   alternates[0].character.show),
-                                tags=["casting", "role_available"])
+        alt = alternates[0]
+        alt.alternate_notified = True
+        alt.save()
+        if alt.response:
+            return render_for_user(alt.actor,
+                                   "casting/email/role-received.html",
+                                   "role-received", alt.pk,
+                                   { "role": alt },
+                                   subject="{} in {} Received".format(
+                                       alt.character,
+                                       alt.character.show),
+                                   tags=["casting", "role_received"])
+        else:
+            return render_for_user(alt.actor,
+                                   "casting/email/role-available.html",
+                                   "role-available", alt.pk,
+                                   { "role": alt },
+                                   subject="{} in {} Now Available".format(
+                                       alt.character,
+                                       alt.character.show),
+                                   tags=["casting", "role_available"])
       
 @shared_task(ignore_result=True)
 def update_releases(scheduled=True):
