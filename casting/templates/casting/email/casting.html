@@ -8,7 +8,7 @@
   <tr>
     <td align="center">
       {% if IS_HTML %}
-      <h1 style="margin-bottom: 4px; margin-top: 18px;">You have been cast!</h1>
+      <h1 style="margin-bottom: 4px; margin-top: 18px;">Casting has been released for {{ crm }}!</h1>
       {% endif %}
     </td>
   </tr>
@@ -22,6 +22,7 @@
       </ul>
     </td>
   </tr>
+  {% if signings %}
   <tr>
     <td align="center">
       You have been offered roles in the following shows:
@@ -79,6 +80,7 @@
   </tr>
   {% endif %}
   {% endfor %}
+  {% endif %}
   {% if IS_HTML %}
   <style>
     .special-link {
