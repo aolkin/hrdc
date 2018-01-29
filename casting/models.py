@@ -392,7 +392,14 @@ class Signing(ActorMapping):
             return "First Choice"
     order_title.short_description = "Casting Preference Order"
     order_title.admin_order_field = "order"
-    
+
+    def order_title_email(self):
+        order = max(self.order - (self.character.allowed_signers - 1), 0)
+        if order:
+            return "({} alternate)".format(humanize.ordinal(order))
+        else:
+            return ""
+        
     @property
     def editable(self):
         if self.show.cast_submitted:
