@@ -77,12 +77,17 @@ def release_casting(pk):
     if crm and crm.stage == 2:
         shows = get_shows(crm, "cast_submitted")
         if shows:
+            actor_roles = { i.actor: [] for i in get_model(
+                "Audition").objects.filter(
+                    show__in=shows, sign_in_complete=True).select_related(
+                        "actor") }
             signings = get_model("Signing").objects.filter(
                 character__show__in=shows,
                 character__hidden_for_signing=False).order_by(
                     "character__show", "order")
-            actor_roles = defaultdict(list)
             for i in signings:
+                if not (i.actor in actor_roles):
+                    actor_roles[i.actor] = []
                 actor_roles[i.actor].append(i)
             for actor, roles in actor_roles.items():
                 if not actor.login_token:
@@ -90,7 +95,7 @@ def release_casting(pk):
                 render_for_user(actor, "casting/email/casting.html",
                                 "casting", crm.pk,
                                 { "signings": roles, "crm": crm },
-                                subject="Your {} Roles".format(crm),
+                                subject="{} Casting Released".format(crm),
                                 tags=["casting", "cast_list"])
         crm.stage = 3
         crm.save()

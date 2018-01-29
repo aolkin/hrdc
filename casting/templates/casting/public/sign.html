@@ -116,7 +116,11 @@
 <h2 class="text-center">The signing period has not yet begun!</h2>
 <h3 class="text-center">Please come back {{ unpublished.0.signing_opens|naturaltime }}.</h3>
 {% elif actor %}
-<h2 class="text-center">You have not been cast in any shows at this time.</h2>
-<h3 class="text-center">Please check back later.</h3>
+<h2 class="text-center">We could not find any shows you have been cast in.</h2>
+{% load config %}
+<h4 class="text-center text-muted">
+  If this is incorrect, please contact 
+  <a href="mailto:{% option 'site_contact_email' %}">
+    {% option 'site_contact_name' %}</a> immediately.</h4>
 {% endif %}
 {% endblock %}
