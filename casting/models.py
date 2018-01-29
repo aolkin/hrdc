@@ -385,8 +385,9 @@ class Signing(ActorMapping):
         return self.order + 1
 
     def order_title(self):
-        if self.order:
-            return humanize.ordinal(self.order) + " Alternate"
+        order = max(self.order - (self.character.allowed_signers - 1), 0)
+        if order:
+            return humanize.ordinal(order) + " Alternate"
         else:
             return "First Choice"
     order_title.short_description = "Casting Preference Order"
