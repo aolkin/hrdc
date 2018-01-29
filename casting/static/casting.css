@@ -154,17 +154,21 @@ table .btn {
     overflow: auto;
 }
 
-.card {
+.card, .restart-signing-numbering {
     counter-reset: signing-counter;
 }
 .list-group .list-group-item.blank .signing-count {
     display: none;
 }
 .list-group .list-group-item .signing-count:before {
-    content: counter(signing-counter) ".";
+    color: grey;
+    content: "Alt " counter(signing-counter) ":";
     counter-increment: signing-counter;
     width: 1rem;
     text-align: right;
+}
+.list-group .list-group-item.no-signing-numbering .signing-count:before {
+    content: "1st:";
 }
 
 .input-group>span.select2-container .select2-selection {

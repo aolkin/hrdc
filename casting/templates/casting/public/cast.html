@@ -88,7 +88,7 @@
 	<ul class="list-group list-group-flush">
 	  {% for signing in character.signing_set.all %}
 	  {% if show_all_actors or signing.order < character.allowed_signers %}
-	  <li class="list-group-item signing-item">
+	  <li class="list-group-item signing-item {% if signing.order < character.allowed_signers %}no-signing-numbering{% elif signing.order == character.allowed_signers %}restart-signing-numbering{% endif %}">
 	    <div class="signing-count w-100">
 	      {% if object.cast_submitted %}
 	      {% if signing.signable %}
@@ -97,8 +97,13 @@
 		 class="badge badge-success badge-pill pull-right fa fa-check"
 		 title="Accepted" data-toggle="tooltip"> </span>
 	      {% elif signing.response is False %}
+	      {% if signing.timed_out %}
+	      <span class="badge badge-danger pull-right fa fa-clock-o"
+		    title="Unsigned" data-toggle="tooltip"> </span>
+	      {% else %}
 	      <span class="badge badge-danger pull-right fa fa-times"
 		    title="Rejected" data-toggle="tooltip"> </span>
+	      {% endif %}
 	      {% else %}
 	      <span class="badge badge-light pull-right fa fa-question"
 		    title="No Response" data-toggle="tooltip"> </span>
