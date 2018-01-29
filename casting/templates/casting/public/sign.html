@@ -8,7 +8,13 @@
 <div class="row justify-content-center">
   <div class="col-lg-6 col-md-8 col-sm-10">
     {% if actor %}
-    <h4 class="text-center mb-3">Welcome, {{ actor }}</h4>
+    <h4 class="text-center mb-3">Welcome, {{ actor }}
+      {% if wrong_user %}
+      <span class="text-muted">
+	(<a href="{% url 'casting:actor_token_logout' %}">not you?</a>)
+      </span>
+    {% endif %}
+    </h4>
     {% else %}
     <h3 class="text-center">
       <span class="text-danger">Unable to determine your identity:</span>
@@ -73,7 +79,8 @@
 	<div class="col-5 pull-7">
 	  <div class="form-control-static text-danger">
 	    <div class="fa fa-exclamation-triangle pull-left mt-1"> </div>
-	    <div class="ml-4">This role has been offered to alternates.</div>
+	    <div class="ml-4">This role was not signed for and
+	      has been offered to alternates.</div>
 	  </div>
 	</div>
 	{% else %}
@@ -92,7 +99,7 @@
 	<div class="col-5 pull-7">
 	  <div class="form-control-static text-danger">
 	    <div class="fa fa-exclamation-triangle pull-left mt-1"> </div>
-	    <div class="ml-4">This role has already been taken.</div>
+	    <div class="ml-4">Someone else has accepted this role.</div>
 	  </div>
 	</div>
 	{% endif %}

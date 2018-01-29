@@ -151,6 +151,8 @@ class SigningView(FixHeaderUrlMixin, ListView):
         seconds = all_shows.filter(casting_meta__release_meta__stage__lt=5)
         context["unpublished"] = []
         context["seconds"] = []
+        context["wrong_user"] = (self.request.user.is_authenticated and
+                                 SIGNING_ACTOR_KEY in self.request.session)
         for key, qs in (("unpublished", unpublished),
                         ("seconds", seconds)):
             for i in qs.distinct().values_list(
@@ -188,6 +190,12 @@ def actor_token_auth(request, token):
         request.session[SIGNING_ACTOR_KEY] = user.pk
     except Exception:
         messages.error(request, "Please request a new signing link.")
+    finally:
+        return HttpResponseRedirect(reverse("casting:signing"))
+
+def actor_token_logout(request):
+    try:
+        del request.session[SIGNING_ACTOR_KEY]
     finally:
         return HttpResponseRedirect(reverse("casting:signing"))
 
@@ -260,4 +268,5 @@ urlpatterns = [
     url(r'^sign/$', SigningView.as_view(), name="signing"),
     url(r'^getlink/$', RequestLinkView.as_view(), name="request_link"),
     url(r'^t/([A-Za-z0-9+-]{86})/$', actor_token_auth, name="actor_token"),
+    url(r'^sign/logout/$', actor_token_logout, name="actor_token_logout"),
 ]
