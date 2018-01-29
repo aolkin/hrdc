@@ -101,7 +101,6 @@ class QueuedEmail(models.Model):
                     self.status = "<Unknown>"
             else:
                 self.status = "<Not AnyMail>"
-            unlink(self.msg)
         self.sent = timezone.now()
         self.save()
         return msg
