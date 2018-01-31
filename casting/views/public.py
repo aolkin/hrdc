@@ -169,7 +169,8 @@ class SigningView(FixHeaderUrlMixin, ListView):
                 casting_meta__release_meta__stage__gte=4,
                 casting_meta__cast_submitted=True)
         qs = super().get_queryset().filter(
-            actor=self.get_actor(), character__show__show__in=shows).order_by(
+            actor=self.get_actor(), character__show__show__in=shows,
+            character__hidden_for_signing=False).order_by(
                 "character__show", "order")
         return qs
 
