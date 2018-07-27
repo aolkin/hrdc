@@ -7,3 +7,4 @@ django-bootstrap-form==3.3
 django-model-utils==3.0.0
 Twisted[http2]==17.9.0
 Twisted[tls]==17.9.0
+service-identity==17.0.0
