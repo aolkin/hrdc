@@ -234,7 +234,7 @@ class MetaAdmin(admin.ModelAdmin):
         if obj:
             return ["show"] + fields
         else:
-            return self.fields
+            return fields
     
     def contact_email_link(self, obj):
         return format_html('<a href="mailto:{0}">{0}</a>', obj.contact_email)
