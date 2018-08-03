@@ -1,9 +1,9 @@
-Django==2.0
+Django==2.1
+django-anymail~=3.0
 bleach==1.5.0
 celery==4.1.0
 channels==1.1.8
-django-anymail==1.2
-django-bootstrap-form==3.3
+django-bootstrap-form==3.4
 django-model-utils==3.0.0
 Twisted[http2]==17.9.0
 Twisted[tls]==17.9.0
