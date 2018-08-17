@@ -55,7 +55,8 @@
   <div class="text-muted text-right">(since {{ audition.busy.called_time|date:"g:i A" }})</i></div>
   {% elif audition.status == "waiting" %}
   <a href="{% url 'casting:audition_call' audition.pk %}"
-     class="btn btn-primary btn-sm ajaxify">call</a>
+     class="btn btn-primary btn-sm ajaxify call-btn"
+     data-actor-name="{{ audition.actor.get_full_name }}">ready</a>
   {% elif audition.status == "called" %}<br>
   <a href="{% url 'casting:audition_cancel' audition.pk %}"
      class="btn btn-danger btn-sm ajaxify">cancel</a>
