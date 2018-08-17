@@ -9,3 +9,8 @@ $(document.body).on("click", ".btn-copy-excel", function(){
     }
     el.attr("hidden", true);
 });
+
+$(document.body).on("click", ".call-btn", function() {
+    $("#fetch-actor-name").text($(this).data("actor-name"));
+    $("#fetch-msg-modal").modal("show");
+});

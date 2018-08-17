@@ -230,7 +230,7 @@ class ActorSeasonMeta(Season):
 class Audition(AssociateShowMixin):
     STATUSES = (
         ("waiting", "Waiting"),
-        ("called", "Called"),
+        ("called", "Fetched"),
         ("done", "Auditioned")
     )
     actor = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
