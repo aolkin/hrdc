@@ -9,13 +9,23 @@
 {% include "casting/sign_in/selected_shows.html" %}
 <p class="lead text-center">
   If you are not cast in {{ object.show }}, would you be interested in doing
-  technical or backstage work on this production? If so, in what areas?
+  technical or backstage work on this production?
 </p>
 <div class="row justify-content-center">
   <form method="POST" class="col-lg-6 col-md-8 audition-sign-in-shows">
+    <div class="row justify-content-center">
+      <div id="tech-interest-buttons">
+	<button type="submit" class="btn btn-danger btn-lg mr-3">No</button>
+	<button type="button" class="btn btn-info btn-lg mr-3">Maybe...</button>
+	<button type="button" class="btn btn-success btn-lg">Yes!</button>
+      </div>
+    </div>
     {% csrf_token %}
-    {{ form|bootstrap }}
-    <button type="submit" class="btn btn-primary btn-block">Continue</button>
+    <div class="tech-interest-form" style="display: none;">
+      <p class="text-center">Do you have any particular areas of interest?</p>
+      {{ form|bootstrap }}
+      <button type="submit" class="btn btn-primary btn-block">Continue</button>
+    </div>
   </form>
 </div>
 {% endblock %}

@@ -4,8 +4,12 @@ from django.contrib.auth.admin import GroupAdmin
 from django.contrib.auth.models import Group, Permission
 
 from django import forms
+from django.conf import settings
 
 from .models import *
+
+admin.site.site_title = settings.ADMIN_SITE_TITLE
+admin.site.site_header = settings.ADMIN_SITE_TITLE
 
 class UserCreationForm(forms.ModelForm):
     class Meta:
