@@ -210,10 +210,10 @@ class IndexView(FixHeaderUrlMixin, TemplateView):
     
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context["shows"] = (("Callback", "casting:view_callbacks", [], "info"),
-                            ("Cast", "casting:view_cast", [], "primary"))
+        context["shows"] = (("Cast", "casting:view_cast", [], "primary"),
+                            ("Callback", "casting:view_callbacks", [], "info"))
         for show in self.get_shows():
-            if show.callbacks_released and show.release_meta.stage < 3:
+            if show.callbacks_released: # and show.release_meta.stage < 3:
                 context["shows"][0][2].append(show)
             if show.cast_list_released:
                 context["shows"][1][2].append(show)

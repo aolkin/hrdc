@@ -29,7 +29,7 @@ class StaffViewMixin(UserIsPdsmMixin):
         }]
         
         for show in [i.casting_meta for i in
-                     self.request.user.show_set.current_season()
+                     self.request.user.show_set.all().order_by("-pk")
                      if hasattr(i, "casting_meta")]:
             submenu = menu[str(show)] = []
             is_active = hasattr(self, "object") and self.object.pk == show.pk

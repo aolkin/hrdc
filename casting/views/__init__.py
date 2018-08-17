@@ -31,4 +31,4 @@ def admin(request):
         return redirect("casting:view_cast", cm.pk)
     return render(request, "bt/default.html")
 admin.verbose_name = "Common Casting"
-admin.help_text = "administer Common Casting"
+admin.help_text = "view Common Casting lists"
