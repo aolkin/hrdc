@@ -68,7 +68,7 @@
     </div>
     {% endif %}
     {% endif %}
-    <p class="lead">{{ object.cast_list_description|linebreaksbr }}</p>
+    <p class="lead">{{ object.cast_list_description|urlize|linebreaksbr }}</p>
   </div>
 </div>
 <div class="container-fluid limited-container-1200">
@@ -130,7 +130,7 @@
 	  {% endif %}
 	  {% if character.cast_description %}
 	  <small class="text-muted">
-	    {{ character.cast_description|linebreaksbr }}
+	    {{ character.cast_description|urlize|linebreaksbr }}
 	  </small>
 	  {% endif %}
 	</div>
