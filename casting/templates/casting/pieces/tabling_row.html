@@ -2,7 +2,12 @@
 <td class="text-nowrap align-middle">
   {{ audition.signed_in|date:"g:i A" }}
 </td>
-<td>{{ audition.actor.get_full_name }}</td>
+<td>{{ audition.actor.get_full_name }}
+  {% if audition.actor.is_suspended %}
+  <i class="fa fa-times-rectangle text-danger" data-toggle="tooltip"
+     title="This actor is currently suspended from Common Casting"></i>
+  {% endif %}
+</td>
 <td>{{ audition.actor.pgps|break_punctuation }}</td>
 <td>{{ audition.actor.affiliationyear|break_punctuation }}</td>
 <td>{{ audition.show }}</td>

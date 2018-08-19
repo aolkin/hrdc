@@ -41,6 +41,10 @@
 {% endif %}
 ">
     more info</a>
+  {% if audition.actor.is_suspended %}
+  <i class="fa fa-times-rectangle text-danger" data-toggle="tooltip"
+     title="This actor is currently suspended from Common Casting and you will be unable to cast them"></i>
+  {% endif %}
 </td>
 <td class="align-middle {% if audition.status == "done" %}text-success{% endif %}">
   {{ audition.get_status_display }}
