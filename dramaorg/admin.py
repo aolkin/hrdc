@@ -35,7 +35,8 @@ class UserAdmin(BaseUserAdmin):
     fieldsets = (
         (None, {'fields': (('first_name', 'last_name'),
                            ('pgps', 'gender_pref'),
-                           ('affiliation', 'year'))}),
+                           ('affiliation', 'year'),
+                           ('suspended_until',))}),
         ('Contact Info', {'fields': ('email', 'phone')}),
         ('Permissions', {'fields': ('is_active', 'is_superuser', 'groups')}),
         ('Information', {'fields': ('last_login', 'date_joined', 'password')}),
