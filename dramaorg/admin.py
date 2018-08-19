@@ -45,7 +45,8 @@ class UserAdmin(BaseUserAdmin):
         (None, {'fields': (('first_name', 'last_name'),
                            ('pgps', 'gender_pref'),
                            ('affiliation', 'year'), 'email', 'phone',
-                           'groups', 'is_active', 'password')}),
+                           'suspended_until', 'groups', 'is_active',
+                           'password')}),
     )
     add_fieldsets = (
         (None, {
@@ -57,12 +58,13 @@ class UserAdmin(BaseUserAdmin):
     add_form_template = "dramaadmin/invite_user.html"
     list_display = ('__str__', 'email', 'phone', 'affiliationyear',
                     'get_pdsm', 'has_password', 'get_active')
-    list_filter = ('is_active','is_superuser', 'affiliation', 'year')
+    list_filter = ('is_active','is_superuser', 'affiliation', 'year',
+                   'suspended_until')
     search_fields = ('email', 'first_name', 'last_name',)
     readonly_fields = ('last_login', 'date_joined')
     staff_readonly = ('email', 'first_name', 'last_name',
                       'pgps', 'gender_pref', 'phone', 'groups',
-                      'affiliation', 'year', 'is_active')
+                      'affiliation', 'year', 'is_active', 'suspended_until')
     actions = [generate_tokens, clear_tokens] if settings.DEBUG else []
     ordering = ('date_joined',)
     save_as_continue = True
