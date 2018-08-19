@@ -219,6 +219,7 @@ p.lead.only-small {
 }
 
 .tech-interest-icon {
+    display: inline-block;
     margin-left: -1.5em;
     padding-right: .3em;
 }
