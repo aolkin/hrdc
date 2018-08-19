@@ -2,7 +2,7 @@
 <li class="list-group-item stream-item {% if doblank %}blank signing-blank{% endif %}" {% boundattrs signing %}>
   <div class="input-group input-group-sm">
     <div class="input-group-prepend">
-      <span class="input-group-text signing-count"></span>
+      <span class="input-group-text signing-count {% if not object.first_cast_submitted or object.first_cast_submitted and signing.order < character.allowed_signers and not doblank %}signing-count-no-alt{% endif %}"></span>
     </div>
     {% boundinput signing "order" type="hidden" %}
     {% if doblank or signing.editable %}

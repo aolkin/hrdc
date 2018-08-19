@@ -31,7 +31,7 @@ class CharacterBinding(AssociatedShowBinding):
     model = Character
     stream = "character"
     fields = ("name", "callback_description", "allowed_signers",
-              "hidden_for_signing")
+              "hidden_for_signing", "cast_description")
 
     @classmethod
     def group_names(cls, instance):

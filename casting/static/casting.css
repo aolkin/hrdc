@@ -154,15 +154,26 @@ table .btn {
     overflow: auto;
 }
 
+.card-deck.horizontal-scroll>.card.cast-card>.card-footer:last-child {
+    height: 186px;
+}
+
+.card-deck.horizontal-scroll>.card.cast-card>.card-block.list-group.list-group-flush {
+    margin-bottom: 186px;
+}
+
 .card, .restart-signing-numbering {
     counter-reset: signing-counter;
 }
 .list-group .list-group-item.blank .signing-count {
     display: none;
 }
+.list-group .list-group-item .signing-count.signing-count-no-alt:before {
+    content: counter(signing-counter);
+}
 .list-group .list-group-item .signing-count:before {
-    color: grey;
     content: "Alt " counter(signing-counter) ":";
+    color: grey;
     counter-increment: signing-counter;
     width: 1rem;
     text-align: right;

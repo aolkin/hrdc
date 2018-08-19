@@ -119,12 +119,20 @@
 	  {% endif %}
 	  {% endfor %}
 	</ul>
-	{% if character.allowed_signers != 1 %}
+	{% if character.allowed_signers != 1 or character.cast_description %}
 	<div class="card-footer py-2 px-3">
+	  {% if character.allowed_signers != 1 %}
 	  <small class="text-muted">
 	    {{ character.allowed_signers|apnumber|capfirst }} actors can sign
 	    for this part.
 	  </small>
+	  <hr class="mb-1 mt-2">
+	  {% endif %}
+	  {% if character.cast_description %}
+	  <small class="text-muted">
+	    {{ character.cast_description|linebreaksbr }}
+	  </small>
+	  {% endif %}
 	</div>
 	{% endif %}
 	{% if character.actors %}
