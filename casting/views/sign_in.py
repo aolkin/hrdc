@@ -96,7 +96,13 @@ class ActorSignInStart(ActorSignInBase, BaseUpdateView):
         self.request.session["building"] = self.object.pk
         self.request.session["show_ids"] = form.cleaned_data["shows"]
         auditions = []
-        
+
+        if self.actor.is_suspended:
+            messages.error(
+                self.request,
+                "You are currently suspended from Common Casting and cannot " +
+                "be cast in productions via Common Casting.")
+                                
         for showspace in form.cleaned_data["shows"]:
             i, space = showspace.split(":")
             space = int(space)
