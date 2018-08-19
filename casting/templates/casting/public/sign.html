@@ -109,6 +109,11 @@
 	  accept this role.
 	</div>
 	{% endif %}
+	{% if i.character.cast_description %}
+	<div class="form-text text-right w-100 mt-1 small">
+	  {{ i.character.cast_description|linebreaksbr }}
+	</div>
+	{% endif %}
       </div>
       {% endfor %}
       <button type="submit" class="btn btn-block btn-primary"

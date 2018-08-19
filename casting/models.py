@@ -312,6 +312,9 @@ class Character(AssociateShowMixin):
     callback_description = models.TextField(
         blank=True, verbose_name="Character Callback Information",
         help_text="Extra information about callbacks for this character.")
+    cast_description = models.TextField(
+        blank=True, verbose_name="Character Details",
+        help_text="Additional information for actors about this character.")
     allowed_signers = models.PositiveSmallIntegerField(
         default=1,
         help_text="Number of actors allowed to sign for this character.")

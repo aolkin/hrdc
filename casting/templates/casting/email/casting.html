@@ -70,7 +70,13 @@
 	    </strong>
 	    {% if role.character.allowed_signers != 1 %}
 	    <p style="margin-left: 20px; margin-bottom: 4px; margin-top: 4px; font-style: italic;">
-	      <em>{{ role.character.allowed_signers|apnumber|capfirst }} actor{{ role.character.allowed_signers|pluralize }} are allowed to sign for this role.</em></p>
+	      <em>{{ role.character.allowed_signers|apnumber|capfirst }} actor{{ role.character.allowed_signers|pluralize }} are allowed to sign for this role.</em>
+	    </p>
+	    {% endif %}
+	    {% if role.character.cast_description %}
+	    <p style="margin-left: 20px; margin-bottom: 12px; margin-top: 4px; font-size: 1em; text-align: center;">
+	      {{ role.character.cast_description|linebreaksbr }}
+	    </p>
 	    {% endif %}
 	  </td>
 	</tr>
