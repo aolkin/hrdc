@@ -35,7 +35,7 @@
 	{% if cb.show.callback_description %}
 	<tr>
 	  <td style="font-style: italic; padding-bottom: 4px; padding-top: 4px; font-size: 1.2em">
-	    <em>{{ cb.show.callback_description|linebreaksbr }}</em>
+	    <em>{{ cb.show.callback_description|urlize|linebreaksbr }}</em>
 	  </td>
 	</tr>
 	{% endif %}
@@ -51,7 +51,7 @@
 	  <td style="padding-top: 4px;">
 	    <strong style="font-size: 1.2em;">{{ cb.character }}</strong>
 	    <p style="margin-left: 20px; margin-bottom: 4px; margin-top: 4px; font-style: italic; font-size: 1.1em;">
-	      <em>{{ cb.character.callback_description|linebreaksbr }}</em>
+	      <em>{{ cb.character.callback_description|urlize|linebreaksbr }}</em>
 	    </p>
 	  </td>
 	</tr>
