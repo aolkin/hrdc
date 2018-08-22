@@ -118,7 +118,8 @@ class ActorSignInStart(ActorSignInBase, BaseUpdateView):
                             CastingMeta.objects.get(id=i)))
                 else:
                     if (obj.space_id != space or
-                        obj.signed_in.date() != timezone.localdate()):
+                        timezone.localdate(obj.signed_in) !=
+                        timezone.localdate()):
                         obj.space_id = space
                         obj.status = Audition.STATUSES[0][0]
                         with suppress_autotime(obj, "signed_in"):
