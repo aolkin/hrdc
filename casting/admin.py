@@ -8,7 +8,8 @@ from .models import *
 
 @admin.register(Signing)
 class SigningAdmin(admin.ModelAdmin):
-    list_display = ('show', 'character', 'order_title', 'actor', 'response')
+    list_display = ('show', 'character', 'order_title', 'actor', 'response',
+                    'tech_req')
     list_display_links = ('response',)
     list_filter = ('character__show', 'character__show__show__year',
                    'character__show__show__season')
@@ -20,7 +21,7 @@ class SigningAdmin(admin.ModelAdmin):
             "fields": ("show", "character", "order_title")
         }),
         ("Signature", {
-            "fields": ("actor", "response"),
+            "fields": ("actor", "response", 'tech_req'),
         }),
     )
     readonly_fields = ("show", "character", "order_title", "actor")
