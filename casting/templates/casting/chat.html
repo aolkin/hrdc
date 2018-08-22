@@ -1,0 +1,18 @@
+<div id="chat-window" class="card">
+  <div class="card-header py-2 px-3">
+    Tabling Chat
+    <button class="btn btn-sm btn-light float-right fa fa-window-minimize">
+  </div>
+  <div class="chat-minimizable">
+    <div class="card-body py-2 px-2 scroll-on-load">
+      <ul id="chat" class="list-unstyled">
+	{% for chat in chat_messages %}
+	{% include "casting/pieces/chat_msg.html" %}
+	{% endfor %}
+      </ul>
+    </div>
+    <div class="card-footer p-1">
+      <input class="form-control form-control-sm" id="chat-entry">
+    </div>
+  </div>
+</div>

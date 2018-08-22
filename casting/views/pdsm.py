@@ -12,8 +12,10 @@ from django.utils import timezone
 
 from config import config
 
+from chat.models import Message
+
 from ..models import *
-from . import get_current_slots, building_model, show_model
+from . import get_current_slots, get_active_slot, building_model, show_model
 from ..utils import UserIsPdsmMixin
 from . import public
 
@@ -88,6 +90,10 @@ class TablingView(StaffViewMixin, DetailView):
             signed_in__date=timezone.localdate(),
             sign_in_complete=True,
             space__building=self.object).order_by("signed_in")
+        context["chat_messages"] = Message.objects.filter(
+            room="building-{}-{}".format(
+                self.object.pk, timezone.localdate())).order_by(
+                    "-timestamp")[:settings.CHAT_LOADING_LIMIT:-1]
         return context
 
 class ShowStaffMixin(StaffViewMixin, SingleObjectMixin):
@@ -132,6 +138,15 @@ class ShowEditor(ShowStaffMixin, UpdateView):
     
 class AuditionView(ShowStaffMixin, DetailView):
     template_name = "casting/audition.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["chat_messages"] = Message.objects.filter(
+            room="building-{}-{}".format(
+                get_active_slot(self.object.pk).space.building.pk,
+                timezone.localdate())).order_by("-timestamp")[
+                    :settings.CHAT_LOADING_LIMIT:-1]
+        return context
 
 class AuditionStatusBase(StaffViewMixin, SingleObjectMixin, View):
     model = Audition

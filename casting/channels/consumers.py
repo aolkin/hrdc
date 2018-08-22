@@ -3,14 +3,33 @@ from channels.generic.websockets import (JsonWebsocketConsumer,
 
 from ..utils import test_pdsm, test_board
 from ..models import CastingMeta
+from ..views import get_active_slot
 
 from .bindings import *
 
-class TablingConsumer(JsonWebsocketConsumer):
+from django.utils import timezone
+
+from chat.models import Message
+
+class ChatConsumer(JsonWebsocketConsumer):
+    http_user = True
+    
+    def get_name(self):
+        return "building-{}-{}".format(self.kwargs["building"],
+                                       timezone.localdate())
+    
+    def connection_groups(self, **kwargs):
+        return ["chat-" + self.get_name()]
+    
+    def receive(self, content, **kwargs):
+        Message.create(self.message.user, self.get_name(), content["msg"])
+    
+class TablingConsumer(ChatConsumer):
     http_user = True
 
     def connection_groups(self, **kwargs):
-        return ["auditions-building-{}".format(kwargs["building"])]
+        return (super().connection_groups(**kwargs) +
+                ["auditions-building-{}".format(kwargs["building"])])
 
     def connect(self, message, **kwargs):
         if not (test_pdsm(message.user) or test_board(message.user)):
@@ -18,11 +37,17 @@ class TablingConsumer(JsonWebsocketConsumer):
             return False
         super().connect(message, **kwargs)
         
-class ShowConsumer(JsonWebsocketConsumer):
+class ShowConsumer(ChatConsumer):
     http_user = True
 
+    def __init__(self, *args, **kwargs):
+        pk = get_active_slot(kwargs["show"]).space.building.pk
+        kwargs.update({ "building": pk })
+        super().__init__(*args, **kwargs)
+    
     def connection_groups(self, **kwargs):
-        return ["auditions-show-{}".format(kwargs["show"])]
+        return (super().connection_groups(**kwargs) +
+                ["auditions-show-{}".format(kwargs["show"])])
 
     def connect(self, message, **kwargs):
         if not (test_pdsm(message.user) and (CastingMeta.objects.get(
