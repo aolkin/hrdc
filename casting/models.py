@@ -157,6 +157,10 @@ class CastingReleaseMeta(models.Model):
                 raise ValidationError(
                 { "second_signing_opens":
                   "Second-round signing must open after first-round signing."})
+
+class TechReqPool(Season):
+    name = models.CharField(max_length=36)
+    shows = models.ManyToManyField("casting.CastingMeta")
             
 class CastingMeta(models.Model):
     show = models.OneToOneField(settings.SHOW_MODEL, on_delete=models.CASCADE,
@@ -177,9 +181,15 @@ class CastingMeta(models.Model):
         default=False, verbose_name="Full Cast")
     contact_email = models.EmailField(
         blank=True, verbose_name="Show Contact Email")
+    
     release_meta = models.ForeignKey(
         CastingReleaseMeta, verbose_name=CastingReleaseMeta._meta.verbose_name,
         on_delete=models.CASCADE)
+    
+    tech_req_pool = models.ForeignKey(TechReqPool, blank=True, null=True,
+                                      on_delete=models.SET_NULL,
+                                      verbose_name="Contributes tech reqers to")
+    num_tech_reqers = models.PositiveSmallIntegerField(default=999)
 
     class Meta:
         verbose_name = "Casting-Enabled Show"
@@ -384,6 +394,8 @@ class Signing(ActorMapping):
     ))
     timed_out = models.BooleanField(default=False)
     alternate_notified = models.BooleanField(default=False)
+    tech_req = models.ForeignKey(CastingMeta, null=True, blank=True,
+                                 on_delete=models.SET_NULL)
 
     def order_num(self):
         return self.order + 1
