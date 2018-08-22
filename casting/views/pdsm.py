@@ -384,7 +384,7 @@ class ShowActors(ShowStaffMixin, DetailView):
             terms = ("",)
         
         auditions = self.get_object().audition_set.filter(
-            Q(actor__suspended_until__lte=datetime.date.today()) |
+            Q(actor__suspended_until__lte=timezone.localdate()) |
             Q(actor__suspended_until__isnull=True),
             sign_in_complete=True)
         for term in terms:
@@ -401,7 +401,7 @@ class ShowActors(ShowStaffMixin, DetailView):
                              i["actor__last_name"])
         else:
             users = get_user_model().objects.filter(
-                Q(suspended_until__lte=datetime.date.today()) |
+                Q(suspended_until__lte=timezone.localdate()) |
                 Q(suspended_until__isnull=True))
             for term in terms:
                 q = Q(first_name__contains=term) | Q(last_name__contains=term)

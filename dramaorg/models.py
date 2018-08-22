@@ -55,7 +55,7 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     @property
     def is_suspended(self):
         return (self.suspended_until and
-                self.suspended_until > datetime.date.today())
+                self.suspended_until > timezone.localdate())
     
     source = models.CharField(default="default", editable=False,
                               max_length=20)
