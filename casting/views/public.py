@@ -192,6 +192,7 @@ class SigningView(FixHeaderUrlMixin, ListView):
             elif res:
                 accepted[i.character.show] = True
             shows[i.character.show].append((i, res))
+        signed = 0
         for signings in shows.values():
             for obj, res in signings:
                 if res is None and accepted[obj.character.show]:
@@ -208,6 +209,11 @@ class SigningView(FixHeaderUrlMixin, ListView):
                         return HttpResponseRedirect(reverse("casting:signing"))
                     obj.response = res
                     obj.save()
+                    signed += 1
+        if signed:
+            messages.success(self.request,
+                             "Successfully signed {} role{}.".format(
+                                 signed, "s" if signed != 1 else ""))
         return HttpResponseRedirect(reverse("casting:signing"))
 
 def actor_token_auth(request, token):
