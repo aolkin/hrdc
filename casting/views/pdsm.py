@@ -90,6 +90,7 @@ class TablingView(StaffViewMixin, DetailView):
             signed_in__date=timezone.localdate(),
             sign_in_complete=True,
             space__building=self.object).order_by("signed_in")
+        context["chat_building"] = self.object
         context["chat_messages"] = Message.objects.filter(
             room="building-{}-{}".format(
                 self.object.pk, timezone.localdate())).order_by(
@@ -141,9 +142,11 @@ class AuditionView(ShowStaffMixin, DetailView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
+        context["chat_building"] = get_active_slot(
+            self.object.pk).space.building
         context["chat_messages"] = Message.objects.filter(
             room="building-{}-{}".format(
-                get_active_slot(self.object.pk).space.building.pk,
+                context["chat_building"].pk,
                 timezone.localdate())).order_by("-timestamp")[
                     :settings.CHAT_LOADING_LIMIT:-1]
         return context

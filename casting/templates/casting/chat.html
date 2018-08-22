@@ -1,6 +1,6 @@
 <div id="chat-window" class="card">
   <div class="card-header py-2 px-3">
-    Tabling Chat
+    <strong>{{ chat_building }}</strong>
     <button class="btn btn-sm btn-light float-right fa fa-window-minimize">
   </div>
   <div class="chat-minimizable">
@@ -12,7 +12,8 @@
       </ul>
     </div>
     <div class="card-footer p-1">
-      <input class="form-control form-control-sm" id="chat-entry">
+      <input class="form-control form-control-sm" id="chat-entry"
+	     placeholder="Type a chat message...">
     </div>
   </div>
 </div>
