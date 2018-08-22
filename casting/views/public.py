@@ -10,6 +10,8 @@ from django.contrib import messages
 
 from django import forms
 
+from collections import defaultdict
+
 from ..models import *
 from ..tasks import signing_email
 
@@ -175,14 +177,37 @@ class SigningView(FixHeaderUrlMixin, ListView):
         return qs
 
     def post(self, *args, **kwargs):
-        signings = [(int(x.split("-")[-1]), int(y)) for x, y in
-                    self.request.POST.items() if
-                    x.startswith("signing-response-") and y]
-        for pk, r in signings:
-            obj = Signing.objects.get(pk=pk)
-            if obj.response == None:
-                obj.response = r
-                obj.save()
+        qs = self.get_queryset().select_related("character", "character__show")
+        shows = defaultdict(list)
+        accepted = defaultdict(bool)
+        for i in qs:
+            res = self.request.POST.get(
+                "signing-response-{}".format(i.pk), i.response)
+            res = bool(int(res)) if res else i.response
+            if accepted[i.character.show]:
+                if res:
+                    messages.error(self.request,
+                                   "You may only accept one role per show!")
+                    return HttpResponseRedirect(reverse("casting:signing"))
+            elif res:
+                accepted[i.character.show] = True
+            shows[i.character.show].append((i, res))
+        for signings in shows.values():
+            for obj, res in signings:
+                if res is None and accepted[obj.character.show]:
+                    res = 0
+                    messages.info(self.request,
+                                  "Since you signed for a role in {}, {} "
+                                  "was automatically rejected.".format(
+                                      obj.character.show, obj.character))
+                if res is not None and res != obj.response:
+                    if obj.response != None:
+                        messages.error(self.request,
+                                       "An error was encountered while saving "
+                                       "your responses. Please try again.")
+                        return HttpResponseRedirect(reverse("casting:signing"))
+                    obj.response = res
+                    obj.save()
         return HttpResponseRedirect(reverse("casting:signing"))
 
 def actor_token_auth(request, token):
