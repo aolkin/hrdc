@@ -18,6 +18,9 @@ def get_current_slots():
             minutes=config.get_float("casting_advance_signin_minutes", 0)),
         end__gte=timezone.localtime())
 
+def get_active_slot(show):
+    return get_current_slots().filter(show_id=show)[0]
+
 show_model = apps.get_model(settings.SHOW_MODEL)
 building_model = apps.get_model(settings.BUILDING_MODEL)
 

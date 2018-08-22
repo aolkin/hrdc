@@ -189,20 +189,28 @@ $(function() {
                 el = $(data.element).attr("id", data.id);
                 $(data.container).append(el);
 
-		$(window).scrollTo(el, 500, {
-                    interrupt: true,
-		});
+                requestAnimationFrame(function() {
+                    if (data.scroll) {
+		        $(data.scroll).scrollTo("100%", 200);
+                    } else {
+		        $(window).scrollTo(el, 500, {
+                            interrupt: true,
+		        });
+                    }
+                });
             }
             el.html(data.html);
             if (data.pulse) {
-                el.addClass(data.pulse);
+                console.log(data);
+                let pulse_el = data.pulse_el ? $(data.pulse_el) : el;
+                pulse_el.addClass(data.pulse);
                 setTimeout(function() {
-                    el.addClass("pulse");
+                    pulse_el.addClass("pulse");
                     setTimeout(function() {
-                        el.removeClass(data.pulse);
+                        pulse_el.removeClass(data.pulse);
                         setTimeout((function(){
                                         this.removeClass("pulse");
-                                    }).bind(el), 1000);
+                                    }).bind(pulse_el), 1000);
                     }, 0);
                 }, 0);
             }
@@ -259,6 +267,20 @@ $(function() {
 
     initTooltips();
     initSelects();
+
+    $("#chat-entry").keypress(function(e) {
+        if (e.which == 13) {
+            bridge.send({
+                msg: $(this).val()
+            });
+            $(this).val("");
+        }
+    });
+
+    $(".scroll-on-load").scrollTo("100%");
+    $("#chat-window .fa-window-minimize").click(function(){
+        $(".chat-minimizable").slideToggle(200);
+    })
 });
 
 $(document.body).on("click", "a.ajaxify", function(e){

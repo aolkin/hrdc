@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'config',
     'emailtracker',
     'basetemplates',
+    'chat',
     'hrdc',
     'django.contrib.humanize',
     'django.contrib.admin',
@@ -212,3 +213,5 @@ CELERY_BEAT_SCHEDULE = {
 
 QUEUED_EMAIL_TEMP = None
 QUEUED_EMAIL_DEBUG = False
+
+CHAT_LOADING_LIMIT = 80
