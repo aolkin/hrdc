@@ -16,10 +16,10 @@ from chat.models import Message
 
 from ..models import *
 from . import get_current_slots, get_active_slot, building_model, show_model
-from ..utils import UserIsPdsmMixin
+from ..utils import UserIsPdsmMixin, UserIsSeasonPdsmMixin, test_spdsm
 from . import public
 
-class StaffViewMixin(UserIsPdsmMixin):
+class StaffViewMixin:
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         current_url = self.request.resolver_match.url_name
@@ -59,7 +59,7 @@ class StaffViewMixin(UserIsPdsmMixin):
                 })
         return context
 
-class IndexView(StaffViewMixin, TemplateView):
+class IndexView(StaffViewMixin, UserIsPdsmMixin, TemplateView):
     verbose_name = "Common Casting"
     help_text = "audition actors and cast your shows"
 
@@ -67,26 +67,27 @@ class IndexView(StaffViewMixin, TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        building_ids = (get_current_slots().distinct()
-                        .values_list("space__building"))
-        context["buildings"] = building_model.objects.filter(
-            pk__in=building_ids).values("pk", "name")
-        for b in context["buildings"]:
-            shows = get_current_slots().filter(
-                space__building=b["pk"]).distinct().values_list(
-                    "show__show__title")
-            b["slots"] = ", ".join([i[0] for i in shows])
+        if self.request.user.is_season_pdsm or self.request.user.is_board:
+            building_ids = (get_current_slots().distinct()
+                            .values_list("space__building"))
+            context["buildings"] = building_model.objects.filter(
+                pk__in=building_ids).values("pk", "name")
+            for b in context["buildings"]:
+                shows = get_current_slots().filter(
+                    space__building=b["pk"]).distinct().values_list(
+                        "show__show__title")
+                b["slots"] = ", ".join([i[0] for i in shows])
             
-        context["first_cast_lists"] = []
-        shows = show_model.objects.current_season().filter(
-            casting_meta__isnull=False)
-        for show in shows:
-            if (show.casting_meta.first_cast_submitted and
-                show.casting_meta.release_meta.stage == 2):
-                context["first_cast_lists"].append(show.casting_meta)
+            context["first_cast_lists"] = []
+            shows = show_model.objects.current_season().filter(
+                casting_meta__isnull=False)
+            for show in shows:
+                if (show.casting_meta.first_cast_submitted and
+                    show.casting_meta.release_meta.stage == 2):
+                    context["first_cast_lists"].append(show.casting_meta)
         return context
 
-class TablingView(StaffViewMixin, DetailView):
+class TablingView(StaffViewMixin, UserIsSeasonPdsmMixin, DetailView):
     template_name = "casting/tabling.html"
     model = building_model
 
@@ -103,7 +104,7 @@ class TablingView(StaffViewMixin, DetailView):
                     "-timestamp")[:settings.CHAT_LOADING_LIMIT:-1]
         return context
 
-class ShowStaffMixin(StaffViewMixin, SingleObjectMixin):
+class ShowStaffMixin(StaffViewMixin, UserIsPdsmMixin, SingleObjectMixin):
     model = CastingMeta
     
     test_silent = False
@@ -119,7 +120,7 @@ class ShowStaffMixin(StaffViewMixin, SingleObjectMixin):
                                    "different user?")
         return False
 
-class ShowEditor(ShowStaffMixin, UpdateView):
+class ShowEditor(ShowStaffMixin, UserIsPdsmMixin, UpdateView):
     fields = ("contact_email",)
     success_url = reverse_lazy("casting:index")
     template_name = "casting/show_editor.html"
@@ -143,7 +144,7 @@ class ShowEditor(ShowStaffMixin, UpdateView):
         context["legal"] = self.test_func()
         return context
     
-class AuditionView(ShowStaffMixin, DetailView):
+class AuditionView(ShowStaffMixin, UserIsPdsmMixin, DetailView):
     template_name = "casting/audition.html"
 
     def get_context_data(self, *args, **kwargs):
@@ -194,7 +195,7 @@ def clear_session_vars(session, name):
         if var in session:
             del session[var]
                 
-class ActorListView(ShowStaffMixin, DetailView):
+class ActorListView(ShowStaffMixin, UserIsPdsmMixin, DetailView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["character_blank"] = Character()
@@ -241,7 +242,7 @@ class CastListView(ActorListView):
         else:
             return super().get(*args, **kwargs)
             
-class SubmitView(ShowStaffMixin, View): 
+class SubmitView(ShowStaffMixin, UserIsPdsmMixin, View): 
     def get(self, *args, **kwargs):
         self.object = self.get_object()
         clear_session_vars(self.request.session, self.var_name)
@@ -401,7 +402,7 @@ class CastSubmitView(SubmitView):
                 "cast list" if self.object.cast_submitted else
                 "first-round casting", self.object))
     
-class ShowActors(ShowStaffMixin, DetailView):
+class ShowActors(ShowStaffMixin, UserIsPdsmMixin, DetailView):
     def get(self, *args, **kwargs):
         if "term" in self.request.GET:
             terms = self.request.GET["term"].split(" ")
@@ -446,7 +447,7 @@ class ActorName(UserIsPdsmMixin, BaseDetailView):
             "text": user.get_full_name(),
         })
 
-class TechReqView(ShowStaffMixin, DetailView):
+class TechReqView(ShowStaffMixin, UserIsPdsmMixin, DetailView):
     template_name = "casting/tech_reqs.html"
     
     def get_context_data(self, *args, **kwargs):

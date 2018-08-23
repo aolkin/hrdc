@@ -58,7 +58,7 @@ class UserAdmin(BaseUserAdmin):
     add_form = UserCreationForm
     add_form_template = "dramaadmin/invite_user.html"
     list_display = ('__str__', 'email', 'phone', 'affiliationyear',
-                    'get_pdsm', 'has_password', 'get_active')
+                    'get_pdsm', 'get_season_pdsm', 'has_password')
     list_filter = ('is_active','is_superuser', 'affiliation', 'year',
                    'suspended_until')
     search_fields = ('email', 'first_name', 'last_name',)
@@ -84,6 +84,11 @@ class UserAdmin(BaseUserAdmin):
         return obj.is_pdsm
     get_pdsm.boolean = True
     get_pdsm.short_description = "PDSM"
+
+    def get_season_pdsm(self, obj):
+        return obj.is_season_pdsm
+    get_season_pdsm.boolean = True
+    get_season_pdsm.short_description = "Season PDSM"
 
     def get_active(self, obj):
         return obj.is_active
