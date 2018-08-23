@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from anymail.message import AnymailMessage
 from django.template.loader import get_template
 from django.db import transaction
-import logging, bleach, re
+import logging, bleach, re, time
 
 from .models import *
 from .utils import *
@@ -36,6 +36,8 @@ def get(*args, **kwargs):
         return None
 
 def queue_msg(msg, name, ident="", silent=True):
+    if not ident:
+        ident = time.time()
     obj, created = QueuedEmail.objects.get_or_create(
         name=name, ident=str(ident), to=extract_address(msg.to[0]))
     if obj.sent:
