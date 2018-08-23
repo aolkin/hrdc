@@ -43,7 +43,7 @@
       <small>
 	You may also leave any number of roles without a response and
 	return to them later.
-	<strong>Note that accepting a role in a show will
+	<strong>Note that accepting any role in a show (even an alternate) will
 	  automatically reject the rest of the roles in that show!</strong>
       </small>
     </p>
@@ -58,7 +58,7 @@
     <p class="text-center mb-0">
       <!-- Actor help -->
     </p>
-    <form method="POST">
+    <form method="POST" action="#">
       {% csrf_token %}
       {% for i in object_list %}
       {% ifchanged i.show %}
@@ -152,6 +152,9 @@
 	      title="Please double-check your responses before submitting, as they cannot be changed later.">
 	Submit Responses
       </button>
+      <p class="lead text-center mt-3">
+	You will receive an email confirming your signatures.
+      </p>
     </form>
   </div>
 </div>

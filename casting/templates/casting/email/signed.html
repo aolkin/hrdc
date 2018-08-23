@@ -1,0 +1,45 @@
+{% extends "casting/email/base.html" %}
+{% load email %}
+{% load bt %}
+{% load humanize %}
+
+{% block body %}
+<table cellpadding="0" cellspacing="8" width="100%">
+  <tr>
+    <td align="center">
+      {% if IS_HTML %}
+      <h2 style="margin-bottom: 4px; margin-top: 18px;">Successfully Signed {{ signed|length|apnumber|capfirst }} Role{{ signed|length|pluralize }}</h2>
+      {% endif %}
+    </td>
+  </tr>
+  {% if IS_HTML %}
+  <style>
+    .special-link {
+    text-decoration: none;
+    color: #666666;
+    }
+    .special-link:hover {
+    text-decoration: underline;
+    color: #333333;
+    }
+  </style>
+  {% endif %}
+  {% for role in signed %}
+  <tr>
+    <td align="left" style="font-size: 1.1em">
+      <span style="font-weight: 600">{{ role.character }}</span> in <em>{{ role.character.show }}</em>: {% if role.response %}<strong>ACCEPTED</strong>{% if role.tech_req %} <small>(Tech Req: <em>{{ role.tech_req }}</em>)</small>{% endif %}{% else %}REJECTED{% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+  <tr>
+    <td align="center" style="font-weight: bolder; font-size: 1.1em;">
+      {% href 'casting:actor_token' 'Click here' user.login_token %} to sign for other roles online.
+    </td>
+  </tr>
+  <tr>
+    <td align="center" style="padding-top: 8px;">
+      {% href 'casting:public_index' 'view all cast lists' class='special-link' %}
+    </td>
+  </tr>
+</table>
+{% endblock %}

@@ -12,6 +12,8 @@ from django import forms
 
 from collections import defaultdict
 
+from emailtracker.tools import render_for_user
+
 from ..models import *
 from ..tasks import signing_email
 
@@ -210,7 +212,7 @@ class SigningView(FixHeaderUrlMixin, ListView):
                                    "show you are performing in!")
                     return HttpResponseRedirect(reverse("casting:signing"))
             shows[i.character.show].append((i, res, tech))
-        signed = 0
+        signed = []
         for signings in shows.values():
             for obj, res, tech in signings:
                 if res is None and accepted[obj.character.show_id]:
@@ -242,11 +244,16 @@ class SigningView(FixHeaderUrlMixin, ListView):
                             continue
                         obj.tech_req = tshow
                     obj.save()
-                    signed += 1
+                    signed.append(obj)
         if signed:
             messages.success(self.request,
                              "Successfully signed {} role{}.".format(
-                                 signed, "s" if signed != 1 else ""))
+                                 len(signed), "s" if len(signed) != 1 else ""))
+            render_for_user(self.request.user, "casting/email/signed.html",
+                            "signed", "-".join([str(i.pk) for i in signed]),
+                            { "signed": signed },
+                            subject="Signing Confirmation",
+                            tags=["casting", "signing_confirmation"])
         return HttpResponseRedirect(reverse("casting:signing"))
 
 def actor_token_auth(request, token):
