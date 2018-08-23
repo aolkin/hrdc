@@ -2,9 +2,30 @@ from django.contrib import admin
 from django import forms
 from django.utils import timezone
 from django.utils.html import format_html
+from django.contrib import messages
 from datetime import timedelta
 
+from collections import defaultdict
+
+from emailtracker.tools import render_for_user
+
 from .models import *
+
+def send_confirmation(modeladmin, request, qs):
+    actors = defaultdict(list)
+    for i in qs.filter(response__isnull=False):
+        actors[i.actor].append(i)
+    emails = 0
+    for actor, signed in actors.items():
+        render_for_user(actor, "casting/email/signed.html",
+                        "signed", context={ "signed": signed },
+                        subject="Signing Confirmation",
+                        tags=["casting", "signing_confirmation", "admin"])
+        emails += 1
+    messages.success(request, "Sent {} email{}.".format(
+        emails, "s" if emails != 1 else ""))
+send_confirmation.short_description = ("Send confirmation emails for "
+                                       "selected signatures")
 
 @admin.register(Signing)
 class SigningAdmin(admin.ModelAdmin):
@@ -15,6 +36,7 @@ class SigningAdmin(admin.ModelAdmin):
                    'character__show__show__season')
     search_fields = ('actor__first_name', 'actor__last_name',
                      'character__name')
+    actions = [send_confirmation]
     
     fieldsets = (
         ("Role", {
