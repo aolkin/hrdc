@@ -15,6 +15,9 @@ def get_admin_group():
         return None
     except ProgrammingError:
         return None
+
+def add_view_permissions(*models):
+    add_permissions(models, Q(codename__contains="view"))
     
 def add_change_permissions(*models):
     add_permissions(models,

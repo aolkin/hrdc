@@ -38,7 +38,8 @@ class UserAdmin(BaseUserAdmin):
                            ('affiliation', 'year'),
                            ('suspended_until',))}),
         ('Contact Info', {'fields': ('email', 'phone')}),
-        ('Permissions', {'fields': ('is_active', 'is_superuser', 'groups')}),
+        ('Permissions', {'fields': ('is_active', 'is_superuser', 'groups'),
+                         'classes': ('collapse',)}),
         ('Information', {'fields': ('last_login', 'date_joined', 'password')}),
     )
     staff_fieldsets = (
@@ -114,9 +115,9 @@ class UserAdmin(BaseUserAdmin):
             
 @admin.register(Show)
 class ShowAdmin(admin.ModelAdmin):
-    list_display = ('title', 'seasonstr', 'space', 'people') #, 'invisible')
-    list_filter = ('season', 'year', 'space') #, 'invisible')
-    #list_editable = ('invisible',)
+    list_display = ('title', 'seasonstr', 'space',
+                    'residency_starts', 'residency_ends') 
+    list_filter = ('season', 'year', 'space')
     autocomplete_fields = ('staff',)
     fields = ('title', ('season', 'year'), 'space',
               ('residency_starts', 'residency_ends'), 'staff', 'slug',

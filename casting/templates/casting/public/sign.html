@@ -40,9 +40,12 @@
       Accept or reject the roles you've been cast as below:
     </p>
     <p class="lead text-center only-small">
-      <small>You may also leave any number of roles without a response and
-	return to them later. <strong>Note that accepting a role in a show will
-	  automatically reject the rest of the roles in that show!</small>
+      <small>
+	You may also leave any number of roles without a response and
+	return to them later.
+	<strong>Note that accepting a role in a show will
+	  automatically reject the rest of the roles in that show!</strong>
+      </small>
     </p>
     {% if seconds %}
     <div class="text-center alert alert-warning">
@@ -95,6 +98,33 @@
 	  <option selected value="">No Response</option>
 	  {% endif %}
 	</select>
+	{% if i.character.show.tech_req_pool and user.year != i.character.show.tech_req_pool.exempt_year and i.response != 0 %}
+	<label class="col-7 push-5 mt-1 text-right text-secondary">
+	  Fulfill the tech req via</label>
+	<select class="form-control form-control-sm custom-select
+		custom-select-sm col-5 pull-7"
+		name="signing-tech-req-{{ i.pk }}" data-toggle="tooltip"
+		title="Signing for {{ i.character.show }} requires you to
+		fulfill a tech req on one of these shows."
+		{% if i.response is not None %}disabled>
+	  {% if i.tech_req %}
+	  <option selected>{{ i.tech_req }}</option>
+	  {% endif %}
+	  {% else %}>
+	  {% for t in i.character.show.tech_req_pool.shows.all %}
+	  {% if t != i.character.show %}
+	  <option value="{{ t.pk }}" {% if user in t.tech_actors or user in t.signed_actors or t.show in i.character.show.show or not t.needs_more_tech_reqers %}disabled{% endif %}>
+	    {{ t }} {% if not t.needs_more_tech_reqers %}(Full){% endif %}
+	    {% if user in t.tech_actors %}(already tech req-ing){% endif %}
+	    {% if user in t.signed_actors %}(already performing in){% endif %}
+	    {% if t.show in i.character.show.show %}
+	    (overlapping residency){% endif %}
+	  </option>
+	  {% endif %}
+	  {% endfor %}
+	  {% endif %}
+	</select>
+	{% endif %}
 	{% endif %}
 	{% else %}
 	<div class="col-5 pull-7">

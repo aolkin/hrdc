@@ -51,6 +51,12 @@ class StaffViewMixin(UserIsPdsmMixin):
                     "url": reverse("casting:cast_list", args=(show.pk,)),
                     "active": is_active and current_url == "cast_list"
                 })
+            if show.techreqpool_set.exists():
+                submenu.append({
+                    "name": "Tech Reqs",
+                    "url": reverse("casting:tech_reqs", args=(show.pk,)),
+                    "active": is_active and current_url == "tech_reqs"
+                })
         return context
 
 class IndexView(StaffViewMixin, TemplateView):
@@ -142,11 +148,12 @@ class AuditionView(ShowStaffMixin, DetailView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context["chat_building"] = get_active_slot(
-            self.object.pk).space.building
+        active_slot = get_active_slot(self.object.pk)
+        context["chat_building"] = (active_slot.space.building if active_slot
+                                    else 0)
         context["chat_messages"] = Message.objects.filter(
             room="building-{}-{}".format(
-                context["chat_building"].pk,
+                context["chat_building"].pk if context["chat_building"] else 0,
                 timezone.localdate())).order_by("-timestamp")[
                     :settings.CHAT_LOADING_LIMIT:-1]
         return context
@@ -217,7 +224,7 @@ class CallbackView(ActorListView):
             return self.inline_public(public.CallbackView())
         else:
             return super().get(*args, **kwargs)
-    
+
 class CastListView(ActorListView):
     template_name = "casting/cast_list.html"
     
@@ -438,6 +445,13 @@ class ActorName(UserIsPdsmMixin, BaseDetailView):
             "id": user.pk,
             "text": user.get_full_name(),
         })
+
+class TechReqView(ShowStaffMixin, DetailView):
+    template_name = "casting/tech_reqs.html"
+    
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        return context
     
 urlpatterns = [
     url('^$', IndexView.as_view(), name='index'),
@@ -464,6 +478,10 @@ urlpatterns = [
         url(r'^cast/', include([
             url('^$', CastListView.as_view(), name="cast_list"),
             url('^submit/$', CastSubmitView.as_view(), name="cast_submit"),
+        ])),
+        
+        url(r'^techreqs/', include([
+            url('^$', TechReqView.as_view(), name="tech_reqs"),
         ])),
     ])),
     url('^show/\d+/[a-z]+/actor/(?P<pk>\d+)$', ActorName.as_view(),

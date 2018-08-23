@@ -180,34 +180,65 @@ class SigningView(FixHeaderUrlMixin, ListView):
         qs = self.get_queryset().select_related("character", "character__show")
         shows = defaultdict(list)
         accepted = defaultdict(bool)
+        techreqs = defaultdict(bool)
         for i in qs:
+            if i.response:
+                tech = str(i.tech_req.pk) if i.tech_req else None
+            else:
+                tech = self.request.POST.get("signing-tech-req-{}".format(i.pk))
             res = self.request.POST.get(
                 "signing-response-{}".format(i.pk), i.response)
             res = bool(int(res)) if res else i.response
-            if accepted[i.character.show]:
-                if res:
+            if res:
+                if tech:
+                    if techreqs[tech]:
+                        messages.error(self.request,
+                                       "You cannot fulfill your tech req with "
+                                       "the same show twice!")
+                        return HttpResponseRedirect(reverse("casting:signing"))
+                    techreqs[tech] = True
+                if accepted[i.character.show_id]:
                     messages.error(self.request,
                                    "You may only accept one role per show!")
                     return HttpResponseRedirect(reverse("casting:signing"))
-            elif res:
-                accepted[i.character.show] = True
-            shows[i.character.show].append((i, res))
+                accepted[i.character.show_id] = True
+                if tech and accepted[int(tech)]:
+                    messages.error(self.request,
+                                   "You cannot fulfill your tech req with a "
+                                   "show you are performing in!")
+                    return HttpResponseRedirect(reverse("casting:signing"))
+            shows[i.character.show].append((i, res, tech))
         signed = 0
         for signings in shows.values():
-            for obj, res in signings:
-                if res is None and accepted[obj.character.show]:
+            for obj, res, tech in signings:
+                if res is None and accepted[obj.character.show_id]:
                     res = 0
                     messages.info(self.request,
                                   "Since you signed for a role in {}, {} "
                                   "was automatically rejected.".format(
                                       obj.character.show, obj.character))
                 if res is not None and res != obj.response:
-                    if obj.response != None:
+                    if obj.response is not None or obj.tech_req is not None:
                         messages.error(self.request,
                                        "An error was encountered while saving "
                                        "your responses. Please try again.")
                         return HttpResponseRedirect(reverse("casting:signing"))
                     obj.response = res
+                    if res and tech:
+                        tshow = CastingMeta.objects.get(pk=int(tech))
+                        if tshow.show in obj.character.show.show:
+                            messages.error(self.request,
+                                           "You cannot tech req {}, since it "
+                                           "overlaps with {}!".format(
+                                               tshow, obj.character.show))
+                            continue
+                        if not tshow.needs_more_tech_reqers:
+                            messages.error(self.request,
+                                           "{} already has the maximum number "
+                                           "of tech reqers allowed.".format(
+                                               tshow))
+                            continue
+                        obj.tech_req = tshow
                     obj.save()
                     signed += 1
         if signed:
