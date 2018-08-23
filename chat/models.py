@@ -1,7 +1,8 @@
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
 
 from channels.generic.websockets import JsonWebsocketConsumer
 
@@ -45,4 +46,17 @@ def send_message(sender, instance, created, raw, **kwargs):
             }),
             "pulse": "bg-dark text-light",
             "pulse_el": "#chat-window .card-header",
+        })
+
+@receiver(pre_delete)
+def censor_message(sender, instance, *args, **kwargs):
+    if sender == Message:
+        instance.message = mark_safe("<em>*deleted*</em>")
+        JsonWebsocketConsumer.group_send("chat-{}".format(instance.room), {
+            "container": "#chat",
+            "element": "<li>",
+            "id": "chat-msg-{}".format(instance.pk),
+            "html": render_to_string("casting/pieces/chat_msg.html", {
+                "chat" : instance
+            })
         })

@@ -201,7 +201,6 @@ $(function() {
             }
             el.html(data.html);
             if (data.pulse) {
-                console.log(data);
                 let pulse_el = data.pulse_el ? $(data.pulse_el) : el;
                 pulse_el.addClass(data.pulse);
                 setTimeout(function() {

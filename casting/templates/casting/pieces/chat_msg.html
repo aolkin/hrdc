@@ -1,3 +1,5 @@
-<span class="badge badge-light">{{ chat.nickname }}</span>
-<small class="text-muted">{{ chat.timestamp|time:"h:i" }}</small>
-<p class="p-1 mb-2">{{ chat.message }}</p>
+<li id="chat-msg-{{ chat.pk }}">
+  <span class="badge badge-light">{{ chat.nickname }}</span>
+  <small class="text-muted">{{ chat.timestamp|time:"h:i" }}</small>
+  <p class="p-1 mb-2">{{ chat.message }}</p>
+</li>
