@@ -27,8 +27,11 @@ building_model = apps.get_model(settings.BUILDING_MODEL)
 
 @user_passes_test(test_board)
 def admin(request):
-    cm = show_model.objects.current_season().filter(
-        casting_meta__isnull=False)[0].casting_meta
+    shows = show_model.objects.current_season().filter(
+        casting_meta__isnull=False)
+    if not shows.exists():
+        return redirect("casting:index")
+    cm = shows[0].casting_meta
     if cm.release_meta.stage < 1:
         return redirect("casting:view_callbacks", cm.pk)
     else:

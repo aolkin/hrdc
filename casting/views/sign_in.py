@@ -18,7 +18,7 @@ import datetime
 
 from ..models import *
 from . import get_current_slots, building_model
-from ..utils import UserIsPdsmMixin, suppress_autotime
+from ..utils import UserIsSeasonPdsmMixin, suppress_autotime
 
 class SignInStartForm(forms.Form):
     email = forms.EmailField(
@@ -40,7 +40,7 @@ class SignInStartForm(forms.Form):
         self.building = instance
         super().__init__(**kwargs)
 
-class ActorSignInBase(UserIsPdsmMixin, TemplateResponseMixin):
+class ActorSignInBase(UserIsSeasonPdsmMixin, TemplateResponseMixin):
     popout = False
 
     def get_success_url(self):

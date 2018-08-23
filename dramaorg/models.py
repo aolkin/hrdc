@@ -119,6 +119,10 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         return self.show_set.exists()
     
     @property
+    def is_season_pdsm(self):
+        return self.show_set.current_season().exists()
+    
+    @property
     def is_staff(self):
         return self.is_board or self.is_superuser
     

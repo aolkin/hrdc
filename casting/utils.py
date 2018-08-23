@@ -9,9 +9,16 @@ def test_board(user):
 def test_pdsm(user):
     return user.is_authenticated and user.is_pdsm
 
+def test_spdsm(user):
+    return user.is_authenticated and user.is_season_pdsm
+
 class UserIsPdsmMixin(UserPassesTestMixin):
     def test_func(self):
         return test_pdsm(self.request.user) or test_board(self.request.user)
+
+class UserIsSeasonPdsmMixin(UserPassesTestMixin):
+    def test_func(self):
+        return test_spdsm(self.request.user) or test_board(self.request.user)
 
 @contextlib.contextmanager
 def suppress_autotime(model, fields):

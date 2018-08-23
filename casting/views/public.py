@@ -21,7 +21,7 @@ class FixHeaderUrlMixin:
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         if self.request.user.is_authenticated:
-            if self.request.user.is_pdsm:
+            if self.request.user.is_season_pdsm:
                 context["BT_header_url"] = 'casting:index'
         else:
             context["BT_header_url"] = 'casting:public_index'
@@ -35,7 +35,8 @@ class PublicView(FixHeaderUrlMixin, DetailView):
         context["user_is_staff"] = self.object.show.user_is_staff(
             self.request.user)
         context["sidebar_menu"] = {}
-        if self.request.user.is_authenticated and self.request.user.is_pdsm:
+        if (self.request.user.is_authenticated and
+            self.request.user.is_season_pdsm):
             submenu = context["sidebar_menu"]["Common Casting"] = []
             submenu.append({
                 "name": "Home",
@@ -88,7 +89,8 @@ class CastView(PublicView):
         context["popout"] = self.popout
         context["allow_view_first_cast"] = (
             self.object.first_cast_released and
-            self.request.user.is_authenticated and self.request.user.is_pdsm)
+            self.request.user.is_authenticated and
+            self.request.user.is_season_pdsm)
         context["show_all_actors"] = ((self.object.first_cast_submitted and
                                        context["user_is_staff"]) or
                                       self.object.cast_list_released)
@@ -99,7 +101,7 @@ class CastView(PublicView):
         if self.request.user.is_authenticated and self.request.user.is_board:
             filter_args = {}
         elif (self.request.user.is_authenticated and
-              self.request.user.is_pdsm):
+              self.request.user.is_season_pdsm):
             filter_args = {
                 "first_cast_submitted": True,
                 "release_meta__stage__gt": 1,
