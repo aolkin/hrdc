@@ -160,7 +160,19 @@ class CastingReleaseMeta(models.Model):
 
 class TechReqPool(Season):
     name = models.CharField(max_length=36)
-    shows = models.ManyToManyField("casting.CastingMeta")
+    shows = models.ManyToManyField(
+        "casting.CastingMeta",
+        help_text="Shows in this pool that need tech reqers.")
+
+    exempt_year = models.PositiveSmallIntegerField(
+        null=True, help_text="Actors in this year do not need to contribute to "
+        "this pool.")
+
+    def __str__(self):
+        return "{} ({})".format(self.name, self.seasonstr())
+    
+    class Meta:
+        verbose_name = "Tech Req Show Pool"
             
 class CastingMeta(models.Model):
     show = models.OneToOneField(settings.SHOW_MODEL, on_delete=models.CASCADE,
@@ -189,7 +201,9 @@ class CastingMeta(models.Model):
     tech_req_pool = models.ForeignKey(TechReqPool, blank=True, null=True,
                                       on_delete=models.SET_NULL,
                                       verbose_name="Contributes tech reqers to")
-    num_tech_reqers = models.PositiveSmallIntegerField(default=999)
+    num_tech_reqers = models.PositiveSmallIntegerField(
+        default=999, verbose_name="Tech Reqers Allowed",
+        help_text="How many tech reqers can this show have?")
 
     class Meta:
         verbose_name = "Casting-Enabled Show"
@@ -197,6 +211,33 @@ class CastingMeta(models.Model):
     def __str__(self):
         return str(self.show)
 
+    @property
+    def signed_actors(self):
+        return [i.actor for i in
+                Signing.objects.filter(character__show=self, response=True)]
+
+    @property
+    def tech_actors(self):
+        return [i.actor for i in
+                Signing.objects.filter(tech_req=self, response=True)]
+    
+    @property
+    def tech_reqers(self):
+        return Signing.objects.filter(tech_req=self, response=True)
+    
+    @property
+    def tech_reqer_count(self):
+        return Signing.objects.filter(tech_req=self, response=True).count()
+    
+    @property
+    def needs_more_tech_reqers(self):
+        return self.tech_reqer_count < self.num_tech_reqers
+
+    @property
+    def techreq_contributors(self):
+        return CastingMeta.objects.filter(
+            tech_req_pool__in=self.techreqpool_set.all())
+    
     @property
     def audition_avg(self):
         avg = Audition.objects.filter(

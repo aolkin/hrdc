@@ -19,7 +19,8 @@ def get_current_slots():
         end__gte=timezone.localtime())
 
 def get_active_slot(show):
-    return get_current_slots().filter(show_id=show)[0]
+    slots = get_current_slots().filter(show_id=show)
+    return slots[0] if slots else None
 
 show_model = apps.get_model(settings.SHOW_MODEL)
 building_model = apps.get_model(settings.BUILDING_MODEL)

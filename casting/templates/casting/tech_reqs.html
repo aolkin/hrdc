@@ -1,0 +1,110 @@
+{% extends "casting/base.html" %}
+
+{% load bt %}
+{% load humanize %}
+{% load config %}
+
+{% block title %}{{ object }} | Tech Reqs{% endblock %}
+
+{% block content %}
+<h2 class="text-center">{{ object }}</h2>
+
+<div class="row justify-content-center">
+  {% if object.tech_req_pool and object.tech_req_pool.shows.exists %}
+  <div class="col-md-6">
+    <div class="card border-secondary">
+      <div class="card-body">
+	<p>
+	  Actors signing for this show must fulfill a tech req on one of the
+	  following shows:
+	</p>
+	<ul>
+	  {% for i in object.tech_req_pool.shows.all %}
+	  {% if i != object %}
+	  <li>{{ i }}</li>
+	  {% endif %}
+	  {% endfor %}
+	</ul>
+	<p>
+	  Actors graduating in {{ object.tech_req_pool.exempt_year }} are
+	  exempt.
+	</p>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  {% if object.techreqpool_set.exists %}
+  <div class="col-md-6">
+    <div class="card border-secondary">
+      <div class="card-body">
+	<p>
+	  This show may receive tech reqers from the following shows:
+	</p>
+	<ul>
+	  {% for i in object.techreq_contributors %}
+	  {% if i != object %}
+	  <li>{{ i }}</li>
+	  {% endif %}
+	  {% endfor %}
+	</ul>
+	<p>At most {{ object.num_tech_reqers|apnumber }}
+	  {% if object.num_tech_reqers == 1 %}person{% else %}people{% endif %}
+	  can fulfill their requirement via this show.
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+<p class="lead text-center my-3">
+  Please contact <a href="mailto:{% option 'tech_contact_email' %}">
+    {% option 'tech_contact_name' %}</a> with any questions about the above.
+</p>
+
+<table class="table table-responsive bt-table-responsive table-striped mt-3">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th class="table-col-xs">PGPs</th>
+      <th>Email</th>
+      <th></th>
+      <th>From Show</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for signing in object.tech_reqers.all|order_by:"character__show" %}
+    <tr>
+      <td>{{ signing.actor.get_full_name }}</td>
+      <td>{{ signing.actor.pgps|break_punctuation }}</td>
+      <td>
+	<a href="mailto:{{ signing.actor.email }}">{{ signing.actor.email }}</a>
+      </td>
+      <td class="copyable" hidden>
+	<textarea>{{ signing.actor.get_full_name }}	{{ signing.actor.email }}	{{ signing.actor.phone }}	{{ signing.actor.affiliation }}	{{ signing.actor.year }}	{{ signing.actor.pgps }}</textarea>
+      </td>
+      <td class="align-middle">
+	<button class="btn btn-secondary btn-sm btn-copy-excel"
+		title="Copy actor information to clipboard for spreadsheets (includes email and phone)"
+		data-toggle="tooltip">
+	  copy</button>
+	<a class="btn btn-primary btn-sm" tabindex="0" role="button"
+	   data-toggle="popover" data-html="true"
+	   data-title="Contact Information" data-placement="top"
+	   data-content="
+<div>{{ signing.actor.get_full_name }}
+<span class=&quot;text-muted&quot;>
+{% if signing.actor.pgps %}({{ signing.actor.pgps }}){% endif %}
+</span><br>
+{{ signing.actor.affiliationyear }}<br>
+<span class=&quot;text-primary&quot;>{{ signing.actor.email }}</span><br>
+{{ signing.actor.pretty_phone }}</div>
+">
+	  more info</a>
+      </td>
+      <td>
+	{{ signing.character.show }}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

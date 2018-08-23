@@ -41,7 +41,8 @@ class ShowConsumer(ChatConsumer):
     http_user = True
 
     def __init__(self, *args, **kwargs):
-        pk = get_active_slot(kwargs["show"]).space.building.pk
+        active_slot = get_active_slot(kwargs["show"])
+        pk = active_slot.space.building.pk if active_slot else 0
         kwargs.update({ "building": pk })
         super().__init__(*args, **kwargs)
     

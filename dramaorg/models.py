@@ -233,6 +233,12 @@ class Show(Season):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
+    def __contains__(self, other):
+        return ((other.residency_starts < self.residency_ends and
+                 other.residency_starts >= self.residency_starts) or
+                (other.residency_ends <= self.residency_ends and
+                 other.residency_ends > self.residency_starts))
+    
     @property
     def residency_length(self):
         return self.residency_ends - self.residency_starts

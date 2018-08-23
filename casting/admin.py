@@ -26,11 +26,6 @@ class SigningAdmin(admin.ModelAdmin):
     )
     readonly_fields = ("show", "character", "order_title", "actor")
     
-    def get_actions(self, request):
-        actions = super().get_actions(request)
-        del actions['delete_selected']
-        return actions
-    
     def has_delete_permission(self, request, obj=None):
         return False
     
@@ -199,13 +194,18 @@ class CallbackSlotAdmin(SlotAdmin):
 class MetaAdmin(admin.ModelAdmin):
     list_display = ('show', 'season', 'casting_release_stage',
                     'callbacks_submitted', 'first_cast_submitted',
-                    'cast_submitted', 'auditioners')
+                    'cast_submitted', 'auditioners', 'tech_reqer_count')
     #exclude = ('callback_description', 'cast_list_description',
      #          'contact_email', 'callbacks_submitted', 'first_cast_submitted',
       #         'cast_submitted')
     fieldsets = (
         ("", {
-            "fields": ('release_meta', 'show')
+            "fields": ('show', 'release_meta',)
+        }),
+        ("Technical Requirement", {
+            "fields": ('tech_req_pool', 'num_tech_reqers'),
+            "description": "To allow this show to receive tech reqers, please "
+            "add it to a Tech Req Show Pool."
         }),
         ("Information", {
             "fields": ('contact_email_link',)
@@ -220,7 +220,8 @@ class MetaAdmin(admin.ModelAdmin):
     )
     readonly_fields = ('contact_email_link',)
     search_fields = ('show__title',)
-    list_filter = ('show__season', 'show__year', 'release_meta', 'slot__day')
+    list_filter = ('show__season', 'show__year', 'release_meta', 'slot__day',
+                   'tech_req_pool')
 
     inlines = [
         AuditionSlotAdmin,
@@ -249,3 +250,15 @@ class MetaAdmin(admin.ModelAdmin):
 
     def casting_release_stage(self, instance):
         return instance.release_meta.get_stage_display()
+
+@admin.register(TechReqPool)
+class TechReqAdmin(admin.ModelAdmin):
+    fields = (('name', 'year', 'season'), 'exempt_year', 'shows')
+    autocomplete_fields = ('shows',)
+
+    list_filter = ("year", "season")
+    list_display = ('name', 'year', 'season', 'exempt_year', 'showstr')
+
+    def showstr(self, obj):
+        return ", ".join([str(i) for i in obj.shows.all()])
+    showstr.short_description = "Shows"
