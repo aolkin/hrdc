@@ -27,7 +27,8 @@ class CastingReleaseMeta(models.Model):
         (2, "First-Round Casting Released"),
         (3, "Cast Lists Released"),
         (4, "Signing Open"),
-        (5, "Alternate Signing Open"),
+        (5, "Sent Signing Reminder"),
+        (6, "Alternate Signing Open"),
     )
     stage = models.PositiveSmallIntegerField(choices=STAGES, default=0)
     prevent_advancement = models.BooleanField(
@@ -38,12 +39,16 @@ class CastingReleaseMeta(models.Model):
     signing_opens = models.DateTimeField(null=True, blank=True)
     second_signing_opens = models.DateTimeField(
         null=True, blank=True, verbose_name="Signing closes")
+    second_signing_warning = models.DateTimeField(
+        null=True, blank=True, verbose_name="Signing closes warning",
+        help_text="Sends a reminder to unsigned actors at this time.")
 
     tracker = FieldTracker(fields=("publish_callbacks",
                                    "publish_first_round_casts",
                                    "publish_casts",
                                    "signing_opens",
-                                   "second_signing_opens"))
+                                   "second_signing_opens",
+                                   "second_signing_warning"))
     
     class Meta:
         verbose_name = "Casting Release Group"
@@ -134,6 +139,23 @@ class CastingReleaseMeta(models.Model):
                     { "signing_opens":
                       "Cast lists have already been published, cannot edit "
                       "signing options." })
+            if self.second_signing_warning:
+                if ((self.stage > 2 or (
+                        not self.tracker.has_changed("publish_casts") and
+                        self.publish_casts <= timezone.now())) and
+                    self.tracker.has_changed("second_signing_warning")):
+                    self.second_signing_warning = self.tracker.previous(
+                        "second_signing_warning")
+                    raise ValidationError(
+                        { "second_signing_warning":
+                          "Cast lists have already been published, cannot "
+                          "edit signing options." })
+                if self.publish_casts >= self.second_signing_warning:
+                    self.second_signing_warning = self.second_signing_warning
+                    raise ValidationError(
+                        { "second_signing_warning":
+                          "Second-round signing warning must happen after "
+                          "casts have been published." })
             if self.second_signing_opens:
                 if ((self.stage > 2 or (
                         not self.tracker.has_changed("publish_casts") and
