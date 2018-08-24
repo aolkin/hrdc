@@ -177,7 +177,7 @@ class Space(models.Model):
         if self.nickname:
             return self.nickname
         elif self.include_building_name:
-            return "{}, {}".format(self.name, self.building)
+            return "{} {}".format(self.building, self.name)
         else:
             return self.name
     
