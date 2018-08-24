@@ -243,3 +243,8 @@ p.lead.only-small {
 #chat .badge {
     font-size: 1em;
 }
+
+.schedule-deck .card {
+    min-width: 20rem;
+    margin-top: 1rem;
+}

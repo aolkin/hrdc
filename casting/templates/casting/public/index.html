@@ -11,6 +11,44 @@
 {% block title %}Common Casting{% endblock %}
 
 {% block content %}
+{% if schedule %}
+<h3 class="text-center mt-5">
+  Common Casting Schedule
+  {% if object %}- {{ object }}{% endif %}
+</h3>
+<div class="card-deck schedule-deck">
+  {% for show in schedule %}
+  <div class="card">
+    <div class="card-header">
+      <h5 class="card-title mb-0">{{ show }}</h5>
+    </div>
+    <div class="card-body bg-light text-info">
+      <em>{{ show }}</em>'s residency is
+      {{ show.show.residency_starts|date:"n/j" }} to
+      {{ show.show.residency_ends|date:"n/j" }} in {{ show.show.space }}.
+    </div>
+    <ul class="list-group list-group-flush card-body">
+      {% for slot in show.audition_slots %}
+      <li class="list-group-item">
+	<div>
+	  {{ slot.day|date:"l" }},
+	  {{ slot.start|time:"g:i A" }} - {{ slot.end|time:"g:i A" }}
+	</div>
+	<div class="text-muted text-right">{{ slot.space }}</div>
+      </li>
+      {% endfor %}
+    </ul>
+    <div class="card-footer text-muted font-weight-light">
+      {% if show.contact_email %}
+      Email
+      <a href="mailto:{{ show.contact_email }}">{{ show.contact_email }}</a>
+      with questions about this show.
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
 {% for i in shows %}
 {% if i.2 %}
 <h3 class="text-center mt-5">
