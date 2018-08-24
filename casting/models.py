@@ -281,7 +281,8 @@ class CastingMeta(models.Model):
     
     @property
     def audition_slots(self):
-        return self.slot_set.filter(type=Slot.TYPES[0][0])
+        return self.slot_set.filter(type=Slot.TYPES[0][0]).order_by(
+            "day", "start")
     
     @property
     def callback_slots(self):

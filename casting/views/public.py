@@ -17,7 +17,7 @@ from emailtracker.tools import render_for_user
 from ..models import *
 from ..tasks import signing_email
 
-from . import show_model
+from . import show_model, get_current_slots
 
 class FixHeaderUrlMixin:
     def get_context_data(self, *args, **kwargs):
@@ -283,11 +283,15 @@ class IndexView(FixHeaderUrlMixin, TemplateView):
         context = super().get_context_data(*args, **kwargs)
         context["shows"] = (("Cast", "casting:view_cast", [], "primary"),
                             ("Callback", "casting:view_callbacks", [], "info"))
+        context["schedule"] = []
         for show in self.get_shows():
             if show.callbacks_released: # and show.release_meta.stage < 3:
                 context["shows"][0][2].append(show)
             if show.cast_list_released:
                 context["shows"][1][2].append(show)
+            if show.release_meta.stage == 0:
+                context["schedule"].append(show)
+        context["current"] = get_current_slots()
         return context
 
 class PKIndexView(SingleObjectMixin, IndexView):
