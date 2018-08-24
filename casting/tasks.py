@@ -152,7 +152,7 @@ def second_signing_warning(pk):
 @shared_task(ignore_result=True)
 def open_second_signing(pk):
     crm = get_crm(pk)
-    if crm and crm.stage == 4:
+    if crm and crm.stage >= 4 and crm.stage < 6:
         shows = get_shows(crm, "cast_submitted")
         signings = get_model("Signing").objects.filter(
             character__show__in=shows, order=0, response=None,
