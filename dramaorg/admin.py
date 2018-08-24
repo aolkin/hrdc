@@ -140,12 +140,9 @@ class BuildingAdmin(admin.ModelAdmin):
     
 @admin.register(Space)
 class SpaceAdmin(admin.ModelAdmin):
-    list_display = ('name', 'building', 'include_building_name')
+    list_display = ('__str__', 'name', 'building', 'nickname')
     list_filter = ('building',)
-    list_editable = ('name', 'building', 'include_building_name')
-    list_display_links = None
-    search_fields = ('name', 'building__name')
+    list_editable = ('nickname',)
+    search_fields = ('name', 'building__name', 'nickname')
 
-#admin.site.unregister(Group)
-#admin.site.register(GroupProxy, GroupAdmin)
 admin.site.register(Permission)

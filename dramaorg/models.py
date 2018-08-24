@@ -169,9 +169,14 @@ class Space(models.Model):
     include_building_name = models.BooleanField(
         default=True, help_text="uncheck this to hide the building name when "+
         "displaying the full name of the space")
+    nickname = models.CharField(
+        max_length=150, blank=True,
+        help_text="If set, the space will be displayed using this name.")
 
     def full_name(self):
-        if self.include_building_name:
+        if self.nickname:
+            return self.nickname
+        elif self.include_building_name:
             return "{}, {}".format(self.name, self.building)
         else:
             return self.name
