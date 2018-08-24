@@ -128,6 +128,28 @@ def open_signing(pk):
         crm.save()
 
 @shared_task(ignore_result=True)
+def second_signing_warning(pk):
+    crm = get_crm(pk)
+    if crm and crm.stage == 4:
+        signings = get_model("Signing").objects.filter(
+            character__show__in=get_shows(crm, "cast_submitted"),
+            character__hidden_for_signing=False, response=None, order=0)
+        actors = [get_user_model().objects.get(pk=i[0]) for i in
+                  signings.distinct().values_list("actor")]
+        for actor in actors:
+            firstroles = signings.filter(actor=actor)
+            render_for_user(actor, "casting/email/signing-reminder.html",
+                            "signing", crm.pk,
+                            { "firstroles": firstroles, "crm": crm,
+                              "timeleft": crm.second_signing_opens -
+                              timezone.now() },
+                            subject="Don't Forget to Sign for Your "
+                            "{} Roles Now".format(crm),
+                            tags=["casting", "signing_notif"])
+        crm.stage = 5
+        crm.save()
+
+@shared_task(ignore_result=True)
 def open_second_signing(pk):
     crm = get_crm(pk)
     if crm and crm.stage == 4:
@@ -143,7 +165,7 @@ def open_second_signing(pk):
                 i.response = False
                 i.timed_out = True
                 i.save()
-        crm.stage = 5
+        crm.stage = 6
         crm.save()
 
 @shared_task(ignore_result=True)
@@ -201,7 +223,11 @@ def update_releases(scheduled=True):
                           stage=3).values("pk")
     for i in cbs:
         open_signing.delay(i["pk"])
-    cbs = releases.filter(second_signing_opens__lte=timezone.now(),
+    cbs = releases.filter(second_signing_warning__lte=timezone.now(),
                           stage=4).values("pk")
+    for i in cbs:
+        second_signing_warning.delay(i["pk"])
+    cbs = releases.filter(second_signing_opens__lte=timezone.now(),
+                          stage__gte=4, stage__lt=6).values("pk")
     for i in cbs:
         open_second_signing.delay(i["pk"])

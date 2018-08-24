@@ -99,6 +99,10 @@ class CastingReleaseForm(forms.ModelForm):
         self.clean_signing_option_field()
         return self.cleaned_data["second_signing_opens"]
     
+    def clean_second_signing_warning(self):
+        self.clean_signing_option_field()
+        return self.cleaned_data["second_signing_warning"]
+    
 PUBLISHING_HELP = """
 The callback and cast lists will become visible on the site after the inputted
 dates and times. Additionally, actors will be emailed when these times pass.
@@ -135,14 +139,16 @@ class CastingReleaseAdmin(admin.ModelAdmin):
             "description": PUBLISHING_HELP
         }),
         ("Signing Options", {
-            "fields": ("signing_opens", "second_signing_opens"),
+            "fields": ("signing_opens", "second_signing_opens",
+                       "second_signing_warning"),
             "description": SIGNING_HELP
         })
     )
     readonly_fields = ("associated_with", "stage")
     list_display = ('__str__', 'stage', 'publish_callbacks',
                     'publish_first_round_casts', 'publish_casts',
-                    'signing_opens', 'second_signing_opens')
+                    'signing_opens', 'second_signing_opens',
+                    'second_signing_warning')
 
     def get_readonly_fields(self, request, obj):
         readonly = list(self.readonly_fields)
@@ -151,7 +157,8 @@ class CastingReleaseAdmin(admin.ModelAdmin):
         if obj.stage > 2 or (
                 not obj.tracker.has_changed("publish_casts") and
                 is_locked(obj.publish_casts)):
-            for i in ("signing_opens", "second_signing_opens"):
+            for i in ("signing_opens", "second_signing_opens",
+                      "second_signing_warning"):
                 if not obj.tracker.has_changed(i):
                     readonly.append(i)
         for i, attr in enumerate(CASTING_RELEASE_TIME_LOCKS):

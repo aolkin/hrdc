@@ -1,0 +1,55 @@
+{% extends "casting/email/base.html" %}
+{% load email %}
+{% load bt %}
+{% load humanize %}
+
+{% block body %}
+<table cellpadding="0" cellspacing="8" width="100%">
+  <tr>
+    <td align="center">
+      {% if IS_HTML %}
+      <h1 style="margin-bottom: 4px; margin-top: 18px;">Remember to Sign for {{ crm }} Roles</h1>
+      {% endif %}
+    </td>
+  </tr>
+  {% if IS_HTML %}
+  <style>
+    .special-link {
+    text-decoration: none;
+    color: #666666;
+    }
+    .special-link:hover {
+    text-decoration: underline;
+    color: #333333;
+    }
+  </style>
+  {% endif %}
+  <tr>
+    <td align="center" style="font-size: 1.1em;">
+      You have {{ crm.second_signing_opens|timeuntil }} left to sign for some {{ crm }} roles before they will be offered to the first alternate.
+    </td>
+  </tr>
+  <tr>
+    <td align="center" style="font-weight: bolder; font-size: 1.2em;">
+      Please {% href 'casting:actor_token' 'sign for your roles' user.login_token %} online.
+    </td>
+  </tr>
+  {% if firstroles %}
+  <tr>
+    <td style="padding-left: 40px; padding-right: 40px;">
+      If you do not sign for any of the following roles by {{ crm.second_signing_opens|date:"g:i A" }} {{ crm.second_signing_opens|naturalday }} they will automatically be offered to their first alternate:
+      <ul style="margin-top: 0.5em; margin-bottom: 1em;">
+	{% for i in firstroles %}
+	<li><strong>{{ i.character }}</strong> in <em>{{ i.character.show }}</em></li>
+	{% endfor %}
+      </ul>
+    </td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td align="center" style="padding-top: 8px;">
+      {% href 'casting:public_index' 'view all cast lists' class='special-link' %}
+    </td>
+  </tr>
+</table>
+{% endblock %}

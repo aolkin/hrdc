@@ -154,7 +154,7 @@ class SigningView(FixHeaderUrlMixin, ListView):
             casting_meta__isnull=False)
         unpublished = all_shows.filter(
             casting_meta__release_meta__stage__lt=4)
-        seconds = all_shows.filter(casting_meta__release_meta__stage__lt=5)
+        seconds = all_shows.filter(casting_meta__release_meta__stage__lt=6)
         context["unpublished"] = []
         context["seconds"] = []
         context["wrong_user"] = (self.request.user.is_authenticated and
