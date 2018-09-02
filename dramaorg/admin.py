@@ -96,7 +96,7 @@ class UserAdmin(BaseUserAdmin):
     get_active.short_description = "Enabled"
     
     def has_password(self, obj):
-        return obj.has_usable_password()
+        return obj.password and obj.has_usable_password()
     has_password.boolean = True
     has_password.short_description = "Has PW"
     
