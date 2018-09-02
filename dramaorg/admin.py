@@ -29,6 +29,25 @@ def generate_tokens(modeladmin, request, queryset):
 def clear_tokens(modeladmin, request, queryset):
     for obj in queryset:
         obj.clear_token()
+
+class ActiveFilter(admin.SimpleListFilter):
+    title = "active status"
+    parameter_name = "pw_active"
+
+    def lookups(self, request, model_admin):
+        return (
+            ("disabled", "Disabled"),
+            ("enabled", "Enabled but password-less"),
+            ("active", "Has set password"),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == "disabled":
+            return queryset.filter(is_active=False)
+        if self.value() == "enabled":
+            return queryset.filter(is_active=True, password="")
+        if self.value() == "active":
+            return queryset.filter(is_active=True).exclude(password="")
         
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
@@ -59,7 +78,7 @@ class UserAdmin(BaseUserAdmin):
     add_form_template = "dramaadmin/invite_user.html"
     list_display = ('__str__', 'email', 'phone', 'affiliationyear',
                     'get_pdsm', 'get_season_pdsm', 'has_password')
-    list_filter = ('is_active','is_superuser', 'affiliation', 'year',
+    list_filter = (ActiveFilter,'is_superuser', 'affiliation', 'year',
                    'suspended_until')
     search_fields = ('email', 'first_name', 'last_name',)
     readonly_fields = ('last_login', 'date_joined')
@@ -96,9 +115,14 @@ class UserAdmin(BaseUserAdmin):
     get_active.short_description = "Enabled"
     
     def has_password(self, obj):
-        return obj.password and obj.has_usable_password()
+        if obj.active is False:
+            return False
+        if obj.password is None or obj.password == "":
+            return None
+        else:
+            return obj.active and obj.has_usable_password()
     has_password.boolean = True
-    has_password.short_description = "Has PW"
+    has_password.short_description = "Active"
     
     def get_readonly_fields(self, request, obj):
         if obj:
