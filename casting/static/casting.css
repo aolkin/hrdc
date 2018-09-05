@@ -231,15 +231,18 @@ p.lead.only-small {
 	position: fixed;
 	bottom: 0;
 	z-index: 9999;
+	display: none;
     }
     #chat-window.chat-right {
 	right: 2rem;
+	display: inherit;
     }
     #chat-window.chat-right .fa-chevron-right {
 	display: none;
     }
     #chat-window.chat-left {
 	left: 2rem;
+	display: inherit;
     }
     #chat-window.chat-left .fa-chevron-left {
 	display: none;
