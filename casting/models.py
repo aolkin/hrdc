@@ -265,7 +265,7 @@ class CastingMeta(models.Model):
         avg = Audition.objects.filter(
             show=self, audition_length__isnull=False).aggregate(
                 Avg("audition_length"))["audition_length__avg"]
-        return round(avg / 60)
+        return round(avg / 60) if avg else avg
     
     @property
     def callbacks_released(self):
