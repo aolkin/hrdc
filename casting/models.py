@@ -360,9 +360,9 @@ def send_auditions(sender, instance, *args, **kwargs):
         if instance.status == Audition.STATUSES[1][0]:
             for aud in Audition.objects.filter(
                     actor_id=instance.actor_id,
-                    space__building=instance.space.building,
-                    signed_in__date=instance.signed_in).exclude(
-                        id=instance.id):
+                    space__building=instance.space.building).exclude(
+                        id=instance.id).exclude(
+                            status=Audition.STATUSES[1][0]):
                 aud.busy = instance
                 aud.save()
         else:
