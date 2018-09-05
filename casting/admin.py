@@ -223,7 +223,8 @@ class CallbackSlotAdmin(SlotAdmin):
 class MetaAdmin(admin.ModelAdmin):
     list_display = ('show', 'season', 'casting_release_stage',
                     'callbacks_submitted', 'first_cast_submitted',
-                    'cast_submitted', 'auditioners', 'tech_reqer_count')
+                    'cast_submitted', 'auditioners',
+                    'audition_avg_display', 'tech_reqer_count',)
     #exclude = ('callback_description', 'cast_list_description',
      #          'contact_email', 'callbacks_submitted', 'first_cast_submitted',
       #         'cast_submitted')
@@ -273,6 +274,11 @@ class MetaAdmin(admin.ModelAdmin):
 
     def auditioners(self, obj):
         return obj.audition_set.filter(sign_in_complete=True).count()
+
+    def audition_avg_display(self, obj):
+        return ("{} mins".format(obj.audition_avg) if obj.audition_avg
+                is not None else None)
+    audition_avg_display.short_description = "Avg Aud Len"
     
     def season(self, obj):
         return obj.show.seasonstr()

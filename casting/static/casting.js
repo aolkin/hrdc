@@ -285,12 +285,24 @@ $(function() {
         el.removeClass("pulse").removeClass(el.data("pulse-class"));
     });
     $("#chat-window .fa-window-minimize").click(function() {
+        localStorage.previousChatDisplay = $(".chat-minimizable").css(
+            "display");
         $(".chat-minimizable").slideToggle(200);
     });
     $("#chat-window .fa-chevron-left, #chat-window .fa-chevron-right").click(
         function() {
             $("#chat-window").toggleClass("chat-right chat-left");
+            localStorage.chatWindowLeft = $("#chat-window").hasClass(
+                "chat-left");
         });
+    if (localStorage.chatWindowLeft == "true") {
+        $("#chat-window").addClass("chat-left");
+    } else {
+        $("#chat-window").addClass("chat-right");
+    }
+    if (localStorage.previousChatDisplay == "block") {
+        $(".chat-minimizable").hide();
+    }
 });
 
 $(document.body).on("click", "a.ajaxify", function(e){
