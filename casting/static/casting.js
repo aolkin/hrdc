@@ -203,14 +203,17 @@ $(function() {
             if (data.pulse) {
                 let pulse_el = data.pulse_el ? $(data.pulse_el) : el;
                 pulse_el.addClass(data.pulse);
+                pulse_el.data("pulse-class", data.pulse);
                 setTimeout(function() {
                     pulse_el.addClass("pulse");
-                    setTimeout(function() {
-                        pulse_el.removeClass(data.pulse);
-                        setTimeout((function(){
-                                        this.removeClass("pulse");
-                                    }).bind(pulse_el), 1000);
-                    }, 0);
+                    if (!pulse_el.hasClass("pulse-manual-dismiss")) {
+                        setTimeout(function() {
+                            pulse_el.removeClass(data.pulse);
+                            setTimeout((function(){
+                                            this.removeClass("pulse");
+                                        }).bind(pulse_el), 1000);
+                        }, 0);
+                    }
                 }, 0);
             }
             initTooltips(el);
@@ -277,9 +280,17 @@ $(function() {
     });
 
     $(".scroll-on-load").scrollTo("100%");
-    $("#chat-window .fa-window-minimize").click(function(){
+    $("#chat-window .chat-minimizable *").on("click keypress", function(e) {
+        let el = $("#chat-window .pulse-manual-dismiss");
+        el.removeClass("pulse").removeClass(el.data("pulse-class"));
+    });
+    $("#chat-window .fa-window-minimize").click(function() {
         $(".chat-minimizable").slideToggle(200);
-    })
+    });
+    $("#chat-window .fa-chevron-left, #chat-window .fa-chevron-right").click(
+        function() {
+            $("#chat-window").toggleClass("chat-right chat-left");
+        });
 });
 
 $(document.body).on("click", "a.ajaxify", function(e){
