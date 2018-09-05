@@ -230,7 +230,19 @@ p.lead.only-small {
 	width: 18rem;
 	position: fixed;
 	bottom: 0;
+	z-index: 9999;
+    }
+    #chat-window.chat-right {
 	right: 2rem;
+    }
+    #chat-window.chat-right .fa-chevron-right {
+	display: none;
+    }
+    #chat-window.chat-left {
+	left: 2rem;
+    }
+    #chat-window.chat-left .fa-chevron-left {
+	display: none;
     }
 }
 
