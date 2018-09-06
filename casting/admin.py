@@ -221,7 +221,7 @@ class CallbackSlotAdmin(SlotAdmin):
 
 @admin.register(CastingMeta)
 class MetaAdmin(admin.ModelAdmin):
-    list_display = ('show', 'season', 'casting_release_stage',
+    list_display = ('show', 'release_meta', 'casting_release_stage',
                     'callbacks_submitted', 'first_cast_submitted',
                     'cast_submitted', 'auditioners',
                     'audition_avg_display', 'tech_reqer_count',)
@@ -250,8 +250,7 @@ class MetaAdmin(admin.ModelAdmin):
     )
     readonly_fields = ('contact_email_link',)
     search_fields = ('show__title',)
-    list_filter = ('show__season', 'show__year', 'release_meta', 'slot__day',
-                   'tech_req_pool')
+    list_filter = ('show__season', 'show__year', 'slot__day')
 
     inlines = [
         AuditionSlotAdmin,
