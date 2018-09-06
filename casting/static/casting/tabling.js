@@ -16,12 +16,11 @@ $(function() {
     $("th.filterable").click(function(e){
         if (!$(this).children("span").hasClass("d-none")) {
 	    $(this).children("span").addClass("d-none");
-	    $(this).children("input").removeClass("d-none");
+	    $(this).children("input").removeClass("d-none").focus();
 	}
 	e.stopPropagation();
     });
-    $(document.body).on("click", function(e) {
-	console.log("document clicked");
+    $("html").on("click", function(e) {
 	$("th.filterable").each(function(index, el) {
 	    if ($(el).children("input").val() != "") {
 		$(el).children("input").val("").keyup();
@@ -33,5 +32,9 @@ $(function() {
     $("th.filterable input").keyup(function(e) {
 	filterTable($(this).data("n"), $(this).val());
     });
-    
+
+    $("#chat-window").click(function(e) {
+        e.stopPropagation();
+    });
+
 });
