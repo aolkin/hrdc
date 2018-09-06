@@ -280,7 +280,7 @@ $(function() {
     });
 
     $(".scroll-on-load").scrollTo("100%");
-    $("#chat-window .chat-minimizable *").on("click keypress", function(e) {
+    $("#chat-window *").on("click keypress", function(e) {
         let el = $("#chat-window .pulse-manual-dismiss");
         el.removeClass("pulse").removeClass(el.data("pulse-class"));
     });
