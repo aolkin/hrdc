@@ -8,9 +8,20 @@
 {% block content %}
 
 <div class="row justify-content-center">
+  <h1 class="text-center display-heading">
+    {% setting "ADMIN_SITE_TITLE" %}</h1>
+</div>
+<div class="row justify-content-center my-5">
+  <div class="col-md-6">
+    <a href="{% url 'casting:public_index' %}"
+       class="btn btn-lg btn-info btn-block">
+      Public Portal - For Actors
+    </a>
+  </div>
+</div>
+<div class="row justify-content-center">
   <form method="POST" class="col-md-6">
-    <legend class="text-center">
-      Login to {% setting "ADMIN_SITE_TITLE" %}</legend>
+    <legend class="text-center">Staff Login or Edit Profile</legend>
     {% csrf_token %}
     {{ form|bootstrap }}
     <p class="form-text text-center">
