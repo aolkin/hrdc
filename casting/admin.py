@@ -301,6 +301,8 @@ class TechReqAdmin(admin.ModelAdmin):
 class AuditionAdmin(admin.ModelAdmin):
     autocomplete_fields = ('actor',)
     list_filter = ('show__show__year', 'show__show__season')
+    search_fields = ('actor__email', 'actor__first_name', 'actor__last_name',
+                     'show__show__title')
     list_display = ('actor', 'show', 'sign_in_complete', 'status')
     readonly_fields = ('busy', 'done_time', 'called_time', 'status',
                        'audition_length', 'tech_interest',
