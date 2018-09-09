@@ -286,9 +286,9 @@ class IndexView(FixHeaderUrlMixin, TemplateView):
         context["schedule"] = []
         for show in self.get_shows():
             if show.callbacks_released: # and show.release_meta.stage < 3:
-                context["shows"][0][2].append(show)
-            if show.cast_list_released:
                 context["shows"][1][2].append(show)
+            if show.cast_list_released:
+                context["shows"][0][2].append(show)
             if show.release_meta.stage == 0:
                 context["schedule"].append(show)
         context["current"] = get_current_slots()
