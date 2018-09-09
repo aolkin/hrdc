@@ -296,3 +296,12 @@ class TechReqAdmin(admin.ModelAdmin):
     def showstr(self, obj):
         return ", ".join([str(i) for i in obj.shows.all()])
     showstr.short_description = "Shows"
+
+@admin.register(Audition)
+class AuditionAdmin(admin.ModelAdmin):
+    autocomplete_fields = ('actor',)
+    list_filter = ('show__show__year', 'show__show__season')
+    list_display = ('actor', 'show', 'sign_in_complete', 'status')
+    readonly_fields = ('busy', 'done_time', 'called_time', 'status',
+                       'audition_length', 'tech_interest',
+                       'actorseasonmeta')
