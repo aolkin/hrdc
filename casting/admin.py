@@ -315,7 +315,8 @@ class CharacterAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         return False
     
-    list_filter = ('show__show__year', 'show__show__season')
+    list_filter = ('show__show__year', 'show__show__season',
+                   'added_for_signing', 'hidden_for_signing')
     search_fields = ('name', 'show__show__title')
     list_display = ('name', 'show', 'allow_multiple_signatures')
     list_editable = ('allow_multiple_signatures',)
