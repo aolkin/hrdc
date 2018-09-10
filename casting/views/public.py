@@ -201,11 +201,12 @@ class SigningView(FixHeaderUrlMixin, ListView):
                                        "the same show twice!")
                         return HttpResponseRedirect(reverse("casting:signing"))
                     techreqs[tech] = True
-                if accepted[i.character.show_id]:
-                    messages.error(self.request,
-                                   "You may only accept one role per show!")
-                    return HttpResponseRedirect(reverse("casting:signing"))
-                accepted[i.character.show_id] = True
+                if not i.character.allow_multiple_signatures:
+                    if accepted[i.character.show_id]:
+                        messages.error(self.request,
+                                       "You may only accept one role per show!")
+                        return HttpResponseRedirect(reverse("casting:signing"))
+                    accepted[i.character.show_id] = True
                 if tech and accepted[int(tech)]:
                     messages.error(self.request,
                                    "You cannot fulfill your tech req with a "
@@ -216,11 +217,12 @@ class SigningView(FixHeaderUrlMixin, ListView):
         for signings in shows.values():
             for obj, res, tech in signings:
                 if res is None and accepted[obj.character.show_id]:
-                    res = 0
-                    messages.info(self.request,
-                                  "Since you signed for a role in {}, {} "
-                                  "was automatically rejected.".format(
-                                      obj.character.show, obj.character))
+                    if not obj.character.allow_multiple_signatures:
+                        res = 0
+                        messages.info(self.request,
+                                      "Since you signed for a role in {}, {} "
+                                      "was automatically rejected.".format(
+                                          obj.character.show, obj.character))
                 if res is not None and res != obj.response:
                     if obj.response is not None or obj.tech_req is not None:
                         messages.error(self.request,

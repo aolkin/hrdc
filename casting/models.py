@@ -395,6 +395,7 @@ class Character(AssociateShowMixin):
         help_text="Number of actors allowed to sign for this character.")
     added_for_signing = models.BooleanField(default=False)
     hidden_for_signing = models.BooleanField(default=False)
+    allow_multiple_signatures = models.BooleanField(default=False)
 
     @property
     def editable(self):

@@ -307,3 +307,18 @@ class AuditionAdmin(admin.ModelAdmin):
     readonly_fields = ('busy', 'done_time', 'called_time', 'status',
                        'audition_length', 'tech_interest',
                        'actorseasonmeta')
+
+@admin.register(Character)
+class CharacterAdmin(admin.ModelAdmin):
+    def has_delete_permission(self, request, obj=None):
+        return False
+    def has_add_permission(self, request):
+        return False
+    
+    list_filter = ('show__show__year', 'show__show__season')
+    search_fields = ('name', 'show__show__title')
+    list_display = ('name', 'show', 'allow_multiple_signatures')
+    list_editable = ('allow_multiple_signatures',)
+    readonly_fields = ('name',)
+    fields = ('name', 'callback_description', 'cast_description',
+              'allowed_signers',)
