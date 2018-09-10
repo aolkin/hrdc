@@ -118,6 +118,8 @@ def open_signing(pk):
         actors = [get_user_model().objects.get(pk=i[0]) for i in
                   signings.distinct().values_list("actor")]
         for actor in actors:
+            if not actor.login_token:
+                actor.new_token()
             firstroles = signings.filter(order=0, actor=actor)
             render_for_user(actor, "casting/email/signing.html",
                             "signing", crm.pk,
