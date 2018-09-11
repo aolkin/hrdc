@@ -121,12 +121,18 @@
 	  {% endif %}
 	  {% endfor %}
 	</ul>
-	{% if character.allowed_signers != 1 or character.cast_description %}
+	{% if character.allowed_signers != 1 or character.cast_description or character.allow_multiple_signatures %}
 	<div class="card-footer py-2 px-3">
 	  {% if character.allowed_signers != 1 %}
 	  <small class="text-muted">
 	    {{ character.allowed_signers|apnumber|capfirst }} actors can sign
 	    for this part.
+	  </small>
+	  <hr class="mb-1 mt-2">
+	  {% endif %}
+	  {% if character.allow_multiple_signatures %}
+	  <small class="text-muted">
+	    This role can be signed for in addition to other roles in this show.
 	  </small>
 	  <hr class="mb-1 mt-2">
 	  {% endif %}
