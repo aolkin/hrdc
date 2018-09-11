@@ -50,11 +50,6 @@
       {% option 'site_contact_name' %}</a>.
     {% endif %}
   </p>
-  {% if lists_available %}
-  <h2>
-    <a href="{% url 'casting:public_index' %}">View Callback and Cast Lists</a>
-  </h2>
-  {% endif %}
   <h3 class="justify-content-center">You may 
     <a class="" href="{% url 'dramaorg:profile' %}">edit your profile</a> or
     <a class="" href="{% url 'dramaorg:password_change' %}">
@@ -62,6 +57,10 @@
   </h3>
 </div>
 {% endif %}
+
+<div class="text-center mt-4">
+  <a class="btn btn-info btn-lg" href="{% url 'casting:public_index' %}">For Actors - Public Portal</a>
+</div>
 
 {% if request.user.is_pdsm or request.user.is_board %}
 {% if all_indexes %}
