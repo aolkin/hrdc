@@ -98,6 +98,14 @@
 	  <option selected value="">No Response</option>
 	  {% endif %}
 	</select>
+	{% if i.character.allow_multiple_signatures %}
+	<div class="col-6 push-6"></div>
+	<p class="text-muted text-right col-6 pull-6">
+	  <small>
+	    This role can be signed for in addition to other roles in this show.
+	  </small>
+	</p>
+	{% endif %}
 	{% if i.character.show.tech_req_pool and user.year != i.character.show.tech_req_pool.exempt_year and i.response != 0 %}
 	<label class="col-7 push-5 mt-1 text-right text-secondary">
 	  Fulfill the tech req via</label>
