@@ -251,7 +251,7 @@ class SigningView(FixHeaderUrlMixin, ListView):
             messages.success(self.request,
                              "Successfully signed {} role{}.".format(
                                  len(signed), "s" if len(signed) != 1 else ""))
-            render_for_user(self.request.user, "casting/email/signed.html",
+            render_for_user(self.get_actor(), "casting/email/signed.html",
                             "signed", "-".join([str(i.pk) for i in signed]),
                             { "signed": signed },
                             subject="Signing Confirmation",
