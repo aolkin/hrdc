@@ -318,7 +318,8 @@ class CharacterAdmin(admin.ModelAdmin):
     list_filter = ('show__show__year', 'show__show__season',
                    'added_for_signing', 'hidden_for_signing')
     search_fields = ('name', 'show__show__title')
-    list_display = ('name', 'show', 'allow_multiple_signatures')
+    list_display = ('name', 'show', 'allowed_signers',
+                    'allow_multiple_signatures')
     list_editable = ('allow_multiple_signatures',)
     readonly_fields = ('name',)
     fields = ('name', 'callback_description', 'cast_description',
