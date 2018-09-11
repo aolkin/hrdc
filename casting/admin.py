@@ -316,6 +316,7 @@ class CharacterAdmin(admin.ModelAdmin):
         return False
     
     list_filter = ('show__show__year', 'show__show__season',
+                   'show__show__space__building',
                    'added_for_signing', 'hidden_for_signing')
     search_fields = ('name', 'show__show__title')
     list_display = ('name', 'show', 'allowed_signers',
