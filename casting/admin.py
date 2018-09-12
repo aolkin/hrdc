@@ -223,11 +223,10 @@ class CallbackSlotAdmin(SlotAdmin):
 class MetaAdmin(admin.ModelAdmin):
     list_display = ('show', 'release_meta', 'casting_release_stage',
                     'callbacks_submitted', 'first_cast_submitted',
-                    'cast_submitted', 'auditioners',
-                    'audition_avg_display', 'tech_reqer_count',)
-    #exclude = ('callback_description', 'cast_list_description',
-     #          'contact_email', 'callbacks_submitted', 'first_cast_submitted',
-      #         'cast_submitted')
+                    'cast_submitted')
+    search_fields = ('show__title',)
+    list_filter = ('show__season', 'show__year', 'callbacks_submitted',
+                   'first_cast_submitted', 'cast_submitted')
     fieldsets = (
         ("", {
             "fields": ('show', 'release_meta',)
@@ -249,8 +248,6 @@ class MetaAdmin(admin.ModelAdmin):
         })
     )
     readonly_fields = ('contact_email_link',)
-    search_fields = ('show__title',)
-    list_filter = ('show__season', 'show__year', 'slot__day')
 
     inlines = [
         AuditionSlotAdmin,
@@ -284,6 +281,37 @@ class MetaAdmin(admin.ModelAdmin):
 
     def casting_release_stage(self, instance):
         return instance.release_meta.get_stage_display()
+
+@admin.register(AuditionCastingMeta)
+class AuditionMetaAdmin(MetaAdmin):
+    list_display = ('show', 'release_meta',
+                    'casting_release_stage',
+                    'auditioners', 'audition_avg_display', 'active_slot')
+    list_filter = ('show__season', 'show__year', 'slot__day',
+                   'slot__space__building')
+
+    def active_slot(self, obj):
+        slot = Slot.objects.active_slot(obj)
+        return slot.space if slot else None
+    
+@admin.register(TechReqCastingMeta)
+class TechReqMetaAdmin(MetaAdmin):
+    list_display = ('show', 'release_meta',
+                    'tech_req_pool', 'contributions',
+                    'contributors', 'tech_reqer_count')
+    list_filter = ('show__season', 'show__year',
+                   'show__space__building')
+
+    def contributions(self, obj):
+        return (", ".join([str(i) for i in obj.tech_req_pool.shows.all()])
+                if obj.tech_req_pool else None)
+
+    def contributors(self, obj):
+        showlist = [set(i.castingmeta_set.all()) for i in
+                    TechReqPool.objects.filter(shows=obj)]
+        shows = set().union(*showlist).difference({obj})
+        return ", ".join([str(i) for i in shows
+                          if i.show not in obj.show]) if shows else None
 
 @admin.register(TechReqPool)
 class TechReqAdmin(admin.ModelAdmin):

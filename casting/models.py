@@ -13,6 +13,8 @@ from model_utils import FieldTracker
 
 from django.utils import timezone
 import datetime
+from datetime import timedelta
+from config import config
 
 from dramaorg.models import Season
 
@@ -287,6 +289,18 @@ class CastingMeta(models.Model):
     @property
     def callback_slots(self):
         return self.slot_set.filter(type=Slot.TYPES[1][0])
+
+class TechReqCastingMeta(CastingMeta):
+    class Meta:
+        proxy = True
+        verbose_name = "Casting-Enabled Show - Tech Req Info"
+        verbose_name_plural = "Casting-Enabled Shows - Tech Req Info"
+
+class AuditionCastingMeta(CastingMeta):
+    class Meta:
+        proxy = True
+        verbose_name = "Casting-Enabled Show - Audition Info"
+        verbose_name_plural = "Casting-Enabled Shows - Audition Info"
     
 class AssociateShowMixin(models.Model):
     show = models.ForeignKey(CastingMeta, on_delete=models.CASCADE)
@@ -548,6 +562,17 @@ class SlotManager(models.Manager):
     def callbacks(self):
         return self.filter(type=Slot.TYPES[1][0])
 
+    def current_slots(self):
+        return self.auditions().filter(
+            day=timezone.localdate(),
+            start__lte=timezone.localtime() + timedelta(
+                minutes=config.get_float("casting_advance_signin_minutes", 0)),
+            end__gte=timezone.localtime())
+
+    def active_slot(self, show):
+        slots = self.current_slots().filter(show_id=show)
+        return slots[0] if slots else None
+    
 class Slot(models.Model):
     show = models.ForeignKey(CastingMeta, on_delete=models.CASCADE)
     space = models.ForeignKey(settings.SPACE_MODEL, on_delete=models.CASCADE)
