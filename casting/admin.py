@@ -32,8 +32,9 @@ class SigningAdmin(admin.ModelAdmin):
     list_display = ('show', 'character', 'order_title', 'actor', 'response',
                     'tech_req')
     list_display_links = ('response',)
-    list_filter = ('character__show', 'character__show__show__year',
-                   'character__show__show__season')
+    list_filter = ('character__show__show__year',
+                   'character__show__show__season',
+                   'response', 'timed_out')
     search_fields = ('actor__first_name', 'actor__last_name',
                      'character__name')
     actions = [send_confirmation]
