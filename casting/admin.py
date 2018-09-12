@@ -303,7 +303,7 @@ class TechReqMetaAdmin(MetaAdmin):
 
     def contributes_to(self, obj):
         return (", ".join([str(i) for i in obj.tech_req_pool.shows.all()
-                           if i.show not in obj.show])
+                           if obj.show not in i.show])
                 if obj.tech_req_pool else None)
 
     def contributors(self, obj):
