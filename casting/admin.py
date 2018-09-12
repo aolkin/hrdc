@@ -297,7 +297,7 @@ class AuditionMetaAdmin(MetaAdmin):
 @admin.register(TechReqCastingMeta)
 class TechReqMetaAdmin(MetaAdmin):
     list_display = ('show', 'tech_req_pool', 'contributions',
-                    'contributors', 'tech_reqer_count')
+                    'contributors', 'tech_reqer_numbers', 'tech_reqers')
     list_filter = ('show__season', 'show__year',
                    'show__space__building')
 
@@ -306,12 +306,18 @@ class TechReqMetaAdmin(MetaAdmin):
                 if obj.tech_req_pool else None)
 
     def contributors(self, obj):
-        showlist = [set(i.castingmeta_set.all()) for i in
-                    TechReqPool.objects.filter(shows=obj)]
-        shows = set().union(*showlist).difference({obj})
-        return ", ".join([str(i) for i in shows
-                          if i.show not in obj.show]) if shows else None
+        return (", ".join([str(i) for i in obj.tech_req_contributors
+                          if i.show not in obj.show])
+                if obj.tech_req_contributors else None)
 
+    def tech_reqer_numbers(self, obj):
+        return "{} / {}".format(obj.tech_reqer_count, obj.num_tech_reqers)
+    tech_reqer_numbers.short_description = "Has / Max"
+
+    def tech_reqers(self, obj):
+        return (", ".join([str(i.actor) for i in obj.tech_reqers])
+                if obj.tech_reqers else None)
+    
 @admin.register(TechReqPool)
 class TechReqAdmin(admin.ModelAdmin):
     fields = (('name', 'year', 'season'), 'exempt_year', 'shows')
