@@ -296,8 +296,7 @@ class AuditionMetaAdmin(MetaAdmin):
     
 @admin.register(TechReqCastingMeta)
 class TechReqMetaAdmin(MetaAdmin):
-    list_display = ('show', 'release_meta',
-                    'tech_req_pool', 'contributions',
+    list_display = ('show', 'tech_req_pool', 'contributions',
                     'contributors', 'tech_reqer_count')
     list_filter = ('show__season', 'show__year',
                    'show__space__building')
