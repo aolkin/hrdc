@@ -12,15 +12,10 @@ from config import config
 from datetime import timedelta
 
 def get_current_slots():
-    return Slot.objects.auditions().filter(
-        day=timezone.localdate(),
-        start__lte=timezone.localtime() + timedelta(
-            minutes=config.get_float("casting_advance_signin_minutes", 0)),
-        end__gte=timezone.localtime())
+    return Slot.objects.current_slots()
 
 def get_active_slot(show):
-    slots = get_current_slots().filter(show_id=show)
-    return slots[0] if slots else None
+    return Slot.objects.active_slot(show)
 
 show_model = apps.get_model(settings.SHOW_MODEL)
 building_model = apps.get_model(settings.BUILDING_MODEL)
