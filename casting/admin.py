@@ -302,12 +302,13 @@ class TechReqMetaAdmin(MetaAdmin):
                    'show__space__building')
 
     def contributions(self, obj):
-        return (", ".join([str(i) for i in obj.tech_req_pool.shows.all()])
+        return (", ".join([str(i) for i in obj.tech_req_pool.shows.all()
+                           if i.show not in obj.show])
                 if obj.tech_req_pool else None)
 
     def contributors(self, obj):
-        return (", ".join([str(i) for i in obj.tech_req_contributors
-                          if i.show not in obj.show])
+        return ((", ".join([str(i) for i in obj.tech_req_contributors
+                            if i.show not in obj.show]) or None)
                 if obj.tech_req_contributors else None)
 
     def tech_reqer_numbers(self, obj):
