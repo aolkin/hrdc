@@ -296,12 +296,12 @@ class AuditionMetaAdmin(MetaAdmin):
     
 @admin.register(TechReqCastingMeta)
 class TechReqMetaAdmin(MetaAdmin):
-    list_display = ('show', 'tech_req_pool', 'contributions',
+    list_display = ('show', 'tech_req_pool', 'contributes_to',
                     'contributors', 'tech_reqer_numbers', 'tech_reqers')
     list_filter = ('show__season', 'show__year',
                    'show__space__building')
 
-    def contributions(self, obj):
+    def contributes_to(self, obj):
         return (", ".join([str(i) for i in obj.tech_req_pool.shows.all()
                            if i.show not in obj.show])
                 if obj.tech_req_pool else None)
