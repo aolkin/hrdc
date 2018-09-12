@@ -258,7 +258,7 @@ class CastingMeta(models.Model):
         return self.tech_reqer_count < self.num_tech_reqers
 
     @property
-    def techreq_contributors(self):
+    def tech_req_contributors(self):
         return CastingMeta.objects.filter(
             tech_req_pool__in=self.techreqpool_set.all())
     
