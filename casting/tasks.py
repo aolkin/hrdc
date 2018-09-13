@@ -175,7 +175,7 @@ def notify_alternates(pk):
     signing = get_model("Signing").objects.get(pk=pk)
     previous = get_model("Signing").objects.filter(
         character=signing.character, order__lt=signing.order, response=False)
-    if len(previous) < max(
+    if len(previous) <= max(
             0, signing.order - signing.character.allowed_signers):
         return
     alternates = get_model("Signing").objects.filter(
