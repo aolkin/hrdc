@@ -113,12 +113,10 @@
 	  {% else %}>
 	  {% for t in i.character.show.tech_req_pool.all %}
 	  {% if t != i.character.show %}
-	  <option value="{{ t.pk }}" {% if user in t.tech_actors or user in t.signed_actors or t.show in i.character.show.show or not t.needs_more_tech_reqers %}disabled{% endif %}>
+	  <option value="{{ t.pk }}" {% if user in t.tech_actors or user in t.signed_actors or not t.needs_more_tech_reqers %}disabled{% endif %}>
 	    {{ t }} {% if not t.needs_more_tech_reqers %}(Full){% endif %}
 	    {% if user in t.tech_actors %}(already tech req-ing){% endif %}
 	    {% if user in t.signed_actors %}(already performing in){% endif %}
-	    {% if t.show in i.character.show.show %}
-	    (overlapping residency){% endif %}
 	  </option>
 	  {% endif %}
 	  {% endfor %}

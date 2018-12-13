@@ -232,12 +232,6 @@ class SigningView(FixHeaderUrlMixin, ListView):
                     obj.response = res
                     if res and tech:
                         tshow = CastingMeta.objects.get(pk=int(tech))
-                        if tshow.show in obj.character.show.show:
-                            messages.error(self.request,
-                                           "You cannot tech req {}, since it "
-                                           "overlaps with {}!".format(
-                                               tshow, obj.character.show))
-                            continue
                         if not tshow.needs_more_tech_reqers:
                             messages.error(self.request,
                                            "{} already has the maximum number "
