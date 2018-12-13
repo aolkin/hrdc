@@ -3,6 +3,7 @@ from django import forms
 from django.utils import timezone
 from django.utils.html import format_html
 from django.contrib import messages
+from django.conf import settings
 from datetime import timedelta
 
 from collections import defaultdict
@@ -17,6 +18,8 @@ def send_confirmation(modeladmin, request, qs):
         actors[i.actor].append(i)
     emails = 0
     for actor, signed in actors.items():
+        if not actor.login_token:
+            actor.new_token()
         render_for_user(actor, "casting/email/signed.html",
                         "signed", context={ "signed": signed },
                         subject="Signing Confirmation",
@@ -26,6 +29,11 @@ def send_confirmation(modeladmin, request, qs):
         emails, "s" if emails != 1 else ""))
 send_confirmation.short_description = ("Send confirmation emails for "
                                        "selected signatures")
+
+def clear_response(modeladmin, request, qs):
+    qs.update(response=None, tech_req=None)
+    messages.success(request, "Cleared {} signatures.".format(qs.count()))
+clear_response.short_description = "Clear selected responses and tech reqs."
 
 @admin.register(Signing)
 class SigningAdmin(admin.ModelAdmin):
@@ -37,7 +45,7 @@ class SigningAdmin(admin.ModelAdmin):
                    'response', 'timed_out')
     search_fields = ('actor__first_name', 'actor__last_name',
                      'character__name')
-    actions = [send_confirmation]
+    actions = [send_confirmation] + ([clear_response] if settings.DEBUG else [])
     
     fieldsets = (
         ("Role", {
@@ -228,14 +236,14 @@ class MetaAdmin(admin.ModelAdmin):
     search_fields = ('show__title',)
     list_filter = ('show__season', 'show__year', 'callbacks_submitted',
                    'first_cast_submitted', 'cast_submitted')
+    autocomplete_fields = ('tech_req_pool',)
     fieldsets = (
         ("", {
             "fields": ('show', 'release_meta',)
         }),
         ("Technical Requirement", {
-            "fields": ('tech_req_pool', 'num_tech_reqers'),
-            "description": "To allow this show to receive tech reqers, please "
-            "add it to a Tech Req Show Pool."
+            "fields": ('tech_req_pool', ('num_tech_reqers', 'exempt_year')),
+            "description": "Set the shows this show will contribute tech reqers to."
         }),
         ("Information", {
             "fields": ('contact_email_link',)
@@ -297,19 +305,17 @@ class AuditionMetaAdmin(MetaAdmin):
     
 @admin.register(TechReqCastingMeta)
 class TechReqMetaAdmin(MetaAdmin):
-    list_display = ('show', 'tech_req_pool', 'contributes_to',
-                    'contributors', 'tech_reqer_numbers', 'tech_reqers')
+    list_display = ('show', 'contributes_to', 'contributors',
+                    'tech_reqer_numbers', 'tech_reqers')
     list_filter = ('show__season', 'show__year',
                    'show__space__building')
 
     def contributes_to(self, obj):
-        return (", ".join([str(i) for i in obj.tech_req_pool.shows.all()
-                           if obj.show not in i.show])
+        return (", ".join([str(i) for i in obj.tech_req_pool.all()])
                 if obj.tech_req_pool else None)
-
+    
     def contributors(self, obj):
-        return ((", ".join([str(i) for i in obj.tech_req_contributors
-                            if i.show not in obj.show]) or None)
+        return ((", ".join([str(i) for i in obj.tech_req_contributors]) or None)
                 if obj.tech_req_contributors else None)
 
     def tech_reqer_numbers(self, obj):
@@ -319,18 +325,6 @@ class TechReqMetaAdmin(MetaAdmin):
     def tech_reqers(self, obj):
         return (", ".join([str(i.actor) for i in obj.tech_reqers])
                 if obj.tech_reqers else None)
-    
-@admin.register(TechReqPool)
-class TechReqAdmin(admin.ModelAdmin):
-    fields = (('name', 'year', 'season'), 'exempt_year', 'shows')
-    autocomplete_fields = ('shows',)
-
-    list_filter = ("year", "season")
-    list_display = ('name', 'year', 'season', 'exempt_year', 'showstr')
-
-    def showstr(self, obj):
-        return ", ".join([str(i) for i in obj.shows.all()])
-    showstr.short_description = "Shows"
 
 @admin.register(Audition)
 class AuditionAdmin(admin.ModelAdmin):

@@ -182,22 +182,6 @@ class CastingReleaseMeta(models.Model):
                 { "second_signing_opens":
                   "Second-round signing must open after first-round signing."})
 
-class TechReqPool(Season):
-    name = models.CharField(max_length=36)
-    shows = models.ManyToManyField(
-        "casting.CastingMeta",
-        help_text="Shows in this pool that need tech reqers.")
-
-    exempt_year = models.PositiveSmallIntegerField(
-        null=True, help_text="Actors in this year do not need to contribute to "
-        "this pool.")
-
-    def __str__(self):
-        return "{} ({})".format(self.name, self.seasonstr())
-    
-    class Meta:
-        verbose_name = "Tech Req Show Pool"
-            
 class CastingMeta(models.Model):
     show = models.OneToOneField(settings.SHOW_MODEL, on_delete=models.CASCADE,
                                 related_name="casting_meta")
@@ -222,9 +206,12 @@ class CastingMeta(models.Model):
         CastingReleaseMeta, verbose_name=CastingReleaseMeta._meta.verbose_name,
         on_delete=models.CASCADE)
     
-    tech_req_pool = models.ForeignKey(TechReqPool, blank=True, null=True,
-                                      on_delete=models.SET_NULL,
-                                      verbose_name="Contributes tech reqers to")
+    tech_req_pool = models.ManyToManyField(
+        "self", blank=True, verbose_name="Actors must tech req on one of",
+        symmetrical=False, related_name="tech_req_contributor_set")
+    exempt_year = models.PositiveSmallIntegerField(
+        null=True, blank=True,
+        help_text="Actors in this year do not need to sign for a tech req.")
     num_tech_reqers = models.PositiveSmallIntegerField(
         default=999, verbose_name="Tech Reqers Allowed",
         help_text="How many tech reqers can this show have?")
@@ -259,8 +246,7 @@ class CastingMeta(models.Model):
 
     @property
     def tech_req_contributors(self):
-        return CastingMeta.objects.filter(
-            tech_req_pool__in=self.techreqpool_set.all())
+        return self.tech_req_contributor_set.all()
     
     @property
     def audition_avg(self):

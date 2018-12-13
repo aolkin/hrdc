@@ -10,7 +10,7 @@
 <h2 class="text-center">{{ object }}</h2>
 
 <div class="row justify-content-center">
-  {% if object.tech_req_pool and object.tech_req_pool.shows.exists %}
+  {% if object.tech_req_pool.exists %}
   <div class="col-md-6">
     <div class="card border-secondary">
       <div class="card-body">
@@ -19,21 +19,23 @@
 	  following shows:
 	</p>
 	<ul>
-	  {% for i in object.tech_req_pool.shows.all %}
+	  {% for i in object.tech_req_pool.all %}
 	  {% if i != object %}
 	  <li>{{ i }}</li>
 	  {% endif %}
 	  {% endfor %}
 	</ul>
+	{% if object.exempt_year %}
 	<p>
-	  Actors graduating in {{ object.tech_req_pool.exempt_year }} are
+	  Actors graduating in {{ object.exempt_year }} are
 	  exempt.
 	</p>
+	{% endif %}
       </div>
     </div>
   </div>
   {% endif %}
-  {% if object.techreqpool_set.exists %}
+  {% if object.tech_req_contributors.exists %}
   <div class="col-md-6">
     <div class="card border-secondary">
       <div class="card-body">

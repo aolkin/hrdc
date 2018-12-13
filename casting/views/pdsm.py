@@ -51,7 +51,7 @@ class StaffViewMixin:
                     "url": reverse("casting:cast_list", args=(show.pk,)),
                     "active": is_active and current_url == "cast_list"
                 })
-            if show.techreqpool_set.exists():
+            if show.tech_req_contributor_set.exists():
                 submenu.append({
                     "name": "Tech Reqs",
                     "url": reverse("casting:tech_reqs", args=(show.pk,)),

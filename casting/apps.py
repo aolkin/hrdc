@@ -15,5 +15,4 @@ class CastingConfig(AppConfig):
         add_delete_permissions(chatmodels.Message)
         add_all_permissions(models.Slot)
         add_change_permissions(models.CastingMeta,
-                               models.CastingReleaseMeta,
-                               models.TechReqPool)
+                               models.CastingReleaseMeta)
