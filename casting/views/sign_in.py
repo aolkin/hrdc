@@ -90,7 +90,7 @@ class ActorSignInStart(ActorSignInBase, BaseUpdateView):
     
     def form_valid(self, form):
         self.actor, created = get_user_model().objects.get_or_create(
-            email=form.cleaned_data["email"],
+            email=form.cleaned_data["email"].lower(),
             defaults={"source": "casting"})
         self.request.session["actor"] = self.actor.pk
         self.request.session["building"] = self.object.pk
