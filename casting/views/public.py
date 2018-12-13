@@ -216,13 +216,13 @@ class SigningView(FixHeaderUrlMixin, ListView):
         signed = []
         for signings in shows.values():
             for obj, res, tech in signings:
-                if res is None and accepted[obj.character.show_id]:
-                    if not obj.character.allow_multiple_signatures:
-                        res = 0
-                        messages.info(self.request,
-                                      "Since you signed for a role in {}, {} "
-                                      "was automatically rejected.".format(
-                                          obj.character.show, obj.character))
+                # if res is None and accepted[obj.character.show_id]:
+                #     if not obj.character.allow_multiple_signatures:
+                #         res = 0
+                #         messages.info(self.request,
+                #                       "Since you signed for a role in {}, {} "
+                #                       "was automatically rejected.".format(
+                #                           obj.character.show, obj.character))
                 if res is not None and res != obj.response:
                     if obj.response is not None or obj.tech_req is not None:
                         messages.error(self.request,
