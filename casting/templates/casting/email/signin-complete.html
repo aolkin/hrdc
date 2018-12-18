@@ -1,0 +1,52 @@
+{% extends "casting/email/base.html" %}
+{% load email %}
+{% load bt %}
+{% load humanize %}
+
+{% block body %}
+<table cellpadding="0" cellspacing="8" width="100%">
+  <tr>
+    <td align="center">
+      {% if IS_HTML %}
+      <h2 style="margin-top: 18px;">Audition Sign-in Confirmation</h2>
+      <h3 style="margin-bottom: 4px;">You have signed in to audition for {{ auditions|length|apnumber }} show{{ auditions|length|pluralize }}.</h3>
+      {% endif %}
+    </td>
+  </tr>
+  {% if IS_HTML %}
+  <style>
+    .special-link {
+    text-decoration: none;
+    color: #666666;
+    }
+    .special-link:hover {
+    text-decoration: underline;
+    color: #333333;
+    }
+  </style>
+  {% endif %}
+  <tr>
+    <td align="left" style="font-size: 1.1em">
+      <ul>
+	{% for audition in auditions %}
+	<li>
+	  <span style="font-weight: 600">{{ audition.show }}</span>,
+	  holding auditions in <em>{{ audition.space }}</em>.
+	  <small>Signed in at {{ audition.signed_in|date:"F j, g:i A" }}.</small>
+	</li>
+	{% endfor %}
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" style="padding-top: 8px; font-weight: bold;">
+      {% href 'casting:sign_in_public' 'sign in for more auditions' class='special-link' %}
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      {% href 'casting:public_index' 'common casting portal' class='special-link' %}
+    </td>
+  </tr>
+</table>
+{% endblock %}

@@ -17,6 +17,8 @@ from django.utils import timezone
 from django.utils.functional import SimpleLazyObject
 import datetime
 
+from emailtracker.tools import render_for_user
+
 from ..models import *
 from . import get_current_slots, building_model
 from ..utils import UserIsSeasonPdsmMixin, suppress_autotime
@@ -211,11 +213,19 @@ class ActorSignInDone(ActorSignInBase, TemplateView):
     template_name = "casting/sign_in/done.html"
     
     def get(self, *args, **kwargs):
-        for i in Audition.objects.filter(
-            id__in=self.request.session.get("audition_ids", [])):
+        auditions = Audition.objects.filter(
+            id__in=self.request.session.get("audition_ids", []))
+        for i in auditions:
             i.sign_in_complete=True
             i.save()
-        # Email sign-in confirmation here
+        render_for_user(self.get_actor(), "casting/email/signin-complete.html",
+                        "signin-complete",
+                        "-".join(self.request.session.get("show_ids", [])),
+                        { "auditions": auditions },
+                        subject="Common Casting Sign-in Confirmation",
+                        tags=["casting", "signin_complete"])
+        messages.success(self.request, "You should receive a sign-in " +
+                         "confirmation via email shortly.")
         response = super().get(*args, **kwargs)
         try:
             del self.request.session["show_ids"]
