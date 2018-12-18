@@ -11,17 +11,25 @@
   <h1 class="text-center display-heading">
     {% setting "ADMIN_SITE_TITLE" %}</h1>
 </div>
-<div class="row justify-content-center my-5">
+<div class="row justify-content-center my-3">
   <div class="col-md-6">
     <a href="{% url 'casting:public_index' %}"
        class="btn btn-lg btn-info btn-block">
-      Public Portal - For Actors
+      Common Casting
+    </a>
+  </div>
+</div>
+<div class="row justify-content-center mb-5">
+  <div class="col-md-6">
+    <a href="{% url 'dramaorg:register' %}?post={{ request.GET.next }}"
+       class="btn btn-md btn-secondary btn-block">
+      Create an {% setting "BT_SITE_TITLE" %} Account
     </a>
   </div>
 </div>
 <div class="row justify-content-center">
   <form method="POST" class="col-md-6">
-    <legend class="text-center">Staff Login or Edit Profile</legend>
+    <legend class="text-center">Login to {% setting 'BT_SITE_TITLE' %}</legend>
     {% csrf_token %}
     {{ form|bootstrap }}
     <p class="form-text text-center">

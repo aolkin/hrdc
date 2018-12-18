@@ -5,7 +5,12 @@
 {% block extra_footer %}
 {% if not request.session.popout %}
 <div class="fixed-bottom">
-  <a href="{% url 'casting:index' %}" class="text-muted d-block bg-faded">
+  <a class="text-muted d-block bg-faded"
+     {% if request.session.located_building %}
+     href="{% url 'casting:public_index' %}"
+     {% else %}
+     href="{% url 'casting:index' %}"
+     {% endif %}>
     leave sign-in form
   </a>
 </div>

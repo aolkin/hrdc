@@ -1,0 +1,26 @@
+{% extends "bt/default.html" %}
+
+{% load bootstrap %}
+
+{% block title %}Sign in | Common Casting{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <p class="lead">
+    Please allow location access so we can figure out where to sign you in!
+  </p>
+  <div class="alert alert-danger d-none" role="alert">
+    Unable to determine your location. Please refresh and try again or sign in
+    at the table.
+  </div>
+</div>
+<div class="row justify-content-center">
+  <p>
+    It may take a moment to determine your location, please be patient.
+  </p>
+</div>
+<form method="POST" class="d-none geolocation-form">
+  {% csrf_token %}
+  {{ form }}
+</form>
+{% endblock %}

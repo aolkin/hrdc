@@ -325,7 +325,7 @@ class RequestLinkView(FixHeaderUrlMixin, FormView):
         form.send_link()
         messages.success(self.request, "Link sent!")
         return super().form_valid(form)
-    
+
 urlpatterns = [
     url(r'^show/(?P<pk>\d+)/', include([
         url(r'^callbacks/$', CallbackView.as_view(),
@@ -337,6 +337,7 @@ urlpatterns = [
     ])),
     url(r'^$', IndexView.as_view(), name="public_index"),
     url(r'^(?P<pk>\d+)/$', PKIndexView.as_view(), name="public_index_pk"),
+    
     url(r'^sign/$', SigningView.as_view(), name="signing"),
     url(r'^getlink/$', RequestLinkView.as_view(), name="request_link"),
     url(r'^t/([A-Za-z0-9+-]{86})/$', actor_token_auth, name="actor_token"),

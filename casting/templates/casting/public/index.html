@@ -11,6 +11,18 @@
 {% block title %}Common Casting{% endblock %}
 
 {% block content %}
+<h2 class="text-center mt-3">HRDC Common Casting Portal</h2>
+<div class="text-center mt-4">
+{% if current %}
+<a class="btn btn-info btn-lg"
+   href="{% url 'casting:sign_in_public' %}">
+  Sign in to Common Casting</a>
+{% else %}
+{% if not request.user.is_authenticated %}
+<a class="btn btn-info btn-lg" href="{% url 'dramaorg:register' %}?post={% url 'casting:sign_in_public' %}&from=Common%20Casting">Register for Common Casting</a>
+{% endif %}
+{% endif %}
+</div>
 {% if schedule %}
 <h3 class="text-center mt-5">
   Common Casting Schedule

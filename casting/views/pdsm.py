@@ -91,6 +91,11 @@ class TablingView(StaffViewMixin, UserIsSeasonPdsmMixin, DetailView):
     template_name = "casting/tabling.html"
     model = building_model
 
+    def dispatch(self, *args, **kwargs):
+        if "located_building" in self.request.session:
+            del self.request.session["located_building"]
+        return super().dispatch(*args, **kwargs)
+    
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["auditions"] = Audition.objects.filter(

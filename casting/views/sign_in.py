@@ -7,6 +7,7 @@ from django.urls import reverse_lazy, reverse
 from django.db.models import Q
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
 
 from django.conf.urls import url
@@ -39,9 +40,23 @@ class SignInStartForm(forms.Form):
     def __init__(self, instance, **kwargs):
         self.building = instance
         super().__init__(**kwargs)
-
+        
 class ActorSignInBase(UserIsSeasonPdsmMixin, TemplateResponseMixin):
     popout = False
+
+    def get_building(self):
+        return self.request.session.get("building") or self.get_object().pk
+    
+    def get_location(self):
+        return self.request.session.get("located_building")
+    
+    def test_func(self):
+        if self.get_location:
+            if (self.get_location() == self.get_building() and
+                (self.request.session["located_building_ts"] > (
+                    timezone.now() - timedelta(hours=1)))):
+                return True
+        return super().test_func()
 
     def get_success_url(self):
         if self.get_actor().is_initialized:
@@ -60,7 +75,8 @@ class ActorSignInBase(UserIsSeasonPdsmMixin, TemplateResponseMixin):
     
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context["BT_header_url"] = None
+        if not self.get_location():
+            context["BT_header_url"] = None
         context["shows"] = CastingMeta.objects.filter(
             id__in=map(lambda x: x.split(":")[0],
                        self.request.session.get("show_ids",[])))
@@ -72,7 +88,7 @@ class ActorSignInStart(ActorSignInBase, BaseUpdateView):
     model = building_model
     template_name = "casting/sign_in/start.html"
     show_all = False
-
+    
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         self.request.session["popout"] = self.popout
@@ -86,12 +102,17 @@ class ActorSignInStart(ActorSignInBase, BaseUpdateView):
             slots = get_current_slots().filter(space__building=self.object)
         context["shows"] = slots.order_by("show_id", "start").values_list(
             "show__show__title", "show_id", "space_id")
+        if self.get_location():
+            context["located_user_signin"] = True
         return context
     
     def form_valid(self, form):
-        self.actor, created = get_user_model().objects.get_or_create(
-            email=form.cleaned_data["email"].lower(),
-            defaults={"source": "casting"})
+        if self.request.session.get("located_building"):
+            self.actor = self.request.user
+        else:
+            self.actor, created = get_user_model().objects.get_or_create(
+                email=form.cleaned_data["email"].lower(),
+                defaults={"source": "casting"})
         self.request.session["actor"] = self.actor.pk
         self.request.session["building"] = self.object.pk
         self.request.session["show_ids"] = form.cleaned_data["shows"]
@@ -204,6 +225,35 @@ class ActorSignInDone(ActorSignInBase, TemplateView):
             pass
         return response
 
+class PositionForm(forms.Form):
+    latitude = forms.fields.FloatField()
+    longitude = forms.fields.FloatField()
+    accuracy = forms.fields.FloatField()
+    
+class ActorSignInPublic(LoginRequiredMixin, FormView):
+    template_name = "casting/sign_in/public.html"
+    form_class = PositionForm
+    
+    def form_valid(self, form):
+        slots = get_current_slots().filter(
+            space__building__latitude__isnull=False,
+            space__building__longitude__isnull=False).values_list(
+                "space__building", "space__building__latitude",
+                "space__building__longitude").distinct()
+        for pk, lat, lon in slots:
+            latd = form.cleaned_data["latitude"] - lat
+            lond = form.cleaned_data["longitude"] - lon
+            distance = (latd ** 2 + lond ** 2) ** (0.5)
+            if distance < config.get_float("distance_epsilon"):
+                self.request.session["located_building"] = pk
+                self.request.session["located_building_ts"] = timezone.now()
+                return HttpResponseRedirect(reverse("casting:sign_in_start",
+                                                    args=(pk,)))
+        messages.warning(
+            self.request,
+            "You are not at a location currently hosting Common Casting.")
+        return HttpResponseRedirect(reverse("casting:public_index"))
+
 urlpatterns = [
     url(r'^(?P<pk>\d+)/$', ActorSignInStart.as_view(),
         name="sign_in_start"),
@@ -218,4 +268,6 @@ urlpatterns = [
     url(r'^season/(?P<pk>\d+)/$', ActorSignInTech.as_view(),
         name="sign_in_tech"),
     url(r'^done/$', ActorSignInDone.as_view(),
-        name="sign_in_done")]
+        name="sign_in_done"),
+    url(r'^location/$', ActorSignInPublic.as_view(), name="sign_in_public")
+]

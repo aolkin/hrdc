@@ -10,9 +10,10 @@ from config import config
 
 import time
 
-def activate(user):
+def activate(user, uniq=""):
     render_for_user(user, "dramaemail/activate.html",
-                    "activate", user.pk, tags=["auth", "activate"],
+                    "activate", str(user.pk) + str(uniq),
+                    tags=["auth", "activate"],
                     subject="Welcome to {}".format(settings.BT_SITE_TITLE))
     
 def send_reset(user):

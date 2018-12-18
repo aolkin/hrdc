@@ -59,6 +59,8 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     
     source = models.CharField(default="default", editable=False,
                               max_length=20)
+    post_register = models.CharField(default="", editable=False, max_length=20)
+    
     is_active = models.BooleanField(default=True)
     login_token = models.CharField(max_length=86, default=generate_token)
     token_expiry = models.DateTimeField(default=timezone.now)
@@ -159,6 +161,9 @@ def clear_token_on_user(sender, request, user, **kwargs):
 class Building(models.Model):
     name = models.CharField(max_length=150)
     address = models.TextField(blank=True)
+
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
 
     def __str__(self):
         return self.name

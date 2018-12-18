@@ -159,8 +159,8 @@ class ShowAdmin(admin.ModelAdmin):
 
 @admin.register(Building)
 class BuildingAdmin(admin.ModelAdmin):
-    def has_module_permission(self, request):
-        return False
+    list_display = ("__str__", "latitude", "longitude")
+    list_editable = ('latitude', 'longitude')
     
 @admin.register(Space)
 class SpaceAdmin(admin.ModelAdmin):

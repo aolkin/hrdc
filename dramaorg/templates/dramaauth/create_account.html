@@ -1,0 +1,29 @@
+{% extends "bt/default.html" %}
+{% load bt %}
+
+{% block title %}Sign up for {% setting 'BT_SITE_TITLE' %}{% endblock %}
+
+{% load bt %}
+{% load bootstrap %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <form method="POST" class="col-md-6">
+    <legend class="text-center">
+      Sign up for {% if request.GET.from %}{{ request.GET.from }}
+      {% else %}{% setting 'BT_SITE_TITLE' %}{% endif %}</legend>
+    {% csrf_token %}
+    {{ form|bootstrap }}
+    <p class="form-text text-muted">
+      Please enter your email address to begin the registration process.</p>
+    <button type="submit" class="btn btn-primary btn-block">
+      Sign Up</button>
+  </form>
+</div>
+
+<div class="row justify-content-center">
+  <p class="lead mt-5">Already have an account?
+    <a href="{% url 'dramaorg:login' %}?next={{ request.GET.post }}">Log in</a>.
+  </p>
+</div>
+{% endblock %}

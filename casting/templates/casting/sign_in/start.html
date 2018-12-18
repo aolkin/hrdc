@@ -7,13 +7,27 @@
   <h1>Welcome to Common Casting</h1>
   {% if shows %}
   <p class="lead">
-    Enter your email and select the shows you wish to audition for to begin.
+    {% if not located_user_signin %}Enter your email and select
+    {% else %}Select{% endif %}
+    the shows you wish to audition for to begin.
   </p>
 </div>
 <div class="row justify-content-center">
   <form method="POST" class="col-lg-6 col-md-8 audition-sign-in-shows">
     {% csrf_token %}
+    {% if located_user_signin %}
+    <div class="form-group">
+      <label class="col-form-label sr-only " for="id_email">Email</label>
+      <input type="email" name="email" class="form-control" readonly id="id_email" value="{{ request.user.email }}">
+      {% if not request.session.popout %}
+      <p class="form-text text-center">
+	Not you? <a href="{% url 'dramaorg:logout' %}">Log out</a>
+      </p>
+      {% endif %}
+    </div>
+    {% else %}
     {{ form|bootstrap_inline }}
+    {% endif %}
     <p class="lead text-center">
       Shows currently holding auditions at {{ object }}:
     </p>

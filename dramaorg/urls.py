@@ -18,7 +18,7 @@ auth_urls = [
     url(r'^password/$', auth_view("PasswordChange"),
         name='password_change'),
     url(r'^password/done/$', auth_view("PasswordChangeDone"),
-        name='PasswordChange_done'),
+        name='password_change_done'),
 ]
 
 app_name = "dramaorg"
@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^$', IndexView.as_view(), name="index"),
     url(r'^', include(auth_urls)),
     url(r'^profile/$', ProfileView.as_view(), name="profile"),
+    url(r'^register/$', RegisterView.as_view(), name="register"),
     url(r'^u/([A-Za-z0-9+-]{86})/$', capture_token, name="token_reset"),
     url(r'^password/token/$', TokenView.as_view(), name="password_token"),
     url(r'^reset/$', ResetView.as_view(), name="start_reset"),

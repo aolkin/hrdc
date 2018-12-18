@@ -19,10 +19,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 
 from .utils import user_is_initialized
-from .email import send_reset
+from .email import send_reset, activate
 from .models import *
 
 from config import config
+import time
 
 all_indexes = []
 admin_indexes = [
@@ -107,9 +108,17 @@ def capture_token(request, token):
 
 class TokenView(FormView):
     form_class = SetPasswordForm
-    success_url = reverse_lazy('dramaorg:index')
     template_name = "dramaauth/set_password.html"
-    
+
+    def get_success_url(self):
+        if self.request.user.post_register:
+            url = reverse("dramaorg:profile") + "?next={}".format(
+                self.request.user.post_register)
+            self.request.user.post_register = ""
+        else:
+            url = reverse("dramaorg:index")
+        return url
+            
     @method_decorator(sensitive_post_parameters())
     @method_decorator(never_cache)
     def dispatch(self, *args, **kwargs):
@@ -182,6 +191,44 @@ class ResetView(FormView):
                            "that email, please contact the administrator.")
             return super().form_invalid(form)
 
+class UserRegistrationForm(forms.Form):
+    email = forms.EmailField(label="Email", max_length=254)
+
+class RegisterView(FormView):
+    form_class = UserRegistrationForm
+    template_name = "dramaauth/create_account.html"
+
+    def get_success_url(self):
+        return reverse("dramaorg:register") + "?post={}&from={}".format(
+            self.request.GET.get("post",""), self.request.GET.get("from",""))
+    
+    def form_valid(self, form):
+        users = get_user_model().objects.filter(**{
+            '%s__iexact' % get_user_model().get_email_field_name():
+            form.cleaned_data["email"],
+        })
+        if len(users) > 1:
+            messages.error(self.request, "Multiple users found with this " +
+                           "email address. Please contact support.")
+            return super().form_invalid(form)
+        if users:
+            user = users[0]
+            if user.password:
+                messages.error(self.request, "A user with this email already " +
+                               "exists. Please log in instead.")
+                return super().form_invalid(form)
+        else:
+            user = get_user_model()(email=form.cleaned_data["email"])
+        user.post_register = self.request.GET.get("post","")
+        user.source = "registration"
+        user.new_token(save=False, expiring=True)
+        user.save()
+        activate(user, time.time() if users else "")
+        messages.info(self.request, "Check for an email from {} to ".format(
+            settings.DEFAULT_FROM_EMAIL) +
+                      "complete the sign up process.")
+        return super().form_valid(form)
+                                                    
 class ProfileView(LoginRequiredMixin, UpdateView):
     model = User
     fields = ['first_name', 'last_name', 'pgps', 'gender_pref', 'phone',

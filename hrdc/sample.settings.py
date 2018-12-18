@@ -121,6 +121,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 CSRF_USE_SESSIONS = True
 
+SESSION_SERIALIZER = "django.contrib.sessions.serializers.PickleSerializer"
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 

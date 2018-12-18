@@ -13,6 +13,10 @@
 <div class="row justify-content-center">
   <div class="col-lg-6 col-md-8 audition-sign-in-shows">
     {% include "casting/sign_in/shows.html" %}
+    {% if request.session.located_building %}
+    <a href="{% url 'casting:public_index' %}"
+       class="btn btn-primary btn-block">Done</a>
+    {% else %}
     <a {% if request.session.popout %}
        href="{% url 'casting:sign_in_start_popout' request.session.building %}"
        {% else %}
@@ -20,6 +24,7 @@
        {% endif %}
        class="btn btn-primary btn-block"
        data-autoreset="{% if shows %}5000{% else %}15000{% endif %}">Done</a>
+    {% endif %}
   </div>
 </div>
 {% endblock %}
