@@ -255,7 +255,7 @@ class ActorSignInPublic(LoginRequiredMixin, FormView):
             latd = form.cleaned_data["latitude"] - lat
             lond = form.cleaned_data["longitude"] - lon
             distance = (latd ** 2 + lond ** 2) ** (0.5)
-            if distance < config.get_float("distance_epsilon"):
+            if distance < config.get_float("distance_epsilon", 0):
                 messages.success(self.request, "Welcome to {}!".format(name))
         messages.error(
             self.request,
