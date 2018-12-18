@@ -249,7 +249,15 @@ class ActorSignInPublic(LoginRequiredMixin, FormView):
                 self.request.session["located_building_ts"] = timezone.now()
                 return HttpResponseRedirect(reverse("casting:sign_in_start",
                                                     args=(pk,)))
-        messages.warning(
+        for pk, lat, lon, name in building_model.objects.filter(
+                latitude__isnull=False, longitude__isnull=False).values_list(
+                    "pk", "latitude", "longitude", "name"):
+            latd = form.cleaned_data["latitude"] - lat
+            lond = form.cleaned_data["longitude"] - lon
+            distance = (latd ** 2 + lond ** 2) ** (0.5)
+            if distance < config.get_float("distance_epsilon"):
+                messages.success(self.request, "Welcome to {}!".format(name))
+        messages.error(
             self.request,
             "You are not at a location currently hosting Common Casting.")
         return HttpResponseRedirect(reverse("casting:public_index"))

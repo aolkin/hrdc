@@ -6,18 +6,22 @@
 
 {% block content %}
 <div class="row justify-content-center">
-  <p class="lead">
-    Please allow location access so we can figure out where to sign you in!
-  </p>
-  <div class="alert alert-danger d-none" role="alert">
-    Unable to determine your location. Please refresh and try again or sign in
-    at the table.
+  <div class="col-11">
+    <p class="lead text-center">
+      Please allow location access so we can figure out where to sign you in!
+    </p>
+    <div class="alert alert-danger d-none" role="alert">
+      Unable to determine your location. Please refresh and try again or sign in
+      at the table.
+    </div>
   </div>
 </div>
 <div class="row justify-content-center">
-  <p>
-    It may take a moment to determine your location, please be patient.
-  </p>
+  <div class="col-8">
+    <p class="text-center">
+      It may take a moment to determine your location, please be patient.
+    </p>
+  </div>
 </div>
 <form method="POST" class="d-none geolocation-form">
   {% csrf_token %}
