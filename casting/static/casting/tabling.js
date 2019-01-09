@@ -11,6 +11,13 @@ function filterTable(column, val) {
     );
 }
 
+function hideFilteringMessage(always) {
+    if (always === true) {
+        localStorage.hideFilteringMessage = true;
+    }
+    $(".filterable-instructions").popover("hide");
+}
+
 $(function() {
 
     $("th.filterable").click(function(e){
@@ -36,5 +43,11 @@ $(function() {
     $("#chat-window").click(function(e) {
         e.stopPropagation();
     });
+
+    if (localStorage.hideFilteringMessage != "true") {
+        $(".filterable-instructions").popover();
+        $(".filterable-instructions").popover("show");
+        $(".filterable-instructions-dismiss").click(hideFilteringMessage);
+    }
 
 });

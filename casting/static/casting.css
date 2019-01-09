@@ -274,3 +274,9 @@ p.lead.only-small {
 	column-count: 2;
     }
 }
+
+.filterable-instructions-never {
+    position: absolute;
+    bottom: 1em;
+    right: 1em;
+}
