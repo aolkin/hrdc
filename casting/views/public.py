@@ -239,12 +239,19 @@ class SigningView(FixHeaderUrlMixin, ListView):
                                                tshow))
                             continue
                         obj.tech_req = tshow
+                    if res:
+                        lower_signatures = obj.character.signing_set.exclude(
+                            pk=obj.pk).filter(
+                                order__gt=obj.order, response=True)
+                        lower_signatures.update(response=None, tech_req=None)
                     obj.save()
                     signed.append(obj)
         if signed:
             messages.success(self.request,
                              "Successfully signed {} role{}.".format(
                                  len(signed), "s" if len(signed) != 1 else ""))
+            if not self.get_actor().login_token:
+                self.get_actor().new_token()
             render_for_user(self.get_actor(), "casting/email/signed.html",
                             "signed", "-".join([str(i.pk) for i in signed]),
                             { "signed": signed },

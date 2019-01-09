@@ -103,6 +103,8 @@ def release_casting(pk):
 @shared_task(ignore_result=True)
 def signing_email(pk):
     actor = get_user_model().objects.get(pk=pk)
+    if not actor.login_token:
+        actor.new_token()
     return render_for_user(actor, "casting/email/signing-link.html",
                            "requested-link", timezone.now(),
                            subject="Requested Casting Signing Link",
