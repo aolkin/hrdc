@@ -11,9 +11,9 @@
   Cast List for:
 </h3>
 <h2 class="text-center">{{ object }}</h2>
+{% if user_is_staff %}
 <div class="row justify-content-center">
   <div class="col-md-8 text-center">
-    {% if user_is_staff %}
     {% if object.cast_submitted %}
     <div class="alert alert-info">
       <strong>Cast List submitted!</strong>
@@ -69,8 +69,12 @@
       {% endif %}
     </div>
     {% endif %}
-    {% endif %}
-    <p class="lead">{{ object.cast_list_description|urlize|linebreaksbr }}</p>
+  </div>
+</div>
+{% endif %}
+<div class="row justify-content-center">
+  <div class="col">
+    <p class="lead casting-public-description">{{ object.cast_list_description|urlize|linebreaksbr }}</p>
   </div>
 </div>
 <div class="container-fluid limited-container-1200">

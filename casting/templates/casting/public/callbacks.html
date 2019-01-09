@@ -21,9 +21,9 @@
 </div>
 {% endif %}
 {% if object.callbacks_released or user_is_staff or request.user.is_board and object.callbacks_submitted %}
+{% if user_is_staff %}
 <div class="row justify-content-center">
   <div class="col-md-8 text-center">
-    {% if user_is_staff %}
     {% if object.callbacks_submitted %}
     <div class="alert alert-info">
       <strong>Callbacks submitted!</strong>
@@ -59,8 +59,12 @@
       {% endif %}
     </div>
     {% endif %}
-    {% endif %}
-    <p class="lead">{{ object.callback_description|urlize|linebreaksbr }}</p>
+  </div>
+</div>
+{% endif %}
+<div class="row justify-content-center">
+  <div class="col">
+    <p class="lead casting-public-description">{{ object.callback_description|urlize|linebreaksbr }}</p>
   </div>
 </div>
 <div class="container-fluid limited-container-1200">

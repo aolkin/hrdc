@@ -264,3 +264,13 @@ p.lead.only-small {
     min-width: 20rem;
     margin-top: 1rem;
 }
+
+.casting-public-description {
+    text-align: justify;
+}
+
+@media (min-width: 768px) {
+    .casting-public-description {
+	column-count: 2;
+    }
+}
