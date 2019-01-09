@@ -42,6 +42,10 @@ class SignInStartForm(forms.Form):
     def __init__(self, instance, **kwargs):
         self.building = instance
         super().__init__(**kwargs)
+
+PERMISSION_DENIED_MESSAGE = """You must be logged in as a staff member to access
+ the casting sign-in page directly. If you are not a staff member, please try
+ the publicly accessible location-based sign-in method."""
         
 class ActorSignInBase(UserIsSeasonPdsmMixin, TemplateResponseMixin):
     popout = False
@@ -53,12 +57,15 @@ class ActorSignInBase(UserIsSeasonPdsmMixin, TemplateResponseMixin):
         return self.request.session.get("located_building")
     
     def test_func(self):
-        if self.get_location:
+        if self.get_location():
             if (self.get_location() == self.get_building() and
                 (self.request.session["located_building_ts"] > (
                     timezone.now() - timedelta(hours=1)))):
                 return True
         return super().test_func()
+    
+    def get_permission_denied_message(self):
+        return PERMISSION_DENIED_MESSAGE
 
     def get_success_url(self):
         if self.get_actor().is_initialized:

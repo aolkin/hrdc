@@ -1,0 +1,28 @@
+{% extends "bt/default.html" %}
+
+{% load config %}
+
+{% block title %}Error{% endblock %}
+
+{% include "dramaorg/user_dropdown.html" %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center">
+  <div class="col-md-2 p-2 text-center alert alert-danger">
+    <p class="mb-1"><i class="fa fa-exclamation-triangle fa-5x"></i></p>
+    <p class="mb-1">{% block error_short %}Unknown Error{% endblock %}</p>
+  </div>
+  <div class="col-md-6 ml-3">
+    <p class="lead">{% block error_detail %}{{ exception }}{% endblock %}</p>
+  </div>
+</div>
+<div class="row justify-content-center">
+  <div class="col-md-8 text-center">
+    <p>If you think this is in error, please start over or go <a href="javascript:(function(){history.back();setTimeout(function(){location.assign('{% url "dramaorg:index" %}');},500);})()">back</a> and try again.</p>
+    <p>If you are still unable to complete the desired action, please contact
+      <a href="mailto:{% option 'site_contact_email' %}">
+	{% option 'site_contact_name' %}</a> for support.
+    </p>
+  </div>
+</div>
+{% endblock %}
