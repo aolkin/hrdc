@@ -30,6 +30,7 @@ admin_indexes = [
     (reverse_lazy("admin:index"), "Site Admin",
      "edit objects, invite users, etc."),
 ]
+public_indexes = []
 
 class SeasonForm(forms.ModelForm):
     class Meta:
@@ -95,9 +96,15 @@ class IndexView(SuccessMessageMixin, FormView):
                     admin_indexes.append(get_link(u))
                 except NoReverseMatch:
                     pass
+                try:
+                    u = reverse(i+":public_index")
+                    public_indexes.append(get_link(u))
+                except NoReverseMatch:
+                    pass
         context = super().get_context_data(**kwargs)
         context["all_indexes"] = all_indexes
         context["admin_indexes"] = admin_indexes
+        context["public_indexes"] = public_indexes
         return context
 
 SESSION_TOKEN_KEY = "_CAPTURED_LOGIN_TOKEN"

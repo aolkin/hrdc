@@ -41,31 +41,55 @@
     {% option 'site_contact_name' %}</a>.</p>
 {% endif %}
 {% else %}
-<div class="text-center">
-  <p class="lead">
-    You are not a member of the executive staff of any shows in this system.
-    {% if not user.is_board %}
-    If this is incorrect, please contact
-    <a href="mailto:{% option 'site_contact_email' %}">
-      {% option 'site_contact_name' %}</a>.
-    {% endif %}
-  </p>
-  <h3 class="justify-content-center">You may 
-    <a class="" href="{% url 'dramaorg:profile' %}">edit your profile</a> or
-    <a class="" href="{% url 'dramaorg:password_change' %}">
-      change your password</a>.
-  </h3>
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="jumbotron text-center pt-4 pb-3">
+      <h3>Welcome to HRDC Apps</h3>
+      <p class="lead">
+	We couldn't find any shows that you are an executive staff member of.
+	Don't worry, you can still browse the public portal{{ public_indexes|length|pluralize }} below.
+      </p>
+      {% if not user.is_board %}
+      <p>
+	If this is incorrect, please contact
+	<a href="mailto:{% option 'site_contact_email' %}">
+	  {% option 'site_contact_name' %}</a>.
+      </p>
+      {% endif %}
+    </div>
+    <p class="text-center mb-0">
+      If you need to update your profile information, you can do so
+      <a class="" href="{% url 'dramaorg:profile' %}">here</a>.
+    </p>
+  </div>
 </div>
 {% endif %}
 
-<div class="text-center mt-4">
-  <a class="btn btn-info btn-lg" href="{% url 'casting:public_index' %}">For Actors - Public Portal</a>
+{% if public_indexes %}
+<h3 class="text-center mt-5">
+  Public HRDC Apps
+  <br><small class="text-muted">public portals for HRDC apps</small>
+</h3>
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    {% for index in public_indexes %}
+    <a href="{{ index.0 }}" class="list-group-item list-group-item-action">
+      <div class="d-flex w-100 justify-content-between">
+	<h5 class="mb-0">{{ index.1 }}</h5>
+	{% if index.2 %}
+	<small class="text-muted">{{ index.2 }}</small>
+	{% endif %}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
 </div>
+{% endif %}
 
 {% if request.user.is_pdsm or request.user.is_board %}
 {% if all_indexes %}
 <h3 class="text-center mt-5">
-  HRDC Apps
+  HRDC Apps for PDSMs
   <br><small class="text-muted">administrative tasks for your shows</small>
 </h3>
 <div class="row justify-content-center">

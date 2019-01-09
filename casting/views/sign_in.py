@@ -276,7 +276,8 @@ class ActorSignInPublic(LoginRequiredMixin, FormView):
                 messages.success(self.request, "Welcome to {}!".format(name))
         messages.error(
             self.request,
-            "You are not at a location currently hosting Common Casting.")
+            "You are not at a location currently hosting Common Casting. " +
+            "Please try again when you are in the building's lobby.")
         return HttpResponseRedirect(reverse("casting:public_index"))
 
 urlpatterns = [

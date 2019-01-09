@@ -282,6 +282,9 @@ def actor_token_logout(request):
         return HttpResponseRedirect(reverse("casting:signing"))
 
 class IndexView(FixHeaderUrlMixin, TemplateView):
+    verbose_name = "Common Casting"
+    help_text = "view schedules and posted lists or audition"
+    
     template_name = "casting/public/index.html"
 
     def get_shows(self):
