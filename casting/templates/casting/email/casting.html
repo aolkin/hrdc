@@ -16,7 +16,7 @@
     <td style="padding-left: 60px; padding-right: 60px;">
       <ul>
 	<li>The signing period opens {{ crm.signing_opens|naturalday }} at {{ crm.signing_opens|date:"g:i A" }}.</li>
-	<li>At {{ crm.second_signing_opens|date:"g:i A" }} {{ crm.second_signing_opens|naturalday }}, any roles unclaimed by their first-cast actor will be automatically offered to the first alternate.</li>
+	<li>The signing period closes at {{ crm.second_signing_opens|date:"g:i A" }} {{ crm.second_signing_opens|naturalday }}, at which time any roles unclaimed by their first-cast actor may be offered to the first alternate.</li>
 	<li>You may sign for all roles {% href 'casting:actor_token' 'here' user.login_token %} once the signing period opens.</li>
 	<li>In the meantime, please reach out to the staffs of shows you are considering if you have any questions. <em>Remember: They cannot contact you!</em></li>
       </ul>

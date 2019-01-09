@@ -37,7 +37,7 @@
   {% if firstroles %}
   <tr>
     <td style="padding-left: 40px; padding-right: 40px;">
-      If you do not sign for any of the following roles by {{ crm.second_signing_opens|date:"g:i A" }} {{ crm.second_signing_opens|naturalday }} they will automatically be offered to their first alternate:
+      If you do not sign for any of the following roles by {{ crm.second_signing_opens|date:"g:i A" }} {{ crm.second_signing_opens|naturalday }} they may be offered to their first alternate:
       <ul style="margin-top: 0.5em; margin-bottom: 1em;">
 	{% for i in firstroles %}
 	<li><strong>{{ i.character }}</strong> in <em>{{ i.character.show }}</em></li>

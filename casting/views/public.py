@@ -152,6 +152,8 @@ class SigningView(FixHeaderUrlMixin, ListView):
         context = super().get_context_data(*args, **kwargs)
         all_shows = show_model.objects.current_season().filter(
             casting_meta__isnull=False)
+        context["signing_open"] = all_shows.filter(
+            casting_meta__release_meta__stage__lt=6).exists()
         unpublished = all_shows.filter(
             casting_meta__release_meta__stage__lt=4)
         seconds = all_shows.filter(casting_meta__release_meta__stage__lt=6)
@@ -228,6 +230,11 @@ class SigningView(FixHeaderUrlMixin, ListView):
                         messages.error(self.request,
                                        "An error was encountered while saving "
                                        "your responses. Please try again.")
+                        return HttpResponseRedirect(reverse("casting:signing"))
+                    if not obj.signing_open:
+                        messages.error(self.request,
+                                       "Unable to sign for roles: the " +
+                                       "signing period has ended.")
                         return HttpResponseRedirect(reverse("casting:signing"))
                     obj.response = res
                     if res and tech:

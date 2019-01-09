@@ -36,6 +36,7 @@
 <h2 class="text-center">Roles Offered to You</h2>
 <div class="row justify-content-center">
   <div class="col-lg-6 col-md-8 col-sm-10">
+    {% if signing_open %}
     <p class="lead text-center">
       Accept or reject the roles you've been cast as below:
     </p>
@@ -43,16 +44,24 @@
       <small>
 	You may also leave any number of roles without a response and
 	return to them later.
-	<strong>Note that accepting any role in a show (even an alternate) will
-	  automatically reject the rest of the roles in that show!</strong>
+	<strong>Note that you may only accept one role in a show unless
+	  stated otherwise.</strong>
       </small>
     </p>
+    {% else %}
+    <p class="lead text-center">
+      The signing period has ended. Please contact a show's staff directly to
+      accept or decline roles.
+      <br>
+      They may also reach out to you at this point.
+    </p>
+    {% endif %}
     {% if seconds %}
     <div class="text-center alert alert-warning">
       If you do not sign for a role for which you are first-choice cast by
       {{ seconds.0.second_signing_opens|date:"g:i A" }}
-      {{ seconds.0.second_signing_opens|naturalday }}, it will automatically be
-      offered to its first alternate.
+      {{ seconds.0.second_signing_opens|naturalday }}, it will be
+      offered to alternates.
     </div>
     {% endif %}
     <p class="text-center mb-0">
@@ -89,7 +98,8 @@
 	</div>
 	{% else %}
 	<select class="form-control custom-select col-5 pull-7"
-		name="signing-response-{{ i.pk }}" 
+		name="signing-response-{{ i.pk }}"
+		{% if not i.signing_open %}disabled{% endif %}
 		{% if i.response is not None %}disabled>
 	  <option selected>{{ i.get_response_display }}</option>
 	  {% else %}>
@@ -106,6 +116,7 @@
 		name="signing-tech-req-{{ i.pk }}" data-toggle="tooltip"
 		title="Signing for {{ i.character.show }} requires you to
 		fulfill a tech req on one of these shows."
+		{% if not i.signing_open %}disabled{% endif %}
 		{% if i.response is not None %}disabled>
 	  {% if i.tech_req %}
 	  <option selected>{{ i.tech_req }}</option>
@@ -153,6 +164,7 @@
 	{% endif %}
       </div>
       {% endfor %}
+      {% if signing_open %}
       <button type="submit" class="btn btn-block btn-primary"
 	      data-toggle="tooltip"
 	      title="Please double-check your responses before submitting, as they cannot be changed later.">
@@ -161,6 +173,7 @@
       <p class="lead text-center mt-3">
 	You will receive an email confirming your signatures.
       </p>
+      {% endif %}
     </form>
   </div>
 </div>
