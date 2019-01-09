@@ -38,7 +38,7 @@ clear_response.short_description = "Clear selected responses and tech reqs."
 @admin.register(Signing)
 class SigningAdmin(admin.ModelAdmin):
     list_display = ('show', 'character', 'order_title', 'actor', 'response',
-                    'tech_req')
+                    'tech_req', 'signed_time')
     list_display_links = ('response',)
     list_filter = ('character__show__show__year',
                    'character__show__show__season',
@@ -52,10 +52,11 @@ class SigningAdmin(admin.ModelAdmin):
             "fields": ("show", "character", "order_title")
         }),
         ("Signature", {
-            "fields": ("actor", "response", 'tech_req'),
+            "fields": ("actor", "response", 'tech_req', 'signed_time'),
         }),
     )
-    readonly_fields = ("show", "character", "order_title", "actor")
+    readonly_fields = ("show", "character", "order_title", "actor",
+                       "signed_time")
     
     def has_delete_permission(self, request, obj=None):
         return False
