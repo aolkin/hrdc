@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^', include("dramaorg.urls")),
     url(r'^autocomplete/$', autocomplete_json),
     url(r'^casting/', include("casting.urls")),
+    url(r'^apply/', include("venueapp.urls")),
     url(r'^admin/', admin.site.urls),
     url(r'^email/', include('emailtracker.views')),
 ]

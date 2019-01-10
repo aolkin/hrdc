@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'dramaorg',
     'casting',
+    'venueapp',
     'bootstrapform',
     'anymail',
     'channels',
