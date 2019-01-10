@@ -117,7 +117,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
-]
+] if not DEBUG else []
 
 CSRF_USE_SESSIONS = True
 

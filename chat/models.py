@@ -41,7 +41,7 @@ def send_message(sender, instance, created, raw, **kwargs):
             "element": "<li>",
             "id": "chat-msg-{}".format(instance.pk),
             "scroll": "#chat-window .card-body",
-            "html": render_to_string("casting/pieces/chat_msg.html", {
+            "html": render_to_string("chat/msg.html", {
                 "chat" : instance
             }),
             "pulse": "bg-dark text-light",
@@ -56,7 +56,7 @@ def censor_message(sender, instance, *args, **kwargs):
             "container": "#chat",
             "element": "<li>",
             "id": "chat-msg-{}".format(instance.pk),
-            "html": render_to_string("casting/pieces/chat_msg.html", {
+            "html": render_to_string("chat/msg.html", {
                 "chat" : instance
             })
         })
