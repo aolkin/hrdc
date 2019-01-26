@@ -533,17 +533,23 @@ STANDARD_TIMES = (
     datetime.time(hour=23, minute=59, second=59),
     datetime.time(hour=11),
     datetime.time(hour=19),
-    datetime.time()
 )
 ALL_TIMES = list(sorted(
     [datetime.time(hour=i) for i in range(9, 24)] +
     [datetime.time(hour=i, minute=30) for i in range(9, 24)]))
+
 def make_time_choices(times):
     return tuple(zip(times, [i.strftime("%I:%M %p") for i in times]))
-STANDARD_TIME_CHOICES = make_time_choices(STANDARD_TIMES)
+
+STANDARD_TIME_ENDS = make_time_choices(STANDARD_TIMES)
+STANDARD_TIME_STARTS = make_time_choices(STANDARD_TIMES + (datetime.time(),))
 ALL_TIME_CHOICES = make_time_choices(ALL_TIMES)
-TIME_CHOICES = (
-    ("Common Times", STANDARD_TIME_CHOICES),
+START_TIME_CHOICES = (
+    ("Common Times", STANDARD_TIME_STARTS),
+    ("All Times", ALL_TIME_CHOICES)
+)
+END_TIME_CHOICES = (
+    ("Common Times", STANDARD_TIME_ENDS),
     ("All Times", ALL_TIME_CHOICES)
 )
 
@@ -569,8 +575,8 @@ class Slot(models.Model):
     show = models.ForeignKey(CastingMeta, on_delete=models.CASCADE)
     space = models.ForeignKey(settings.SPACE_MODEL, on_delete=models.CASCADE)
     day = models.DateField()
-    start = models.TimeField(choices=TIME_CHOICES)
-    end = models.TimeField(choices=TIME_CHOICES)
+    start = models.TimeField(choices=START_TIME_CHOICES)
+    end = models.TimeField(choices=END_TIME_CHOICES)
     TYPES = (
         (0, "Audition"),
         (1, "Callback"),
