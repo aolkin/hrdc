@@ -59,7 +59,7 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     
     source = models.CharField(default="default", editable=False,
                               max_length=20)
-    post_register = models.CharField(default="", editable=False, max_length=20)
+    post_register = models.CharField(default="", editable=False, max_length=240)
     
     is_active = models.BooleanField(default=True)
     login_token = models.CharField(max_length=86, default=generate_token)
