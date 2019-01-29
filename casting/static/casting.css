@@ -8,7 +8,7 @@
 .audition-sign-in-shows .custom-control-label::before {
     height: 1.75rem;
     width: 1.75rem;
-    left: -2.25rem;
+    /*left: -2.25rem;*/
 }
 
 .custom-control-input:checked:disabled~.custom-control-label::before {
