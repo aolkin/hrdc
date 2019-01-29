@@ -250,6 +250,13 @@ p.lead.only-small {
     }
 }
 
+#chat-window:not(.minimized) .fa-window-maximize {
+    display: none;
+}
+#chat-window.minimized .fa-window-minimize {
+    display: none;
+}
+
 #chat-window .card-body {
     height: 20rem;
     overflow-y: scroll;

@@ -284,11 +284,13 @@ $(function() {
         let el = $("#chat-window .pulse-manual-dismiss");
         el.removeClass("pulse").removeClass(el.data("pulse-class"));
     });
-    $("#chat-window .fa-window-minimize").click(function() {
-        localStorage.previousChatDisplay = $(".chat-minimizable").css(
-            "display");
-        $(".chat-minimizable").slideToggle(200);
-    });
+    $("#chat-window .fa-window-minimize, #chat-window .fa-window-maximize")
+	.click(function() {
+            localStorage.previousChatDisplay = $(".chat-minimizable").css(
+		"display");
+            $(".chat-minimizable").slideToggle(200);
+	    $("#chat-window").toggleClass("minimized");
+	});
     $("#chat-window .fa-chevron-left, #chat-window .fa-chevron-right").click(
         function() {
             $("#chat-window").toggleClass("chat-right chat-left");
@@ -302,6 +304,7 @@ $(function() {
     }
     if (localStorage.previousChatDisplay == "block") {
         $(".chat-minimizable").hide();
+	$("#chat-window").addClass("minimized");
     }
 });
 
