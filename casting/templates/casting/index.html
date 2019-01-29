@@ -5,6 +5,44 @@
 {% load config %}
 
 {% block content %}
+{% if buildings %}
+<h3 class="text-center">
+  Audition Tabling
+  <br><small class="text-muted">locations currently holding auditions</small>
+</h3>
+<div class="row justify-content-center mb-5">
+  <div class="col-md-8">
+    {% for building in buildings %}
+    <a href="{% url 'casting:tabling' building.pk %}"
+       class="list-group-item list-group-item-action">
+      <div class="d-flex w-100 justify-content-between">
+	<h5 class="mb-0">{{ building.name }}</h5>
+	<small class="text-muted text-right">{{ building.slots }}</small>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if first_cast_lists %}
+<h3 class="text-center">
+  First-Round Cast Lists
+</h3>
+<div class="row justify-content-center mb-5">
+  <div class="col-md-8">
+    {% for casting in first_cast_lists %}
+    <a href="{% url 'casting:view_cast' casting.pk %}"
+       class="list-group-item list-group-item-action">
+      <div class="d-flex w-100 justify-content-between">
+	<h5 class="mb-0">{{ casting }}</h5>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
 {% if request.user.show_set.exists %}
 <h3 class="text-center">Your Shows registered for Common Casting</h3>
 <table class="table table-responsive bt-table-responsive table-striped">
@@ -119,43 +157,6 @@
 <h5 class="text-center text-muted">Please use the
   <a href="{% url 'admin:casting_castingmeta_changelist' %}">site admin</a>
   to edit or add shows</h5>
-{% endif %}
-{% if buildings %}
-<h3 class="text-center mt-5">
-  Audition Tabling
-  <br><small class="text-muted">locations currently holding auditions</small>
-</h3>
-<div class="row justify-content-center">
-  <div class="col-md-8">
-    {% for building in buildings %}
-    <a href="{% url 'casting:tabling' building.pk %}"
-       class="list-group-item list-group-item-action">
-      <div class="d-flex w-100 justify-content-between">
-	<h5 class="mb-0">{{ building.name }}</h5>
-	<small class="text-muted text-right">{{ building.slots }}</small>
-      </div>
-    </a>
-    {% endfor %}
-  </div>
-</div>
-{% endif %}
-
-{% if first_cast_lists %}
-<h3 class="text-center mt-5">
-  First-Round Cast Lists
-</h3>
-<div class="row justify-content-center">
-  <div class="col-md-8">
-    {% for casting in first_cast_lists %}
-    <a href="{% url 'casting:view_cast' casting.pk %}"
-       class="list-group-item list-group-item-action">
-      <div class="d-flex w-100 justify-content-between">
-	<h5 class="mb-0">{{ casting }}</h5>
-      </div>
-    </a>
-    {% endfor %}
-  </div>
-</div>
 {% endif %}
 
 <div class="row justify-content-center mt-5">
