@@ -463,7 +463,7 @@ class Signing(ActorMapping):
     tech_req = models.ForeignKey(CastingMeta, null=True, blank=True,
                                  on_delete=models.SET_NULL)
 
-    signed_time = models.DateTimeField(auto_now=True)
+    signed_time = models.DateTimeField(auto_now=True, null=True)
 
     def order_num(self):
         return self.order + 1

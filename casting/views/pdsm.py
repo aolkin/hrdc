@@ -288,6 +288,7 @@ class CallbackSubmitView(SubmitView):
     var_name = "CALLBACK"
     redirect_url = "casting:view_callbacks"
     edit_url = "casting:callbacks"
+    verbose_name = "Callback List"
     
     def clean(self, warn=True):
         if self.object.callbacks_submitted:
@@ -341,6 +342,7 @@ class CastSubmitView(SubmitView):
     var_name = "CAST"
     redirect_url = "casting:view_cast"
     edit_url = "casting:cast_list"
+    verbose_name = "Cast List"
     
     def clean(self, warn=True):
         if self.object.cast_submitted:
