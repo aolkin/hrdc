@@ -280,7 +280,7 @@ class SubmitView(ShowStaffMixin, UserIsPdsmMixin, View):
         else:
             messages.error(self.request,
                            "Failed to submit {}, please try again.".format(
-                               self.verbose_name))
+                               getattr(self, "verbose_name", "")))
             return HttpResponseRedirect(reverse(self.edit_url,
                                                 args=(self.object.pk,)))
 
