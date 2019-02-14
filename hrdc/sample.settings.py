@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'basetemplates',
     'chat',
     'hrdc',
+    'shortlinks',
     'django.contrib.humanize',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -214,3 +215,5 @@ QUEUED_EMAIL_TEMP = None
 QUEUED_EMAIL_DEBUG = False
 
 CHAT_LOADING_LIMIT = 80
+
+SHORTLINK_PREFIX = SITE_URL + "/shortlinks/"
