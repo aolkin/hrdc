@@ -183,7 +183,7 @@ BT_POPPER_VERSION = "1.12.9"
 BT_POPPER_INTEGRITY = "sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
 
 FOOTER_OWNER = "Harvard-Radcliffe Dramatic Club"
-FOOTER_SITE = "http://hrdctheater.com"
+FOOTER_SITE = "http://hrdctheater.org"
 BT_HEADER_IMAGE = "logo.png"
 BT_HEADER_URL = "dramaorg:index"
 
