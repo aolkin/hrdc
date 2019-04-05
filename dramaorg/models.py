@@ -234,6 +234,10 @@ class Season(models.Model):
 
 class Show(Season):
     title = models.CharField(max_length=150)
+
+    creator_credit = models.CharField(max_length=300, blank=True)
+    group_affiliation = models.CharField(max_length=40, blank=True)
+    
     staff = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
     space = models.ForeignKey(Space, null=True, on_delete=models.SET_NULL,
                               verbose_name="Venue")
@@ -273,6 +277,18 @@ class Show(Season):
             raise ValidationError("Residency cannot end before it begins!")
         return super().clean()
 
+class StaffMember(models.Model):
+    show = models.ForeignKey(Show, on_delete=models.CASCADE)
+    person = models.ForeignKey(settings.AUTH_USER_MODEL,
+                               on_delete=models.CASCADE)
+
+    role = models.CharField(max_length=32)
+    executive = models.BooleanField(default=True)
+    
+    advisor = models.BooleanField(default=False)
+    assistant = models.BooleanField(default=False)
+    
+    # Write code to clean/coerce roles
     
 class GroupProxy(auth.models.Group):
     class Meta:
