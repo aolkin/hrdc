@@ -5,6 +5,6 @@ celery~=4.2
 channels==1.1.8
 django-bootstrap-form==3.4
 django-model-utils==3.0.0
-Twisted[http2]==17.9.0
-Twisted[tls]==17.9.0
+Twisted[http2]==19.2.1
+Twisted[tls]==19.2.1
 service-identity==17.0.0
