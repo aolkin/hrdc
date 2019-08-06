@@ -30,7 +30,7 @@ class CastingReleaseMeta(models.Model):
         (3, "Cast Lists Released"),
         (4, "Signing Open"),
         (5, "Sent Signing Reminder"),
-        (6, "Signing Closed"),
+        (6, "Alternate Signing Open"),
     )
     stage = models.PositiveSmallIntegerField(choices=STAGES, default=0)
     prevent_advancement = models.BooleanField(
@@ -502,10 +502,6 @@ class Signing(ActorMapping):
                                             order__lt=self.order,
                                             response=True))
         return signed < self.character.allowed_signers
-
-    @property
-    def signing_open(self):
-        return self.character.show.release_meta.stage < 6
     
     class Meta:
         ordering = ("character__show", "character", "order")

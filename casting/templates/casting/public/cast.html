@@ -170,7 +170,6 @@
 {% if object.cast_list_released and not popout %}
 <div class="row justify-content-center">
   <div class="col-md-6 text-center">
-    {% if object.release_meta.stage < 6 %}
     <p class="lead">
       If you have been cast in this show, please
       {% if request.user.is_authenticated %}
@@ -186,12 +185,6 @@
       If you cannot find the link or it does not work, please
       <a href="{% url 'casting:request_link' %}">request a new signing link</a>.
     </p>
-    {% else %}
-    <p class="lead">
-      The signing period has ended. Please contact the show staff directly with
-      any questions or to accept or decline roles.
-    </p>
-    {% endif %}
   </div>
 </div>
 {% endif %}

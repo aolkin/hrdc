@@ -157,18 +157,18 @@ def second_signing_warning(pk):
 def open_second_signing(pk):
     crm = get_crm(pk)
     if crm and crm.stage >= 4 and crm.stage < 6:
-        # shows = get_shows(crm, "cast_submitted")
-        # signings = get_model("Signing").objects.filter(
-        #     character__show__in=shows, order=0, response=None,
-        #     character__allowed_signers=1)
-        # for i in signings:
-        #     alternates = get_model("Signing").objects.filter(
-        #         character=i.character, order__gte=1).exclude(
-        #             response=False)
-        #     if alternates.exists():
-        #         i.response = False
-        #         i.timed_out = True
-        #         i.save()
+        shows = get_shows(crm, "cast_submitted")
+        signings = get_model("Signing").objects.filter(
+            character__show__in=shows, order=0, response=None,
+            character__allowed_signers=1)
+        for i in signings:
+            alternates = get_model("Signing").objects.filter(
+                character=i.character, order__gte=1).exclude(
+                    response=False)
+            if alternates.exists():
+                i.response = False
+                i.timed_out = True
+                i.save()
         crm.stage = 6
         crm.save()
 
