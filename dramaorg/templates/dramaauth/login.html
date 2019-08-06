@@ -25,6 +25,14 @@
        class="btn btn-md btn-secondary btn-block">
       Create an {% setting "BT_SITE_TITLE" %} Account
     </a>
+    <a href="{% url 'social:begin' 'google-oauth2' %}"
+       class="btn btn-success btn-lg btn-block mt-5">
+      <i class="fa fa-google"></i>
+      Login with Google
+    </a>
+    <p class="text-center text-muted mt-2">
+      Please use your school or organization account.
+    </p>
   </div>
 </div>
 <div class="row justify-content-center">
