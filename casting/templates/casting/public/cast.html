@@ -178,7 +178,9 @@
       {% else %}
       click the link in the notification email you received
       {% endif %}
-      to sign for your role.
+      to sign for your role, or
+      <a href="{% url 'social:begin' 'google-oauth2' %}?next={% url 'casting:signing' %}#{{ object.pk }}">sign in</a>
+      to your account via Google.
     </p>
     <p>
       If you cannot find the link or it does not work, please

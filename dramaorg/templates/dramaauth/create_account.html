@@ -21,8 +21,14 @@
   </form>
 </div>
 
+<div class="row justify-content-center my-4">
+  <div class="col-md-6">
+    {% include "dramaauth/social_login.html" with next=request.GET.post %}
+  </div>
+</div>
+
 <div class="row justify-content-center">
-  <p class="lead mt-5">Already have an account?
+  <p class="lead">Already have an account?
     <a href="{% url 'dramaorg:login' %}?next={{ request.GET.post }}">Log in</a>.
   </p>
 </div>

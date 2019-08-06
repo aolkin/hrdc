@@ -39,6 +39,7 @@ class ActiveFilter(admin.SimpleListFilter):
             ("disabled", "Disabled"),
             ("enabled", "Enabled but password-less"),
             ("active", "Has set password"),
+            ("social", "Connected with OAuth2"),
         )
 
     def queryset(self, request, queryset):
@@ -48,6 +49,8 @@ class ActiveFilter(admin.SimpleListFilter):
             return queryset.filter(is_active=True, password="")
         if self.value() == "active":
             return queryset.filter(is_active=True).exclude(password="")
+        if self.value() == "social":
+            return queryset.filter(is_active=True, social_auth__isnull=False)
         
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
@@ -77,7 +80,7 @@ class UserAdmin(BaseUserAdmin):
     add_form = UserCreationForm
     add_form_template = "dramaadmin/invite_user.html"
     list_display = ('__str__', 'email', 'phone', 'affiliationyear',
-                    'get_pdsm', 'get_season_pdsm', 'has_password')
+                    'get_pdsm', 'get_season_pdsm', 'has_password', 'get_social')
     list_filter = (ActiveFilter,'is_superuser', 'affiliation', 'year',
                    'suspended_until')
     search_fields = ('email', 'first_name', 'last_name',)
@@ -107,18 +110,25 @@ class UserAdmin(BaseUserAdmin):
     def get_season_pdsm(self, obj):
         return obj.is_season_pdsm
     get_season_pdsm.boolean = True
-    get_season_pdsm.short_description = "Season PDSM"
+    get_season_pdsm.short_description = "Current"
 
     def get_active(self, obj):
         return obj.is_active
     get_active.boolean = True
     get_active.short_description = "Enabled"
+
+    def get_social(self, obj):
+        return obj.social_auth.exists()
+    get_social.boolean = True
+    get_social.short_description = "OAuth"
     
     def has_password(self, obj):
         if obj.is_active is False:
             return False
-        if obj.password is None or obj.password == "":
+        elif obj.password is None or obj.password == "":
             return None
+        elif obj.source == "social":
+            return obj.is_active
         else:
             return obj.is_active and obj.has_usable_password()
     has_password.boolean = True

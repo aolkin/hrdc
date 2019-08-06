@@ -14,4 +14,5 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^email/', include('emailtracker.views')),
     path(r'shortlinks/<slug:slug>', link, name="shortlink"),
+    path('social/', include('social_django.urls', namespace='social')),
 ]

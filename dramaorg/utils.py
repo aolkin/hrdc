@@ -50,3 +50,16 @@ def user_is_initialized(func):
     f  = user_passes_test(test_initialized, login_url="dramaorg:profile")
     return f(func)
 
+def social_create_user(strategy, details, backend, user=None, *args, **kwargs):
+    if user:
+        return {'is_new': False}
+
+    fields = {
+        "email":  details.get("email"),
+        "source": "social"
+    }
+
+    return {
+        'is_new': True,
+        'user': strategy.create_user(**fields)
+    }
