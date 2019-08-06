@@ -11,7 +11,7 @@
   <h1 class="text-center display-heading">
     {% setting "ADMIN_SITE_TITLE" %}</h1>
 </div>
-<div class="row justify-content-center my-3">
+<div class="row justify-content-center my-4">
   <div class="col-md-6">
     <a href="{% url 'casting:public_index' %}"
        class="btn btn-lg btn-info btn-block">
@@ -19,20 +19,13 @@
     </a>
   </div>
 </div>
-<div class="row justify-content-center mb-5">
+<div class="row justify-content-center mb-4">
   <div class="col-md-6">
-    <a href="{% url 'dramaorg:register' %}?post={{ request.GET.next }}"
+    <!--<a href="{% url 'dramaorg:register' %}?post={{ request.GET.next }}"
        class="btn btn-md btn-secondary btn-block">
       Create an {% setting "BT_SITE_TITLE" %} Account
-    </a>
-    <a href="{% url 'social:begin' 'google-oauth2' %}"
-       class="btn btn-success btn-lg btn-block mt-5">
-      <i class="fa fa-google"></i>
-      Login with Google
-    </a>
-    <p class="text-center text-muted mt-2">
-      Please use your school or organization account.
-    </p>
+	 </a>-->
+    {% include "dramaauth/social_login.html" with next=request.GET.next %}
   </div>
 </div>
 <div class="row justify-content-center">

@@ -20,6 +20,9 @@
       <span class="text-danger">Unable to determine your identity:</span>
       please log in again or click the link in your email to log in automatically.
     </h3>
+    <h3 class="text-center my-3">
+      You may also <a href="{% url 'social:begin' 'google-oauth2' %}?next={% url 'casting:signing' %}">sign in via Google</a>
+    </h3>
     <div class="mt-4 mb-5">
       <h4 class="text-center">
 	If you cannot find the link or it does not work, please
