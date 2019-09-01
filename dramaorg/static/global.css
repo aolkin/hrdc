@@ -1,0 +1,8 @@
+.asteriskField {
+    display: none;
+}
+
+.alert.alert-block>ul {
+    margin-bottom: 0;
+    list-style-type: square;
+}

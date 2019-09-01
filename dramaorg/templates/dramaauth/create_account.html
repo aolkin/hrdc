@@ -4,7 +4,7 @@
 {% block title %}Sign up for {% setting 'BT_SITE_TITLE' %}{% endblock %}
 
 {% load bt %}
-{% load bootstrap %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -13,7 +13,7 @@
       Sign up for {% if request.GET.from %}{{ request.GET.from }}
       {% else %}{% setting 'BT_SITE_TITLE' %}{% endif %}</legend>
     {% csrf_token %}
-    {{ form|bootstrap }}
+    {{ form|crispy }}
     <p class="form-text text-muted">
       Please enter your email address to begin the registration process.</p>
     <button type="submit" class="btn btn-primary btn-block">

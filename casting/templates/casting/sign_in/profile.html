@@ -1,6 +1,6 @@
 {% extends "casting/sign_in/base.html" %}
 
-{% load bootstrap %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 <div class="text-center">
@@ -27,7 +27,7 @@
     </div>
     {% endif %}
     {% csrf_token %}
-    {{ form|bootstrap }}
+    {{ form|crispy }}
     <button type="submit" class="btn btn-primary btn-block">Continue</button>
   </form>
 </div>

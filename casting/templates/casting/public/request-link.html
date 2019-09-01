@@ -1,6 +1,6 @@
 {% extends "bt/default.html" %}
 
-{% load bootstrap %}
+{% load crispy_forms_tags %}
 
 {% block title %}Signing | Common Casting{% endblock %}
 
@@ -13,7 +13,7 @@
       Enter your email address to receive a link allowing you to sign for
       your roles online.
     </p>
-    {{ form|bootstrap }}
+    {{ form|crispy }}
     <button type="submit" class="btn btn-primary btn-block">
       Request Link
     </button>

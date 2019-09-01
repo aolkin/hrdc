@@ -1,9 +1,9 @@
-{% load bootstrap %}
+{% load crispy_forms_tags %}
 
 {% if legal %}
 <form method="POST" action="{% url 'casting:edit_show' object.pk %}">
   {% csrf_token %}
-{{ form|bootstrap }}
+{{ form|crispy }}
 </form>
 {% else %}
 {% if user.is_authenticated %}
