@@ -157,55 +157,52 @@ def second_signing_warning(pk):
 def open_second_signing(pk):
     crm = get_crm(pk)
     if crm and crm.stage >= 4 and crm.stage < 6:
-        # shows = get_shows(crm, "cast_submitted")
-        # signings = get_model("Signing").objects.filter(
-        #     character__show__in=shows, order=0, response=None,
-        #     character__allowed_signers=1)
-        # for i in signings:
-        #     alternates = get_model("Signing").objects.filter(
-        #         character=i.character, order__gte=1).exclude(
-        #             response=False)
-        #     if alternates.exists():
-        #         i.response = False
-        #         i.timed_out = True
-        #         i.save()
+        shows = get_shows(crm, "cast_submitted")
+        signings = get_model("Signing").objects.filter(
+            character__show__in=shows, order=0, response=None,
+            character__allowed_signers=1)
+        for i in signings:
+            alternates = get_model("Signing").objects.filter(
+                character=i.character, order__gte=1).exclude(
+                    response=False)
+            if alternates.exists():
+                i.response = False
+                i.timed_out = True
+                i.save()
         crm.stage = 6
         crm.save()
 
 @shared_task(ignore_result=True)
 def notify_alternates(pk):
     signing = get_model("Signing").objects.get(pk=pk)
-    previous = get_model("Signing").objects.filter(
-        character=signing.character, order__lt=signing.order, response=False)
-    if len(previous) <= max(
-            0, signing.order - signing.character.allowed_signers):
-        return
-    alternates = get_model("Signing").objects.filter(
-        character=signing.character, alternate_notified=False,
-        order__gt=signing.character.allowed_signers - 1).exclude(
-            response=False).select_related("character", "character__show")
-    if alternates.exists():
-        alt = alternates[0]
-        alt.alternate_notified = True
-        alt.save()
-        if alt.response:
-            return render_for_user(alt.actor,
-                                   "casting/email/role-received.html",
-                                   "role-received", alt.pk,
-                                   { "role": alt },
-                                   subject="{} in {} Received".format(
-                                       alt.character,
-                                       alt.character.show),
-                                   tags=["casting", "role_received"])
-        else:
-            return render_for_user(alt.actor,
-                                   "casting/email/role-available.html",
-                                   "role-available", alt.pk,
-                                   { "role": alt },
-                                   subject="{} in {} Now Available".format(
-                                       alt.character,
-                                       alt.character.show),
-                                   tags=["casting", "role_available"])
+    not_rejected = get_model("Signing").objects.filter(
+        character=signing.character).exclude(response=False).select_related(
+            "character", "character__show")
+    available_to = not_rejected[:signing.character.allowed_signers]
+
+    for alt in available_to:
+        if (alt.order >= signing.character.allowed_signers and
+            not alt.alternate_notified):
+            alt.alternate_notified = True
+            alt.save()
+            if alt.response:
+                return render_for_user(alt.actor,
+                                       "casting/email/role-received.html",
+                                       "role-received", alt.pk,
+                                       { "role": alt },
+                                       subject="{} in {} Received".format(
+                                           alt.character,
+                                           alt.character.show),
+                                       tags=["casting", "role_received"])
+            else:
+                return render_for_user(alt.actor,
+                                       "casting/email/role-available.html",
+                                       "role-available", alt.pk,
+                                       { "role": alt },
+                                       subject="{} in {} Now Available".format(
+                                           alt.character,
+                                           alt.character.show),
+                                       tags=["casting", "role_available"])
       
 @shared_task(ignore_result=True)
 def update_releases(scheduled=True):
