@@ -3,7 +3,7 @@
 {% block title %}Login{% endblock %}
 
 {% load bt %}
-{% load bootstrap %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 
@@ -32,7 +32,7 @@
   <form method="POST" class="col-md-6">
     <legend class="text-center">Login to {% setting 'BT_SITE_TITLE' %}</legend>
     {% csrf_token %}
-    {{ form|bootstrap }}
+    {{ form|crispy }}
     <p class="form-text text-center">
       <a href="{% url 'dramaorg:start_reset' %}">Forgot password?</a>
     </p>

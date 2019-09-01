@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'social_django',
     'dramaorg',
     'casting',
+    'crispy_forms',
     'bootstrapform',
     'anymail',
     'channels',
@@ -88,6 +89,8 @@ TEMPLATES = [
         },
     },
 ]
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 WSGI_APPLICATION = 'hrdc.wsgi.application'
 
