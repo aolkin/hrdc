@@ -31,7 +31,9 @@ def add_all_permissions(*models):
                     Q(codename__contains="change"))
     
 def add_delete_permissions(*models):
-    add_permissions(models, Q(codename__contains="delete"))
+    add_permissions(models,
+                    Q(codename__contains="view") |
+                    Q(codename__contains="delete"))
     
 def add_permissions(models, q):
     group = get_admin_group()
