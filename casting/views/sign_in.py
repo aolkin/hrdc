@@ -184,7 +184,7 @@ class ActorSignInStart(ActorSignInBase, BaseUpdateView):
     def get_actor(self):
         return self.actor
 
-PROFILE_FIELDS = ["first_name", "last_name", "phone", "affiliation"]
+PROFILE_FIELDS = ["email", "first_name", "last_name", "phone", "affiliation"]
 PROFILE_WIDGETS = dict(zip(PROFILE_FIELDS, [
     forms.TextInput(attrs={ "autocomplete": "off" }) for i in range(len(
         PROFILE_FIELDS))]))
