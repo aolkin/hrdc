@@ -157,7 +157,8 @@ class TokenView(FormView):
     def form_valid(self, form):
         user = form.save()
         self.delete_captured_token()
-        login(self.request, user)
+        login(self.request, user,
+              backend="django.contrib.auth.backends.ModelBackend")
         return super().form_valid(form)
         
     def get_context_data(self, valid=True, **kwargs):
