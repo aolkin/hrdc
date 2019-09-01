@@ -237,7 +237,7 @@ class MetaAdmin(admin.ModelAdmin):
     search_fields = ('show__title',)
     list_filter = ('show__season', 'show__year', 'callbacks_submitted',
                    'first_cast_submitted', 'cast_submitted')
-    autocomplete_fields = ('tech_req_pool',)
+    autocomplete_fields = ('show', 'tech_req_pool',)
     fieldsets = (
         ("", {
             "fields": ('show', 'release_meta',)
