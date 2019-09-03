@@ -3,6 +3,10 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.admin import GroupAdmin
 from django.contrib.auth.models import Group, Permission
 
+from django.http import HttpResponse
+
+import csv
+
 from django import forms
 from django.conf import settings
 
@@ -29,6 +33,26 @@ def generate_tokens(modeladmin, request, queryset):
 def clear_tokens(modeladmin, request, queryset):
     for obj in queryset:
         obj.clear_token()
+
+def export_users(modeladmin, request, qs):
+    response = HttpResponse(content_type="text/csv")
+    response['Content-Disposition'] = 'attachment; filename="hrdcapp_users_{}.csv"'.format(
+        timezone.localtime(timezone.now()).strftime("%Y-%m-%d_%H%M%S"))
+    writer = csv.writer(response)
+    writer.writerow((
+        "Name", "Email", "Phone", "Affiliation", "Year", "PGPs",
+    ))
+    for i in qs:
+        writer.writerow((
+            i.get_full_name(False),
+            i.email,
+            i.phone,
+            i.affiliation,
+            i.year,
+            i.pgps
+        ))
+    return response
+export_users.short_description = "Download spreadsheet of selected users"
 
 class ActiveFilter(admin.SimpleListFilter):
     title = "active status"
@@ -82,13 +106,14 @@ class UserAdmin(BaseUserAdmin):
     list_display = ('__str__', 'email', 'phone', 'affiliationyear',
                     'get_pdsm', 'get_season_pdsm', 'has_password', 'get_social')
     list_filter = (ActiveFilter,'is_superuser', 'affiliation', 'year',
-                   'suspended_until')
+                   'suspended_until', 'last_login', 'date_joined')
     search_fields = ('email', 'first_name', 'last_name',)
     readonly_fields = ('last_login', 'date_joined')
     staff_readonly = ('email', 'first_name', 'last_name',
                       'pgps', 'gender_pref', 'phone', 'groups',
                       'affiliation', 'year', 'is_active', 'suspended_until')
-    actions = [generate_tokens, clear_tokens] if settings.DEBUG else []
+    actions = [export_users] + (
+        [generate_tokens, clear_tokens] if settings.DEBUG else [])
     ordering = ('date_joined',)
     save_as_continue = True
 
