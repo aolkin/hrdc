@@ -34,7 +34,6 @@ INSTALLED_APPS = [
     'social_django',
     'dramaorg',
     'casting',
-    'venueapp',
     'crispy_forms',
     'bootstrapform',
     'anymail',
