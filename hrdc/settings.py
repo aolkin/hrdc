@@ -10,24 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
-import os
 from django.contrib import messages
-
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ''
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -48,6 +34,7 @@ INSTALLED_APPS = [
     'social_django',
     'dramaorg',
     'casting',
+    'venueapp',
     'crispy_forms',
     'bootstrapform',
     'anymail',
@@ -99,9 +86,6 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = 'INSERT_PROVIDED_KEY_HERE'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'INSERT_PROVIDED_SECRET_HERE'
-
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
 SOCIAL_AUTH_PIPELINE = (
@@ -116,34 +100,6 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.associate_by_email',
 )
 
-# Database
-# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
-
-
-# Password validation
-# https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-] if not DEBUG else []
 
 CSRF_USE_SESSIONS = True
 
@@ -163,9 +119,6 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.11/howto/static-files/
-
 STATIC_URL = '/static/'
 
 MESSAGE_TAGS = {
@@ -182,64 +135,27 @@ SHOW_MODEL = "dramaorg.Show"
 SPACE_MODEL = "dramaorg.Space"
 BUILDING_MODEL = "dramaorg.Building"
 
-ANYMAIL = {
-    "MAILGUN_API_KEY": "",
-    "MAILGUN_SENDER_DOMAIN": ""
-}
+
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 
-DEFAULT_FROM_EMAIL = "HRDC Apps <user@domain.com>"
-
 CONFIGURATION_APP_TITLE = "Global Settings"
-
-ADMIN_SITE_TITLE = "HRDC Apps"
-
-ADMIN_GROUP_NAME = "HRDC Board"
 
 LOGIN_URL = "dramaorg:login"
 LOGOUT_URL = "dramaorg:logout"
 LOGIN_REDIRECT_URL = "dramaorg:index"
 LOGOUT_REDIRECT_URL = LOGIN_URL
 
-LOGO_PATH = os.path.join(BASE_DIR, "hrdc/static/logo.png")
-
-BT_SITE_TITLE = "HRDC Apps"
 BT_FAVICON_URL = STATIC_URL + "icon.png"
 BT_POPPER_VERSION = "1.12.9"
 BT_POPPER_INTEGRITY = "sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
 
-FOOTER_OWNER = "Harvard-Radcliffe Dramatic Club"
-FOOTER_SITE = "http://hrdctheater.org"
 BT_HEADER_IMAGE = "logo.png"
 BT_HEADER_URL = "dramaorg:index"
 
 BT_JS_FILES = ["profilefields.js"]
 BT_CSS_FILES = ["global.css"]
 
-GROUP_LOCATION = "Harvard"
-SITE_URL = "http://localhost:8000"
-
-CASTING_IS_COMMON = True
-
 ACTIVE_SEASON_KEY = "season"
 ACTIVE_YEAR_KEY = "year"
 
-CELERY_BEAT_SCHEDULE = {
-    'update-casting-releases': {
-        'task': 'casting.tasks.update_releases',
-        'schedule': 10.0,
-        'relative': True,
-    },
-    'send-missed-emails': {
-        'task': 'emailtracker.tasks.send_missing',
-        'schedule': 60.0 * 10.0,
-        'relative': False,
-    },
-}
-
-QUEUED_EMAIL_TEMP = None
-QUEUED_EMAIL_DEBUG = False
-
-CHAT_LOADING_LIMIT = 80
-
-SHORTLINK_PREFIX = SITE_URL + "/shortlinks/"
+from .local_settings import *
