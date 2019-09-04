@@ -182,9 +182,10 @@ class ShowAdmin(admin.ModelAdmin):
     list_display = ('title', 'seasonstr', 'space',
                     'residency_starts', 'residency_ends') 
     list_filter = ('season', 'year', 'space')
-    autocomplete_fields = ('staff',)
+    autocomplete_fields = ('staff', 'liaisons')
     fields = ('title', ('season', 'year'), 'space',
-              ('residency_starts', 'residency_ends'), 'staff', 'slug',
+              ('residency_starts', 'residency_ends'),
+              ('staff', 'liaisons'), 'slug',
               ('created', 'modified'))
     readonly_fields = "created", "modified"
     exclude = ('invisible',)

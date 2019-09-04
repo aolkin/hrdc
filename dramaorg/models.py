@@ -244,6 +244,9 @@ class Show(Season):
     slug = models.SlugField(unique=True, db_index=True)
     invisible = models.BooleanField(default=False)
 
+    liaisons = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True,
+                                      related_name="liaison_shows")
+    
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
