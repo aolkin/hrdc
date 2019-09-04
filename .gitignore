@@ -112,5 +112,3 @@ ENV/
 # Development databases
 *.db
 *.sqlite3
-
-*/settings.py
