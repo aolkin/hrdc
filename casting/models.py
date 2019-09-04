@@ -296,7 +296,7 @@ class AssociateShowMixin(models.Model):
 
 class ActorSeasonMeta(Season):
     actor = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    conflicts = models.TextField()
+    conflicts = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return "{} Meta for {}".format(self.seasonstr(), self.actor)

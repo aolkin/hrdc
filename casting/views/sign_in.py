@@ -80,7 +80,7 @@ class ActorSignInBase(UserIsSeasonPdsmMixin, TemplateResponseMixin):
         if self.get_actor().is_initialized:
             for i in self.request.session.get("audition_ids", []):
                 audition = Audition.objects.get(id=i)
-                if not audition.actorseasonmeta.conflicts:
+                if audition.actorseasonmeta.conflicts == None:
                     return reverse("casting:sign_in_seasonmeta")
                 if audition.tech_interest == None:
                     return reverse("casting:sign_in_tech", args=(audition.id,))
