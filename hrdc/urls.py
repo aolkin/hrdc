@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^', include("dramaorg.urls")),
     url(r'^autocomplete/$', autocomplete_json),
     url(r'^casting/', include("casting.urls")),
+    url(r'^publicity/', include("publicity.urls")),
     url(r'^admin/', admin.site.urls),
     url(r'^email/', include('emailtracker.views')),
     path(r'shortlinks/<slug:slug>', link, name="shortlink"),
