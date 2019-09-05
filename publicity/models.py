@@ -48,12 +48,18 @@ class ShowPerson(models.Model):
     show = models.ForeignKey(PublicityInfo, on_delete=models.CASCADE,
                              db_index=True)
 
-    name = models.CharField(max_length=120, blank=True)
+    name = models.CharField(max_length=120)
     year = models.PositiveSmallIntegerField(blank=True, null=True)
 
     position = models.CharField(max_length=120, blank=True)
+    
     type = models.PositiveSmallIntegerField(default=0, choices=TYPE_CHOICES)
+    order = models.PositiveSmallIntegerField()
 
+    class Meta:
+        ordering = "order",
+        unique_together = "order", "show", "type"
+    
     def yearstr(self):
         return "'{:02d}".format(self.year % 100) if self.year else ""
     
