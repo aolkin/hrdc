@@ -1,0 +1,14 @@
+.performancedate_formset fieldset {
+    position: relative;
+}
+
+.performancedate_formset fieldset .col-form-label,
+.performancedate_formset fieldset .form-check {
+    display: none;
+}
+
+.performancedate_formset fieldset .delete-performance {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+}

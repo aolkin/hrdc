@@ -12,12 +12,26 @@
   <form method="POST" class="col-md-8">
     {% csrf_token %}
     {{ form|crispy }}
-    <legend>Performance Dates</legend>
-    {{ date_formset.management_form }}
-    {% for date in date_formset %}
-    {{ date|crispy }}
-    {% endfor %}
-    <button type="submit" class="btn btn-primary btn-block">
+    <legend>
+      Performance Dates
+      <button type="button" class="btn btn-success btn-sm add-performance">
+	<i class="fa fa-plus"></i>
+      </button>
+    </legend>
+    <div class="performancedate_formset">
+      {{ date_formset.management_form }}
+      {% for date in date_formset %}
+      <fieldset>
+	{{ date|crispy }}
+	{% if not date.errors %}
+	<button type="button" class="btn btn-danger btn-sm delete-performance">
+	  <i class="fa fa-minus-square"></i>
+	</button>
+	{% endif %}
+      </fieldset>
+      {% endfor %}
+    </div>
+    <button type="submit" class="btn btn-primary btn-block btn-lg">
       Save Changes
     </button>
   </form>
