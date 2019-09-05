@@ -49,6 +49,7 @@ $(() => {
 	$el.datetimepicker({
 	    format: DATETIME_FORMAT,
 	    useCurrent: false,
+	    sideBySide: true,
 	    date: moment($el.val(), DATETIME_FORMAT)
 	});
     });
@@ -57,6 +58,7 @@ $(() => {
 	$(this).datetimepicker({
 	    format: DATETIME_FORMAT,
 	    useCurrent: false,
+	    sideBySide: true,
 	    date: moment($(this).val(), DATETIME_FORMAT)
 	});
 	$(this).datetimepicker("show");
