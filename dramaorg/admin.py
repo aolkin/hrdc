@@ -194,7 +194,7 @@ class ShowAdmin(admin.ModelAdmin):
     save_as_continue = False
 
     def liaison_display(self, obj):
-        return ", ".join([str(i) for i in obj.liaisons.all()])
+        return ", ".join([str(i.get_full_name()) for i in obj.liaisons.all()])
     liaison_display.short_description = "Liaisons"
 
 @admin.register(Building)
