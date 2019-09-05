@@ -1,14 +1,22 @@
 {% extends "publicity/base.html" %}
 
-{% load bt %}
+{% load bt config %}
 
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-md-8">
-    <h3 class="text-center">Welcome</h3>
+    <h3 class="text-center">Welcome to the Publicity Manager</h3>
     <p>
-      <a href="{% url 'publicity:form' %}">Go to the form</a>
+      Select a show from the sidebar to edit your publicity presence on the
+      public website.
     </p>
+    {% if not user.is_board %}
+    <p class="text-muted text-center">
+      Please contact <a href="mailto:{% option 'pub_contact_email' %}">
+      {% option 'pub_contact_name' %}</a> to have your shows added to the
+      publicity manager.
+    </p>
+    {% endif %}
   </div>
 </div>
 {% endblock %}
