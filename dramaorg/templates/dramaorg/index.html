@@ -17,7 +17,7 @@
       <th class="table-col-md">Show</th>
       <th class="table-col-sm table-col-desktop">Season</th>
       <th class="table-col-xs">Residency</th>
-      <th class="table-col-sm">Venue</th>
+      <th class="table-col-sm">Venue (Liaisons)</th>
       <th class="table-col-lg">Administrative Staff</th>
     </tr>
   </thead>
@@ -29,7 +29,12 @@
     <td>{{ show.residency_starts|date:"M j" }}
       {% if show.residency_starts != show.residency_ends %}-
       {{ show.residency_ends|date:"M j" }}{% endif %}</td>
-    <td>{{ show.space }}</td>
+    <td>
+      {{ show.space }}
+      {% if show.liaisons.exists %}
+      ({% for liaison in show.liaisons.all %}<a href="mailto:{{ liaison.email }}" title="{{ liaison.phone }}">{{ liaison.get_full_name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %})
+      {% endif %}
+    </td>
     <td>{{ show.people }}</td>
   </tr>
   {% endfor %}
