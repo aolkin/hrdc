@@ -6,9 +6,14 @@ class PerformanceDateAdmin(admin.StackedInline):
     model = PerformanceDate
     extra = 1
 
-class ShowPersonAdmin(admin.TabularInline):
+class ShowPersonAdmin(admin.StackedInline):
     model = ShowPerson
     extra = 1
+    fields = (
+        ("name", "year"),
+        ("position", "type", "order"),
+        ("email", "phone"),
+    )
 
 @admin.register(PublicityInfo)
 class MetaAdmin(admin.ModelAdmin):

@@ -1,6 +1,6 @@
 from django.db import models
-
 from django.conf import settings
+from django.utils import timezone
 
 from django.contrib.auth import get_user_model
 
@@ -37,7 +37,8 @@ class PerformanceDate(models.Model):
         unique_together = "show", "performance"
     
     def __str__(self):
-        return self.performance.strftime("%A, %B %-d at %-I:%M %p")
+        return timezone.localtime(
+            self.performance).strftime("%A, %B %-d at %-I:%M %p")
 
 class ShowPerson(models.Model):
     TYPE_CHOICES = (
@@ -51,7 +52,12 @@ class ShowPerson(models.Model):
     name = models.CharField(max_length=120)
     year = models.PositiveSmallIntegerField(blank=True, null=True)
 
-    position = models.CharField(max_length=120, blank=True)
+    email = models.EmailField(blank=True,
+                              help_text="This will not be shown publicly.")
+    phone = models.CharField(max_length=20, blank=True,
+                             help_text="This will not be shown publicly.")
+    
+    position = models.CharField(max_length=120)
     
     type = models.PositiveSmallIntegerField(default=0, choices=TYPE_CHOICES)
     order = models.PositiveSmallIntegerField()

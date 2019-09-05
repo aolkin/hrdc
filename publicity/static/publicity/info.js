@@ -1,5 +1,7 @@
 
-$(() => {
+$(() => {   
+    let DATETIME_FORMAT = "dddd, MMMM D, Y [at] h:mm A"
+
     let extra = $("fieldset").last();
     let count = Number($("#id_performancedate_set-TOTAL_FORMS").val());
     if (!extra.find(`#id_performancedate_set-${count - 1}-performance`).val()) {
@@ -34,6 +36,33 @@ $(() => {
 	}
 	fieldset.slideUp();
     }
+    
     $(".performancedate_formset").on(
 	"click", ".delete-performance", deletePerformance);
+
+    $(".performancedate_formset .datetimeinput").each((index, el) => {
+	let $el = $(el);
+	$el.attr("autocomplete", "off");
+	$el.data("toggle", "datetimepicker");
+	$el.data("target", "#" + $el.attr("id"));
+	$el.addClass("datetimepicker-input");
+	$el.datetimepicker({
+	    format: DATETIME_FORMAT,
+	    useCurrent: false,
+	    date: moment($el.val(), DATETIME_FORMAT)
+	});
+    });
+    
+    $(".performancedate_formset").on("focus", ".datetimeinput", function () {
+	$(this).datetimepicker({
+	    format: DATETIME_FORMAT,
+	    useCurrent: false,
+	    date: moment($(this).val(), DATETIME_FORMAT)
+	});
+	$(this).datetimepicker("show");
+    });
+
+    $(".performancedate_formset").on("blur", ".datetimeinput", function () {
+	$(this).datetimepicker("hide");
+    });
 });
