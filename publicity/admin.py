@@ -9,7 +9,6 @@ class PerformanceDateAdmin(admin.StackedInline):
 class ShowPersonAdmin(admin.TabularInline):
     model = ShowPerson
     extra = 1
-    autocomplete_fields = ("user",)
 
 @admin.register(PublicityInfo)
 class MetaAdmin(admin.ModelAdmin):

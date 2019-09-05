@@ -1,6 +1,6 @@
 {% extends "publicity/base.html" %}
 
-{% load bt crispy_forms_tags %}
+{% load bt crispy_forms_tags bootstrap %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -12,10 +12,14 @@
   <form method="POST" class="col-md-8">
     {% csrf_token %}
     {{ form|crispy }}
+    <legend>Performance Dates</legend>
+    {{ date_formset.management_form }}
+    {% for date in date_formset %}
+    {{ date|crispy }}
+    {% endfor %}
     <button type="submit" class="btn btn-primary btn-block">
       Save Changes
     </button>
-    {{ date_formset|crispy }}
   </form>
 </div>
 {% endblock %}

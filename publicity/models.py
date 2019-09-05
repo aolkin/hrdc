@@ -28,9 +28,14 @@ class PublicityInfo(models.Model):
         return str(self.show)
 
 class PerformanceDate(models.Model):
-    show = models.ForeignKey(PublicityInfo, on_delete=models.CASCADE)
+    show = models.ForeignKey(PublicityInfo, on_delete=models.CASCADE,
+                             db_index=True)
     performance = models.DateTimeField()
 
+    class Meta:
+        ordering = "performance",
+        unique_together = "show", "performance"
+    
     def __str__(self):
         return self.performance.strftime("%A, %B %-d at %-I:%M %p")
 
@@ -40,13 +45,17 @@ class ShowPerson(models.Model):
         (1, "Cast")
     )
     
-    show = models.ForeignKey(PublicityInfo, on_delete=models.CASCADE)
-
-    user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL,
-                             null=True, blank=True)
+    show = models.ForeignKey(PublicityInfo, on_delete=models.CASCADE,
+                             db_index=True)
 
     name = models.CharField(max_length=120, blank=True)
     year = models.PositiveSmallIntegerField(blank=True, null=True)
 
     position = models.CharField(max_length=120, blank=True)
     type = models.PositiveSmallIntegerField(default=0, choices=TYPE_CHOICES)
+
+    def yearstr(self):
+        return "'{:02d}".format(self.year % 100) if self.year else ""
+    
+    def __str__(self):
+        return "{}: {} {}".format(self.position, self.name, self.yearstr())

@@ -72,8 +72,8 @@ class IndexView(MenuMixin, InitializedLoginMixin, TemplateView):
     
     template_name = "publicity/index.html"
 
-DateFormSet = forms.modelformset_factory(PerformanceDate,
-                                         fields=("show", "performance"))
+DateFormSet = forms.inlineformset_factory(PublicityInfo, PerformanceDate,
+                                          fields=("performance",), extra=1)
     
 class InfoForm(forms.ModelForm):
     class Meta:
@@ -93,22 +93,24 @@ class InfoView(MenuMixin, ShowStaffMixin, UpdateView):
 
     def post(self, *args, **kwargs):
         res = super().post(*args, **kwargs)
-        self.formset = DateFormSet(self.request.POST)
+        self.formset = DateFormSet(self.request.POST,
+                                   instance=self.get_object())
         if self.formset.is_valid():
             self.formset.save()
         else:
             messages.error(self.request, "Failed to save performance dates. "+
                            "Please try again.")
-        return self.get(*args, **kwargs)
+            return self.get(*args, **kwargs)
+        messages.success(self.request,
+                         "Updated publicity information for {}.".format(
+                             self.get_object()))
+        return res
     
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["date_formset"] = (
             self.formset if hasattr(self, "formset") else DateFormSet(
-                queryset=self.get_object().performancedate_set.all(),
-                initial=[{
-                    "show": self.get_object()
-                }]
+                instance=self.get_object()
             )
         )
         return context
