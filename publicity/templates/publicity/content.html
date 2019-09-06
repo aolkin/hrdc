@@ -1,0 +1,44 @@
+{% if enabled.credits %}
+<p>{{ object.credits|linebreaksbr }}</p>
+{% endif %}
+{% if enabled.dates %}
+<{{ h }}>PERFORMANCE DATES</{{ h }}>
+<p>{{ object.show.venue }}</p>
+<p>
+  {% for perf in object.performancedate_set.all %}
+  {{ perf }}<br>
+  {% empty %}
+  Performance Dates TBD
+  {% endfor %}
+</p>
+<p>Run time: {{ object.runtime|default:"TBD" }}</p>
+{% endif %}
+{% if enabled.about %}
+<{{ h }}>ABOUT THE SHOW</{{ h }}>
+<p>{{ object.blurb|urlize|linebreaksbr }}</p>
+<p>
+  Please reach out to
+  <a href="mailto:{{ object.contact_email }}">{{ object.contact_email }}</a>
+  with any questions.
+</p>
+{% endif %}
+{% if enabled.staff %}
+<{{ h }}>CREW</{{ h }}>
+<p>
+  {% for person in object.staff %}
+  {{ person.position }} ... {{ person.name }} {{ person.yearstr }}
+  {% empty %}
+  To be announced!
+  {% endfor %}
+</p>
+{% endif %}
+{% if enabled.cast %}
+<{{ h }}>CAST</{{ h }}>
+<p>
+  {% for person in object.cast %}
+  {{ person.position }} ... {{ person.name }} {{ person.yearstr }}
+  {% empty %}
+  To be announced!
+  {% endfor %}
+</p>
+{% endif %}

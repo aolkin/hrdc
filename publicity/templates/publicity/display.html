@@ -1,0 +1,16 @@
+{% extends "publicity/base.html" %}
+
+{% load bt crispy_forms_tags bootstrap %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col">
+    <h3>{{ object }}</h3>
+    <script src="{% url 'publicity:script' object.pk %}?h=h5"></script>
+    <div class="alert alert-secondary">
+      To include this in another webpage, insert the following code snippet:
+      <pre class="mt-3"><code>&lt;script src="{{ SETTINGS.SITE_URL }}{% url 'publicity:script' object.pk %}"&gt;&lt;/script&gt;</code></pre>
+    </div>
+  </div>
+</div>
+{% endblock %}
