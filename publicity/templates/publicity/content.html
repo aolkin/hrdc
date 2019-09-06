@@ -16,11 +16,13 @@
 {% if enabled.about %}
 <{{ h }}>ABOUT THE SHOW</{{ h }}>
 <p>{{ object.blurb|urlize|linebreaksbr }}</p>
+{% if object.contact_email %}
 <p>
   Please reach out to
   <a href="mailto:{{ object.contact_email }}">{{ object.contact_email }}</a>
   with any questions.
 </p>
+{% endif %}
 {% endif %}
 {% if enabled.staff %}
 <{{ h }}>CREW</{{ h }}>
