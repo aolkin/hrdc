@@ -188,4 +188,5 @@ class ScriptView(DetailView):
     def get(self, *args, **kwargs):
         res = super().get(*args, **kwargs)
         res["Content-Type"] = "application/javascript"
+        res["Cache-Control"] = "no-cache"
         return res
