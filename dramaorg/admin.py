@@ -180,7 +180,7 @@ class UserAdmin(BaseUserAdmin):
 @admin.register(Show)
 class ShowAdmin(admin.ModelAdmin):
     list_display = ('title', 'seasonstr', 'space',
-                    'residency_starts', 'residency_ends') 
+                    'residency_starts', 'residency_ends', 'liaison_display')
     list_filter = ('season', 'year', 'space')
     autocomplete_fields = ('staff', 'liaisons')
     fields = ('title', ('season', 'year'), 'space',
@@ -192,6 +192,10 @@ class ShowAdmin(admin.ModelAdmin):
     search_fields = ('title',)
     prepopulated_fields = {"slug": ("title",)}
     save_as_continue = False
+
+    def liaison_display(self, obj):
+        return ", ".join([str(i.get_full_name()) for i in obj.liaisons.all()])
+    liaison_display.short_description = "Liaisons"
 
 @admin.register(Building)
 class BuildingAdmin(admin.ModelAdmin):
