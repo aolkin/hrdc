@@ -30,7 +30,6 @@ $(() => {
     function deletePerformance() {
 	let fieldset = $(this).parent();
 	let id = fieldset.data("id");
-	console.log(id);
 	if (fieldset.find(`#id_performancedate_set-${id}-id`).val()) {
 	    fieldset.find(".form-check-input").prop("checked", true);
 	}

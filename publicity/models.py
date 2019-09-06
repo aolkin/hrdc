@@ -67,15 +67,15 @@ class ShowPerson(models.Model):
     phone = models.CharField(max_length=20, blank=True,
                              help_text="This will not be shown publicly.")
     
-    position = models.CharField(max_length=120)
+    position = models.CharField(max_length=120, verbose_name="Role or Position")
     
     type = models.PositiveSmallIntegerField(default=0, choices=TYPE_CHOICES,
                                             db_index=True)
-    order = models.PositiveSmallIntegerField(db_index=True)
+    order = models.SmallIntegerField(db_index=True, default=0)
     
     class Meta:
         ordering = "type", "order",
-        unique_together = "order", "show", "type"
+        #unique_together = "order", "show", "type"
     
     def yearstr(self):
         return "'{:02d}".format(self.year % 100) if self.year else ""

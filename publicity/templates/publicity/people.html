@@ -5,7 +5,7 @@
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-md-8">
-    <h3 class="text-center">{{ object }}</h3>
+    <h3 class="text-center">Directory: {{ object }}</h3>
   </div>
 </div>
 <div class="row justify-content-center">
@@ -13,26 +13,43 @@
     {% csrf_token %}
     {{ formset.management_form }}
     {% for form in formset %}
-    <div class="row person-form">
+    <div class="person-form">
       {% if form.non_field_errors %}
       <div class="alert alert-danger">{{ form.non_field_errors }}</div>
       {% endif %}
-      {{ form.id }}
-      <div class="col-md-4 col-sm-12">
-	{{ form.errors.position }}
-	{{ form.position|as_crispy_field }}
-      </div>
-      <div class="col-md-4 col-sm-7">
-	{{ form.name|as_crispy_field }}
-      </div>
-      <div class="col-md-2 col-sm-3">
-	{{ form.year|as_crispy_field }}
-      </div>
-      <div class="col-md-2 col-sm-2">
-	<div class="d-none">
-	  {{ form.order|as_crispy_field }}
+      <div class="row">
+	{{ form.id }}
+	<div class="col-md-4 col-sm-12">
+	  {{ form.position|as_crispy_field }}
+	</div>
+	<div class="col-md-4 col-sm-7">
+	  {{ form.name|as_crispy_field }}
+	</div>
+	<div class="col-md-2 col-sm-3">
+	  {{ form.year|as_crispy_field }}
+	</div>
+	<div class="col-md-2 col-sm-2">
 	  {{ form.type|as_crispy_field }}
-	  {{ form.DELETE|as_crispy_field }}
+	</div>
+      </div>
+      <div class="d-none">
+	{{ form.DELETE|as_crispy_field }}
+      </div>
+      <div class="row">
+	<div class="col-md-5">
+	  {{ form.email|as_crispy_field }}
+	</div>
+	<div class="col-md-4">
+	  {{ form.phone|as_crispy_field }}
+	</div>
+	<div class="col-md-2">
+	  {{ form.order|as_crispy_field }}
+	</div>
+	<div class="col-md-1">
+	  <button type="button"
+		  class="btn btn-sm btn-danger mt-4 remove-person">
+	    <i class="fa fa-minus-square"></i>
+	  </button>
 	</div>
       </div>
     </div>
