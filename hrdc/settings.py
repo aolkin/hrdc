@@ -118,10 +118,11 @@ USE_L10N = False
 
 USE_TZ = True
 
-DATETIME_FORMAT = "%A, %B %d, %Y at %I:%M %p"
+DATETIME_FORMAT = "l, F d, Y [at] g:i A"
+DATETIME_INPUT_FORMAT = "%A, %B %d, %Y at %I:%M %p"
 
 DATETIME_INPUT_FORMATS = [
-    DATETIME_FORMAT,
+    DATETIME_INPUT_FORMAT,
     '%Y-%m-%d %I:%M %p',     # '2006-10-25 10:30 AM'
     '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
     '%Y-%m-%d %H:%M:%S.%f',  # '2006-10-25 14:30:59.000200'
