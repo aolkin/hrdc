@@ -9,9 +9,34 @@
   </div>
 </div>
 <div class="row justify-content-center">
-  <form method="POST" class="col-md-8">
+  <form method="POST" class="col peopleform">
     {% csrf_token %}
-    {{ form|crispy }}
+    {{ formset.management_form }}
+    {% for form in formset %}
+    <div class="row person-form">
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+      {% endif %}
+      {{ form.id }}
+      <div class="col-md-4 col-sm-12">
+	{{ form.errors.position }}
+	{{ form.position|as_crispy_field }}
+      </div>
+      <div class="col-md-4 col-sm-7">
+	{{ form.name|as_crispy_field }}
+      </div>
+      <div class="col-md-2 col-sm-3">
+	{{ form.year|as_crispy_field }}
+      </div>
+      <div class="col-md-2 col-sm-2">
+	<div class="d-none">
+	  {{ form.order|as_crispy_field }}
+	  {{ form.type|as_crispy_field }}
+	  {{ form.DELETE|as_crispy_field }}
+	</div>
+      </div>
+    </div>
+    {% endfor %}
     <button type="submit" class="btn btn-primary btn-block">
       Save Changes
     </button>

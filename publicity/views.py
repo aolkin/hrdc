@@ -3,6 +3,7 @@ from django.views.generic import TemplateView
 from django.views.generic.edit import UpdateView
 from django.views.generic.detail import SingleObjectMixin, DetailView
 from django.urls import reverse_lazy
+from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django import forms
 from django.contrib import messages
@@ -124,10 +125,41 @@ class InfoView(MenuMixin, ShowStaffMixin, UpdateView):
         )
         return context
 
-class PeopleView(MenuMixin, ShowStaffMixin, UpdateView):
-    template_name = "publicity/people.html"
+PersonFormSet = forms.inlineformset_factory(
+    PublicityInfo, ShowPerson,
+    fields=("position", "name", "year",
+            "email", "phone", "type","order"), extra=1)
 
-    fields = ('people',)
+class PeopleView(MenuMixin, ShowStaffMixin, TemplateView):
+    template_name = "publicity/people.html"
+    model = PublicityInfo
+
+    def post(self, *args, **kwargs):
+        self.formset = PersonFormSet(self.request.POST,
+                                     instance=self.get_object())
+        for i in self.formset:
+            print(i["id"], dir(i["id"]))
+        if self.formset.is_valid():
+            self.formset.save()
+        else:
+            print(self.formset.errors)
+            messages.error(self.request, "Failed to save cast and staff. "+
+                           "Please try again.")
+            return self.get(*args, **kwargs)
+        messages.success(self.request,
+                         "Updated cast and staff directory for {}.".format(
+                             self.get_object()))
+        return redirect(reverse_lazy("publicity:index"))
+
+    def get_context_data(self, *args, **kwargs):
+        self.object = self.get_object()
+        context = super().get_context_data(*args, **kwargs)
+        context["formset"] = (
+            self.formset if hasattr(self, "formset") else PersonFormSet(
+                instance=self.get_object()
+            )
+        )
+        return context
 
 class DisplayView(MenuMixin, DetailView):
     template_name = "publicity/display.html"

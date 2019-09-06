@@ -24,11 +24,14 @@ class PublicityInfo(models.Model):
     class Meta:
         verbose_name = "Publicity-Enabled Show"
 
-    def staff(self):
+    def hidden_people(self):
         return self.showperson_set.filter(type=0)
 
-    def cast(self):
+    def staff(self):
         return self.showperson_set.filter(type=1)
+
+    def cast(self):
+        return self.showperson_set.filter(type=2)
         
     def __str__(self):
         return str(self.show)
@@ -48,8 +51,9 @@ class PerformanceDate(models.Model):
 
 class ShowPerson(models.Model):
     TYPE_CHOICES = (
-        (0, "Staff"),
-        (1, "Cast")
+        (0, "Hidden"),
+        (1, "Staff"),
+        (2, "Cast")
     )
     
     show = models.ForeignKey(PublicityInfo, on_delete=models.CASCADE,
@@ -65,11 +69,12 @@ class ShowPerson(models.Model):
     
     position = models.CharField(max_length=120)
     
-    type = models.PositiveSmallIntegerField(default=0, choices=TYPE_CHOICES)
-    order = models.PositiveSmallIntegerField()
-
+    type = models.PositiveSmallIntegerField(default=0, choices=TYPE_CHOICES,
+                                            db_index=True)
+    order = models.PositiveSmallIntegerField(db_index=True)
+    
     class Meta:
-        ordering = "order",
+        ordering = "type", "order",
         unique_together = "order", "show", "type"
     
     def yearstr(self):
