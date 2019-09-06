@@ -98,9 +98,11 @@ class InfoForm(forms.ModelForm):
     
 class InfoView(MenuMixin, ShowStaffMixin, UpdateView):
     template_name = "publicity/info.html"
-    success_url = reverse_lazy("publicity:index")
     form_class = InfoForm
 
+    def get_success_url(self):
+        return reverse_lazy("publicity:info", args=(self.object.id,))
+    
     def post(self, *args, **kwargs):
         res = super().post(*args, **kwargs)
         self.formset = DateFormSet(self.request.POST,
@@ -137,19 +139,17 @@ class PeopleView(MenuMixin, ShowStaffMixin, TemplateView):
     def post(self, *args, **kwargs):
         self.formset = PersonFormSet(self.request.POST,
                                      instance=self.get_object())
-        for i in self.formset:
-            print(i["id"], dir(i["id"]))
         if self.formset.is_valid():
             self.formset.save()
         else:
-            print(self.formset.errors)
             messages.error(self.request, "Failed to save cast and staff. "+
                            "Please try again.")
             return self.get(*args, **kwargs)
         messages.success(self.request,
                          "Updated cast and staff directory for {}.".format(
                              self.get_object()))
-        return redirect(reverse_lazy("publicity:index"))
+        return redirect(reverse_lazy("publicity:people",
+                                     args=(self.get_object().id,)))
 
     def get_context_data(self, *args, **kwargs):
         self.object = self.get_object()
