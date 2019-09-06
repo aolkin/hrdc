@@ -24,6 +24,12 @@ class PublicityInfo(models.Model):
     class Meta:
         verbose_name = "Publicity-Enabled Show"
 
+    def staff(self):
+        return self.showperson_set.filter(type=0)
+
+    def cast(self):
+        return self.showperson_set.filter(type=1)
+        
     def __str__(self):
         return str(self.show)
 

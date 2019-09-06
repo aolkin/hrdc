@@ -29,7 +29,7 @@ class MetaAdmin(admin.ModelAdmin):
             "fields": ('credits',)
         }),
         ("Show Information", {
-            "fields": ('blurb', 'runtime', 'content_warning'),
+            "fields": ('blurb', 'runtime',) # 'content_warning'),
         })
     )
     

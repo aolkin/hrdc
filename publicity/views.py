@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.views.generic.edit import UpdateView
-from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.detail import SingleObjectMixin, DetailView
 from django.urls import reverse_lazy
-
+from django.template.loader import render_to_string
 from django import forms
 from django.contrib import messages
     
@@ -29,6 +29,9 @@ class MenuMixin:
             "url": reverse_lazy("publicity:index"),
             "active": current_url == "index"
         }]
+
+        if self.request.user.is_anonymous:
+            return context
         
         for show in [i for i in
                      self.request.user.show_set.all().order_by("-pk")
@@ -47,6 +50,12 @@ class MenuMixin:
                 "url": reverse_lazy("publicity:people",
                                     args=(show.publicity_info.pk,)),
                 "active": is_active and current_url == "people"
+            })
+            submenu.append({
+                "name": "Preview",
+                "url": reverse_lazy("publicity:display",
+                                    args=(show.publicity_info.pk,)),
+                "active": is_active and current_url == "display"
             })
         return context
 
@@ -79,7 +88,7 @@ class InfoForm(forms.ModelForm):
     class Meta:
         model = PublicityInfo
         fields = ('credits', 'contact_email',
-                  'blurb', 'runtime', 'content_warning')
+                  'blurb', 'runtime',) # 'content_warning')
         widgets = {
             'credits': forms.Textarea(attrs={'rows': 4, 'cols': 40}),
             'blurb': forms.Textarea(attrs={'rows': 5, 'cols': 40}),
@@ -119,3 +128,32 @@ class PeopleView(MenuMixin, ShowStaffMixin, UpdateView):
     template_name = "publicity/people.html"
 
     fields = ('people',)
+
+class DisplayView(MenuMixin, DetailView):
+    template_name = "publicity/display.html"
+    model = PublicityInfo
+
+class ScriptView(DetailView):
+    template_name = "publicity/embed.js"
+    model = PublicityInfo
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["innerHtml"] = render_to_string(
+            "publicity/content.html", {
+                "object": context["object"],
+                "h": self.request.GET.get("h", "h3"),
+                "enabled": {
+                    "cast": self.request.GET.get("cast", "") != "0",
+                    "credits": self.request.GET.get("credits", "") != "0",
+                    "staff": self.request.GET.get("staff", "") != "0",
+                    "about": self.request.GET.get("about", "") != "0",
+                    "dates": self.request.GET.get("dates", "") != "0",
+                }
+            }).replace("\n","")
+        return context
+    
+    def get(self, *args, **kwargs):
+        res = super().get(*args, **kwargs)
+        res["Content-Type"] = "application/javascript"
+        return res
