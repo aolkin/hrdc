@@ -4,6 +4,8 @@ from django.utils import timezone
 
 from django.contrib.auth import get_user_model
 
+from django.urls import reverse_lazy
+
 from dramaorg.models import Space, Season, Show
 
 class PublicityInfo(models.Model):
@@ -32,7 +34,10 @@ class PublicityInfo(models.Model):
 
     def cast(self):
         return self.showperson_set.filter(type=2)
-        
+
+    def get_absolute_url(self):
+        return reverse_lazy("publicity:display", args=(self.id,))
+    
     def __str__(self):
         return str(self.show)
 
