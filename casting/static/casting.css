@@ -2,13 +2,13 @@
     font-size: 1.5em;
 }
 .audition-sign-in-shows .custom-control {
-    padding-left: 3rem;
+    padding-left: 3.5rem;
 }
 .audition-sign-in-shows .custom-control-label::after,
 .audition-sign-in-shows .custom-control-label::before {
     height: 1.75rem;
     width: 1.75rem;
-    /*left: -2.25rem;*/
+    left: -2.25rem;
 }
 
 .custom-control-input:checked:disabled~.custom-control-label::before {
