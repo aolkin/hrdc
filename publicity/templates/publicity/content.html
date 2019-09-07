@@ -28,7 +28,7 @@
 <{{ h }}>CREW</{{ h }}>
 <p>
   {% for person in object.staff %}
-  {{ person.position }} ... {{ person.name }} {{ person.yearstr }}
+  {{ person.position }} ... {{ person.name }} {{ person.yearstr }}<br>
   {% empty %}
   To be announced!
   {% endfor %}
@@ -38,7 +38,7 @@
 <{{ h }}>CAST</{{ h }}>
 <p>
   {% for person in object.cast %}
-  {{ person.position }} ... {{ person.name }} {{ person.yearstr }}
+  {{ person.position }} ... {{ person.name }} {{ person.yearstr }}<br>
   {% empty %}
   To be announced!
   {% endfor %}
