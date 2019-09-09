@@ -12,6 +12,8 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from utils import user_is_initialized
 
+from django.conf import settings
+
 from .models import *
 
 class InitializedLoginMixin:
@@ -82,8 +84,12 @@ class IndexView(MenuMixin, InitializedLoginMixin, TemplateView):
     
     template_name = "publicity/index.html"
 
-DateFormSet = forms.inlineformset_factory(PublicityInfo, PerformanceDate,
-                                          fields=("performance",), extra=1)
+DateFormSet = forms.inlineformset_factory(
+    PublicityInfo, PerformanceDate, fields=("performance",), extra=1, widgets={
+        "performance": forms.DateTimeInput(
+            format=settings.DATETIME_INPUT_FORMAT
+        )
+    })
     
 class InfoForm(forms.ModelForm):
     class Meta:
