@@ -10,6 +10,8 @@ from django.contrib import messages
 
 from django.utils import timezone
 
+import csv
+
 from config import config
 
 from chat.models import Message
@@ -164,6 +166,34 @@ class AuditionView(ShowStaffMixin, UserIsPdsmMixin, DetailView):
                     :settings.CHAT_LOADING_LIMIT:-1]
         return context
 
+class AuditionExportView(ShowStaffMixin, UserIsPdsmMixin, DetailView):
+    def get(self, *args, **kwargs):
+        response = HttpResponse(content_type="text/csv")
+        obj = self.get_object()
+        response['Content-Disposition'] = 'attachment; filename="{}_auditions_{}.csv"'.format(
+            obj.show.slug,
+            timezone.localtime(timezone.now()).strftime("%Y-%m-%d_%H%M%S"))
+        writer = csv.writer(response)
+        writer.writerow((
+            "Sign-in Time", "Name", "Email", "Phone", "Affiliation", "Year",
+            "PGPs", "Preferred Stage Gender", "Conflicts", "Tech Interest"
+        ))
+        for i in obj.audition_set.all().order_by("signed_in"):
+            writer.writerow((
+                i.signed_in,
+                i.actor.get_full_name(False),
+                i.actor.email,
+                i.actor.phone,
+                i.actor.affiliation,
+                i.actor.year,
+                i.actor.pgps,
+                i.actor.gender_pref,
+                i.actorseasonmeta.conflicts,
+                i.tech_interest
+            ))
+        return response
+        
+    
 class AuditionStatusBase(StaffViewMixin, SingleObjectMixin, View):
     model = Audition
 
@@ -474,7 +504,9 @@ urlpatterns = [
             url('^call/$', AuditionCallView.as_view(), name="audition_call"),
             url('^cancel/$', AuditionCancelView.as_view(),
                 name="audition_cancel"),
-            url('^done/$', AuditionDoneView.as_view(), name="audition_done")
+            url('^done/$', AuditionDoneView.as_view(), name="audition_done"),
+            url('^export/$', AuditionExportView.as_view(),
+                name="audition_export"),
         ])),
         
         url(r'^callbacks/', include([
