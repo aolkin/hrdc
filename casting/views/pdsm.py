@@ -451,8 +451,8 @@ class ShowActors(ShowStaffMixin, UserIsPdsmMixin, DetailView):
             Q(actor__suspended_until__isnull=True),
             sign_in_complete=True)
         for term in terms:
-            q = Q(actor__first_name__contains=term)
-            q |= Q(actor__last_name__contains=term)
+            q = Q(actor__first_name__icontains=term)
+            q |= Q(actor__last_name__icontains=term)
             auditions = auditions.filter(q)
         if config.get("only_auditioners",
                       "no").lower() == "yes" or auditions.exists():
@@ -467,7 +467,7 @@ class ShowActors(ShowStaffMixin, UserIsPdsmMixin, DetailView):
                 Q(suspended_until__lte=timezone.localdate()) |
                 Q(suspended_until__isnull=True))
             for term in terms:
-                q = Q(first_name__contains=term) | Q(last_name__contains=term)
+                q = Q(first_name__icontains=term) | Q(last_name__icontains=term)
                 users = users.filter(q)
             actors = list(users.values("id", "first_name", "last_name"))
             for i in actors:
