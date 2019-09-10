@@ -33,7 +33,7 @@ send_confirmation.short_description = ("Send confirmation emails for "
 def clear_response(modeladmin, request, qs):
     qs.update(response=None, tech_req=None)
     messages.success(request, "Cleared {} signatures.".format(qs.count()))
-clear_response.short_description = "Clear selected responses and tech reqs."
+clear_response.short_description = "Clear selected responses and tech reqs"
 
 @admin.register(Signing)
 class SigningAdmin(admin.ModelAdmin):

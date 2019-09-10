@@ -414,7 +414,7 @@ class Character(AssociateShowMixin):
     def actors(self):
         responses = self.signing_set.filter(response=True)
         if responses:
-            if self.signing_set.filter(order__lt=responses[0].order,
+            if self.signing_set.filter(order__lt=responses.last().order,
                                        response__isnull=True):
                 return None
         if len(responses) >= self.allowed_signers:

@@ -133,15 +133,16 @@
 	    {{ character.allowed_signers|apnumber|capfirst }} actors can sign
 	    for this part.
 	  </small>
-	  <hr class="mb-1 mt-2">
 	  {% endif %}
 	  {% if character.allow_multiple_signatures %}
 	  <small class="text-muted">
 	    This role can be signed for in addition to other roles in this show.
 	  </small>
-	  <hr class="mb-1 mt-2">
 	  {% endif %}
 	  {% if character.cast_description %}
+	  {% if character.allowed_signers != 1 or character.allow_multiple_signatures %}
+	  <hr class="mb-1 mt-2">
+	  {% endif %}
 	  <small class="text-muted">
 	    {{ character.cast_description|urlize|linebreaksbr }}
 	  </small>
@@ -153,8 +154,7 @@
 	  <small>
 	    <span class="text-muted">This role has been filled by</span>
 	    {% for actor in character.actors %}
-	    {{ actor }}
-	    {% if forloop.revcounter0 == 1 %}
+	    {{ actor }}{% if forloop.revcounter0 == 1 %}
 	    and
 	    {% elif not forloop.last %},
 	    {% endif %}
