@@ -239,12 +239,16 @@ class SigningView(FixHeaderUrlMixin, ListView):
                                                tshow))
                             continue
                         obj.tech_req = tshow
+                    obj.save()
                     if res:
                         lower_signatures = obj.character.signing_set.exclude(
                             pk=obj.pk).filter(
                                 order__gt=obj.order, response=True)
-                        lower_signatures.update(response=None, tech_req=None)
-                    obj.save()
+                        for sig in lower_signatures:
+                            if not sig.signable:
+                                sig.response = None
+                                sig.tech_req = None
+                                sig.save()
                     signed.append(obj)
         if signed:
             messages.success(self.request,
