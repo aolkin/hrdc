@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'social_django',
     'dramaorg',
     'casting',
+    'finance',
     'publicity',
     'crispy_forms',
     'bootstrapform',

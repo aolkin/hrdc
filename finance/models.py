@@ -1,0 +1,19 @@
+from django.db import models
+from django.conf import settings
+from django.utils import timezone
+
+from django.contrib.auth import get_user_model
+
+from django.urls import reverse_lazy
+
+from dramaorg.models import Space, Season, Show
+
+class FinanceInfo(models.Model):
+    show = models.OneToOneField(settings.SHOW_MODEL, on_delete=models.CASCADE,
+                                related_name="finance_info")
+
+    class Meta:
+        verbose_name = "Finance-Enabled Show"
+    
+    def __str__(self):
+        return str(self.show)

@@ -1,0 +1,21 @@
+{% extends "finance/base.html" %}
+
+{% load bt config %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h3 class="text-center">Welcome to the Finance Manager</h3>
+    <p>
+      Select a show from the sidebar to manage your financials.
+    </p>
+    {% if not user.is_board %}
+    <p class="text-muted text-center">
+      Please contact <a href="mailto:{% option 'fin_contact_email' %}">
+      {% option 'fin_contact_name' %}</a> to have your shows added to the
+      finance manager.
+    </p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
