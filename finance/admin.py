@@ -21,6 +21,28 @@ class BudgetExpenseInline(admin.StackedInline):
         ("reported", "actual", "notes",)
     )
 
+class ExpenseInline(admin.StackedInline):
+    model = Expense
+    extra = 0
+    autocomplete_fields = ("subcategory", "submitting_user")
+    fieldsets = (
+        (None, {
+            "fields": (
+                ("status", "purchased_using", "submitting_user",),
+                ("subcategory", "item",),
+                ("purchaser_name", "date_purchased",),
+                ("amount", "receipt"),
+            )
+        }),
+        ("Reimbursement Options", {
+            "fields": (
+                ("purchaser_email", "reimburse_via_mail",),
+                ("mailing_address",),
+            ),
+            "classes": ("collapse",),
+        })
+    )
+
 @admin.register(FinanceInfo)
 class MetaAdmin(admin.ModelAdmin):
     list_display = ('show', 'season', "income_count",
@@ -34,7 +56,7 @@ class MetaAdmin(admin.ModelAdmin):
         }),
     )
 
-    inlines = (IncomeInline, BudgetExpenseInline)
+    inlines = (IncomeInline, BudgetExpenseInline, ExpenseInline)
 
     def get_readonly_fields(self, modeladmin, obj):
         return ("show",) if obj and obj.show else []
@@ -76,3 +98,57 @@ class IncomeAdmin(admin.ModelAdmin):
 
     readonly_fields = "show",
     actions = export_income,
+
+@admin.register(BudgetExpense)
+class BudgetExpenseAdmin(admin.ModelAdmin):
+    list_display = ("show", "category", "name",
+                    "estimate", "reported", "actual")
+    list_filter = ("category",
+                   "show__show__season", "show__show__year")
+    list_editable = ("estimate", "reported", "actual")
+    search_fields = ("show__show__title", "category", "name")
+    list_display_links = None
+
+    readonly_fields = "show",
+
+def export_expense(modeladmin, request, qs):
+    response = HttpResponse(content_type="text/csv")
+    response['Content-Disposition'] = 'attachment; filename="hrdcapp_expenses_{}.csv"'.format(
+        timezone.localtime(timezone.now()).strftime("%Y-%m-%d_%H%M%S"))
+    writer = csv.writer(response)
+    writer.writerow((
+        "Show", "Category", "Subcategory", "Item", "Amount", "Purchaser Name",
+        "Status", "Purchased Via", "Date Purchased", "Receipt",
+        "Purchaser Email", "Reimburse via Mail", "Mailing Address"
+    ))
+    for i in qs:
+        writer.writerow((
+            str(i.show),
+            i.category,
+            i.subcategory.name,
+            i.item,
+            i.amount,
+            i.purchaser_name,
+            i.get_status_display(),
+            i.get_purchased_using_display(),
+            i.date_purchased,
+            i.receipt,
+            i.purchaser_email,
+            i.reimburse_via_mail,
+            i.mailing_address
+        ))
+    return response
+export_expense.short_description = "Export selected to csv"
+
+@admin.register(Expense)
+class ExpenseAdmin(admin.ModelAdmin):
+    list_display = ("show", "category", "sub_category", "item",
+                    "amount", "status", "purchased_using", "purchaser_name")
+    list_filter = ("status", "purchased_using", "subcategory__category",
+                   "show__show__season", "show__show__year")
+    search_fields = ("show__show__title", "subcategory__name", "item")
+    list_display_links = None
+    list_editable = "status",
+
+    readonly_fields = "show",
+    actions = export_expense,

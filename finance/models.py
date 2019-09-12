@@ -3,8 +3,9 @@ from django.conf import settings
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
-
 from django.urls import reverse_lazy
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 from dramaorg.models import Space, Season, Show
 
@@ -126,8 +127,82 @@ class BudgetExpense(models.Model):
     notes = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
-        return self.name
+        return "{} - {} - {}".format(
+            self.show, self.get_category_display(), self.name)
 
     class Meta:
         verbose_name = "Budget Expense Item"
         ordering = "category",
+
+class Expense(models.Model):
+    EXPENSE_STATUSES = (
+        (0, "Purchased"),
+        (
+            "Reimbursement", (
+                (51, "Requested"),
+                (52, "Processed"),
+            )
+        ),
+        (
+            "P-Card", (
+                (62, "Confirmed"),
+            )
+        ),
+    )
+
+    FUNDS_SOURCES = (
+        (0, "P-Card"),
+        (1, "Personal Funds")
+    )
+
+    def upload_destination(instance, filename):
+        return "finance/receipts/{}/{}".format(instance.show.show.slug,
+                                               filename)
+    
+    show = models.ForeignKey(FinanceInfo, on_delete=models.CASCADE,
+                             db_index=True)
+
+    status = models.PositiveSmallIntegerField(choices=EXPENSE_STATUSES,
+                                              default=0)
+    purchased_using = models.PositiveSmallIntegerField(choices=FUNDS_SOURCES,
+                                                       default=0)
+
+    last_updated = models.DateTimeField(auto_now=True)
+
+    date_purchased = models.DateField()
+    amount = models.DecimalField(decimal_places=2, max_digits=7)
+    receipt = models.FileField(upload_to=upload_destination, blank=True)
+
+    item = models.CharField(max_length=255)
+    subcategory = models.ForeignKey(BudgetExpense, on_delete=models.PROTECT)
+    purchaser_name = models.CharField(max_length=255)
+
+    submitting_user = models.ForeignKey(get_user_model(), null=True,
+                                        on_delete=models.SET_NULL)
+    
+    # For Reimbursement Only
+    purchaser_email = models.EmailField(blank=True)
+    reimburse_via_mail = models.BooleanField(
+        default=False,
+        help_text="Does the reimbursement check need to be mailed?"
+    )
+    mailing_address = models.TextField(blank=True)
+    
+    def category(self):
+        return self.subcategory.get_category_display()
+    category.admin_order_field = "subcategory__category"
+
+    def sub_category(self):
+        return self.subcategory.name
+    sub_category.admin_order_field = "subcategory__name"
+
+    def __str__(self):
+        return "{} - {} - ${:.2f}".format(self.subcategory, self.item, self.amount)
+
+@receiver(post_save)
+def send_message(sender, instance, created, raw, **kwargs):
+    if sender == Expense:
+        budget_item = instance.subcategory
+        budget_item.actual = round(budget_item.expense_set.all().aggregate(
+            models.Sum("amount"))["amount__sum"], 2) or 0
+        budget_item.save()
