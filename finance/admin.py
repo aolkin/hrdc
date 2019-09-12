@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.http import HttpResponse
 
-import csv
+import csv, re
 
 from .models import *
 
@@ -112,6 +112,13 @@ class BudgetExpenseAdmin(admin.ModelAdmin):
 
     readonly_fields = "show",
 
+    def get_search_results(self, request, queryset, search_term):
+        referer = request.META.get("HTTP_REFERER", "")
+        financeinfo_match = re.search(r'/financeinfo/(\d+)/', referer)
+        if financeinfo_match:
+            queryset = queryset.filter(show=financeinfo_match.group(1))
+        return super().get_search_results(request, queryset, search_term)
+
 def export_expense(modeladmin, request, qs):
     response = HttpResponse(content_type="text/csv")
     response['Content-Disposition'] = 'attachment; filename="hrdcapp_expenses_{}.csv"'.format(
@@ -128,7 +135,7 @@ def export_expense(modeladmin, request, qs):
             i.category(),
             i.sub_category(),
             i.item,
-            i.amount,
+            i.amount_display,
             i.purchaser_name,
             i.get_status_display(),
             i.get_purchased_using_display(),
@@ -144,7 +151,8 @@ export_expense.short_description = "Export selected to csv"
 @admin.register(Expense)
 class ExpenseAdmin(admin.ModelAdmin):
     list_display = ("show", "category", "sub_category", "item",
-                    "amount", "status", "purchased_using", "purchaser_name")
+                    "amount_display", "status",
+                    "purchased_using", "purchaser_name")
     list_filter = ("status", "purchased_using", "subcategory__category",
                    "show__show__season", "show__show__year")
     search_fields = ("show__show__title", "subcategory__name", "item")

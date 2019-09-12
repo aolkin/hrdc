@@ -127,8 +127,7 @@ class BudgetExpense(models.Model):
     notes = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
-        return "{} - {} - {}".format(
-            self.show, self.get_category_display(), self.name)
+        return "{} - {}".format(self.get_category_display(), self.name)
 
     class Meta:
         verbose_name = "Budget Expense Item"
@@ -136,7 +135,7 @@ class BudgetExpense(models.Model):
 
 class Expense(models.Model):
     EXPENSE_STATUSES = (
-        (0, "Purchased"),
+        (0, "Pending"),
         (
             "P-Card", (
                 (52, "Confirmed"),
@@ -196,8 +195,13 @@ class Expense(models.Model):
         return self.subcategory.name
     sub_category.admin_order_field = "subcategory__name"
 
+    @property
+    def amount_display(self):
+        return "${:.2f}".format(self.amount)
+    
     def __str__(self):
-        return "{} - {} - ${:.2f}".format(self.subcategory, self.item, self.amount)
+        return ("{} - ${:.2f}".format(self.item, self.amount)
+                if self.amount else self.item)
 
 
     def clean(self):
@@ -206,9 +210,6 @@ class Expense(models.Model):
             raise ValidationError(
                 "Selected expense category does not belong to selected show.")
         if self.status > 60:
-            if not self.receipt:
-                raise ValidationError(
-                    "Must provide receipt for reimbursement.")
             if not self.purchaser_email:
                 raise ValidationError(
                     "Must provide purchaser email for reimbursement.")
@@ -219,6 +220,9 @@ class Expense(models.Model):
                 raise ValidationError(
                     "Reimbursement statuses can only be selected for purchases "
                     "made with personal funds.")
+            if not self.receipt:
+                raise ValidationError(
+                    "Must provide receipt for reimbursement.")
         if self.purchased_using != 0 and (
                 self.status > 50 and self.status < 60):
             raise ValidationError(
@@ -226,7 +230,7 @@ class Expense(models.Model):
                 "made via a p-card.")
 
 @receiver(post_save)
-def send_message(sender, instance, created, raw, **kwargs):
+def update_actual(sender, instance, created, raw, **kwargs):
     if sender == Expense:
         budget_item = instance.subcategory
         budget_item.actual = round(budget_item.expense_set.all().aggregate(

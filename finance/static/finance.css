@@ -25,6 +25,24 @@ input[type=number]::-webkit-outer-spin-button {
     display: none;
 }
 
+.date-purchased select.form-control {
+    display: inline;
+    width: 30%;
+    margin-right: 3%;
+}
+
+.date-purchased select:nth-child(1).form-control {
+    width: 40%;
+}
+
+.date-purchased select:nth-child(2).form-control {
+    width: 20%;
+}
+
+.reimburse-via-mail>.form-group {
+    margin-top: 2rem;
+}
+
 @media print {
     .budget-worksheet>thead>tr>th:nth-child(6),
     .budget-worksheet>tbody>tr>td:nth-child(6),

@@ -12,6 +12,8 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from utils import user_is_initialized
 
+import datetime, os
+
 from django.conf import settings
 
 from .models import *
@@ -45,18 +47,17 @@ class MenuMixin:
             submenu = menu[str(show)] = []
             is_active = (hasattr(self, "object") and
                          self.object.pk == show.finance_info.pk)
-            submenu.append({
-                "name": "Grants and Income",
-                "url": reverse_lazy("finance:income",
-                                    args=(show.finance_info.pk,)),
-                "active": is_active and current_url == "income"
-            })
-            submenu.append({
-                "name": "Budget",
-                "url": reverse_lazy("finance:budget",
-                                    args=(show.finance_info.pk,)),
-                "active": is_active and current_url == "budget"
-            })
+            for name, url in (
+                    ("Grants and Income", "income"),
+                    ("Budget", "budget"),
+                    ("Expenses", "expenses"),
+            ):
+                submenu.append({
+                    "name": name,
+                    "url": reverse_lazy("finance:" + url,
+                                        args=(show.finance_info.pk,)),
+                    "active": is_active and current_url == url
+                })
         return context
 
 class ShowStaffMixin(InitializedLoginMixin, SingleObjectMixin):
@@ -128,4 +129,95 @@ class BudgetView(MenuMixin, ShowStaffMixin, DetailView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
+        return context
+
+class ExpenseForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["subcategory"].queryset = self.show_instance.budgetexpense_set.all()
+        self.fields["date_purchased"].widget.is_required = False
+        self.receipt_filename = os.path.basename(
+            self.instance.receipt.name) if self.instance.receipt else None
+
+    def clean(self):
+        res = super().clean()
+        if res["purchased_using"] == 1:
+            if res["reimburse_via_mail"] and not res["mailing_address"]:
+                raise ValidationError(
+                    "Reimbursement via mail requires a mailing address.")
+        return res
+
+THIS_YEAR = datetime.date.today().year
+
+BaseExpenseFormSet = forms.inlineformset_factory(
+    FinanceInfo, Expense,
+    form=ExpenseForm,
+    fields=("item", "subcategory", "amount", "purchased_using",
+            "date_purchased", "purchaser_name", "purchaser_email", "receipt",
+            "reimburse_via_mail", "mailing_address", "submitting_user"),
+    extra=1,
+    widgets = {
+        "mailing_address": forms.Textarea(attrs={"rows": 4, "cols": 40}),
+        "receipt": forms.FileInput(),
+        "submitting_user": forms.HiddenInput(),
+        "date_purchased": forms.SelectDateWidget(
+            years=range(THIS_YEAR - 1, THIS_YEAR + 2)),
+    }
+)
+
+class ExpenseFormSet(BaseExpenseFormSet):
+    def __init__(self, *args, submitting_user=None, **kwargs):
+        self.form.show_instance = kwargs["instance"]
+        super().__init__(*args, **kwargs)
+        self.queryset = self.queryset.filter(status__lt=50)
+
+class ExpenseView(MenuMixin, ShowStaffMixin, TemplateView):
+    template_name = "finance/expenses.html"
+    model = FinanceInfo
+
+    def post(self, *args, **kwargs):
+        self.formset = ExpenseFormSet(
+            self.request.POST, self.request.FILES,
+            instance=self.get_object(),
+            initial=[{"submitting_user": self.request.user}]
+        )
+        if self.formset.is_valid():
+            self.formset.save()
+        else:
+            messages.error(self.request, "Failed to save expense information. "+
+                           "Please try again.")
+            return self.get(*args, **kwargs)
+        req = self.request.POST.get("request-reimbursement")
+        if req:
+            expense = Expense.objects.get(pk=req)
+            expense.status = 61
+            try:
+                expense.full_clean()
+                expense.save()
+                messages.success(self.request,
+                                 "Requested reimbursement for {}.".format(
+                                     expense))
+            except ValidationError as err:
+                for msg in err.messages:
+                    messages.error(self.request, msg)
+                return self.get(*args, **kwargs)
+        messages.success(self.request,
+                         "Updated expense information for {}.".format(
+                             self.get_object()))
+        return redirect(reverse_lazy("finance:expenses",
+                                     args=(self.get_object().id,)))
+
+    def get_context_data(self, *args, **kwargs):
+        self.object = self.get_object()
+        context = super().get_context_data(*args, **kwargs)
+        context["reimbursements"] = self.object.expense_set.filter(
+            status__gte=60)
+        context["p_card"] = self.object.expense_set.filter(
+            status__gte=50, status__lt=60)
+        context["formset"] = (
+            self.formset if hasattr(self, "formset") else ExpenseFormSet(
+                instance=self.get_object(),
+                initial=[{"submitting_user": self.request.user}]
+            )
+        )
         return context
