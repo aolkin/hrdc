@@ -194,6 +194,7 @@ class Expense(models.Model):
     def sub_category(self):
         return self.subcategory.name
     sub_category.admin_order_field = "subcategory__name"
+    sub_category.short_description = "Subcategory"
 
     @property
     def amount_display(self):

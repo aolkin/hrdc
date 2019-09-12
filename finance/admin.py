@@ -151,12 +151,12 @@ export_expense.short_description = "Export selected to csv"
 @admin.register(Expense)
 class ExpenseAdmin(admin.ModelAdmin):
     list_display = ("show", "category", "sub_category", "item",
-                    "amount_display", "status",
-                    "purchased_using", "purchaser_name")
+                    "get_amount", "status",
+                    "purchased_using", "purchaser_name", "date_purchased")
     list_filter = ("status", "purchased_using", "subcategory__category",
                    "show__show__season", "show__show__year")
     search_fields = ("show__show__title", "subcategory__name", "item")
-    list_display_links = None
+    list_display_links = "item",
     list_editable = "status",
     autocomplete_fields = "show", "submitting_user", "subcategory"
     actions = export_expense,
@@ -184,5 +184,10 @@ class ExpenseAdmin(admin.ModelAdmin):
         })
     )
 
+    def get_amount(self, obj):
+        return obj.amount_display
+    get_amount.short_description = "Amount"
+    get_amount.admin_order_field = "amount"
+    
     def get_readonly_fields(self, modeladmin, obj):
         return ("show",) if obj and obj.show else []
