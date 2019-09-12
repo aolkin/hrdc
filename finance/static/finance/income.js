@@ -50,7 +50,6 @@ $(() => {
 	$("#total-received-income").text(formatter.format(received));
     }
     
-    $(".dollar-field input, .status-field select").on("change keypress",
-						      calculateTotal);
+    $(".dollar-field input, .status-field select").on("input", calculateTotal);
     calculateTotal();
 });
