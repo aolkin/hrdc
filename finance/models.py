@@ -18,12 +18,12 @@ class FinanceInfo(models.Model):
     @property
     def requested_income_val(self):
         return self.income_set.exclude(status=11).aggregate(
-            models.Sum("requested"))["requested__sum"]
+            models.Sum("requested"))["requested__sum"] or 0
 
     @property
     def requested_income(self):
         sum = self.requested_income_val
-        return "${:.2f}".format(sum) if sum else None
+        return "${:.2f}".format(sum) if sum else sum
 
     @property
     def received_income_val(self):
