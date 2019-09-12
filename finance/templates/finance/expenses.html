@@ -88,12 +88,20 @@
   </div>
 </div>
 {% endif %}
+<div class="row justify-content-center mt-3">
+  <div class="col-md-8">
+    <h4 class="text-center">New Expenses</h4>
+  </div>
+</div>
 <div class="row justify-content-center mt-2">
   <form method="POST" class="col expenseform" enctype="multipart/form-data">
     {% csrf_token %}
     {{ formset.management_form }}
     {% for form in formset %}
     <div class="expense-form">
+      <div class="row">
+	<h5>Expense</h5>
+      </div>
       <div class="row">
 	{{ form.id }}
 	{{ form.submitting_user }}
@@ -163,6 +171,10 @@
 	  </button>
 	  <p class="text-center text-muted mt-2">
 	    Once reimbursement is requested, you cannot edit this item anymore.
+	  </p>
+	  {% else %}
+	  <p class="text-center">
+	    You must save this expense before requesting reimbursement.
 	  </p>
 	  {% endif %}
 	</div>
