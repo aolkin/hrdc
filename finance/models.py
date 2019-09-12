@@ -16,10 +16,24 @@ class FinanceInfo(models.Model):
         verbose_name = "Finance-Enabled Show"
 
     @property
-    def requested_income(self):
-        sum = self.income_set.exclude(status=11).aggregate(
+    def requested_income_val(self):
+        return self.income_set.exclude(status=11).aggregate(
             models.Sum("amount_requested"))["amount_requested__sum"]
+
+    @property
+    def requested_income(self):
+        sum = self.requested_income_val
         return "${:.2f}".format(sum) if sum else None
+
+    @property
+    def received_income_val(self):
+        return self.income_set.filter(status__gt=50).aggregate(
+            models.Sum("amount_received"))["amount_received__sum"] or 0
+
+    @property
+    def received_income(self):
+        sum = self.received_income_val
+        return "${:.2f}".format(sum) if sum else sum
 
     @property
     def confirmed_income_val(self):
@@ -30,7 +44,22 @@ class FinanceInfo(models.Model):
     def confirmed_income(self):
         sum = self.confirmed_income_val
         return "${:.2f}".format(sum) if sum else sum
-        
+
+    @property
+    def administrative_budget(self):
+        return self.budgetexpense_set.filter(
+            category=BudgetExpense.BUDGET_CATEGORIES[0][0])
+
+    @property
+    def production_budget(self):
+        return self.budgetexpense_set.filter(
+            category=BudgetExpense.BUDGET_CATEGORIES[1][0])
+
+    @property
+    def other_budget(self):
+        return self.budgetexpense_set.filter(
+            category=BudgetExpense.BUDGET_CATEGORIES[2][0])
+    
     def __str__(self):
         return str(self.show)
 
@@ -48,7 +77,8 @@ class Income(models.Model):
         (11, "Rejected"),
     )
     
-    show = models.ForeignKey(FinanceInfo, on_delete=models.CASCADE)
+    show = models.ForeignKey(FinanceInfo, on_delete=models.CASCADE,
+                             db_index=True)
     name = models.CharField(max_length=40)
 
     amount_requested = models.DecimalField(decimal_places=2, max_digits=7)
@@ -59,11 +89,44 @@ class Income(models.Model):
                                               default=0)
 
     def clean(self):
-        if self.status > 50 and self.amount_received is None:
-            raise ValidationError("Must provide amount received.")
+        if self.status > 50:
+            if self.amount_received is None:
+                raise ValidationError("Must provide amount received.")
+        else:
+            if self.amount_received is not None:
+                raise ValidationError(
+                    "Cannot provide amount received before grant is received.")
     
     def __str__(self):
         return self.name
     
     class Meta:
         verbose_name = "Grant/Income"
+        verbose_name_plural = "Grants and Income"
+        ordering = "-status",
+
+class BudgetExpense(models.Model):
+    BUDGET_CATEGORIES = (
+        (10, "Administrative"),
+        (20, "Production"),
+        (50, "Other"),
+    )
+    
+    show = models.ForeignKey(FinanceInfo, on_delete=models.CASCADE,
+                             db_index=True)
+
+    category = models.PositiveSmallIntegerField(choices=BUDGET_CATEGORIES,
+                                                default=10)
+    name = models.CharField(max_length=80)
+    
+    estimate = models.DecimalField(decimal_places=2, max_digits=7, default=0)
+    reported = models.DecimalField(decimal_places=2, max_digits=7, default=0)
+    actual = models.DecimalField(decimal_places=2, max_digits=7, default=0)
+
+    notes = models.CharField(max_length=255, blank=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Budget Expense Item"

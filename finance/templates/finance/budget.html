@@ -1,0 +1,125 @@
+{% extends "finance/base.html" %}
+
+{% load bt crispy_forms_tags %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h3 class="text-center">{{ object }} Budget</h3>
+  </div>
+</div>
+
+<div class="row justify-content-center mt-3">
+  <div class="col-md-8">
+    <h4 class="text-center">Grants and Income</h4>
+    <h5 class="text-center">
+      <a href="{% url 'finance:income' object.pk %}">
+	Edit your Grants and Income
+      </a>
+    </h5>
+  </div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+	<th>Income Source</th>
+	<th>Status</th>
+	<th>Requested</th>
+	<th>Received</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in object.income_set.all %}
+      <tr class="{% if i.status > 50 %}table-success{% elif i.status == 11 %}table-danger{% elif i.status > 0 %}table-warning{% endif %}">
+	<td>{{ i.name }}</td>
+	<td>{{ i.get_status_display }}</td>
+	<td>${{ i.amount_requested }}</td>
+	<td>{% if i.amount_received %}${{ i.amount_received }}{% else %}-{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="row justify-content-end">
+  <div class="col-md-8">
+    <table class="table table-striped">
+      <thead>
+	<tr>
+	  <th>Total Requested</th>
+	  <th>Total Received</th>
+	  <th>Total Confirmed</th>
+	</tr>
+      </thead>
+      <tbody>
+	<tr>
+	  <td>{{ object.requested_income }}</td>
+	  <td>{{ object.received_income }}</td>
+	  <td>{{ object.confirmed_income }}</td>
+	</tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="row justify-content-center mt-3">
+  <div class="col-md-8">
+    <h4 class="text-center">Expenses</h4>
+  </div>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+	<th>Item</th>
+	<th>Estimate</th>
+	<th>Reported</th>
+	<th>Actual</th>
+	<th>Notes</th>
+	<th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="table-secondary">
+	<td colspan="5">Administrative</td>
+	<td>
+	  <button class="btn btn-sm btn-success add-item" data-category="10">
+	    <i class="fa fa-plus"></i>
+	  </button>
+	</td>
+      </tr>
+      {% for i in object.administrative_budget %}
+      {% include "finance/budget_line.html" with item=i category=i.category %}
+      {% endfor %}
+      {% include "finance/budget_line.html" with category=10 %}
+      <tr class="table-secondary">
+	<td colspan="5">Production</td>
+	<td>
+	  <button class="btn btn-sm btn-success add-item" data-category="20">
+	    <i class="fa fa-plus"></i>
+	  </button>
+	</td>
+      </tr>
+      {% for i in object.production_budget %}
+      {% include "finance/budget_line.html" with item=i category=i.category  %}
+      {% endfor %}
+      {% include "finance/budget_line.html" with category=20 %}
+      <tr class="table-secondary">
+	<td colspan="5">Other</td>
+	<td>
+	  <button class="btn btn-sm btn-success add-item" data-category="50">
+	    <i class="fa fa-plus"></i>
+	  </button>
+	</td>
+      </tr>
+      {% for i in object.other_budget %}
+      {% include "finance/budget_line.html" with item=i category=i.category  %}
+      {% endfor %}
+      {% include "finance/budget_line.html" with category=50 %}
+    </tbody>
+  </table>
+</div>
+
+<script type="text/javascript">
+ let total_confirmed_income = {{ object.confirmed_income_val }};
+ let total_received_income = {{ object.received_income_val }};
+ let total_requested_income = {{ object.requested_income_val }};
+</script>
+{% endblock %}

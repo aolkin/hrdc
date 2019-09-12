@@ -2,3 +2,18 @@
     margin-bottom: 0;
     list-style: square;
 }
+
+.budget-expense-row .input-group input[type=number] {
+    text-align: right;
+    width: 50px;
+}
+
+.budget-expense-row input[type=number]::-webkit-inner-spin-button, 
+.budget-expense-row input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
+.budget-expense-row.is-blank-row {
+    display: none;
+}

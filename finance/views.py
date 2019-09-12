@@ -48,6 +48,12 @@ class MenuMixin:
                                     args=(show.finance_info.pk,)),
                 "active": is_active and current_url == "income"
             })
+            submenu.append({
+                "name": "Budget",
+                "url": reverse_lazy("finance:budget",
+                                    args=(show.finance_info.pk,)),
+                "active": is_active and current_url == "budget"
+            })
         return context
 
 class ShowStaffMixin(InitializedLoginMixin, SingleObjectMixin):
@@ -111,4 +117,12 @@ class IncomeView(MenuMixin, ShowStaffMixin, TemplateView):
                 instance=self.get_object()
             )
         )
+        return context
+
+class BudgetView(MenuMixin, ShowStaffMixin, DetailView):
+    template_name = "finance/budget.html"
+    model = FinanceInfo
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
         return context

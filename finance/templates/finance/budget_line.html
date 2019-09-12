@@ -1,0 +1,41 @@
+      <tr class="budget-expense-row {% if not item %}is-blank-row{% endif %} category-{{ category }} budget-expense-{{ item.id }}"
+	  data-category="{{ category }}" data-id="{{ item.id }}">
+	<td>
+	  <input class="form-control" value="{{ item.name }}" name="name">
+	</td>
+	<td>
+	  <div class="input-group">
+	    <div class="input-group-prepend">
+	      <span class="input-group-text">$</span>
+	    </div>
+	    <input class="form-control" value="{{ item.estimate }}"
+		   type="number" size="4" name="estimate">
+	  </div>
+	</td>
+	<td>
+	  <div class="input-group">
+	    <div class="input-group-prepend">
+	      <span class="input-group-text">$</span>
+	    </div>
+	    <input class="form-control" value="{{ item.reported }}"
+		   type="number" size="4" name="reported">
+	  </div>
+	</td>
+	<td>
+	  <div class="input-group">
+	    <div class="input-group-prepend">
+	      <span class="input-group-text">$</span>
+	    </div>
+	    <input class="form-control" value="{{ item.actual }}"
+		   type="number" size="4" readonly>
+	  </div>
+	</td>
+	<td>
+	  <input class="form-control" value="{{ item.notes }}" name="notes">
+	</td>
+	<td>
+	  <button class="btn btn-sm btn-danger delete-item" data-category="20">
+	    <i class="fa fa-minus-square"></i>
+	  </button>
+	</td>
+      </tr>

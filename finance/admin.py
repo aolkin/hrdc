@@ -1,13 +1,24 @@
 from django.contrib import admin
+from django.http import HttpResponse
+
+import csv
 
 from .models import *
 
-class IncomeAdmin(admin.TabularInline):
+class IncomeInline(admin.TabularInline):
     model = Income
     extra = 1
     fields = (
         ("name", "status"),
         ("amount_requested", "amount_received"),
+    )
+
+class BudgetExpenseInline(admin.StackedInline):
+    model = BudgetExpense
+    extra = 1
+    fields = (
+        ("category", "name", "estimate",),
+        ("reported", "actual", "notes",)
     )
 
 @admin.register(FinanceInfo)
@@ -23,7 +34,11 @@ class MetaAdmin(admin.ModelAdmin):
         }),
     )
 
-    inlines = (IncomeAdmin,)
+    inlines = (IncomeInline, BudgetExpenseInline)
+
+    def get_readonly_fields(self, modeladmin, obj):
+        return ("show",) if obj and obj.show else []
+        
     
     def season(self, obj):
         return obj.show.seasonstr()
@@ -31,3 +46,34 @@ class MetaAdmin(admin.ModelAdmin):
     def income_count(self, obj):
         return obj.income_set.count()
     income_count.short_description = "# of Grants"
+
+def export_income(modeladmin, request, qs):
+    response = HttpResponse(content_type="text/csv")
+    response['Content-Disposition'] = 'attachment; filename="hrdcapp_income_{}.csv"'.format(
+        timezone.localtime(timezone.now()).strftime("%Y-%m-%d_%H%M%S"))
+    writer = csv.writer(response)
+    writer.writerow((
+        "Show", "Grant", "Requested", "Received", "Status",
+    ))
+    for i in qs:
+        writer.writerow((
+            str(i.show),
+            i.name,
+            i.amount_requested,
+            i.amount_received,
+            i.get_status_display()
+        ))
+    return response
+export_income.short_description = "Export selected to csv"
+
+@admin.register(Income)
+class IncomeAdmin(admin.ModelAdmin):
+    list_display = ("show", "name", "amount_requested", "amount_received",
+                    "status")
+    list_filter = ("status", "show__show__season", "show__show__year")
+    search_fields = ("show__show__title", "name")
+    list_display_links = None
+    list_editable = "amount_requested", "amount_received", "status"
+
+    readonly_fields = "show",
+    actions = export_income,
