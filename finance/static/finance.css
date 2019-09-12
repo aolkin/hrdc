@@ -1,0 +1,47 @@
+.income-form .errorlist {
+    margin-bottom: 0;
+    list-style: square;
+}
+
+.budget-expense-row input[type=text] {
+    min-width: 150px;
+}
+
+.dollar-field .input-group {
+    min-width: 124px;
+}
+
+.dollar-field .input-group input[type=number], .total-field {
+    text-align: right;
+}
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
+.budget-expense-row.blank-item {
+    display: none;
+}
+
+@media print {
+    .budget-worksheet>thead>tr>th:nth-child(6),
+    .budget-worksheet>tbody>tr>td:nth-child(6),
+    .budget-worksheet>tbody>tr.category-header>td:nth-child(2) {
+	display: none;
+    }
+
+    .budget-worksheet>tbody>tr>td:not(.dollar-field) input {
+	border: none;
+	padding: 0;
+    }
+
+    .budget-worksheet>tbody>tr>td input[readonly] {
+	background: none;
+    }
+
+    .budget-worksheet>tbody>tr.budget-expense-row>td {
+	padding: .25rem .75rem;
+    }
+}
