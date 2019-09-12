@@ -138,14 +138,14 @@ class Expense(models.Model):
     EXPENSE_STATUSES = (
         (0, "Purchased"),
         (
-            "Reimbursement", (
-                (51, "Requested"),
-                (52, "Processed"),
+            "P-Card", (
+                (52, "Confirmed"),
             )
         ),
         (
-            "P-Card", (
-                (62, "Confirmed"),
+            "Reimbursement", (
+                (61, "Requested"),
+                (62, "Processed"),
             )
         ),
     )
@@ -198,6 +198,32 @@ class Expense(models.Model):
 
     def __str__(self):
         return "{} - {} - ${:.2f}".format(self.subcategory, self.item, self.amount)
+
+
+    def clean(self):
+        if self.show_id and self.subcategory_id and (
+                self.subcategory.show_id != self.show_id):
+            raise ValidationError(
+                "Selected expense category does not belong to selected show.")
+        if self.status > 60:
+            if not self.receipt:
+                raise ValidationError(
+                    "Must provide receipt for reimbursement.")
+            if not self.purchaser_email:
+                raise ValidationError(
+                    "Must provide purchaser email for reimbursement.")
+            if self.reimburse_via_mail and not self.mailing_address:
+                raise ValidationError(
+                    "Must provide mailing address to reimburse via mail.")
+            if self.purchased_using != 1:
+                raise ValidationError(
+                    "Reimbursement statuses can only be selected for purchases "
+                    "made with personal funds.")
+        if self.purchased_using != 0 and (
+                self.status > 50 and self.status < 60):
+            raise ValidationError(
+                "P-card statuses can only be selected for purchases "
+                "made via a p-card.")
 
 @receiver(post_save)
 def send_message(sender, instance, created, raw, **kwargs):

@@ -20,6 +20,7 @@ class BudgetExpenseInline(admin.StackedInline):
         ("category", "name", "estimate",),
         ("reported", "actual", "notes",)
     )
+    readonly_fields = "actual",
 
 class ExpenseInline(admin.StackedInline):
     model = Expense
@@ -105,7 +106,7 @@ class BudgetExpenseAdmin(admin.ModelAdmin):
                     "estimate", "reported", "actual")
     list_filter = ("category",
                    "show__show__season", "show__show__year")
-    list_editable = ("estimate", "reported", "actual")
+    list_editable = ("estimate", "reported",)
     search_fields = ("show__show__title", "category", "name")
     list_display_links = None
 
@@ -124,8 +125,8 @@ def export_expense(modeladmin, request, qs):
     for i in qs:
         writer.writerow((
             str(i.show),
-            i.category,
-            i.subcategory.name,
+            i.category(),
+            i.sub_category(),
             i.item,
             i.amount,
             i.purchaser_name,
@@ -149,6 +150,31 @@ class ExpenseAdmin(admin.ModelAdmin):
     search_fields = ("show__show__title", "subcategory__name", "item")
     list_display_links = None
     list_editable = "status",
-
-    readonly_fields = "show",
+    autocomplete_fields = "show", "submitting_user", "subcategory"
     actions = export_expense,
+
+    fieldsets = (
+        (None, {
+            "fields": (
+                ("show",),
+                ("status", "purchased_using", "submitting_user",),
+            )
+        }),
+        ("Expense Details", {
+            "fields": (
+                ("subcategory", "item",),
+                ("amount", "receipt",),
+                ("purchaser_name", "date_purchased",),
+            )
+        }),
+        ("Reimbursement Options", {
+            "fields": (
+                ("purchaser_email", "reimburse_via_mail",),
+                ("mailing_address",),
+            ),
+            "classes": ("collapse",),
+        })
+    )
+
+    def get_readonly_fields(self, modeladmin, obj):
+        return ("show",) if obj and obj.show else []
