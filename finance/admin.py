@@ -7,7 +7,7 @@ from .models import *
 
 class IncomeInline(admin.TabularInline):
     model = Income
-    extra = 1
+    extra = 0
     fields = (
         ("name", "status"),
         ("requested", "received"),

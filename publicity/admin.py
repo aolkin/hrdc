@@ -4,11 +4,11 @@ from .models import *
 
 class PerformanceDateAdmin(admin.StackedInline):
     model = PerformanceDate
-    extra = 1
+    extra = 0
 
 class ShowPersonAdmin(admin.StackedInline):
     model = ShowPerson
-    extra = 1
+    extra = 0
     fields = (
         ("name", "year"),
         ("position", "type", "order"),
