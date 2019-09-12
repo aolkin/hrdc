@@ -13,26 +13,28 @@
   <div class="col-md-8">
     <h4 class="text-center">Confirmed Grants (Funds Received)</h4>
   </div>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-	<th>Income Source</th>
-	<th>Status</th>
-	<th>Requested</th>
-	<th>Received</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for i in confirmed %}
-      <tr>
-	<td>{{ i.name }}</td>
-	<td>{{ i.get_status_display }}</td>
-	<td>${{ i.amount_requested }}</td>
-	<td>${{ i.amount_received }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+	<tr>
+	  <th>Income Source</th>
+	  <th>Status</th>
+	  <th>Requested</th>
+	  <th>Received</th>
+	</tr>
+      </thead>
+      <tbody>
+	{% for i in confirmed %}
+	<tr>
+	  <td>{{ i.name }}</td>
+	  <td>{{ i.get_status_display }}</td>
+	  <td>${{ i.requested }}</td>
+	  <td>${{ i.received }}</td>
+	</tr>
+	{% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 {% endif %}
 <div class="row justify-content-center mt-2">
@@ -47,10 +49,10 @@
 	  {{ form.name|as_crispy_field }}
 	</div>
 	<div class="col-md-2 col-sm-3 dollar-field requested-field">
-	  {{ form.amount_requested|as_crispy_field }}
+	  {{ form.requested|as_crispy_field }}
 	</div>
 	<div class="col-md-2 col-sm-3 dollar-field received-field">
-	  {{ form.amount_received|as_crispy_field }}
+	  {{ form.received|as_crispy_field }}
 	</div>
 	<div class="col-md-3 col-sm-3 status-field">
 	  {{ form.status|as_crispy_field }}

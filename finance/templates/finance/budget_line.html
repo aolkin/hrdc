@@ -1,41 +1,48 @@
-      <tr class="budget-expense-row {% if not item %}is-blank-row{% endif %} category-{{ category }} budget-expense-{{ item.id }}"
-	  data-category="{{ category }}" data-id="{{ item.id }}">
-	<td>
-	  <input class="form-control" value="{{ item.name }}" name="name">
-	</td>
-	<td>
-	  <div class="input-group">
-	    <div class="input-group-prepend">
-	      <span class="input-group-text">$</span>
-	    </div>
-	    <input class="form-control" value="{{ item.estimate }}"
-		   type="number" size="4" name="estimate">
-	  </div>
-	</td>
-	<td>
-	  <div class="input-group">
-	    <div class="input-group-prepend">
-	      <span class="input-group-text">$</span>
-	    </div>
-	    <input class="form-control" value="{{ item.reported }}"
-		   type="number" size="4" name="reported">
-	  </div>
-	</td>
-	<td>
-	  <div class="input-group">
-	    <div class="input-group-prepend">
-	      <span class="input-group-text">$</span>
-	    </div>
-	    <input class="form-control" value="{{ item.actual }}"
-		   type="number" size="4" readonly>
-	  </div>
-	</td>
-	<td>
-	  <input class="form-control" value="{{ item.notes }}" name="notes">
-	</td>
-	<td>
-	  <button class="btn btn-sm btn-danger delete-item" data-category="20">
-	    <i class="fa fa-minus-square"></i>
-	  </button>
-	</td>
-      </tr>
+<tr class="budget-expense-row stream-item {% if not item %}blank-item budgetexpense-blank{% endif %} category-{{ category }} budget-expense-{{ item.id }}"
+    data-stream="budgetexpense" data-pk="{{ item.pk }}"
+    data-category="{{ category }}">
+  <td>
+    <input class="form-control" value="{{ item.name }}" name="name" type="text"
+	   data-stream="budgetexpense" data-pk="{{ item.pk }}">
+  </td>
+  <td class="dollar-field">
+    <div class="input-group">
+      <div class="input-group-prepend">
+	<span class="input-group-text">$</span>
+      </div>
+      <input class="form-control" value="{{ item.estimate }}"
+	     type="number" size="4" name="estimate"
+	     data-stream="budgetexpense" data-pk="{{ item.pk }}">
+    </div>
+  </td>
+  <td class="dollar-field">
+    <div class="input-group">
+      <div class="input-group-prepend">
+	<span class="input-group-text">$</span>
+      </div>
+      <input class="form-control" value="{{ item.reported }}"
+	     type="number" size="4" name="reported"
+	     data-stream="budgetexpense" data-pk="{{ item.pk }}">
+    </div>
+  </td>
+  <td class="dollar-field">
+    <div class="input-group">
+      <div class="input-group-prepend">
+	<span class="input-group-text">$</span>
+      </div>
+      <input class="form-control" value="{{ item.actual }}"
+	     type="number" size="4" name="actual" readonly
+	     data-stream="budgetexpense" data-pk="{{ item.pk }}">
+    </div>
+  </td>
+  <td>
+    <input class="form-control" value="{{ item.notes }}" name="notes"
+	   data-stream="budgetexpense" data-pk="{{ item.pk }}" type="text">
+  </td>
+  <td>
+    <button class="btn btn-sm btn-danger delete-item"
+	    data-stream="budgetexpense" data-pk="{{ item.pk }}">
+      <i class="fa fa-minus-square"></i>
+    </button>
+  </td>
+</tr>

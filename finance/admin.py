@@ -10,12 +10,12 @@ class IncomeInline(admin.TabularInline):
     extra = 1
     fields = (
         ("name", "status"),
-        ("amount_requested", "amount_received"),
+        ("requested", "received"),
     )
 
 class BudgetExpenseInline(admin.StackedInline):
     model = BudgetExpense
-    extra = 1
+    extra = 0
     fields = (
         ("category", "name", "estimate",),
         ("reported", "actual", "notes",)
@@ -38,7 +38,6 @@ class MetaAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, modeladmin, obj):
         return ("show",) if obj and obj.show else []
-        
     
     def season(self, obj):
         return obj.show.seasonstr()
@@ -59,8 +58,8 @@ def export_income(modeladmin, request, qs):
         writer.writerow((
             str(i.show),
             i.name,
-            i.amount_requested,
-            i.amount_received,
+            i.requested,
+            i.received,
             i.get_status_display()
         ))
     return response
@@ -68,12 +67,12 @@ export_income.short_description = "Export selected to csv"
 
 @admin.register(Income)
 class IncomeAdmin(admin.ModelAdmin):
-    list_display = ("show", "name", "amount_requested", "amount_received",
+    list_display = ("show", "name", "requested", "received",
                     "status")
     list_filter = ("status", "show__show__season", "show__show__year")
     search_fields = ("show__show__title", "name")
     list_display_links = None
-    list_editable = "amount_requested", "amount_received", "status"
+    list_editable = "requested", "received", "status"
 
     readonly_fields = "show",
     actions = export_income,

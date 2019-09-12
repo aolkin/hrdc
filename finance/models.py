@@ -18,7 +18,7 @@ class FinanceInfo(models.Model):
     @property
     def requested_income_val(self):
         return self.income_set.exclude(status=11).aggregate(
-            models.Sum("amount_requested"))["amount_requested__sum"]
+            models.Sum("requested"))["requested__sum"]
 
     @property
     def requested_income(self):
@@ -28,7 +28,7 @@ class FinanceInfo(models.Model):
     @property
     def received_income_val(self):
         return self.income_set.filter(status__gt=50).aggregate(
-            models.Sum("amount_received"))["amount_received__sum"] or 0
+            models.Sum("received"))["received__sum"] or 0
 
     @property
     def received_income(self):
@@ -38,7 +38,7 @@ class FinanceInfo(models.Model):
     @property
     def confirmed_income_val(self):
         return self.income_set.filter(status__gte=90).aggregate(
-            models.Sum("amount_received"))["amount_received__sum"] or 0
+            models.Sum("received"))["received__sum"] or 0
 
     @property
     def confirmed_income(self):
@@ -63,6 +63,9 @@ class FinanceInfo(models.Model):
     def __str__(self):
         return str(self.show)
 
+    def get_absolute_url(self):
+        return reverse_lazy("finance:budget", args=(self.pk,))
+
 class Income(models.Model):
     INCOME_STATUSES = (
         (0, "Planned"),
@@ -81,8 +84,8 @@ class Income(models.Model):
                              db_index=True)
     name = models.CharField(max_length=40)
 
-    amount_requested = models.DecimalField(decimal_places=2, max_digits=7)
-    amount_received = models.DecimalField(decimal_places=2, max_digits=7,
+    requested = models.DecimalField(decimal_places=2, max_digits=7)
+    received = models.DecimalField(decimal_places=2, max_digits=7,
                                           null=True, blank=True)
 
     status = models.PositiveSmallIntegerField(choices=INCOME_STATUSES,
@@ -90,10 +93,10 @@ class Income(models.Model):
 
     def clean(self):
         if self.status > 50:
-            if self.amount_received is None:
+            if self.received is None:
                 raise ValidationError("Must provide amount received.")
         else:
-            if self.amount_received is not None:
+            if self.received is not None:
                 raise ValidationError(
                     "Cannot provide amount received before grant is received.")
     

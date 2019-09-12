@@ -35,10 +35,13 @@ class MenuMixin:
 
         if self.request.user.is_anonymous:
             return context
+
+        board_shows = [self.get_object().show] if (
+            self.request.user.is_board and hasattr(self, "get_object")) else []
         
         for show in [i for i in
                      self.request.user.show_set.all().order_by("-pk")
-                     if hasattr(i, "finance_info")]:
+                     if hasattr(i, "finance_info")] + board_shows:
             submenu = menu[str(show)] = []
             is_active = (hasattr(self, "object") and
                          self.object.pk == show.finance_info.pk)
@@ -81,7 +84,7 @@ class IndexView(MenuMixin, InitializedLoginMixin, TemplateView):
 
 BaseIncomeFormSet = forms.inlineformset_factory(
     FinanceInfo, Income,
-    fields=("name", "amount_requested", "amount_received", "status"), extra=1
+    fields=("name", "requested", "received", "status"), extra=1
 )
 
 class IncomeFormSet(BaseIncomeFormSet):
