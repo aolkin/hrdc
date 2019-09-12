@@ -22,8 +22,7 @@ class FinanceInfo(models.Model):
 
     @property
     def requested_income(self):
-        sum = self.requested_income_val
-        return "${:.2f}".format(sum) if sum else sum
+        return "${:.2f}".format(self.requested_income_val)
 
     @property
     def received_income_val(self):
@@ -32,8 +31,7 @@ class FinanceInfo(models.Model):
 
     @property
     def received_income(self):
-        sum = self.received_income_val
-        return "${:.2f}".format(sum) if sum else sum
+        return "${:.2f}".format(self.received_income_val)
 
     @property
     def confirmed_income_val(self):
@@ -42,8 +40,7 @@ class FinanceInfo(models.Model):
 
     @property
     def confirmed_income(self):
-        sum = self.confirmed_income_val
-        return "${:.2f}".format(sum) if sum else sum
+        return "${:.2f}".format(self.confirmed_income_val)
 
     @property
     def administrative_budget(self):
