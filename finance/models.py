@@ -130,3 +130,4 @@ class BudgetExpense(models.Model):
 
     class Meta:
         verbose_name = "Budget Expense Item"
+        ordering = "category",
