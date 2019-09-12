@@ -44,3 +44,6 @@ class MetaAdmin(admin.ModelAdmin):
     
     def season(self, obj):
         return obj.show.seasonstr()
+
+    def get_readonly_fields(self, modeladmin, obj):
+        return ("show",) if obj and obj.show else []
