@@ -13,7 +13,7 @@ class IncomeAdmin(admin.TabularInline):
 @admin.register(FinanceInfo)
 class MetaAdmin(admin.ModelAdmin):
     list_display = ('show', 'season', "income_count",
-                    "planned_income", "received_income")
+                    "requested_income", "confirmed_income")
     search_fields = ('show__title',)
     list_filter = ('show__season', 'show__year',)
     autocomplete_fields = ('show',)

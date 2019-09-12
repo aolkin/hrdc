@@ -41,11 +41,11 @@ class MenuMixin:
                      if hasattr(i, "finance_info")]:
             submenu = menu[str(show)] = []
             is_active = (hasattr(self, "object") and
-                         self.object.pk == show.publicity_info.pk)
+                         self.object.pk == show.finance_info.pk)
             submenu.append({
                 "name": "Grants and Income",
-                "url": reverse_lazy("publicity:income",
-                                    args=(show.publicity_info.pk,)),
+                "url": reverse_lazy("finance:income",
+                                    args=(show.finance_info.pk,)),
                 "active": is_active and current_url == "income"
             })
         return context
@@ -71,3 +71,44 @@ class IndexView(MenuMixin, InitializedLoginMixin, TemplateView):
     help_text = "Manage budget and finances"
     
     template_name = "finance/index.html"
+
+
+BaseIncomeFormSet = forms.inlineformset_factory(
+    FinanceInfo, Income,
+    fields=("name", "amount_requested", "amount_received", "status"), extra=1
+)
+
+class IncomeFormSet(BaseIncomeFormSet):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.queryset = self.queryset.filter(status__lt=90)
+
+class IncomeView(MenuMixin, ShowStaffMixin, TemplateView):
+    template_name = "finance/income.html"
+    model = FinanceInfo
+
+    def post(self, *args, **kwargs):
+        self.formset = IncomeFormSet(self.request.POST,
+                                     instance=self.get_object())
+        if self.formset.is_valid():
+            self.formset.save()
+        else:
+            messages.error(self.request, "Failed to save income information. "+
+                           "Please try again.")
+            return self.get(*args, **kwargs)
+        messages.success(self.request,
+                         "Updated income information for {}.".format(
+                             self.get_object()))
+        return redirect(reverse_lazy("finance:income",
+                                     args=(self.get_object().id,)))
+
+    def get_context_data(self, *args, **kwargs):
+        self.object = self.get_object()
+        context = super().get_context_data(*args, **kwargs)
+        context["confirmed"] = self.object.income_set.filter(status__gte=90)
+        context["formset"] = (
+            self.formset if hasattr(self, "formset") else IncomeFormSet(
+                instance=self.get_object()
+            )
+        )
+        return context

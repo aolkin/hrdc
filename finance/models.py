@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
-
+from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 
 from django.urls import reverse_lazy
@@ -15,14 +15,20 @@ class FinanceInfo(models.Model):
     class Meta:
         verbose_name = "Finance-Enabled Show"
 
-    def planned_income(self):
+    @property
+    def requested_income(self):
         sum = self.income_set.exclude(status=11).aggregate(
             models.Sum("amount_requested"))["amount_requested__sum"]
-        return "${:.2f}".format(sum) if sum else sum
-        
-    def received_income(self):
-        sum = self.income_set.filter(status__gt=90).aggregate(
-            models.Sum("amount_received"))["amount_received__sum"]
+        return "${:.2f}".format(sum) if sum else None
+
+    @property
+    def confirmed_income_val(self):
+        return self.income_set.filter(status__gte=90).aggregate(
+            models.Sum("amount_received"))["amount_received__sum"] or 0
+
+    @property
+    def confirmed_income(self):
+        sum = self.confirmed_income_val
         return "${:.2f}".format(sum) if sum else sum
         
     def __str__(self):
@@ -32,14 +38,14 @@ class Income(models.Model):
     INCOME_STATUSES = (
         (0, "Planned"),
         (1, "Applied"),
-        (10, "Confirmed"),
-        (11, "Rejected"),
+        (51, "Received"),
         (
             "Administrative Statuses", (
-                (91, "Funds Received"),
+                (91, "Confirmed (Funds Received)"),
                 (92, "A.R.T. Grant"),
             )
-        )
+        ),
+        (11, "Rejected"),
     )
     
     show = models.ForeignKey(FinanceInfo, on_delete=models.CASCADE)
@@ -52,6 +58,10 @@ class Income(models.Model):
     status = models.PositiveSmallIntegerField(choices=INCOME_STATUSES,
                                               default=0)
 
+    def clean(self):
+        if self.status > 50 and self.amount_received is None:
+            raise ValidationError("Must provide amount received.")
+    
     def __str__(self):
         return self.name
     
