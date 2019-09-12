@@ -143,7 +143,7 @@ def second_signing_warning(pk):
         for actor in actors:
             firstroles = signings.filter(actor=actor)
             render_for_user(actor, "casting/email/signing-reminder.html",
-                            "signing", crm.pk,
+                            "signing-reminder", crm.pk,
                             { "firstroles": firstroles, "crm": crm,
                               "timeleft": crm.second_signing_opens -
                               timezone.now() },
