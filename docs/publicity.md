@@ -34,15 +34,18 @@ Most information related to your show will be updated on the "Show Info" page.
 If items are left blank, they will either be omitted, or in some cases listed
 as "TBD".
 
-#### Masthead Credits:
+#### Masthead Credits
 
 Masthead credits should include the author and composer (if applicable), as
 well as the director and other executive staff members. The reccomended
 format is:
 
 > Written by Author's Name
+>
 > Directed by Director's Name '20
+>
 > Produced by Producer 1 '19, Producer 2 '22
+>
 > ...etc
 
 #### Email for Publicity
