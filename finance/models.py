@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
 from django.dispatch import receiver
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete, post_delete
 
 from dramaorg.models import Space, Season, Show
 
@@ -235,5 +235,13 @@ def update_actual(sender, instance, created, raw, **kwargs):
     if sender == Expense:
         budget_item = instance.subcategory
         budget_item.actual = round(budget_item.expense_set.all().aggregate(
-            models.Sum("amount"))["amount__sum"], 2) or 0
+            models.Sum("amount"))["amount__sum"] or 0, 2)
+        budget_item.save()
+
+@receiver(post_delete)
+def update_actual_on_delete(sender, instance, **kwargs):
+    if sender == Expense:
+        budget_item = instance.subcategory
+        budget_item.actual = round(budget_item.expense_set.all().aggregate(
+            models.Sum("amount"))["amount__sum"] or 0, 2)
         budget_item.save()

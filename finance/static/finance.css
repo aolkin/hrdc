@@ -43,6 +43,16 @@ input[type=number]::-webkit-outer-spin-button {
     margin-top: 2rem;
 }
 
+.expenseform {
+    position: relative;
+    padding-bottom: 3rem;
+}
+
+.primary-submit {
+    position: absolute;
+    bottom: 0;
+}
+
 @media print {
     .budget-worksheet>thead>tr>th:nth-child(6),
     .budget-worksheet>tbody>tr>td:nth-child(6),

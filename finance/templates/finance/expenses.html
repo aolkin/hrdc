@@ -99,6 +99,11 @@
   <form method="POST" class="col expenseform" enctype="multipart/form-data">
     {% csrf_token %}
     {{ formset.management_form }}
+    <div class="row">
+      <button type="submit" class="btn btn-primary btn-block primary-submit">
+	Save Changes / Add Another
+      </button>
+    </div>
     {% for form in formset %}
     <div class="expense-form">
       <div class="row">
@@ -187,14 +192,11 @@
       {% if form.non_field_errors %}
       <div class="alert alert-danger">{{ form.non_field_errors }}</div>
       {% endif %}
+      {% if not forloop.last %}
+      <hr>
+      {% endif %}
     </div>
-    {% if not forloop.last %}
-    <hr>
-    {% endif %}
     {% endfor %}
-    <button type="submit" class="btn btn-primary btn-block">
-      Save Changes / Add Another
-    </button>
   </form>
 </div>
 {% endblock %}

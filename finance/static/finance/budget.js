@@ -24,6 +24,10 @@ function calculateTotals() {
 		    if (!isNaN(val)) {
 			categories[category][field] += val;
 		    }
+		    if (field == "actual") {
+			$(input).parents(".budget-expense-row").find(
+			    ".delete-item").toggle(val == 0);
+		    }
 		}
 	    );
 	    $(el).find(".total-field-" + field).text(
