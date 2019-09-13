@@ -31,7 +31,8 @@
 	  <td>{{ i.subcategory }}</td>
 	  <td>
 	    {{ i.item }}
-	    <a href="{{ i.receipt.url }}" class="ml-1" title="View Receipt">
+	    <a href="{{ i.receipt.url }}" class="ml-1" title="View Receipt"
+	       target="_blank">
 	      <i class="fa fa-file"></i>
 	    </a>
 	  </td>
@@ -72,7 +73,8 @@
 	  <td>
 	    {{ i.item }}
 	    {% if i.receipt %}
-	    <a href="{{ i.receipt.url }}" class="ml-1" title="View Receipt">
+	    <a href="{{ i.receipt.url }}" class="ml-1" title="View Receipt"
+	       target="_blank">
 	      <i class="fa fa-file"></i>
 	    </a>
 	    {% endif %}
@@ -144,7 +146,7 @@
 	    <label class="col-form-label">Current Receipt</label>
 	    <div>
 	      {% if form.instance.receipt %}
-	      <a href="{{ form.instance.receipt.url }}">
+	      <a href="{{ form.instance.receipt.url }}" target="_blank">
 		<i class="fa fa-file"></i>
 		{{ form.receipt_filename }}
 	      </a>
