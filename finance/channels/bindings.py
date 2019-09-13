@@ -17,11 +17,11 @@ class BudgetExpenseBinding(WebsocketBinding):
         if action == "create":
             return True
         if action == "update" or action == "delete":
-            return self.model.objects.get(pk=pk).show.show.user_is_staff(user)
+            return self.model.objects.get(pk=pk).show.show.user_is_staff(user) or user.is_board
             
     def create(self, data):
         show = FinanceInfo.objects.get(pk=data["show"])
-        if show.show.user_is_staff(self.user):
+        if show.show.user_is_staff(self.user) or self.user.is_board:
             super().create(data)
 
     def update(self, pk, data):
