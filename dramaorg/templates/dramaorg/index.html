@@ -16,9 +16,9 @@
     <tr>
       <th class="table-col-md">Show</th>
       <th class="table-col-sm table-col-desktop">Season</th>
-      <th class="table-col-xs">Residency</th>
-      <th class="table-col-sm">Venue (Liaisons)</th>
+      <th class="table-col-md">Residency (Liaisons)</th>
       <th class="table-col-lg">Administrative Staff</th>
+      <th class="table-col-xs">Enabled Apps</th>
     </tr>
   </thead>
   <tbody>
@@ -26,16 +26,26 @@
   <tr>
     <td>{{ show.title }}</td>
     <td>{{ show.seasonstr }}</td>
-    <td>{{ show.residency_starts|date:"M j" }}
-      {% if show.residency_starts != show.residency_ends %}-
-      {{ show.residency_ends|date:"M j" }}{% endif %}</td>
     <td>
       {{ show.space }}
-      {% if show.liaisons.exists %}
-      ({% for liaison in show.liaisons.all %}<a href="mailto:{{ liaison.email }}" title="{{ liaison.phone }}">{{ liaison.get_full_name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %})
+      ({{ show.residency_starts|date:"M j" }}
+      {% if show.residency_starts != show.residency_ends %}-
+      {{ show.residency_ends|date:"M j" }}{% endif %})
+      {% if show.liaisons.exists %} -
+      {% for liaison in show.liaisons.all %}
+      <a href="mailto:{{ liaison.email }}" title="{{ liaison.phone }}">
+	{{ liaison.get_full_name }}</a>{% if not forloop.last %}, {% endif %}
+      {% endfor %}
       {% endif %}
     </td>
     <td>{{ show.people }}</td>
+    <td>
+      {% for i in show.enabled_apps %}
+      <a href="{% url i|add:':index' %}">
+	{{ i|capfirst }}</a>{% if not forloop.last %},{% endif %}
+      {% empty %}-
+      {% endfor %}
+    </td>
   </tr>
   {% endfor %}
 </table>
@@ -70,11 +80,23 @@
 </div>
 {% endif %}
 
-{% if request.user.is_pdsm or request.user.is_board %}
+{% if request.user.is_pdsm %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <p class="lead text-center mt-3">
+      <strong>
+	To perform administrative tasks and manage aspects of your shows, use
+	the links under "Enabled Apps" above.
+      </strong>
+    </p>
+  </div>
+</div>
+{% endif %}
+{% if request.user.is_board %}
 {% if all_indexes %}
 <h3 class="text-center mt-5">
   HRDC Apps for PDSMs
-  <br><small class="text-muted">administrative tasks for your shows</small>
+  <br><small class="text-muted">board member access</small>
 </h3>
 <div class="row justify-content-center">
   <div class="col-md-6">
@@ -95,8 +117,10 @@
 
 {% if public_indexes %}
 <h3 class="text-center mt-5">
-  Public HRDC Apps
-  <br><small class="text-muted">public portals for HRDC apps</small>
+  Publicly-accessible HRDC Apps
+  <br><small class="text-muted">
+    Apps available to non-executive staff members
+  </small>
 </h3>
 <div class="row justify-content-center">
   <div class="col-md-6">

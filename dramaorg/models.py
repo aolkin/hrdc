@@ -276,6 +276,15 @@ class Show(Season):
             raise ValidationError("Residency cannot end before it begins!")
         return super().clean()
 
+    @property
+    def enabled_apps(self):
+        return [v.related_model.__module__.partition(".")[0]
+                for k, v in self._meta.fields_map.items()
+                if type(v) == models.OneToOneRel and hasattr(self, k)]
+    
+    @property
+    def apps_str(self):
+        return ", ".join([i.capitalize() for i in self.enabled_apps])
     
 class GroupProxy(auth.models.Group):
     class Meta:
