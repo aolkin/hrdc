@@ -20,8 +20,8 @@ class PublicityInfo(models.Model):
         help_text="E.g. 2 hours with a 10-minute intermission")
     blurb = models.TextField(blank=True, verbose_name="About the Show")
     content_warning = models.TextField(blank=True)
-    
-    # cast and staff
+
+    website_page = models.URLField(blank=True)
 
     class Meta:
         verbose_name = "Publicity-Enabled Show"
@@ -34,13 +34,18 @@ class PublicityInfo(models.Model):
 
     def cast(self):
         return self.showperson_set.filter(type=2)
-
+    
     def get_absolute_url(self):
         return reverse_lazy("publicity:display", args=(self.id,))
     
     def __str__(self):
         return str(self.show)
 
+    @property
+    def next_performance(self):
+        return self.performancedate_set.filter(
+            performance__gte=timezone.now()).first()
+    
 class PerformanceDate(models.Model):
     show = models.ForeignKey(PublicityInfo, on_delete=models.CASCADE,
                              db_index=True)

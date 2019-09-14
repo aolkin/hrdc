@@ -58,6 +58,36 @@ class FinanceInfo(models.Model):
         return self.budgetexpense_set.filter(
             category=BudgetExpense.BUDGET_CATEGORIES[2][0])
     
+    @property
+    def expected_bal(self):
+        expenses = self.budgetexpense_set.all().aggregate(
+            models.Sum("estimate"))["estimate__sum"] or 0
+        return self.requested_income_val - expenses
+
+    @property
+    def expected_balance(self):
+        return "${:.2f}".format(self.expected_bal)
+
+    @property
+    def reported_bal(self):
+        expenses = self.budgetexpense_set.all().aggregate(
+            models.Sum("reported"))["reported__sum"] or 0
+        return self.received_income_val - expenses
+
+    @property
+    def reported_balance(self):
+        return "${:.2f}".format(self.reported_bal)
+
+    @property
+    def actual_bal(self):
+        expenses = self.budgetexpense_set.all().aggregate(
+            models.Sum("actual"))["actual__sum"] or 0
+        return self.confirmed_income_val - expenses
+
+    @property
+    def actual_balance(self):
+        return "${:.2f}".format(self.actual_bal)
+
     def __str__(self):
         return str(self.show)
 

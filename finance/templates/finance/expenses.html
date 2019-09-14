@@ -96,6 +96,14 @@
   </div>
 </div>
 <div class="row justify-content-center mt-2">
+  <div class="col-md-8">
+    <p class="lead text-center">
+      To add or modify expense subcategories,
+      <a href="{% url 'finance:budget' object.pk %}">edit your budget</a>.
+    </p>
+  </div>
+</div>
+<div class="row justify-content-center">
   <form method="POST" class="col expenseform" enctype="multipart/form-data">
     {% csrf_token %}
     {{ formset.management_form }}

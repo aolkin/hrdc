@@ -1,5 +1,7 @@
 from django.contrib import admin
 
+from django.utils.html import format_html
+
 from .models import *
 
 class PerformanceDateAdmin(admin.StackedInline):
@@ -17,19 +19,20 @@ class ShowPersonAdmin(admin.StackedInline):
 
 @admin.register(PublicityInfo)
 class MetaAdmin(admin.ModelAdmin):
-    list_display = ('show', 'season', 'contact_email')
+    list_display = ('show', 'season', 'contact_email_link', "link")
     search_fields = ('show__title',)
     list_filter = ('show__season', 'show__year',)
     autocomplete_fields = ('show',)
     fieldsets = (
         ("", {
-            "fields": ('show', 'contact_email')
+            "fields": ('show', "website_page",)
         }),
         ("Publicity Header", {
             "fields": ('credits',)
         }),
         ("Show Information", {
-            "fields": ('blurb', 'runtime',) # 'content_warning'),
+            "fields": ('blurb', 'runtime', 'contact_email',)
+            # 'content_warning'),
         })
     )
     
@@ -41,6 +44,11 @@ class MetaAdmin(admin.ModelAdmin):
     def contact_email_link(self, obj):
         return format_html('<a href="mailto:{0}">{0}</a>', obj.contact_email)
     contact_email_link.short_description = "Show Email"
+    
+    def link(self, obj):
+        return format_html('<a href="{0}" target="_blank">{0}</a>',
+                           obj.website_page)
+    link.short_description = "Website Link"
     
     def season(self, obj):
         return obj.show.seasonstr()
