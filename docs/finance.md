@@ -18,15 +18,15 @@ page of the financial manager, you should see a list of every show you are an
 executive staff member on that has the financial manager enabled, with your
 current expected, reported, and actual balances.
 
-#### A Note on Terminology:
+#### A Note on Terminology
 
-> Your budget is divided into three columns, "Estimate", "Reported", and
-> "Actual". The estimate column on your budget is for planning your expenses
-> and corresponds to your "requested" grants. The difference of those is your
-> expected balance. The reported budget column is for tracking how much you
-> think you have spent, and corresponds with your "received" grants. Together,
-> those make up your reported balance. Your actual balance will be updated
-> automatically as grant funds come in and purchases are logged.
+Your budget is divided into three columns, "Estimate", "Reported", and
+"Actual". The estimate column on your budget is for planning your expenses
+and corresponds to your "requested" grants. The difference of those is your
+expected balance. The reported budget column is for tracking how much you
+think you have spent, and corresponds with your "received" grants. Together,
+those make up your reported balance. Your actual balance will be updated
+automatically as grant funds come in and purchases are logged.
 
 ## Grants Tracker
 
