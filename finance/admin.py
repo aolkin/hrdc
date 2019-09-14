@@ -96,9 +96,10 @@ class IncomeAdmin(admin.ModelAdmin):
     search_fields = ("show__show__title", "name")
     list_display_links = None
     list_editable = "requested", "received", "status"
-
-    readonly_fields = "show",
     actions = export_income,
+
+    def get_readonly_fields(self, modeladmin, obj):
+        return ("show",) if obj and obj.show else []
 
 @admin.register(BudgetExpense)
 class BudgetExpenseAdmin(admin.ModelAdmin):
@@ -110,7 +111,8 @@ class BudgetExpenseAdmin(admin.ModelAdmin):
     search_fields = ("show__show__title", "category", "name")
     list_display_links = None
 
-    readonly_fields = "show",
+    def get_readonly_fields(self, modeladmin, obj):
+        return ("show",) if obj and obj.show else []
 
     def get_search_results(self, request, queryset, search_term):
         referer = request.META.get("HTTP_REFERER", "")
