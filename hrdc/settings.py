@@ -173,7 +173,7 @@ BT_POPPER_VERSION = "1.12.9"
 BT_POPPER_INTEGRITY = "sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
 
 BT_HEADER_IMAGE = "logo.png"
-BT_HEADER_URL = "dramaorg:index"
+BT_HEADER_URL = "dramaorg:home"
 
 BT_JS_FILES = ["profilefields.js"]
 BT_CSS_FILES = ["global.css"]

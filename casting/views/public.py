@@ -280,7 +280,7 @@ def actor_token_logout(request):
 
 class IndexView(FixHeaderUrlMixin, TemplateView):
     verbose_name = "Common Casting"
-    help_text = "view schedules and posted lists or audition"
+    help_text = "view posted lists and schedules"
     
     template_name = "casting/public/index.html"
 

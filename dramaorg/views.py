@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator 
 
 from django import forms
+from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView, UpdateView
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
@@ -25,12 +26,38 @@ from .models import *
 from config import config
 import time
 
-all_indexes = []
-admin_indexes = [
-    (reverse_lazy("admin:index"), "Site Admin",
-     "edit objects, invite users, etc."),
-]
-public_indexes = []
+indexes = {
+    "staff_indexes": [],
+    "admin_indexes": [
+        (reverse_lazy("admin:index"), "Site Management",
+         "administer shows, users, etc."),
+    ],
+    "public_indexes": []
+}
+
+def get_link(u):
+    r = resolve(u)
+    func = r.func.view_class if hasattr(r.func, "view_class") else r.func
+    name = func.verbose_name if hasattr(func, "verbose_name") else r.view_name
+    return (u, name, getattr(func, "help_text", ""))
+
+def load_indexes():
+    for i in settings.INSTALLED_APPS:
+        try:
+            u = reverse(i+":index")
+            indexes["staff_indexes"].append(get_link(u))
+        except NoReverseMatch:
+            pass
+        try:
+            u = reverse(i+":admin")
+            indexes["admin_indexes"].append(get_link(u))
+        except NoReverseMatch:
+            pass
+        try:
+            u = reverse(i+":public_index")
+            indexes["public_indexes"].append(get_link(u))
+        except NoReverseMatch:
+            pass
 
 class SeasonForm(forms.ModelForm):
     class Meta:
@@ -48,15 +75,11 @@ class SeasonForm(forms.ModelForm):
     def save(self, *args):
         config[settings.ACTIVE_SEASON_KEY] = self.cleaned_data["season"]
         config[settings.ACTIVE_YEAR_KEY] = self.cleaned_data["year"]
-
-def get_link(u):
-    r = resolve(u)
-    func = r.func.view_class if hasattr(r.func, "view_class") else r.func
-    name = func.verbose_name if hasattr(func, "verbose_name") else r.view_name
-    return (u, name, getattr(func, "help_text", ""))
                         
-        
-class IndexView(SuccessMessageMixin, FormView):
+class StaffIndexView(SuccessMessageMixin, FormView):
+    verbose_name = "Your Shows"
+    help_text = "view and manage your shows"
+
     template_name = "dramaorg/index.html"
     success_url = reverse_lazy("dramaorg:index")
     form_class = SeasonForm
@@ -83,30 +106,18 @@ class IndexView(SuccessMessageMixin, FormView):
         return super().form_valid(form)
     
     def get_context_data(self, **kwargs):
-        if not all_indexes:
-            for i in settings.INSTALLED_APPS:
-                try:
-                    if i != "dramaorg":
-                        u = reverse(i+":index")
-                        all_indexes.append(get_link(u))
-                except NoReverseMatch:
-                    pass
-                try:
-                    u = reverse(i+":admin")
-                    admin_indexes.append(get_link(u))
-                except NoReverseMatch:
-                    pass
-                try:
-                    u = reverse(i+":public_index")
-                    public_indexes.append(get_link(u))
-                except NoReverseMatch:
-                    pass
         context = super().get_context_data(**kwargs)
-        context["all_indexes"] = all_indexes
-        context["admin_indexes"] = admin_indexes
-        context["public_indexes"] = public_indexes
+        context.update(indexes)
         return context
 
+class HomePage(TemplateView):
+    template_name = "dramaorg/home.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(indexes)
+        return context
+    
 SESSION_TOKEN_KEY = "_CAPTURED_LOGIN_TOKEN"
 
 def capture_token(request, token):
@@ -123,7 +134,7 @@ class TokenView(FormView):
                 self.request.user.post_register)
             self.request.user.post_register = ""
         else:
-            url = reverse("dramaorg:index")
+            url = reverse("dramaorg:home")
         return url
             
     @method_decorator(sensitive_post_parameters())
@@ -254,4 +265,4 @@ class ProfileView(LoginRequiredMixin, UpdateView):
         return self.request.user
 
     def get_success_url(self):
-        return self.request.GET.get("next", reverse("dramaorg:index"))
+        return self.request.GET.get("next", reverse("dramaorg:home"))

@@ -79,8 +79,8 @@ class ShowStaffMixin(InitializedLoginMixin, SingleObjectMixin):
         return False
 
 class IndexView(MenuMixin, InitializedLoginMixin, TemplateView):
-    verbose_name = "Show Publicity"
-    help_text = "Update your web listing"
+    verbose_name = "Publicity Manager"
+    help_text = "update your webpage and directory"
     
     template_name = "publicity/index.html"
 

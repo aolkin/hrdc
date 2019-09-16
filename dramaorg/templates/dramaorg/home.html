@@ -1,0 +1,113 @@
+{% extends "bt/default.html" %}
+
+{% load bootstrap crispy_forms_tags %}
+{% load drama %}
+{% load config %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
+{% include "dramaorg/user_dropdown.html" %}
+
+<h2 class="display-3 text-center">Welcome to HRDC Apps</h2>
+<h3 class="text-center text-uppercase">Online tools for the HRDC</h3>
+
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <p class="lead text-center mt-3">
+      Access different management portals for shows you are an executive staff
+      member on below, as well as public applications accessible even if
+      you are not on the staff of any shows.
+    </p>
+    <p class="text-center mb-0">
+      If you need to update your profile or contact information, please do so
+      <a class="" href="{% url 'dramaorg:profile' %}">here</a>.
+    </p>
+  </div>
+</div>
+
+<div class="row justify-content-around">
+  <div class="col-md-5">
+    {% if public_indexes %}
+    <h3 class="text-center mt-5">
+      Public Content
+    </h3>
+    {% for index in public_indexes %}
+    <a href="{{ index.0 }}" class="list-group-item list-group-item-action">
+      <div class="d-flex w-100 justify-content-between">
+	<h5 class="mb-0">{{ index.1 }}</h5>
+	{% if index.2 %}
+	<small class="text-muted">{{ index.2 }}</small>
+	{% endif %}
+      </div>
+    </a>
+    {% endfor %}
+    {% endif %}
+  </div>
+  <div class="col-md-5">
+    {% if staff_indexes %}
+    <h3 class="text-center mt-5">
+      Manage your Shows
+    </h3>
+    {% if request.user.is_anonymous %}
+    <p class="lead text-center">
+      To access shows you are an executive staff member on, please
+      <a href="{% url 'dramaorg:login' %}">log in</a>.
+    </p>
+    {% else %}
+    {% if user.show_set.exists or user.is_board %}
+    {% for index in staff_indexes %}
+    <a href="{{ index.0 }}" class="list-group-item list-group-item-action">
+      <div class="d-flex w-100 justify-content-between">
+	<h5 class="mb-0">{{ index.1 }}</h5>
+	{% if index.2 %}
+	<small class="text-muted">{{ index.2 }}</small>
+	{% endif %}
+      </div>
+    </a>
+    {% endfor %}
+    {% else %}
+    <p class="lead text-center">
+      You do not seem to be an executive staff member of any shows in this
+      system. If this is incorrect, please contact
+      <a href="mailto:{% option 'site_contact_email' %}">
+	{% option 'site_contact_name' %}</a>.
+    </p>
+    {% endif %}
+    {% endif %}
+    {% endif %}
+  </div>
+  {% if user.is_board %}
+  <div class="col-md-5">
+    <h3 class="text-center mt-5">
+      Administrative Tools
+    </h3>
+    {% for index in admin_indexes %}
+    <a href="{{ index.0 }}" class="list-group-item list-group-item-action">
+      <div class="d-flex w-100 justify-content-between">
+	<h5 class="mb-0">{{ index.1 }}</h5>
+	{% if index.2 %}
+	<small class="text-muted">{{ index.2 }}</small>
+	{% endif %}
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+<div class="row justify-content-center mt-5">
+  <div class="text-muted">current season:</div>
+</div>
+<div class="row justify-content-center">
+  <h4 class="display-4 text-muted">{% current_season %}</h4>
+</div>
+{% if request.user.is_superuser %}
+<div class="row justify-content-center">
+  <p class="lead text-muted">
+    To update the current season, use the form on
+    <a href="{% url 'dramaorg:index'%}#update-season">this page</a>.
+  </p>
+</div>
+{% endif %}
+{% endblock %}

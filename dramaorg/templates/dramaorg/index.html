@@ -62,7 +62,6 @@
       <h3>Welcome to HRDC Apps</h3>
       <p class="lead">
 	We couldn't find any shows that you are an executive staff member of.
-	Don't worry, you can still browse the public portal{{ public_indexes|length|pluralize }} below.
       </p>
       {% if not user.is_board %}
       <p>
@@ -72,10 +71,6 @@
       </p>
       {% endif %}
     </div>
-    <p class="text-center mb-0">
-      If you need to update your profile or contact information, please do so
-      <a class="" href="{% url 'dramaorg:profile' %}">here</a>.
-    </p>
   </div>
 </div>
 {% endif %}
@@ -92,75 +87,10 @@
   </div>
 </div>
 {% endif %}
-{% if request.user.is_board %}
-{% if all_indexes %}
-<h3 class="text-center mt-5">
-  HRDC Apps for PDSMs
-  <br><small class="text-muted">board member access</small>
-</h3>
-<div class="row justify-content-center">
-  <div class="col-md-6">
-    {% for index in all_indexes %}
-    <a href="{{ index.0 }}" class="list-group-item list-group-item-action">
-      <div class="d-flex w-100 justify-content-between">
-	<h5 class="mb-0">{{ index.1 }}</h5>
-	{% if index.2 %}
-	<small class="text-muted">{{ index.2 }}</small>
-	{% endif %}
-      </div>
-    </a>
-    {% endfor %}
-  </div>
-</div>
-{% endif %}
-{% endif %}
-
-{% if public_indexes %}
-<h3 class="text-center mt-5">
-  Publicly-accessible HRDC Apps
-  <br><small class="text-muted">
-    Apps available to non-executive staff members
-  </small>
-</h3>
-<div class="row justify-content-center">
-  <div class="col-md-6">
-    {% for index in public_indexes %}
-    <a href="{{ index.0 }}" class="list-group-item list-group-item-action">
-      <div class="d-flex w-100 justify-content-between">
-	<h5 class="mb-0">{{ index.1 }}</h5>
-	{% if index.2 %}
-	<small class="text-muted">{{ index.2 }}</small>
-	{% endif %}
-      </div>
-    </a>
-    {% endfor %}
-  </div>
-</div>
-{% endif %}
-
-{% if user.is_board %}
-<h3 class="text-center mt-5">
-  HRDC Apps Administration
-  <br><small class="text-muted">controls for board members</small>
-</h3>
-<div class="row justify-content-center">
-  <div class="col-md-6">
-    {% for index in admin_indexes %}
-    <a href="{{ index.0 }}" class="list-group-item list-group-item-action">
-      <div class="d-flex w-100 justify-content-between">
-	<h5 class="mb-0">{{ index.1 }}</h5>
-	{% if index.2 %}
-	<small class="text-muted">{{ index.2 }}</small>
-	{% endif %}
-      </div>
-    </a>
-    {% endfor %}
-  </div>
-</div>
-{% endif %}
 
 <div class="row justify-content-center mt-5">
 {% if user.is_superuser %}
+  <a name="update-season"></a>
   <form method="POST" class="col-md-6">
     {% csrf_token %}
     {{ form|bootstrap_inline }}

@@ -12,3 +12,5 @@ class DramaorgConfig(AppConfig):
         models = import_module("dramaorg.models")
         add_change_permissions(models.Show, models.User, models.Space,
                                models.Building)
+        views = import_module("dramaorg.views")
+        views.load_indexes()

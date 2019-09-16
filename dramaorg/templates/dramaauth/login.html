@@ -11,20 +11,8 @@
   <h1 class="text-center display-heading">
     {% setting "ADMIN_SITE_TITLE" %}</h1>
 </div>
-<div class="row justify-content-center my-4">
-  <div class="col-md-6">
-    <a href="{% url 'casting:public_index' %}"
-       class="btn btn-lg btn-info btn-block">
-      Common Casting
-    </a>
-  </div>
-</div>
 <div class="row justify-content-center mb-4">
   <div class="col-md-6">
-    <!--<a href="{% url 'dramaorg:register' %}?post={{ request.GET.next }}"
-       class="btn btn-md btn-secondary btn-block">
-      Create an {% setting "BT_SITE_TITLE" %} Account
-	 </a>-->
     {% include "dramaauth/social_login.html" with next=request.GET.next %}
   </div>
 </div>
@@ -38,5 +26,13 @@
     </p>
     <button type="submit" class="btn btn-primary btn-block">Login</button>
   </form>
+</div>
+<div class="row justify-content-center mt-5">
+  <div class="col-md-6">
+    <a href="{% url 'dramaorg:register' %}?post={{ request.GET.next }}"
+       class="btn btn-md btn-secondary btn-block">
+      Create an {% setting "BT_SITE_TITLE" %} Account
+    </a>
+  </div>
 </div>
 {% endblock %}

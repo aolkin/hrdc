@@ -23,7 +23,8 @@ auth_urls = [
 
 app_name = "dramaorg"
 urlpatterns = [
-    url(r'^$', IndexView.as_view(), name="index"),
+    url(r'^$', HomePage.as_view(), name="home"),
+    url(r'^staff/$', StaffIndexView.as_view(), name="index"),
     url(r'^', include(auth_urls)),
     url(r'^profile/$', ProfileView.as_view(), name="profile"),
     url(r'^register/$', RegisterView.as_view(), name="register"),

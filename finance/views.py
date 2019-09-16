@@ -77,8 +77,8 @@ class ShowStaffMixin(InitializedLoginMixin, SingleObjectMixin):
         return False
 
 class IndexView(MenuMixin, InitializedLoginMixin, TemplateView):
-    verbose_name = "Show Finances"
-    help_text = "Manage budget and finances"
+    verbose_name = "Finance Manager"
+    help_text = "manage budget and accounting"
     
     template_name = "finance/index.html"
 
