@@ -166,33 +166,49 @@ class AuditionView(ShowStaffMixin, UserIsPdsmMixin, DetailView):
                     :settings.CHAT_LOADING_LIMIT:-1]
         return context
 
-class AuditionExportView(ShowStaffMixin, UserIsPdsmMixin, DetailView):
+class ExportView(ShowStaffMixin, UserIsPdsmMixin, DetailView):
+    def get_objects(self):
+        return (self.get_object(),)
+    
     def get(self, *args, **kwargs):
         response = HttpResponse(content_type="text/csv")
-        obj = self.get_object()
-        response['Content-Disposition'] = 'attachment; filename="{}_auditions_{}.csv"'.format(
-            obj.show.slug,
+        response['Content-Disposition'] = 'attachment; filename="{}_{}s_{}.csv"'.format(
+            self.get_object().show.slug,
+            self.obj_,
             timezone.localtime(timezone.now()).strftime("%Y-%m-%d_%H%M%S"))
         writer = csv.writer(response)
-        writer.writerow((
+        objects = self.get_objects()
+        writer.writerow([
             "Sign-in Time", "Name", "Email", "Phone", "Affiliation", "Year",
-            "PGPs", "Preferred Stage Gender", "Conflicts", "Tech Interest"
-        ))
-        for i in obj.audition_set.all().order_by("signed_in"):
-            writer.writerow((
-                i.signed_in,
+            "PGPs", "Preferred Stage Gender"
+        ] + (["Conflicts", "Tech Interest"] if self.obj_ == "audition" else
+             ["Cast by Show"]))
+        for i in objects:
+            writer.writerow([
+                i.signed_in if hasattr(i, "signed_in") else "",
                 i.actor.get_full_name(False),
                 i.actor.email,
                 i.actor.phone,
                 i.actor.affiliation,
                 i.actor.year,
                 i.actor.pgps,
-                i.actor.gender_pref,
-                i.actorseasonmeta.conflicts,
-                i.tech_interest
-            ))
+                i.actor.gender_pref
+            ] + ([
+                i.actorseasonmeta.conflicts if hasattr(
+                    i, "actorseasonmeta") else "",
+                i.tech_interest if hasattr(i, "tech_interest") else ""
+            ] if type(i) == Audition else [i.character.show]))
         return response
+
+class AuditionExportView(ExportView):
+    obj_ = "audition"
+    def get_objects(self):
+        return self.get_object().audition_set.all().order_by("signed_in")
         
+class TechReqExportView(ExportView):
+    obj_ = "techreq"
+    def get_objects(self):
+        return self.get_object().tech_reqers.all()
     
 class AuditionStatusBase(StaffViewMixin, SingleObjectMixin, View):
     model = Audition
@@ -522,6 +538,8 @@ urlpatterns = [
         
         url(r'^techreqs/', include([
             url('^$', TechReqView.as_view(), name="tech_reqs"),
+            url('^export/$', TechReqExportView.as_view(),
+                name="tech_req_export"),
         ])),
     ])),
     url('^show/\d+/[a-z]+/actor/(?P<pk>\d+)$', ActorName.as_view(),
