@@ -44,6 +44,7 @@ FOOTER_SITE = "https://hrdctheater.org"
 
 
 GROUP_LOCATION = "Harvard"
+DEFAULT_AFFILIATION = "Harvard College"
 SITE_URL = "http://localhost:8000"
 
 LOGO_PATH = os.path.join(BASE_DIR, "hrdc/static/logo.png")

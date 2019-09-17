@@ -2,8 +2,10 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.admin import GroupAdmin
 from django.contrib.auth.models import Group, Permission
+from django.contrib import messages
 
 from django.http import HttpResponse
+from django.shortcuts import redirect
 
 import csv
 
@@ -53,6 +55,14 @@ def export_users(modeladmin, request, qs):
         ))
     return response
 export_users.short_description = "Download spreadsheet of selected users"
+
+def set_to_default_affiliation(modeladmin, request, qs):
+    qs.update(affiliation=settings.DEFAULT_AFFILIATION)
+    messages.success(request, 'Set users\' affiliation to "{}".'.format(
+        settings.DEFAULT_AFFILIATION))
+    return redirect("admin:dramaorg_user_changelist")
+set_to_default_affiliation.short_description = 'Set affiliation to "{}"'.format(
+    settings.DEFAULT_AFFILIATION)
 
 class ActiveFilter(admin.SimpleListFilter):
     title = "active status"
@@ -112,7 +122,7 @@ class UserAdmin(BaseUserAdmin):
     staff_readonly = ('email', 'first_name', 'last_name',
                       'pgps', 'gender_pref', 'phone', 'groups',
                       'affiliation', 'year', 'is_active', 'suspended_until')
-    actions = [export_users] + (
+    actions = [export_users, set_to_default_affiliation] + (
         [generate_tokens, clear_tokens] if settings.DEBUG else [])
     ordering = ('date_joined',)
     save_as_continue = True
