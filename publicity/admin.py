@@ -21,7 +21,7 @@ class ShowPersonAdmin(admin.StackedInline):
 class MetaAdmin(admin.ModelAdmin):
     list_display = ('show', 'season', 'contact_email_link', "link")
     search_fields = ('show__title',)
-    list_filter = ('show__season', 'show__year',)
+    list_filter = ('show__season', 'show__year', 'performancedate__performance')
     autocomplete_fields = ('show',)
     fieldsets = (
         ("", {
