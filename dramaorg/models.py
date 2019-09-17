@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib import auth
 from django.conf import settings
 from django.utils import timezone
-
+from django.db.models.functions import Concat
 from django.db.models.signals import post_save
 from django.contrib.auth.signals import user_logged_in
 from django.dispatch import receiver
@@ -105,7 +105,7 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     def affiliationyear(self):
         return "{} ({})".format(self.affiliation, self.year)
     affiliationyear.short_description = "Affiliation"
-    affiliationyear.admin_order_field = "year"
+    affiliationyear.admin_order_field = Concat("affiliation", "year")
     
     @property
     def is_initialized(self):
