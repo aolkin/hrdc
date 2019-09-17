@@ -50,6 +50,7 @@ LOGO_PATH = os.path.join(BASE_DIR, "hrdc/static/logo.png")
 
 CASTING_IS_COMMON = True
 
+BT_GTAG_ID = ""
 
 CELERY_BEAT_SCHEDULE = {
     'update-casting-releases': {
