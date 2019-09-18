@@ -2,11 +2,13 @@
 $(() => {   
     let DATETIME_FORMAT = "dddd, MMMM D, Y [at] h:mm A"
 
-    let extra = $("fieldset").last();
+    let extra = $(".date-fieldset").last();
     let count = Number($("#id_performancedate_set-TOTAL_FORMS").val());
     if (!extra.find(`#id_performancedate_set-${count - 1}-performance`).val()) {
 	extra.hide();
     }
+    $("input[name$=-note]").attr("placeholder",
+				'Note, e.g. "Free with HUID"');
 
     function addPerformance() {
 	let newPerformance = extra.clone();
@@ -19,7 +21,8 @@ $(() => {
 	    "name", `performancedate_set-${count}-show`);
 	newPerformance.find(`#id_performancedate_set-${count - 1}-performance`).attr(
 	    "name", `performancedate_set-${count}-performance`);
-	newPerformance.data("id", count);
+	newPerformance.find(`#id_performancedate_set-${count - 1}-note`).attr(
+	    "name", `performancedate_set-${count}-note`);
 	$(".performancedate_formset").append(newPerformance);
 	count += 1;
 	$("#id_performancedate_set-TOTAL_FORMS").val(count);
@@ -28,10 +31,9 @@ $(() => {
     $(".add-performance").click(addPerformance);
 
     function deletePerformance() {
-	let fieldset = $(this).parent();
-	let id = fieldset.data("id");
-	if (fieldset.find(`#id_performancedate_set-${id}-id`).val()) {
-	    fieldset.find(".form-check-input").prop("checked", true);
+	let fieldset = $(this).parents(".date-fieldset");
+	if (fieldset.find("input[name$=-id]").val()) {
+	    fieldset.find("input[name$=-DELETE]").prop("checked", true);
 	}
 	fieldset.slideUp();
     }

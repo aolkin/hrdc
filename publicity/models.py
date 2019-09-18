@@ -50,14 +50,19 @@ class PerformanceDate(models.Model):
     show = models.ForeignKey(PublicityInfo, on_delete=models.CASCADE,
                              db_index=True)
     performance = models.DateTimeField()
+    note = models.CharField(max_length=50, blank=True)
 
     class Meta:
         ordering = "performance",
         unique_together = "show", "performance"
-    
-    def __str__(self):
+
+    @property
+    def datestr(self):
         return timezone.localtime(
             self.performance).strftime("%A, %B %-d at %-I:%M %p")
+    
+    def __str__(self):
+        return self.datestr + (" ({})".format(self.note) if self.note else "")
 
 class ShowPerson(models.Model):
     TYPE_CHOICES = (

@@ -85,10 +85,11 @@ class IndexView(MenuMixin, InitializedLoginMixin, TemplateView):
     template_name = "publicity/index.html"
 
 DateFormSet = forms.inlineformset_factory(
-    PublicityInfo, PerformanceDate, fields=("performance",), extra=1, widgets={
+    PublicityInfo, PerformanceDate, fields=("performance", "note"), extra=1,
+    widgets={
         "performance": forms.DateTimeInput(
             format=settings.DATETIME_INPUT_FORMAT
-        )
+        ),
     })
     
 class InfoForm(forms.ModelForm):

@@ -21,14 +21,28 @@
     <div class="performancedate_formset">
       {{ date_formset.management_form }}
       {% for date in date_formset %}
-      <fieldset>
-	{{ date|crispy }}
+      <div class="form-row date-fieldset">
+	{{ date.id }}
+	<div class="d-none">{{ date.DELETE }}</div>
+	{% if date.non_field_errors %}
+	<div class="alert alert-danger">
+	  {% for error in date.non_field_errors %}
+	  {{ error }}{% if not forloop.last %}, {% endif %}
+	  {% endfor %}
+	</div>
+	{% endif %}
+	<div class="col-md-7">
+	  {{ date.performance|as_crispy_field }}
+	</div>
+	<div class="col-md-5">
+	  {{ date.note|as_crispy_field }}
+	</div>
 	{% if not date.errors %}
 	<button type="button" class="btn btn-danger btn-sm delete-performance">
 	  <i class="fa fa-minus-square"></i>
 	</button>
 	{% endif %}
-      </fieldset>
+      </div>
       {% endfor %}
     </div>
     <button type="submit" class="btn btn-primary btn-block btn-lg">

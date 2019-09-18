@@ -4,7 +4,7 @@ from django.utils.html import format_html
 
 from .models import *
 
-class PerformanceDateAdmin(admin.StackedInline):
+class PerformanceDateAdmin(admin.TabularInline):
     model = PerformanceDate
     extra = 0
 
