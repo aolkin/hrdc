@@ -118,7 +118,7 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     @property
     def is_initialized(self):
         return bool(self.first_name and self.last_name and self.phone and
-                    self.affiliation and self.year)
+                    self.affiliation and (self.year != None))
 
     @property
     def is_board(self):
