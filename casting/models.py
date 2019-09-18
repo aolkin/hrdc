@@ -54,6 +54,10 @@ class CastingReleaseMeta(models.Model):
     
     class Meta:
         verbose_name = "Casting Release Group"
+        permissions = (
+            ("view_first_cast_lists", "Can view first-round cast lists"),
+        )
+
 
     @property
     def association(self):
@@ -218,6 +222,10 @@ class CastingMeta(models.Model):
 
     class Meta:
         verbose_name = "Casting-Enabled Show"
+        permissions = (
+            ("view_unreleased_callbacks", "Can view unreleased callbacks"),
+            ("view_unreleased_cast", "Can view unreleased cast"),
+        )
 
     def __str__(self):
         return str(self.show)
@@ -321,6 +329,11 @@ class Audition(AssociateShowMixin):
     tech_interest = models.TextField(
         null=True, blank=True, default=None, verbose_name="Technical Interests")
 
+    class Meta:
+        permissions = (
+            ("table_auditions", "Can table at audition sign-ins"),
+        )
+    
     @property
     def actorseasonmeta(self):
         if not hasattr(self, "_cached_actorseasonmeta"):

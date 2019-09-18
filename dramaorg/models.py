@@ -288,6 +288,12 @@ class Show(Season):
     @property
     def apps_str(self):
         return ", ".join([i.capitalize() for i in self.enabled_apps])
+
+    class Meta:
+        permissions = (
+            ("change_current_season", "Can change the current season"),
+        )
+
     
 class GroupProxy(auth.models.Group):
     class Meta:

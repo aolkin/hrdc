@@ -55,7 +55,8 @@ class CallbackView(PublicView):
             added_for_signing=False)
         menu = context["sidebar_menu"]
         submenu = menu[self.object.show.seasonstr() + " Callbacks"] = []
-        if self.request.user.is_authenticated and self.request.user.is_board:
+        if self.request.user.is_authenticated and self.request.user.has_perm(
+                "casting.view_unreleased_callbacks"):
             filter_args = {}
         else:
             filter_args = {
@@ -100,7 +101,8 @@ class CastView(PublicView):
             hidden_for_signing=False)
         menu = context["sidebar_menu"]
         submenu = menu[self.object.show.seasonstr() + " Cast Lists"] = []
-        if self.request.user.is_authenticated and self.request.user.is_board:
+        if self.request.user.is_authenticated and self.request.user.has_perm(
+                "casting.view_unreleased_cast"):
             filter_args = {}
         elif (self.request.user.is_authenticated and
               self.request.user.is_season_pdsm):

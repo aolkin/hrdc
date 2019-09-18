@@ -52,7 +52,7 @@
 
 <div class="row justify-content-center">
   <div class="col-md-8">
-    {% if not user.is_board %}
+    {% if not perms.publicity.add_publicityinfo %}
     <p class="text-muted text-center">
       Please contact <a href="mailto:{% option 'pub_contact_email' %}">
       {% option 'pub_contact_name' %}</a> to have your shows added to the

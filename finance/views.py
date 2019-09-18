@@ -37,13 +37,10 @@ class MenuMixin:
 
         if self.request.user.is_anonymous:
             return context
-
-        board_shows = [self.get_object().show] if (
-            self.request.user.is_board and hasattr(self, "get_object")) else []
         
         for show in [i for i in
                      self.request.user.show_set.all().order_by("-pk")
-                     if hasattr(i, "finance_info")] + board_shows:
+                     if hasattr(i, "finance_info")]:
             submenu = menu[str(show)] = []
             is_active = (hasattr(self, "object") and
                          self.object.pk == show.finance_info.pk)

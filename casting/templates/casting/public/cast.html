@@ -188,7 +188,7 @@
   </div>
 </div>
 {% endif %}
-{% elif request.user.is_authenticated and request.user.is_board %}
+{% elif request.user.is_authenticated and perms.casting.view_unreleased_cast %}
 <h3 class="text-center">
   {% if not object.cast_submitted %} First-Round {% endif %}
   Cast List for:

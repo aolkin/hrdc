@@ -69,7 +69,8 @@ class IndexView(StaffViewMixin, UserIsPdsmMixin, TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        if self.request.user.is_season_pdsm or self.request.user.is_board:
+        if self.request.user.is_season_pdsm or self.request.user.has_perm(
+                "casting.table_auditions"):
             building_ids = (get_current_slots().distinct()
                             .values_list("space__building"))
             context["buildings"] = building_model.objects.filter(
@@ -79,7 +80,8 @@ class IndexView(StaffViewMixin, UserIsPdsmMixin, TemplateView):
                     space__building=b["pk"]).distinct().values_list(
                         "show__show__title")
                 b["slots"] = ", ".join([i[0] for i in shows])
-            
+        if self.request.user.is_season_pdsm or self.request.user.has_perm(
+                "casting.view_first_cast_lists"):
             context["first_cast_lists"] = []
             shows = show_model.objects.current_season().filter(
                 casting_meta__isnull=False)

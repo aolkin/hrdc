@@ -52,7 +52,7 @@
 </table>
 {% endif %}
 
-{% if not user.is_board %}
+{% if not perms.finance.change_financeinfo %}
 <p class="text-muted text-center">If any of this information is incorrect or
   your shows are missing from the finance manager, please contact 
   <a href="mailto:{% option 'fin_contact_email' %}">

@@ -49,7 +49,7 @@
   </tr>
   {% endfor %}
 </table>
-{% if not user.is_board %}
+{% if not perms.dramaorg.change_show %}
 <p class="text-muted text-center">If any of this information is incorrect or
   shows are missing from your dashboard, please contact
   <a href="mailto:{% option 'site_contact_email' %}">
@@ -63,7 +63,7 @@
       <p class="lead">
 	We couldn't find any shows that you are an executive staff member of.
       </p>
-      {% if not user.is_board %}
+      {% if not not perms.dramaorg.add_show %}
       <p>
 	If this is incorrect, please contact
 	<a href="mailto:{% option 'site_contact_email' %}">
@@ -89,7 +89,7 @@
 {% endif %}
 
 <div class="row justify-content-center mt-5">
-{% if user.is_superuser %}
+{% if perms.dramaorg.change_current_season %}
   <a name="update-season"></a>
   <form method="POST" class="col-md-6">
     {% csrf_token %}

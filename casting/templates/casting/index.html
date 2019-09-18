@@ -129,31 +129,22 @@
     {% endif %}
     {% endfor %}
 </table>
-{% if not user.is_board %}
 <p class="text-muted text-center">If any of this information is incorrect or
   shows are missing from your dashboard, please contact 
   <a href="mailto:{% option 'site_contact_email' %}">
-    {% option 'site_contact_name' %}</a>.</p>
-{% endif %}
+    {% option 'site_contact_name' %}</a>.
+</p>
 
 {% else %}
 <p class="lead">
   You are not a member of the administrative staff on any shows.
-  {% if not user.is_board %}
+  {% if not perms.casting.change_castingmeta %}
   If this is in error, please contact an HRDC Board member.
   {% endif %}
 </p>
 {% endif %}
 
-{% if user.is_board %}
-{% comment %}
-<h4 class="text-center mt-5">
-  <a href="{% url 'casting:admin' %}">
-    Common Casting Administration
-    <small class="text-muted">for board members</small>
-  </a>
-</h4>
-{% endcomment %}
+{% if perms.casting.change_castingmeta %}
 <h5 class="text-center text-muted">Please use the
   <a href="{% url 'admin:casting_castingmeta_changelist' %}">site admin</a>
   to edit or add shows</h5>

@@ -16,12 +16,17 @@ class BudgetExpenseBinding(WebsocketBinding):
     def has_permission(self, user, action, pk):
         if action == "create":
             return True
-        if action == "update" or action == "delete":
-            return self.model.objects.get(pk=pk).show.show.user_is_staff(user) or user.is_board
+        if action == "update":
+            return (self.model.objects.get(pk=pk).show.show.user_is_staff(user)
+                    or user.has_perm("finance.change_budgetexpense"))
+        if action == "delete":
+            return (self.model.objects.get(pk=pk).show.show.user_is_staff(user)
+                    or user.has_perm("finance.delete_budgetexpense"))
             
     def create(self, data):
         show = FinanceInfo.objects.get(pk=data["show"])
-        if show.show.user_is_staff(self.user) or self.user.is_board:
+        if show.show.user_is_staff(self.user) or self.user.has_perm(
+                "finance.add_budgetexpense"):
             super().create(data)
 
     def update(self, pk, data):
