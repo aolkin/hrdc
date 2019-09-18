@@ -108,6 +108,7 @@ function sendBoundUpdate(e) {
 	    pk: $(this).data("pk"),
 	    data: fields,
         });
+	setDirty(false);
     }
 }
 
