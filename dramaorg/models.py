@@ -65,6 +65,9 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     login_token = models.CharField(max_length=86, default=generate_token)
     token_expiry = models.DateTimeField(default=timezone.now)
 
+    admin_access = models.BooleanField(
+        default=False, help_text="Has access to this administrative portal")
+    
     date_joined = models.DateTimeField(default=timezone.now)
     last_login = models.DateTimeField(default=timezone.now)
     
@@ -126,7 +129,7 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     
     @property
     def is_staff(self):
-        return self.is_board or self.is_superuser
+        return self.admin_access or self.is_superuser or self.is_board
     
     def get_full_name(self, use_email=True):
         full_name = '{} {}'.format(self.first_name, self.last_name).strip()

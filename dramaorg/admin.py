@@ -94,7 +94,8 @@ class UserAdmin(BaseUserAdmin):
                            ('affiliation', 'year'),
                            ('suspended_until',))}),
         ('Contact Info', {'fields': ('email', 'phone')}),
-        ('Permissions', {'fields': ('is_active', 'is_superuser', 'groups'),
+        ('Permissions', {'fields': ('is_active', 'admin_access',
+                                    'is_superuser', 'groups'),
                          'classes': ('collapse',)}),
         ('Information', {'fields': ('last_login', 'date_joined', 'password')}),
     )
