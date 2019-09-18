@@ -188,7 +188,9 @@ class ScriptView(DetailView):
                     "staff": self.request.GET.get("staff", "") != "0",
                     "about": self.request.GET.get("about", "") != "0",
                     "dates": self.request.GET.get("dates", "") != "0",
-                }
+                },
+                "cast": ShowPerson.collate(context["object"].cast()),
+                "staff": ShowPerson.collate(context["object"].staff()),
             }).replace("\n","")
         return context
     

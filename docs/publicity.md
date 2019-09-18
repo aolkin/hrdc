@@ -70,6 +70,9 @@ will. A date and time picker will pop up when you select one of the inputs to
 ensure the date and time are formatted correctly, as it will not save if they
 are not.
 
+You can also list a note for each performance date, such as "Free with HUID"
+or similar. The note will be displayed in parentheses next to the date and time.
+
 ## Cast and Staff
 
 Please list everyone involved in your show, from executive staff to build crew
@@ -91,6 +94,9 @@ By default, people will be listed in the order you add them, and you may ignore
 the order field. However, to control the ordering of the list, simply supply a
 number in the order field, and people will be sorted from lowest to highest
 order.
+
+For ensemble roles or large crew positions, list each individual separately. The
+system will combine them and display them together in the cast or crew list.
 
 # The Preview Page
 

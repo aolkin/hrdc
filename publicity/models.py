@@ -6,6 +6,8 @@ from django.contrib.auth import get_user_model
 
 from django.urls import reverse_lazy
 
+from collections import defaultdict
+
 from dramaorg.models import Space, Season, Show
 
 class PublicityInfo(models.Model):
@@ -97,3 +99,13 @@ class ShowPerson(models.Model):
     
     def __str__(self):
         return "{}: {} {}".format(self.position, self.name, self.yearstr())
+
+    @staticmethod
+    def collate(qs):
+        people = defaultdict(list)
+        positions = []
+        for person in qs:
+            if not people[person.position]:
+                positions.append((person.position, people[person.position]))
+            people[person.position].append(person)
+        return positions
