@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.http import HttpResponse
+from django.utils.html import format_html
 
 import csv, re
 
@@ -44,23 +45,42 @@ class ExpenseInline(admin.StackedInline):
         })
     )
 
+SAVE_WARNING = """
+<p style="background-color: darkred; color: white; border-radius: 0.4em; padding: 0.8em;">
+DANGER: Saving this page will overwrite any concurrent edits made outside
+of this page.
+</p>
+<div id="save-warning" style="position: fixed; width: 100%; height: 100%; top: 0; left: 0; display: none; background-color: darkred; color: white; font-weight: bold; text-align: center; font-size: 1.5em; z-index: 99999; padding-top: 40%;">
+DANGER: Saving this page will overwrite any concurrent edits made outside
+of this page. Please refresh before continuing (your changes will be lost).
+</div>
+<script>
+setTimeout(() => {
+   django.jQuery("#save-warning").fadeIn(1000);
+}, 1000 * 60 * 5);
+</script>
+""".strip().replace("\n", " ")
+
 @admin.register(FinanceInfo)
 class MetaAdmin(admin.ModelAdmin):
     list_display = ('show', 'season', "income_count",
-                    "requested_income", "confirmed_income")
+                    "requested_income", "view_budget")
     search_fields = ('show__title',)
     list_filter = ('show__season', 'show__year',)
     autocomplete_fields = ('show',)
     fieldsets = (
         ("", {
-            "fields": ('show',)
+            "fields": ("show",),
+            "description": SAVE_WARNING,
         }),
     )
 
-    inlines = (IncomeInline, BudgetExpenseInline, ExpenseInline)
+    inlines = (IncomeInline,)
 
+    view_budget_text = "View budget"
+    
     def get_readonly_fields(self, modeladmin, obj):
-        return ("show",) if obj and obj.show else []
+        return ("show", "view_budget") if obj and obj.show else ("view_budget",)
     
     def season(self, obj):
         return obj.show.seasonstr()
@@ -69,6 +89,24 @@ class MetaAdmin(admin.ModelAdmin):
         return obj.income_set.count()
     income_count.short_description = "# of Grants"
 
+    def view_budget(self, obj):
+        return format_html('<a href="{}">{}</a>'.format(
+            obj.get_absolute_url(), self.view_budget_text))
+
+@admin.register(FinanceInfoExpenses)
+class ExpenseMetaAdmin(MetaAdmin):
+    inlines = (ExpenseInline,)
+    list_display = ("show", "season", "received_income",
+                    "actual_expenses", "view_budget")
+
+    view_budget_text = "View budget"
+
+    def has_add_permission(self, req):
+        return False
+    
+    def has_delete_permission(self, req, obj=None):
+        return False
+    
 def export_income(modeladmin, request, qs):
     response = HttpResponse(content_type="text/csv")
     response['Content-Disposition'] = 'attachment; filename="hrdcapp_income_{}.csv"'.format(
@@ -94,6 +132,7 @@ class IncomeAdmin(admin.ModelAdmin):
                     "status")
     list_filter = ("status", "show__show__season", "show__show__year")
     search_fields = ("show__show__title", "name")
+    autocomplete_fields = "show",
     list_display_links = None
     list_editable = "requested", "received", "status"
     actions = export_income,
@@ -107,9 +146,10 @@ class BudgetExpenseAdmin(admin.ModelAdmin):
                     "estimate", "reported", "actual")
     list_filter = ("category",
                    "show__show__season", "show__show__year")
+    autocomplete_fields = "show",
     list_editable = ("estimate", "reported",)
     search_fields = ("show__show__title", "category", "name")
-    list_display_links = None
+    list_display_links = "name",
 
     def get_readonly_fields(self, modeladmin, obj):
         return ("show",) if obj and obj.show else []
@@ -191,5 +231,8 @@ class ExpenseAdmin(admin.ModelAdmin):
     get_amount.short_description = "Amount"
     get_amount.admin_order_field = "amount"
     
-    def get_readonly_fields(self, modeladmin, obj):
+    def get_readonly_fields(self, request, obj):
         return ("show",) if obj and obj.show else []
+
+    def has_add_permission(self, request):
+        return False

@@ -79,10 +79,17 @@ class FinanceInfo(models.Model):
         return "${:.2f}".format(self.reported_bal)
 
     @property
-    def actual_bal(self):
-        expenses = self.budgetexpense_set.all().aggregate(
+    def actual_expense_val(self):
+        return self.budgetexpense_set.all().aggregate(
             models.Sum("actual"))["actual__sum"] or 0
-        return self.confirmed_income_val - expenses
+    
+    @property
+    def actual_expenses(self):
+        return "${:.2f}".format(self.actual_expense_val)
+    
+    @property
+    def actual_bal(self):
+        return self.confirmed_income_val - self.actual_expense_val
 
     @property
     def actual_balance(self):
@@ -94,6 +101,12 @@ class FinanceInfo(models.Model):
     def get_absolute_url(self):
         return reverse_lazy("finance:budget", args=(self.pk,))
 
+class FinanceInfoExpenses(FinanceInfo):
+    class Meta:
+        proxy = True
+        verbose_name = "Finance-Enabled Show - Expenses"
+        verbose_name_plural = "Finance-Enabled Shows - Expenses"
+    
 class Income(models.Model):
     INCOME_STATUSES = (
         (0, "Planned"),
@@ -160,7 +173,8 @@ class BudgetExpense(models.Model):
         return "{} - {}".format(self.get_category_display(), self.name)
 
     class Meta:
-        verbose_name = "Budget Expense Item"
+        verbose_name = "Budgeted Expense Subcategory"
+        verbose_name_plural = "Budgeted Expense Subcategories"
         ordering = "category",
 
 class Expense(models.Model):
