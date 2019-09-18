@@ -298,10 +298,3 @@ class Show(Season):
         permissions = (
             ("change_current_season", "Can change the current season"),
         )
-
-    
-class GroupProxy(auth.models.Group):
-    class Meta:
-        proxy = True
-        verbose_name = auth.models.Group._meta.verbose_name
-        verbose_name_plural = auth.models.Group._meta.verbose_name_plural
