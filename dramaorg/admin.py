@@ -172,7 +172,7 @@ class UserAdmin(BaseUserAdmin):
     
     def get_readonly_fields(self, request, obj):
         if obj:
-            if request.user.is_superuser:
+            if request.user.has_perm("dramaorg.modify_user"):
                 return self.readonly_fields
             else:
                 return self.staff_readonly
@@ -181,7 +181,7 @@ class UserAdmin(BaseUserAdmin):
 
     def get_fieldsets(self, request, obj):
         if obj:
-            if request.user.is_superuser:
+            if request.user.has_perm("dramaorg.modify_user"):
                 return self.fieldsets
             else:
                 return self.staff_fieldsets

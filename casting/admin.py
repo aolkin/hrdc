@@ -266,7 +266,7 @@ class MetaAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj):
         fields = list(self.readonly_fields)
-        if not request.user.is_superuser:
+        if not request.user.has_perm("casting.modify_submission_status"):
             fields += ['callbacks_submitted', 'first_cast_submitted',
                        'cast_submitted']
         if obj:

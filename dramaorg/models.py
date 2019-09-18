@@ -73,6 +73,11 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     
     objects = UserManager()
 
+    class Meta:
+        permissions = (
+            ("modify_user", "Can modify user account details"),
+        )
+
     def set_password(self, *args, **kwargs):
         self.clear_token(False)
         super().set_password(*args, **kwargs)

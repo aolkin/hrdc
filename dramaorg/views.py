@@ -93,7 +93,7 @@ class StaffIndexView(SuccessMessageMixin, FormView):
         return super().dispatch(*args, **kwargs)
 
     def post(self, *args, **kwargs):
-        if self.request.user.is_superuser:
+        if self.request.user.has_perm("dramaorg.change_current_season"):
             return super().post(*args, **kwargs)
         else:
             messages.error(self.request,
@@ -101,7 +101,7 @@ class StaffIndexView(SuccessMessageMixin, FormView):
             return super().get(*args, **kwargs)
         
     def form_valid(self, form):
-        if self.request.user.is_superuser:
+        if self.request.user.has_perm("dramaorg.change_current_season"):
             form.save()
         return super().form_valid(form)
     

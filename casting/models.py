@@ -223,6 +223,7 @@ class CastingMeta(models.Model):
     class Meta:
         verbose_name = "Casting-Enabled Show"
         permissions = (
+            ("modify_submission_status", "Can change list submission status"),
             ("view_unreleased_callbacks", "Can view unreleased callbacks"),
             ("view_unreleased_cast", "Can view unreleased cast"),
         )
