@@ -97,6 +97,8 @@ order.
 
 For ensemble roles or large crew positions, list each individual separately. The
 system will combine them and display them together in the cast or crew list.
+You can also omit the "Role or Position" field if desired, for shows with a
+purely ensemble cast of performers.
 
 # The Preview Page
 

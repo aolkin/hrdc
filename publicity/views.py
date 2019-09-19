@@ -118,7 +118,7 @@ class InfoView(MenuMixin, ShowStaffMixin, UpdateView):
             self.formset.save()
         else:
             messages.error(self.request, "Failed to save performance dates. "+
-                           "Please try again.")
+                           "Please fix any errors below and try again.")
             return self.get(*args, **kwargs)
         messages.success(self.request,
                          "Updated publicity information for {}.".format(
@@ -150,7 +150,7 @@ class PeopleView(MenuMixin, ShowStaffMixin, TemplateView):
             self.formset.save()
         else:
             messages.error(self.request, "Failed to save cast and staff. "+
-                           "Please try again.")
+                           "Please fix any errors below and try again.")
             return self.get(*args, **kwargs)
         messages.success(self.request,
                          "Updated cast and staff directory for {}.".format(

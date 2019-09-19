@@ -28,10 +28,7 @@
 <{{ h }}>PRODUCTION STAFF</{{ h }}>
 <p>
   {% for position, people in staff %}
-  {{ position }} ...
-  {% for person in people %}
-  {{ person.name }}{% if person.year %} {{ person.yearstr }}{% endif %}{% if not forloop.last %}, {% endif %}
-  {% endfor %}<br>
+  {% include "publicity/position_people.html" %}
   {% empty %}
   To be announced!
   {% endfor %}
@@ -41,10 +38,7 @@
 <{{ h }}>CAST</{{ h }}>
 <p>
   {% for position, people in cast %}
-  {{ position }} ...
-  {% for person in people %}
-  {{ person.name }}{% if person.year %} {{ person.yearstr }}{% endif %}{% if not forloop.last %}, {% endif %}
-  {% endfor %}<br>
+  {% include "publicity/position_people.html" %}
   {% empty %}
   To be announced!
   {% endfor %}
