@@ -230,6 +230,8 @@ class Expense(models.Model):
         help_text="Does the reimbursement check need to be mailed?"
     )
     mailing_address = models.TextField(blank=True)
+    check_number = models.PositiveIntegerField(blank=True, null=True,
+                                               verbose_name="Check #")
     
     def category(self):
         return self.subcategory.get_category_display()

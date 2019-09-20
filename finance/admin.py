@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.http import HttpResponse
 from django.utils.html import format_html
 
-import csv, re
+import csv, re, zipfile
 
 from .models import *
 
@@ -169,7 +169,7 @@ def export_expense(modeladmin, request, qs):
     writer.writerow((
         "Show", "Category", "Subcategory", "Item", "Amount", "Purchaser Name",
         "Status", "Purchased Via", "Date Purchased", "Receipt",
-        "Purchaser Email", "Reimburse via Mail", "Mailing Address"
+        "Purchaser Email", "Reimburse via Mail", "Mailing Address", "Check #",
     ))
     for i in qs:
         writer.writerow((
@@ -182,26 +182,52 @@ def export_expense(modeladmin, request, qs):
             i.get_status_display(),
             i.get_purchased_using_display(),
             i.date_purchased,
-            i.receipt,
+            i.receipt.url if i.receipt and i.receipt.url.startswith(
+                "http") else i.receipt,
             i.purchaser_email,
             i.reimburse_via_mail,
-            i.mailing_address
+            i.mailing_address,
+            i.check_number,
         ))
     return response
-export_expense.short_description = "Export selected to csv"
+export_expense.short_description = "Export selected expenses to csv"
+
+def export_receipt_zip(modeladmin, request, qs):
+    response = HttpResponse(content_type="application/zip")
+    response['Content-Disposition'] = 'attachment; filename="hrdcapp_receipts_{}.zip"'.format(
+        timezone.localtime(timezone.now()).strftime("%Y-%m-%d_%H%M%S"))
+    zipfd = zipfile.ZipFile(response, "w")
+    for expense in qs:
+        if expense.receipt:
+            zipfd.writestr("hrdcapp_receipts/" +
+                           expense.receipt.name.rpartition("receipts")[2],
+                           expense.receipt.read())
+    zipfd.close()
+    return response
+export_receipt_zip.short_description = "Download zip of selected receipts"
+
+def mark_confirmed(modeladmin, request, qs):
+    if qs.exclude(purchased_using=0).exists():
+        messages.warning(request,
+                         "Not marking reimburseable purchases as confirmed.")
+    qs.filter(purchased_using=0).update(status=52)
+    messages.success(request, "Marked P-Card purchases as confirmed.")
+mark_confirmed.short_description = "Confirm selected P-Card purchases"
 
 @admin.register(Expense)
 class ExpenseAdmin(admin.ModelAdmin):
     list_display = ("show", "category", "sub_category", "item",
                     "get_amount", "status",
-                    "purchased_using", "purchaser_name", "date_purchased")
+                    "purchased_using", "purchaser_name", "date_purchased",
+                    "check_number", "view_receipt",)
     list_filter = ("status", "purchased_using", "subcategory__category",
                    "show__show__season", "show__show__year")
-    search_fields = ("show__show__title", "subcategory__name", "item")
+    search_fields = ("show__show__title", "subcategory__name", "item",
+                     "check_number")
     list_display_links = "item",
-    list_editable = "status",
+    list_editable = "status", "check_number"
     autocomplete_fields = "show", "submitting_user", "subcategory"
-    actions = export_expense,
+    actions = mark_confirmed, export_expense, export_receipt_zip
 
     fieldsets = (
         (None, {
@@ -217,14 +243,18 @@ class ExpenseAdmin(admin.ModelAdmin):
                 ("purchaser_name", "date_purchased",),
             )
         }),
-        ("Reimbursement Options", {
+        ("Reimbursement Data", {
             "fields": (
-                ("purchaser_email", "reimburse_via_mail",),
-                ("mailing_address",),
+                ("purchaser_email", "check_number",),
+                ("reimburse_via_mail", "mailing_address",),
             ),
-            "classes": ("collapse",),
         })
     )
+
+    def view_receipt(self, obj):
+        return format_html(
+            '<a href="{}" target="_blank">view receipt</a>'.format(
+                obj.receipt.url)) if obj.receipt else "-"
 
     def get_amount(self, obj):
         return obj.amount_display

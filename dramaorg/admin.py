@@ -60,7 +60,6 @@ def set_to_default_affiliation(modeladmin, request, qs):
     qs.update(affiliation=settings.DEFAULT_AFFILIATION)
     messages.success(request, 'Set users\' affiliation to "{}".'.format(
         settings.DEFAULT_AFFILIATION))
-    return redirect("admin:dramaorg_user_changelist")
 set_to_default_affiliation.short_description = 'Set affiliation to "{}"'.format(
     settings.DEFAULT_AFFILIATION)
 
