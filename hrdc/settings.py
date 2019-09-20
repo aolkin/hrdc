@@ -161,7 +161,7 @@ BUILDING_MODEL = "dramaorg.Building"
 
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 
-CONFIGURATION_APP_TITLE = "Global Settings"
+CONFIGURATION_APP_TITLE = "Settings"
 
 LOGIN_URL = "dramaorg:login"
 LOGOUT_URL = "dramaorg:logout"
