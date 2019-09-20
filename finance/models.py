@@ -101,12 +101,6 @@ class FinanceInfo(models.Model):
     def get_absolute_url(self):
         return reverse_lazy("finance:budget", args=(self.pk,))
 
-class FinanceInfoExpenses(FinanceInfo):
-    class Meta:
-        proxy = True
-        verbose_name = "Finance-Enabled Show - Expenses"
-        verbose_name_plural = "Finance-Enabled Shows - Expenses"
-    
 class Income(models.Model):
     INCOME_STATUSES = (
         (0, "Planned"),
@@ -232,6 +226,9 @@ class Expense(models.Model):
     mailing_address = models.TextField(blank=True)
     check_number = models.PositiveIntegerField(blank=True, null=True,
                                                verbose_name="Check #")
+
+    class Meta:
+        ordering = "date_purchased",
     
     def category(self):
         return self.subcategory.get_category_display()

@@ -9,10 +9,12 @@ from .models import *
 class IncomeInline(admin.TabularInline):
     model = Income
     extra = 0
-    fields = (
-        ("name", "status"),
-        ("requested", "received"),
-    )
+    fields = ("name", "requested", "received", "status")
+    readonly_fields = "name", "requested",
+    show_change_link = True
+    can_delete = False
+    def has_add_permission(self, request, obj):
+        return False
 
 class BudgetExpenseInline(admin.StackedInline):
     model = BudgetExpense
@@ -23,17 +25,16 @@ class BudgetExpenseInline(admin.StackedInline):
     )
     readonly_fields = "actual",
 
-class ExpenseInline(admin.StackedInline):
+class EditableExpenseInline(admin.StackedInline):
     model = Expense
     extra = 0
     autocomplete_fields = ("subcategory", "submitting_user")
     fieldsets = (
         (None, {
             "fields": (
-                ("status", "purchased_using", "submitting_user",),
-                ("subcategory", "item",),
-                ("purchaser_name", "date_purchased",),
-                ("amount", "receipt"),
+                ("status", "purchased_using", "amount",),
+                ("subcategory", "item", "submitting_user",),
+                ("purchaser_name", "date_purchased", "receipt"),
             )
         }),
         ("Reimbursement Options", {
@@ -44,6 +45,33 @@ class ExpenseInline(admin.StackedInline):
             "classes": ("collapse",),
         })
     )
+
+class LimitedExpenseInline(admin.TabularInline):
+    model = Expense
+    can_delete = False
+    show_change_link = True
+    def has_add_permission(self, request, obj):
+        return False
+    
+class PCardExpenseInline(LimitedExpenseInline):
+    fields = ("subcategory", "item", "amount", "status", "purchaser_name",
+              "date_purchased")
+    readonly_fields = ("subcategory", "item", "purchaser_name",
+                       "date_purchased",)
+    verbose_name_plural = "P-Card Expenses"
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).filter(purchased_using=0)
+    
+class ReimburseableExpenseInline(LimitedExpenseInline):
+    fields = ("subcategory", "item", "amount", "status", "purchaser_name",
+              "date_purchased")
+    readonly_fields = ("subcategory", "item", "purchaser_name",
+                       "date_purchased",)
+    verbose_name_plural = "Reimburseable Expenses"
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).filter(purchased_using=1)
 
 SAVE_WARNING = """
 <p style="background-color: darkred; color: white; border-radius: 0.4em; padding: 0.8em;">
@@ -75,7 +103,7 @@ class MetaAdmin(admin.ModelAdmin):
         }),
     )
 
-    inlines = (IncomeInline,)
+    inlines = (IncomeInline, PCardExpenseInline, ReimburseableExpenseInline)
 
     view_budget_text = "View budget"
     
@@ -92,20 +120,6 @@ class MetaAdmin(admin.ModelAdmin):
     def view_budget(self, obj):
         return format_html('<a href="{}">{}</a>'.format(
             obj.get_absolute_url(), self.view_budget_text))
-
-@admin.register(FinanceInfoExpenses)
-class ExpenseMetaAdmin(MetaAdmin):
-    inlines = (ExpenseInline,)
-    list_display = ("show", "season", "received_income",
-                    "actual_expenses", "view_budget")
-
-    view_budget_text = "View budget"
-
-    def has_add_permission(self, req):
-        return False
-    
-    def has_delete_permission(self, req, obj=None):
-        return False
     
 def export_income(modeladmin, request, qs):
     response = HttpResponse(content_type="text/csv")
@@ -134,7 +148,7 @@ class IncomeAdmin(admin.ModelAdmin):
     search_fields = ("show__show__title", "name")
     autocomplete_fields = "show",
     list_display_links = None
-    list_editable = "requested", "received", "status"
+    list_editable = "received", "status"
     actions = export_income,
 
     def get_readonly_fields(self, modeladmin, obj):
@@ -147,7 +161,7 @@ class BudgetExpenseAdmin(admin.ModelAdmin):
     list_filter = ("category",
                    "show__show__season", "show__show__year")
     autocomplete_fields = "show",
-    list_editable = ("estimate", "reported",)
+    #list_editable = ("estimate", "reported",)
     search_fields = ("show__show__title", "category", "name")
     list_display_links = "name",
 
@@ -225,14 +239,15 @@ class ExpenseAdmin(admin.ModelAdmin):
                     "purchased_using", "purchaser_name", "date_purchased",
                     "check_number", "view_receipt",)
     list_filter = ("status", "purchased_using", "subcategory__category",
-                   "show__show__season", "show__show__year")
+                   "show__show__season", "show__show__year",
+                   "last_updated",)
     search_fields = ("show__show__title", "subcategory__name", "item",
                      "check_number")
     list_display_links = "item",
     list_editable = "status", "check_number"
     autocomplete_fields = "show", "submitting_user", "subcategory"
     actions = mark_confirmed, export_expense, export_receipt_zip
-
+              
     fieldsets = (
         (None, {
             "fields": (
