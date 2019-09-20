@@ -25,7 +25,8 @@ specific information about what happened as possible.
 ### Credits
 
 The HRDC Apps site was originally created and maintained by Aaron Olkin, 2018
-HRDC Treasurer and 2019 HRDC VP, Harvard College Class of 2020. His contact
-info can be found hidden at the bottom of the "Site Administration" portal home
-page, in case of emergency. Hopefully said emergency doesn't prevent reaching
-that page.
+HRDC Treasurer and 2019 HRDC Vice President, Harvard College Class of 2020.
+
+His contact info can be found hidden at the bottom of the "Site Administration"
+portal home page, in case of emergency. Hopefully said emergency doesn't
+prevent reaching that page.
