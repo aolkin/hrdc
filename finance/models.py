@@ -121,7 +121,7 @@ class Income(models.Model):
         (11, "Rejected"),
     )
     
-    show = models.ForeignKey(FinanceInfo, on_delete=models.CASCADE,
+    show = models.ForeignKey(FinanceInfo, on_delete=models.PROTECT,
                              db_index=True)
     name = models.CharField(max_length=40)
 
@@ -202,7 +202,7 @@ class Expense(models.Model):
         return "finance/receipts/{}/{}".format(instance.show.show.slug,
                                                filename)
     
-    show = models.ForeignKey(FinanceInfo, on_delete=models.CASCADE,
+    show = models.ForeignKey(FinanceInfo, on_delete=models.PROTECT,
                              db_index=True)
 
     status = models.PositiveSmallIntegerField(choices=EXPENSE_STATUSES,

@@ -73,7 +73,7 @@ class ShowPerson(models.Model):
         (2, "Cast")
     )
     
-    show = models.ForeignKey(PublicityInfo, on_delete=models.CASCADE,
+    show = models.ForeignKey(PublicityInfo, on_delete=models.PROTECT,
                              db_index=True)
 
     name = models.CharField(max_length=120)
