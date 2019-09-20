@@ -37,23 +37,32 @@ class MenuMixin:
 
         if self.request.user.is_anonymous:
             return context
+
+        shows = [i.finance_info for i in
+                 self.request.user.show_set.all().order_by("-pk")
+                 if hasattr(i, "finance_info")]
+        if (self.request.user.has_perm("finance.view_financeinfo") and
+            hasattr(self, "object")):
+            shows += [self.object]
+
+        urls = [
+            ("Grants and Income", "finance:income"),
+            ("Budget", "finance:budget"),
+            ("Expenses", "finance:expenses"),
+        ]
+        if (self.request.user.is_staff and
+            self.request.user.has_perm("finance.change_financeinfo")):
+            urls += [ ("[Admin Access]", "admin:finance_financeinfo_change") ]
         
-        for show in [i for i in
-                     self.request.user.show_set.all().order_by("-pk")
-                     if hasattr(i, "finance_info")]:
+        for show in shows:
             submenu = menu[str(show)] = []
             is_active = (hasattr(self, "object") and
-                         self.object.pk == show.finance_info.pk)
-            for name, url in (
-                    ("Grants and Income", "income"),
-                    ("Budget", "budget"),
-                    ("Expenses", "expenses"),
-            ):
+                         self.object.pk == show.pk)
+            for name, url in urls:
                 submenu.append({
                     "name": name,
-                    "url": reverse_lazy("finance:" + url,
-                                        args=(show.finance_info.pk,)),
-                    "active": is_active and current_url == url
+                    "url": reverse_lazy(url, args=(show.pk,)),
+                    "active": is_active and current_url == url.split(":")[-1]
                 })
         return context
 
