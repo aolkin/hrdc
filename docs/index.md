@@ -7,12 +7,11 @@ description: Documentation
 
 Here you will find various writeups on how to use the HRDC web applications:
 
-- ["Common Casting Administration"](/walkthrough.html) (Updated Dec 2017)
-- ["Common Casting for PDSMs"](/pdsm_intro.html) (Updated Feb 2019)
-- ["Common Casting for Actors"](/actors.html) (Updated Feb 2019)
-- ["Finance Manager Documentation (aimed at PDSMs)"](/finance.html)
-  (Updated Sep 2019)
-- ["Publicity Manager Documentation (aimed at PDSMs)"](/publicity.html) (Updated Sep 2019)
+- [Common Casting Administration](/walkthrough.html) - updated Dec 2017
+- [Common Casting for PDSMs](/pdsm_intro.html) - updated Feb 2019
+- [Common Casting for Actors](/actors.html) - updated Feb 2019
+- [Finance Manager (aimed at PDSMs)](/finance.html) - updated Sep 2019
+- [Publicity Manager (aimed at PDSMs)](/publicity.html) - updated Sep 2019
 
 ## Help and Support
 
