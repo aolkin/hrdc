@@ -16,6 +16,7 @@ from .models import *
 
 admin.site.site_title = settings.ADMIN_SITE_TITLE
 admin.site.site_header = settings.ADMIN_SITE_TITLE
+admin.site.index_template = "dramaadmin/index.html"
 
 class UserCreationForm(forms.ModelForm):
     class Meta:

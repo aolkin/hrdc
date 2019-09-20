@@ -1,0 +1,23 @@
+{% extends "admin/index.html" %}
+
+{% block footer %}
+<div id="footer">
+  {% if SETTINGS.AAAA_HELP %}
+  If all else fails, click
+  <a href="#aaaa" name="aaaa"
+     onclick="this.parentElement.lastElementChild.style.display='initial';">
+    here
+  </a>
+  for help.
+  <p style="display: none; font-weight: bold;">
+    Contact {{ SETTINGS.AAAA_HELP.NAME }} if you are completely stuck and
+    trying to solve a problem with this site.
+    {{ SETTINGS.AAAA_HELP.PRONOUN|default:"they"|capfirst }} can be reached at
+    <a href="mailto:{{ SETTINGS.AAAA_HELP.EMAIL }}">
+      {{ SETTINGS.AAAA_HELP.EMAIL }}</a>{% if SETTINGS.AAAA_HELP.PHONE %} or
+    <a href="tel:{{ SETTINGS.AAAA_HELP.PHONE }}">
+      {{ SETTINGS.AAAA_HELP.PHONE }}</a>{% endif %}.
+  </p>
+  {% endif %}
+</div>
+{% endblock %}
