@@ -155,10 +155,14 @@ class BudgetExpenseAdmin(admin.ModelAdmin):
         return ("show",) if obj and obj.show else []
 
     def get_search_results(self, request, queryset, search_term):
-        referer = request.META.get("HTTP_REFERER", "")
-        financeinfo_match = re.search(r'/financeinfo/(\d+)/', referer)
-        if financeinfo_match:
-            queryset = queryset.filter(show=financeinfo_match.group(1))
+        filter_show = request.META.get("HTTP_X_EXPENSE_SUBCATEGORY_SHOW", "")
+        if filter_show:
+            queryset = queryset.filter(show=filter_show)
+        else:
+            referer = request.META.get("HTTP_REFERER", "")
+            financeinfo_match = re.search(r'/financeinfo/(\d+)/', referer)
+            if financeinfo_match:
+                queryset = queryset.filter(show=financeinfo_match.group(1))
         return super().get_search_results(request, queryset, search_term)
 
 def export_expense(modeladmin, request, qs):
@@ -251,6 +255,9 @@ class ExpenseAdmin(admin.ModelAdmin):
         })
     )
 
+    class Media:
+        js = ('finance/expense_admin.js',)
+
     def view_receipt(self, obj):
         return format_html(
             '<a href="{}" target="_blank">view receipt</a>'.format(
@@ -260,9 +267,3 @@ class ExpenseAdmin(admin.ModelAdmin):
         return obj.amount_display
     get_amount.short_description = "Amount"
     get_amount.admin_order_field = "amount"
-    
-    def get_readonly_fields(self, request, obj):
-        return ("show",) if obj and obj.show else []
-
-    def has_add_permission(self, request):
-        return False
