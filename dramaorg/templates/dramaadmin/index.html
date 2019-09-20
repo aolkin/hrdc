@@ -2,6 +2,12 @@
 
 {% block footer %}
 <div id="footer">
+  {% if SETTINGS.DOCUMENTATION_SITE %}
+  <p>
+    Some documentation on how to use this site can be found
+    <a href="{{ SETTINGS.DOCUMENTATION_SITE }}">here</a>.
+  </p>
+  {% endif %}
   {% if SETTINGS.AAAA_HELP %}
   If all else fails, click
   <a href="#aaaa" name="aaaa"
