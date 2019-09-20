@@ -8,6 +8,16 @@
     <h3 class="text-center">{{ object }} Expenses</h3>
   </div>
 </div>
+{% if user.is_staff and perms.finance.change_expense %}
+<div class="row justify-content-center mt-2">
+  <div class="col-md-8">
+    <p class="alert alert-info text-center">
+      You are a site administrator. For more options, use the
+      <a href="{% url 'admin:finance_expense_changelist' %}?show={{ object.pk }}">Expenses Administration</a> page.
+    </p>
+  </div>
+</div>
+{% endif %}
 {% if reimbursements.exists %}
 <div class="row justify-content-center mt-3">
   <div class="col-md-8">
