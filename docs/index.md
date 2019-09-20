@@ -5,7 +5,7 @@ description: Documentation
 
 # HRDC Apps Documentation
 
-Here you will find various writeups on how to use the HRDC web applications:
+Here are some writeups and instructions on how to use the HRDC web applications:
 
 - [Common Casting Administration](/walkthrough.html) - updated Dec 2017
 - [Common Casting for PDSMs](/pdsm_intro.html) - updated Feb 2019
