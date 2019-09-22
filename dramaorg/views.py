@@ -14,6 +14,7 @@ from django.views.decorators.cache import never_cache
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 
+from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -117,6 +118,16 @@ class HomePage(TemplateView):
         context = super().get_context_data(**kwargs)
         context.update(indexes)
         return context
+
+class LoginView(DjangoLoginView):
+    template_name = "dramaauth/login.html"
+    
+    def get(self, *args, **kwargs):
+        if self.request.GET.get("next", None):
+            messages.warning(
+                self.request,
+                "Please log in or create an account to access that page.")
+        return super().get(*args, **kwargs)
     
 SESSION_TOKEN_KEY = "_CAPTURED_LOGIN_TOKEN"
 
