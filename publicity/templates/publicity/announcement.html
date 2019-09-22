@@ -1,0 +1,48 @@
+{% extends "publicity/base.html" %}
+
+{% load bt crispy_forms_tags bootstrap %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h3 class="text-center">
+      {% if object %}
+      Editing: {{ object }}
+      {% else %}
+      Submit an Announcement to the HRDC Newsletter
+      {% endif %}
+    </h3>
+  </div>
+</div>
+<div class="row justify-content-center">
+  <form method="POST" class="col-md-8">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {{ form.user }}
+    {{ form.title|as_crispy_field }}
+    {{ form.message|as_crispy_field }}
+    {{ form.note|as_crispy_field }}
+    <div class="row">
+      <div class="col-sm-6">
+	{{ form.start_date|as_crispy_field }}
+      </div>
+      <div class="col-md-6">
+	{{ form.end_date|as_crispy_field }}
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary btn-block btn-lg">
+      {% if object %}
+      Save Changes
+      {% else %}
+      Submit Announcement
+      {% endif %}
+    </button>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />
+{% endblock %}

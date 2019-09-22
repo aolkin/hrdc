@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
-
+from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 
 from django.urls import reverse_lazy
@@ -109,3 +109,38 @@ class ShowPerson(models.Model):
                 positions.append((person.position, people[person.position]))
             people[person.position].append(person)
         return positions
+
+class Announcement(models.Model):
+    user = models.ForeignKey(get_user_model(), on_delete=models.PROTECT,
+                             verbose_name="Submitting user")
+
+    title = models.CharField(max_length=100)
+    message = models.TextField()
+    note = models.TextField(blank=True, verbose_name="Note for the Editor",
+                            help_text="This will not be published.")
+
+    start_date = models.DateField(
+        help_text="Do not include in the newsletter before this date.")
+    end_date = models.DateField(
+        help_text="Do not include in the newsletter after this date.")
+    
+    submitted = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+    published = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ("-start_date", "-end_date", "-submitted")
+    
+    def clean(self):
+        if self.end_date < self.start_date:
+            raise ValidationError({
+                "start_date": "Must be before end date.",
+                "end_date": "Must be after start date.",
+            })
+    
+    def __str__(self):
+        return self.title
+
+    def get_absolute_url(self):
+        return reverse_lazy("publicity:edit_announcement", args=(self.pk,))

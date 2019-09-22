@@ -55,3 +55,25 @@ class MetaAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, modeladmin, obj):
         return ("show",) if obj and obj.show else []
+
+@admin.register(Announcement)
+class AnnouncementAdmin(admin.ModelAdmin):
+    readonly_fields = ("user", "title", "message", "note",
+                       "start_date", "end_date", "submitted", "modified")
+    fields = (
+        ("user",),
+        ("title",),
+        ("message",),
+        ("note",),
+        ("start_date", "end_date"),
+        ("submitted", "modified"),
+        ("published",),
+    )
+
+    list_display = ("__str__", "user", "start_date", "end_date", "modified",
+                    "published")
+    list_editable = "published",
+    list_filter = ("published", "start_date", "end_date", "submitted")
+
+    def has_add_permission(self, arg):
+        return False
