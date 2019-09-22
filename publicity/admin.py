@@ -58,22 +58,28 @@ class MetaAdmin(admin.ModelAdmin):
 
 @admin.register(Announcement)
 class AnnouncementAdmin(admin.ModelAdmin):
-    readonly_fields = ("user", "title", "message", "note",
+    readonly_fields = ("user", "title", "message", "note", "graphic",
                        "start_date", "end_date", "submitted", "modified")
     fields = (
         ("user",),
         ("title",),
         ("message",),
+        ("graphic",),
         ("note",),
         ("start_date", "end_date"),
         ("submitted", "modified"),
         ("published",),
     )
 
-    list_display = ("__str__", "user", "start_date", "end_date", "modified",
-                    "published")
+    list_display = ("__str__", "user", "start_date", "end_date", "graphic_link",
+                    "modified", "published")
     list_editable = "published",
     list_filter = ("published", "start_date", "end_date", "submitted")
 
     def has_add_permission(self, arg):
         return False
+
+    def graphic_link(self, obj):
+        return format_html('<a href="{0}" target="_blank">view</a>',
+                           obj.graphic.url) if obj.graphic else None
+    graphic_link.short_description = "Graphic"

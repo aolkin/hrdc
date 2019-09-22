@@ -116,6 +116,9 @@ class Announcement(models.Model):
 
     title = models.CharField(max_length=100)
     message = models.TextField()
+    graphic = models.ImageField(
+        blank=True, help_text="Optional graphic to include with your message.",
+        upload_to='publicity/announcements/%Y/%m/%d/')
     note = models.TextField(blank=True, verbose_name="Note for the Editor",
                             help_text="This will not be published.")
 

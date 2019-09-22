@@ -229,7 +229,8 @@ class NewsletterMixin:
 class NewsletterForm(forms.ModelForm):
     class Meta:
         model = Announcement
-        fields = "title", "message", "note", "start_date", "end_date", "user"
+        fields = ("title", "message", "graphic",
+                  "note", "start_date", "end_date", "user")
         widgets = {
             'message': forms.Textarea(attrs={'rows': 8, 'cols': 40}),
             'note': forms.Textarea(attrs={'rows': 4, 'cols': 40}),
