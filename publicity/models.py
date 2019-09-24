@@ -23,12 +23,12 @@ class PublicityInfo(models.Model):
     blurb = models.TextField(blank=True, verbose_name="About the Show")
     content_warning = models.TextField(blank=True)
     ticket_link = models.URLField(blank=True)
-    band_term = models.CharField(max_length=20, default="", choices=(
+    band_term = models.CharField(max_length=20, blank=True, choices=(
         ("", "Not Applicable"),
         ("Band", "Band"),
         ("Orchestra", "Orchestra"),
         ("Musicians", "Musicians"),
-    ), verbose_name="Term for Pit Musicians")
+    ), default="", verbose_name="Term for Pit Musicians")
 
     website_page = models.URLField(blank=True)
 
