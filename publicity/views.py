@@ -27,31 +27,25 @@ class MenuMixin:
 
         if self.request.user.is_anonymous:
             return context
+
+        urls = (
+            ("Show Info", "publicity:info"),
+            ("Personnel List", "publicity:people"),
+            ("Preview", "publicity:display")
+        )
         
-        for show in [i for i in
+        for show in [i.publicity_info for i in
                      self.request.user.show_set.all().order_by("-pk")
                      if hasattr(i, "publicity_info")]:
             submenu = menu[str(show)] = []
             is_active = (hasattr(self, "object") and
-                         self.object.pk == show.publicity_info.pk)
-            submenu.append({
-                "name": "Show Info",
-                "url": reverse_lazy("publicity:info",
-                                    args=(show.publicity_info.pk,)),
-                "active": is_active and current_url == "info"
-            })
-            submenu.append({
-                "name": "Cast and Staff",
-                "url": reverse_lazy("publicity:people",
-                                    args=(show.publicity_info.pk,)),
-                "active": is_active and current_url == "people"
-            })
-            submenu.append({
-                "name": "Preview",
-                "url": reverse_lazy("publicity:display",
-                                    args=(show.publicity_info.pk,)),
-                "active": is_active and current_url == "display"
-            })
+                         self.object.pk == show.pk)
+            for name, url in urls:
+                submenu.append({
+                    "name": name,
+                    "url": reverse_lazy(url, args=(show.pk,)),
+                    "active": is_active and current_url == url.split(":")[-1]
+                })
         return context
 
 class ShowStaffMixin(InitializedLoginMixin, SingleObjectMixin):
@@ -88,7 +82,7 @@ class InfoForm(forms.ModelForm):
     class Meta:
         model = PublicityInfo
         fields = ('credits', 'contact_email',
-                  'blurb', 'runtime',) # 'content_warning')
+                  'blurb', 'runtime', 'band_term') # 'content_warning')
         widgets = {
             'credits': forms.Textarea(attrs={'rows': 4, 'cols': 40}),
             'blurb': forms.Textarea(attrs={'rows': 5, 'cols': 40}),
@@ -128,8 +122,7 @@ class InfoView(MenuMixin, ShowStaffMixin, UpdateView):
 
 PersonFormSet = forms.inlineformset_factory(
     PublicityInfo, ShowPerson,
-    fields=("position", "name", "year",
-            "email", "phone", "type","order"), extra=1)
+    fields=("position", "name", "year", "type","order"), extra=1)
 
 class PeopleView(MenuMixin, ShowStaffMixin, TemplateView):
     template_name = "publicity/people.html"
@@ -175,14 +168,16 @@ class ScriptView(DetailView):
                 "object": context["object"],
                 "h": self.request.GET.get("h", "h3"),
                 "enabled": {
-                    "cast": self.request.GET.get("cast", "") != "0",
                     "credits": self.request.GET.get("credits", "") != "0",
+                    "cast": self.request.GET.get("cast", "") != "0",
                     "staff": self.request.GET.get("staff", "") != "0",
+                    "band": self.request.GET.get("band", "") != "0",
                     "about": self.request.GET.get("about", "") != "0",
                     "dates": self.request.GET.get("dates", "") != "0",
                 },
                 "cast": ShowPerson.collate(context["object"].cast()),
                 "staff": ShowPerson.collate(context["object"].staff()),
+                "band": ShowPerson.collate(context["object"].band()),
             }).replace("\n","")
         return context
     

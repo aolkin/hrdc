@@ -17,40 +17,31 @@
       {% if form.non_field_errors %}
       <div class="alert alert-danger">{{ form.non_field_errors }}</div>
       {% endif %}
-      <div class="row">
+      <div class="form-row">
 	{{ form.id }}
-	<div class="col-md-4 col-sm-12">
+	<div class="col-md-3 col-sm-6">
 	  {{ form.position|as_crispy_field }}
 	</div>
-	<div class="col-md-4 col-sm-7">
+	<div class="col-md-3 col-sm-6">
 	  {{ form.name|as_crispy_field }}
 	</div>
-	<div class="col-md-2 col-sm-3">
+	<div class="col-md-2 col-sm-4">
 	  {{ form.year|as_crispy_field }}
 	</div>
-	<div class="col-md-2 col-sm-2">
+	<div class="col-md-2 col-sm-3">
 	  {{ form.type|as_crispy_field }}
+	</div>
+	<div class="col-md-1 col-sm-3">
+	  {{ form.order|as_crispy_field }}
+	</div>
+	<div class="col-md-1 col-sm-2">
+	  <button type="button" class="btn btn-danger remove-person">
+	    <i class="fa fa-minus-square"></i>
+	  </button>
 	</div>
       </div>
       <div class="d-none">
 	{{ form.DELETE|as_crispy_field }}
-      </div>
-      <div class="row">
-	<div class="col-md-5">
-	  {{ form.email|as_crispy_field }}
-	</div>
-	<div class="col-md-4">
-	  {{ form.phone|as_crispy_field }}
-	</div>
-	<div class="col-md-2">
-	  {{ form.order|as_crispy_field }}
-	</div>
-	<div class="col-md-1">
-	  <button type="button"
-		  class="btn btn-sm btn-danger mt-4 remove-person">
-	    <i class="fa fa-minus-square"></i>
-	  </button>
-	</div>
       </div>
     </div>
     {% endfor %}

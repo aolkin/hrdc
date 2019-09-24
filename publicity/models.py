@@ -22,6 +22,12 @@ class PublicityInfo(models.Model):
         help_text="E.g. 2 hours with a 10-minute intermission")
     blurb = models.TextField(blank=True, verbose_name="About the Show")
     content_warning = models.TextField(blank=True)
+    band_term = models.CharField(max_length=20, default="", choices=(
+        ("", "Not Applicable"),
+        ("Band", "Band"),
+        ("Orchestra", "Orchestra"),
+        ("Musicians", "Musicians"),
+    ), verbose_name="Term for Pit Musicians")
 
     website_page = models.URLField(blank=True)
 
@@ -36,6 +42,9 @@ class PublicityInfo(models.Model):
 
     def cast(self):
         return self.showperson_set.filter(type=2)
+
+    def band(self):
+        return self.showperson_set.filter(type=3)
     
     def get_absolute_url(self):
         return reverse_lazy("publicity:display", args=(self.id,))
@@ -70,7 +79,8 @@ class ShowPerson(models.Model):
     TYPE_CHOICES = (
         (0, "Hidden"),
         (1, "Staff"),
-        (2, "Cast")
+        (2, "Cast"),
+        (3, "Band"),
     )
     
     show = models.ForeignKey(PublicityInfo, on_delete=models.PROTECT,

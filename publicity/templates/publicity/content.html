@@ -44,3 +44,13 @@
   {% endfor %}
 </p>
 {% endif %}
+{% if enabled.band and object.band_term %}
+<{{ h }}>{{ object.band_term|upper }}</{{ h }}>
+<p>
+  {% for position, people in band %}
+  {% include "publicity/position_people.html" %}
+  {% empty %}
+  To be announced!
+  {% endfor %}
+</p>
+{% endif %}
