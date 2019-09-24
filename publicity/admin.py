@@ -31,8 +31,8 @@ class MetaAdmin(admin.ModelAdmin):
             "fields": ('credits',)
         }),
         ("Show Information", {
-            "fields": ('blurb', 'runtime', 'contact_email',)
-            # 'content_warning'),
+            "fields": ('blurb', 'runtime', 'contact_email', 'ticket_link',
+                       'band_term',)
         })
     )
     

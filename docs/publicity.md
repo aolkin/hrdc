@@ -53,6 +53,10 @@ format is:
 This email address will be listed as a contact email for questions. We suggest
 you use your @shows.hrdctheater.org email account for this purpose.
 
+#### Ticketing Link
+
+If you have a link where patrons can acquire tickets, supply it here.
+
 #### About the Show
 
 Your primary blurb and text space on the page. Any links or email addresses

@@ -81,7 +81,7 @@ DateFormSet = forms.inlineformset_factory(
 class InfoForm(forms.ModelForm):
     class Meta:
         model = PublicityInfo
-        fields = ('credits', 'contact_email',
+        fields = ('credits', 'contact_email', 'ticket_link',
                   'blurb', 'runtime', 'band_term') # 'content_warning')
         widgets = {
             'credits': forms.Textarea(attrs={'rows': 4, 'cols': 40}),

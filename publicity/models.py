@@ -22,6 +22,7 @@ class PublicityInfo(models.Model):
         help_text="E.g. 2 hours with a 10-minute intermission")
     blurb = models.TextField(blank=True, verbose_name="About the Show")
     content_warning = models.TextField(blank=True)
+    ticket_link = models.URLField(blank=True)
     band_term = models.CharField(max_length=20, default="", choices=(
         ("", "Not Applicable"),
         ("Band", "Band"),
