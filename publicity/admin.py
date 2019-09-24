@@ -2,6 +2,8 @@ from django.contrib import admin
 
 from django.utils.html import format_html
 
+from rangefilter.filter import DateRangeFilter
+
 from .models import *
 
 class PerformanceDateAdmin(admin.TabularInline):
@@ -56,6 +58,18 @@ class MetaAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, modeladmin, obj):
         return ("show",) if obj and obj.show else []
 
+@admin.register(PerformanceDate)
+class PerformanceDateAdmin(admin.ModelAdmin):
+    list_display = "show", "performance", "note"
+    list_display_links = "performance",
+    search_fields = ("show__show__title", "note")
+    list_filter = (("performance", DateRangeFilter),
+                   "show__show__season", "show__show__year")
+    fields = ("show",), ("performance", "note")
+
+    def get_readonly_fields(self, modeladmin, obj):
+        return ("show",) if obj and obj.show else []
+    
 @admin.register(Announcement)
 class AnnouncementAdmin(admin.ModelAdmin):
     readonly_fields = ("user", "title", "message", "note", "graphic",
