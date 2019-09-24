@@ -103,7 +103,7 @@ class ShowPerson(models.Model):
     order = models.SmallIntegerField(db_index=True, default=0)
     
     class Meta:
-        ordering = "type", "order",
+        ordering = "type", "order", "pk"
     
     def yearstr(self):
         return "'{:02d}".format(self.year % 100) if self.year else ""
