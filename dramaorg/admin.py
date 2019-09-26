@@ -128,6 +128,14 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('date_joined',)
     save_as_continue = True
 
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if request.user.is_superuser:
+            for name, field in form.base_fields.items():
+                if name not in ("email",):
+                    field.required = False
+        return form
+    
     def get_initialized(self, obj):
         return obj.is_initialized
     get_initialized.boolean = True
