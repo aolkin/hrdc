@@ -237,7 +237,7 @@ class ExpenseAdmin(admin.ModelAdmin):
     list_display = ("show", "category", "sub_category", "item",
                     "get_amount", "status",
                     "purchased_using", "purchaser_name", "date_purchased",
-                    "check_number", "view_receipt",)
+                    "administrative_note", "check_number", "view_receipt",)
     list_filter = ("status", "purchased_using", "subcategory__category",
                    "show__show__season", "show__show__year",
                    "last_updated",)
@@ -260,6 +260,7 @@ class ExpenseAdmin(admin.ModelAdmin):
                 ("subcategory", "item",),
                 ("amount", "receipt",),
                 ("purchaser_name", "date_purchased",),
+                ("administrative_note",)
             )
         }),
         ("Reimbursement Data", {
