@@ -3,7 +3,7 @@
 {% endif %}
 {% if enabled.dates %}
 <{{ h }}>PERFORMANCE DATES</{{ h }}>
-<p>{{ object.show.venue }}</p>
+<p>{{ object.show.space }}</p>
 <p>
   {% for perf in object.performancedate_set.all %}
   {{ perf }}<br>
@@ -12,6 +12,9 @@
   {% endfor %}
 </p>
 <p>Run time: {{ object.runtime|default:"TBD" }}</p>
+{% if object.ticket_link %}
+<p><a href="{{ object.ticket_link }}" target="_blank">Get tickets here!</a></p>
+{% endif %}
 {% endif %}
 {% if enabled.about %}
 <{{ h }}>ABOUT THE SHOW</{{ h }}>
@@ -38,6 +41,16 @@
 <{{ h }}>CAST</{{ h }}>
 <p>
   {% for position, people in cast %}
+  {% include "publicity/position_people.html" %}
+  {% empty %}
+  To be announced!
+  {% endfor %}
+</p>
+{% endif %}
+{% if enabled.band and object.band_term %}
+<{{ h }}>{{ object.band_term|upper }}</{{ h }}>
+<p>
+  {% for position, people in band %}
   {% include "publicity/position_people.html" %}
   {% empty %}
   To be announced!

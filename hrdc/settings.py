@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'social_django',
+    'rangefilter',
     'dramaorg',
     'casting',
     'finance',
@@ -162,7 +163,7 @@ BUILDING_MODEL = "dramaorg.Building"
 
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 
-CONFIGURATION_APP_TITLE = "Global Settings"
+CONFIGURATION_APP_TITLE = "Settings"
 
 LOGIN_URL = "dramaorg:login"
 LOGOUT_URL = "dramaorg:logout"

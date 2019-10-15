@@ -1,7 +1,8 @@
 from django.db.utils import OperationalError, ProgrammingError
 from django.db.models import Q
 
-from django.contrib.auth.decorators import user_passes_test
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 from importlib import import_module
 from django.conf import settings
@@ -52,6 +53,13 @@ def user_is_initialized(func):
     f  = user_passes_test(test_initialized, login_url="dramaorg:profile")
     return f(func)
 
+class InitializedLoginMixin:
+    @method_decorator(login_required)
+    @method_decorator(user_is_initialized)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    
 def social_create_user(strategy, details, backend, user=None, *args, **kwargs):
     if user:
         return {'is_new': False}

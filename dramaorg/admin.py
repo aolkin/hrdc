@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.admin import GroupAdmin
 from django.contrib.auth.models import Group, Permission
 from django.contrib import messages
-
+from django.utils.html import format_html, mark_safe
 from django.http import HttpResponse
 from django.shortcuts import redirect
 
@@ -128,6 +128,14 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('date_joined',)
     save_as_continue = True
 
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if request.user.is_superuser:
+            for name, field in form.base_fields.items():
+                if name not in ("email",):
+                    field.required = False
+        return form
+    
     def get_initialized(self, obj):
         return obj.is_initialized
     get_initialized.boolean = True
@@ -197,8 +205,9 @@ class ShowAdmin(admin.ModelAdmin):
     fields = ('title', ('season', 'year'), 'space',
               ('residency_starts', 'residency_ends'),
               ('staff', 'liaisons'), 'slug',
-              ('created', 'modified'))
-    readonly_fields = "created", "modified"
+              ('created', 'modified'),
+              'contact_staff_members')
+    readonly_fields = "created", "modified", 'contact_staff_members'
     exclude = ('invisible',)
     search_fields = ('title',)
     prepopulated_fields = {"slug": ("title",)}
@@ -208,6 +217,12 @@ class ShowAdmin(admin.ModelAdmin):
         return ", ".join([str(i.get_full_name()) for i in obj.liaisons.all()])
     liaison_display.short_description = "Liaisons"
 
+    def contact_staff_members(self, obj):
+        return mark_safe(", ".join([format_html(
+            '<a href="mailto:{0}">{1}</a>', i.email,
+            "{} <{}>".format(i.get_full_name(False), i.email))
+                                    for i in obj.staff.all()]))
+    
 @admin.register(Building)
 class BuildingAdmin(admin.ModelAdmin):
     list_display = ("__str__", "latitude", "longitude")

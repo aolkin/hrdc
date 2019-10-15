@@ -53,6 +53,10 @@ format is:
 This email address will be listed as a contact email for questions. We suggest
 you use your @shows.hrdctheater.org email account for this purpose.
 
+#### Ticketing Link
+
+If you have a link where patrons can acquire tickets, supply it here.
+
 #### About the Show
 
 Your primary blurb and text space on the page. Any links or email addresses
@@ -62,6 +66,13 @@ you include in this box will be clickable.
 
 The show's runtime, e.g. "1 hour w/ 10 minute intermission", "90 minutes". If
 this is left blank, the webpage will say "Runtime: TBD".
+
+#### Term for Pit Musicians
+
+If your show is a musical or otherwise includes a corps of musicians, select the
+header that should be used for them. You must select a value other than "Not
+Applicable" for "Band" personnel to show up on the webpage, but they will be
+referred to via whatever term you select.
 
 ### Performance Dates
 
@@ -73,22 +84,23 @@ are not.
 You can also list a note for each performance date, such as "Free with HUID"
 or similar. The note will be displayed in parentheses next to the date and time.
 
-## Cast and Staff
+## Personnel List
 
 Please list everyone involved in your show, from executive staff to build crew
-to cast members.
+to cast members to pit musicians.
 
 The directory editor will always display all of the people you have already
 added, plus one blank person at the bottom, so after adding each person just
 hit "Save Changes" to be able to add another.
 
-Most fields should be fairly self-explanatory. You must include the role or
-position, name, and year if applicable. Additionally, though email address and
-phone number will not be shown publicly, please provide them if you have them.
+Most fields should be fairly self-explanatory. You must include the person's
+role or position, name, and year if applicable.
 
-The "Type" selector controls whether the given person will appear in the "Cast"
-or "Staff" section on the webpage, or for people listed in the masthead that
-you do not wish to duplicate, you may select "Hidden".
+The "Type" selector controls whether the given person will appear in the "Cast",
+"Staff", or "Musician" section on the webpage, or for people listed in the
+masthead that you do not wish to duplicate, you may select "Hidden". The heading
+that will be used for the "Musicians" section is selectable on the "Show Info"
+page.
 
 By default, people will be listed in the order you add them, and you may ignore
 the order field. However, to control the ordering of the list, simply supply a

@@ -16,3 +16,16 @@
 .peopleform .person-form:not(:last-of-type) {
     border-bottom: 2px lightgrey solid;
 }
+
+.peopleform .person-form button.remove-person {
+    width: 80%;
+    margin-left: 10%;
+    margin-bottom: 1rem;
+}
+
+@media (min-width: 576px) {
+    .peopleform .person-form button.remove-person {
+	margin-top: 2.3rem;
+	margin-bottom: auto;
+    }
+}

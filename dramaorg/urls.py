@@ -13,7 +13,7 @@ def auth_view(name):
     return NewView.as_view()
 
 auth_urls = [
-    url(r'^login/$', auth_view("Login"), name='login'),
+    url(r'^login/$', LoginView.as_view(), name='login'),
     url(r'^logout/$', auth_view("Logout"), name='logout'),
     url(r'^password/$', auth_view("PasswordChange"),
         name='password_change'),

@@ -216,6 +216,8 @@ class Expense(models.Model):
 
     submitting_user = models.ForeignKey(get_user_model(), null=True,
                                         on_delete=models.SET_NULL)
+
+    administrative_note = models.CharField(max_length=255, blank=True)
     
     # For Reimbursement Only
     purchaser_email = models.EmailField(blank=True)

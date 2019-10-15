@@ -4,7 +4,8 @@ $(() => {
 
     let extra = $(".date-fieldset").last();
     let count = Number($("#id_performancedate_set-TOTAL_FORMS").val());
-    if (!extra.find(`#id_performancedate_set-${count - 1}-performance`).val()) {
+    let initial = count - 1;
+    if (!extra.find(`#id_performancedate_set-${initial}-performance`).val()) {
 	extra.hide();
     }
     $("input[name$=-note]").attr("placeholder",
@@ -13,15 +14,15 @@ $(() => {
     function addPerformance() {
 	let newPerformance = extra.clone();
 	newPerformance.show();
-	newPerformance.find(`#id_performancedate_set-${count - 1}-id`).attr(
+	newPerformance.find(`#id_performancedate_set-${initial}-id`).attr(
 	    "name", `performancedate_set-${count}-id`);
-	newPerformance.find(`#id_performancedate_set-${count - 1}-DELETE`).attr(
+	newPerformance.find(`#id_performancedate_set-${initial}-DELETE`).attr(
 	    "name", `performancedate_set-${count}-DELETE`);
-	newPerformance.find(`#id_performancedate_set-${count - 1}-show`).attr(
+	newPerformance.find(`#id_performancedate_set-${initial}-show`).attr(
 	    "name", `performancedate_set-${count}-show`);
-	newPerformance.find(`#id_performancedate_set-${count - 1}-performance`).attr(
+	newPerformance.find(`#id_performancedate_set-${initial}-performance`).attr(
 	    "name", `performancedate_set-${count}-performance`);
-	newPerformance.find(`#id_performancedate_set-${count - 1}-note`).attr(
+	newPerformance.find(`#id_performancedate_set-${initial}-note`).attr(
 	    "name", `performancedate_set-${count}-note`);
 	$(".performancedate_formset").append(newPerformance);
 	count += 1;

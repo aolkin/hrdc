@@ -8,21 +8,16 @@ from django.template.loader import render_to_string
 from django import forms
 from django.contrib import messages
     
-from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
-from utils import user_is_initialized
+from utils import InitializedLoginMixin
+
+from emailtracker.tools import render_to_queue
+from config import config
 
 import datetime, os
 
 from django.conf import settings
 
 from .models import *
-
-class InitializedLoginMixin:
-    @method_decorator(login_required)
-    @method_decorator(user_is_initialized)
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
 
 class MenuMixin:
     def get_context_data(self, *args, **kwargs):
@@ -199,6 +194,24 @@ class ExpenseView(MenuMixin, ShowStaffMixin, TemplateView):
             expense.status = 61
             try:
                 expense.full_clean()
+
+                if config.get("fin_contact_email"):
+                    res = render_to_queue(
+                        "finance/email/reimbursement-requested.html",
+                        "reimbursement-requested",
+                        "{}: {}".format(expense.pk, expense.last_updated),
+                        { "expense": expense },
+                        to=config["fin_contact_email"],
+                        subject="Reimbursement Requested for {}".format(
+                            expense.show),
+                        tags=["finance", "reimbursements",
+                              "reimbursement_request"]
+                    )
+                    if not res:
+                        messages.warning(
+                            self.request, "Error sending reimbursement request."
+                        )
+
                 expense.save()
                 messages.success(self.request,
                                  "Requested reimbursement for {}.".format(
