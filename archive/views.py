@@ -14,7 +14,8 @@ from utils import user_is_initialized
 
 from django.conf import settings
 
-import os
+import os, logging
+logger = logging.getLogger(__name__)
 
 import dramaorg.models as org
 
@@ -123,7 +124,8 @@ class UploadView(MenuMixin, ShowStaffMixin, DetailView):
             try:
                 ProductionPhoto.objects.create(
                     img=f, show=obj, credit=request.POST.get("photo-credit"))
-            except:
+            except Exception as err:
+                logger.exception("Photo upload failed: {}".format(f))
                 messages.error(
                     request, "Failed to upload photo '{}'.".format(f))
         return redirect(self.get_object().get_absolute_url())
