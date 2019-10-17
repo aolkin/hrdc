@@ -3,7 +3,7 @@
 from django.urls import path
 from django.conf.urls import url, include
 from django.contrib import admin
-
+from django.conf import settings
 from config.views import autocomplete_json
 from shortlinks.views import link
 
@@ -19,3 +19,7 @@ urlpatterns = [
     path(r'shortlinks/<slug:slug>', link, name="shortlink"),
     path('social/', include('social_django.urls', namespace='social')),
 ]
+
+if settings.DEBUG:
+    from django.conf.urls.static import static
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

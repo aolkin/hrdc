@@ -1,0 +1,19 @@
+
+.view-upload .custom-file,
+.view-upload .custom-file-input,
+.view-upload .custom-file-label {
+    height: calc(4rem + 2px);
+}
+
+.view-upload .custom-file-label {
+    padding-right: 5.75rem;
+}
+
+.view-upload .custom-file-label::after {
+    height: 4rem;
+    padding: 1.25rem .75rem;
+}
+
+.fa-ul .fa-li {
+    top: 0;
+}

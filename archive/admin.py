@@ -5,10 +5,14 @@ from django.utils.html import format_html
 import dramaorg.models as org
 from .models import *
 
-"""class PerformanceDateAdmin(admin.TabularInline):
-    model = PerformanceDate
+class ExtraFileInline(admin.TabularInline):
+    model = ExtraFile
     extra = 0
-"""
+
+class ProductionPhotoInline(admin.TabularInline):
+    model = ProductionPhoto
+    extra = 0
+
 @admin.register(ArchivalInfo)
 class MetaAdmin(admin.ModelAdmin):
     list_display = ('show', 'season',)
@@ -16,9 +20,14 @@ class MetaAdmin(admin.ModelAdmin):
     list_filter = ('show__season', 'show__year',)
     fieldsets = (
         ("", {
-            "fields": ('show',)
+            "fields": ('show',),
+        }),
+        ("Materials", {
+            "fields": ("poster", "program"),
         }),
     )
+
+    inlines = (ExtraFileInline, ProductionPhotoInline)
     
     def season(self, obj):
         return obj.show.seasonstr()

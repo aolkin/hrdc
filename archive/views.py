@@ -14,6 +14,8 @@ from utils import user_is_initialized
 
 from django.conf import settings
 
+import os
+
 import dramaorg.models as org
 
 from .models import *
@@ -93,11 +95,38 @@ class IndexView(MenuMixin, InitializedLoginMixin, TemplateView):
                 ArchivalInfo(show=i).save()
         return super().get(*args, **kwargs)
 
-class ShowView(MenuMixin, ShowStaffMixin, DetailView):
+class ShowForm(forms.ModelForm):
+    class Meta:
+        model = ArchivalInfo
+        fields = "poster", "program",
+        widgets = {
+            'poster': forms.FileInput(),
+            'program': forms.FileInput(),
+        }
+
+class ShowView(MenuMixin, ShowStaffMixin, UpdateView):
     template_name = "archive/show.html"
+    model = ArchivalInfo
+    form_class = ShowForm
 
 class UploadView(MenuMixin, ShowStaffMixin, DetailView):
     template_name = "archive/upload.html"
+    model = ArchivalInfo
+
+    def post(self, request, *args, **kwargs):
+        obj = self.get_object()
+        for f in request.FILES.getlist("files"):
+            ExtraFile.objects.create(file=f, show=obj,
+                                     credit=request.POST.get("file-credit"),
+                                     description=request.POST.get("file-desc"))
+        for f in request.FILES.getlist("photos"):
+            try:
+                ProductionPhoto.objects.create(
+                    img=f, show=obj, credit=request.POST.get("photo-credit"))
+            except:
+                messages.error(
+                    request, "Failed to upload photo '{}'.".format(f))
+        return redirect(self.get_object().get_absolute_url())
 
 class PublicView(DetailView):
     template_name = "archive/public.html"
