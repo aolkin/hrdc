@@ -108,8 +108,10 @@
   <div class="col">
     <h4>Uploaded Files</h4>
     {% for file in object.extrafile_set.all %}
-    {{ file.description }} by {{ file.credit }}:
-    <a href="{{ file.file.url }}" target="_blank">{{ file.filename }}</a>
+    <div>
+      {{ file.description }} by {{ file.credit }}:
+      <a href="{{ file.file.url }}" target="_blank">{{ file.filename }}</a>
+    </div>
     {% empty %}
     <div>No files uploaded!</div>
     {% endfor %}

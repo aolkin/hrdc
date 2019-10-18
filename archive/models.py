@@ -17,10 +17,9 @@ class ArchivalInfo(models.Model):
                                 related_name="archival_info")
 
     def pub_destination(instance, filename):
-        return "archive/{}/{}/{}/pub/{}".format(instance.show.year,
-                                                instance.show.season,
-                                                instance.show.slug,
-                                                filename)
+        return "archive/{}/{}/{}/pub/{}".format(
+            instance.show.year, instance.show.get_season_display(),
+            instance.show.slug, filename)
     poster = models.FileField(upload_to=pub_destination, blank=True)
     program = models.FileField(upload_to=pub_destination, blank=True)
 
@@ -50,10 +49,9 @@ class ArchivalInfo(models.Model):
 
 class ExtraFile(models.Model):
     def upload_destination(instance, filename):
-        return "archive/{}/{}/{}/files/{}".format(instance.show.show.year,
-                                                  instance.show.show.season,
-                                                  instance.show.show.slug,
-                                                  filename)
+        return "archive/{}/{}/{}/files/{}".format(
+            instance.show.show.year, instance.show.show.get_season_display(),
+            instance.show.show.slug, filename)
 
     show = models.ForeignKey(ArchivalInfo, on_delete=models.PROTECT)
     credit = models.CharField(max_length=120)
@@ -68,10 +66,9 @@ class ExtraFile(models.Model):
 
 class ProductionPhoto(models.Model):
     def upload_destination(instance, filename):
-        return "archive/{}/{}/{}/photos/{}".format(instance.show.show.year,
-                                                   instance.show.show.season,
-                                                   instance.show.show.slug,
-                                                   filename)
+        return "archive/{}/{}/{}/photos/{}".format(
+            instance.show.show.year, instance.show.show.get_season_display(),
+            instance.show.show.slug, filename)
 
     THUMB_SIZES = (
         { "code": "thumb", "wxh": "320x240", "resize": "crop" },
