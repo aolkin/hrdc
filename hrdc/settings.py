@@ -185,4 +185,6 @@ BT_CSS_FILES = ["global.css"]
 ACTIVE_SEASON_KEY = "season"
 ACTIVE_YEAR_KEY = "year"
 
+THUMBS_JPG = False
+
 from .local_settings import *
