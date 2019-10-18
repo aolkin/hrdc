@@ -112,4 +112,7 @@ ENV/
 # Development databases
 *.db
 *.sqlite3
+
 /uploads/
+
+/src/
