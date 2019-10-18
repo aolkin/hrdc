@@ -16,7 +16,8 @@ class ProductionPhotoInline(admin.TabularInline):
 @admin.register(ArchivalInfo)
 class MetaAdmin(admin.ModelAdmin):
     list_display = ('show', 'season',
-                    "program_submitted", "poster_submitted", "photos_submitted")
+                    "program_submitted", "poster_submitted", "photos_submitted",
+                    "view")
     search_fields = ('show__title',)
     list_filter = ('show__season', 'show__year')
     fieldsets = (
@@ -51,3 +52,7 @@ class MetaAdmin(admin.ModelAdmin):
     def photos_submitted(self, obj):
         return obj.productionphoto_set.count()
     photos_submitted.short_description = "Photos"
+
+    def view(self, obj):
+        return format_html('<a href="{}">{}</a>'.format(
+            obj.get_absolute_url(), "view page"))
