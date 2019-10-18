@@ -123,7 +123,9 @@ class UploadView(MenuMixin, ShowStaffMixin, DetailView):
         for f in request.FILES.getlist("photos"):
             try:
                 ProductionPhoto.objects.create(
-                    img=f, show=obj, credit=request.POST.get("photo-credit"))
+                    img=f, show=obj, credit=request.POST.get("photo-credit"),
+                    allow_in_publicity=bool(
+                        request.POST.get("allow_in_publicity")))
             except Exception as err:
                 logger.exception("Photo upload failed: {}".format(f))
                 messages.error(

@@ -56,3 +56,14 @@ class MetaAdmin(admin.ModelAdmin):
     def view(self, obj):
         return format_html('<a href="{}">{}</a>'.format(
             obj.get_absolute_url(), "view page"))
+
+@admin.register(ProductionPhoto)
+class ProductionPhotoAdmin(admin.ModelAdmin):
+    list_display = "show", "credit", "filename", "allow_in_publicity", "view"
+    list_filter = ("allow_in_publicity",
+                   "show__show__year", "show__show__season",)
+    list_display_links = None
+
+    def view(self, obj):
+        return format_html('<a href="{}" target="_blank">{}</a>'.format(
+            obj.img.url, "view"))

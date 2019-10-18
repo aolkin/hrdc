@@ -77,6 +77,8 @@ class ProductionPhoto(models.Model):
 
     show = models.ForeignKey(ArchivalInfo, on_delete=models.PROTECT)
     credit = models.CharField(max_length=120)
+    allow_in_publicity = models.BooleanField(default=False)
+
     height = models.PositiveIntegerField()
     width = models.PositiveIntegerField()
     img = ImageThumbsField(upload_to=upload_destination, sizes=THUMB_SIZES,
@@ -84,3 +86,6 @@ class ProductionPhoto(models.Model):
 
     def __str__(self):
         return "{} by {}".format(os.path.basename(self.img.name), self.credit)
+
+    def filename(self):
+        return os.path.basename(self.img.name)
