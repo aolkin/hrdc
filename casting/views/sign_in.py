@@ -184,7 +184,8 @@ class ActorSignInStart(ActorSignInBase, BaseUpdateView):
     def get_actor(self):
         return self.actor
 
-PROFILE_FIELDS = ["email", "first_name", "last_name", "phone", "affiliation"]
+PROFILE_FIELDS = ["email", "first_name", "last_name", "phone", "affiliation",
+                  "year", "huid", "year", "pgps", "gender_pref"]
 PROFILE_WIDGETS = dict(zip(PROFILE_FIELDS, [
     forms.TextInput(attrs={ "autocomplete": "off" }) for i in range(len(
         PROFILE_FIELDS))]))
@@ -193,7 +194,7 @@ PROFILE_WIDGETS["year"] = forms.NumberInput()
 class ActorProfileForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
-        fields = PROFILE_FIELDS + ["year", "pgps", "gender_pref"]
+        fields = PROFILE_FIELDS
         widgets = PROFILE_WIDGETS
     
 class ActorSignInProfile(ActorSignInBase, BaseUpdateView):

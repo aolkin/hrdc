@@ -1,6 +1,8 @@
 
 from django.contrib.auth.mixins import UserPassesTestMixin
 
+from dramaorg.utils import InitializedLoginMixin
+
 import contextlib
 
 def test_board(user):
@@ -12,7 +14,7 @@ def test_pdsm(user):
 def test_spdsm(user):
     return user.is_authenticated and user.is_season_pdsm
 
-class UserIsPdsmMixin(UserPassesTestMixin):
+class UserIsPdsmMixin(UserPassesTestMixin, InitializedLoginMixin):
     def test_func(self):
         return test_pdsm(self.request.user) or test_board(self.request.user)
 

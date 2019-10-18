@@ -43,7 +43,7 @@ def export_users(modeladmin, request, qs):
         timezone.localtime(timezone.now()).strftime("%Y-%m-%d_%H%M%S"))
     writer = csv.writer(response)
     writer.writerow((
-        "Name", "Email", "Phone", "Affiliation", "Year", "PGPs",
+        "Name", "Email", "Phone", "Affiliation", "Year", "HUID", "PGPs",
     ))
     for i in qs:
         writer.writerow((
@@ -52,6 +52,7 @@ def export_users(modeladmin, request, qs):
             i.phone,
             i.affiliation,
             i.year,
+            i.huid,
             i.pgps
         ))
     return response
@@ -91,7 +92,7 @@ class UserAdmin(BaseUserAdmin):
     fieldsets = (
         (None, {'fields': (('first_name', 'last_name'),
                            ('pgps', 'gender_pref'),
-                           ('affiliation', 'year'),
+                           ('affiliation', 'year', 'huid'),
                            ('suspended_until',))}),
         ('Contact Info', {'fields': ('email', 'phone')}),
         ('Permissions', {'fields': ('is_active', 'admin_access',
@@ -102,7 +103,7 @@ class UserAdmin(BaseUserAdmin):
     staff_fieldsets = (
         (None, {'fields': (('first_name', 'last_name'),
                            ('pgps', 'gender_pref'),
-                           ('affiliation', 'year'), 'email', 'phone',
+                           ('affiliation', 'year', 'huid'), 'email', 'phone',
                            'suspended_until', 'groups', 'is_active',
                            'password')}),
     )

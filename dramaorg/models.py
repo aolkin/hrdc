@@ -45,6 +45,10 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
                                             verbose_name="Graduation Year")
     affiliation = models.CharField(max_length=160,
                                    verbose_name="School or Affiliation")
+    huid = models.CharField(
+        max_length=8, verbose_name="HUID",
+        help_text='If you do not have or do not wish to provide a HUID, ' +
+        'you may enter "0" into this field.')
     pgps = models.CharField(max_length=20, blank=True,
                             verbose_name="Preferred Gender Pronouns")
     gender_pref = models.CharField(max_length=30, blank=True,
@@ -118,7 +122,7 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     @property
     def is_initialized(self):
         return bool(self.first_name and self.last_name and self.phone and
-                    self.affiliation and (self.year != None))
+                    self.affiliation and self.huid and (self.year != None))
 
     @property
     def is_board(self):
