@@ -93,7 +93,9 @@
     <div class="row justify-content-start">
       {% for photo in object.productionphoto_set.all %}
       <div class="col-md-3 col-sm-6 col-xs-1 pb-2 px-1">
-	<a href="{{ photo.img.url }}" target="_blank">
+	<a href="{{ photo.img.url }}" target="_blank"
+	   data-toggle="lightbox" data-gallery="photos"
+	   data-remote="{{ photo.img.url_preview }}">
 	  <img src="{{ photo.img.url_thumb }}" class="img-fluid img-thumbnail"
 	       data-preview="{{ photo.img.url_preview }}">
 	</a>
@@ -121,4 +123,6 @@
 
 {% block extra_scripts %}
 <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.css">
 {% endblock %}
