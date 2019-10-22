@@ -33,7 +33,7 @@ class MenuMixin:
         current_url = self.request.resolver_match.url_name
         menu = context["sidebar_menu"] = {}
         menu[""] = [{
-            "name": "Archive Tool",
+            "name": "Archival Tool",
             "url": reverse_lazy("archive:index"),
             "active": current_url == "index"
         }]

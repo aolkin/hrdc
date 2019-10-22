@@ -24,6 +24,7 @@
       <th class="table-col-md">Show</th>
       <th class="table-col-sm table-col-desktop">Season</th>
       <th class="table-col-lg">Executive Staff</th>
+      <th class="text-center">Submitted</th>
     </tr>
   </thead>
   <tbody>
@@ -34,6 +35,9 @@
       <td>{{ show.title }}</td>
       <td>{{ show.seasonstr }}</td>
       <td>{{ show.people }}</td>
+      <td class="text-center">
+	<i class="fa {% if meta.complete %}fa-check text-success{% else %}fa-times text-danger{% endif %}"></i>
+      </td>
     </tr>
     {% endwith %}
     {% endif %}
