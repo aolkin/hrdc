@@ -296,7 +296,7 @@ class Show(Season):
     
     @property
     def apps_str(self):
-        return ", ".join([i.verbose_name for i in self.enabled_apps])
+        return ", ".join([i.capitalize() for i in self.enabled_apps])
 
     class Meta:
         permissions = (

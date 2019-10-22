@@ -4,11 +4,11 @@ from django.conf import settings
 
 from dramaorg.models import Space, Season, Show, StaffMember
 
-class VenueApplication(Season):
-    owners = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, blank=True,
+class VenueApp(Season):
+    managers = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, blank=True, related_name="venue_manager",
         help_text="These users will get application submission notifications.")
-    viewers = models.ManyToManyField(
+    readers = models.ManyToManyField(
         settings.AUTH_USER_MODEL, blank=True,
         help_text="These users can view submitted applications.")
 
@@ -19,7 +19,7 @@ class VenueApplication(Season):
     instructions = models.TextField()
 
 class AvailableDates(models.Model):
-    venue = models.ForeignKey(VenueApplication, on_delete=models.CASCADE)
+    venue = models.ForeignKey(VenueApp, on_delete=models.CASCADE)
     start = models.DateField()
     end = models.DateField()
 
@@ -49,7 +49,7 @@ class StaffApp(models.Model):
     
 class SlotPreference(models.Model):
     app = models.ForeignKey(Application, on_delete=models.CASCADE)
-    venue = models.ForeignKey(VenueApplication, on_delete=models.CASCADE)
+    venue = models.ForeignKey(VenueApp, on_delete=models.CASCADE)
     ordering = models.PositiveSmallIntegerField(default=1)
     start = models.DateField()
     end = models.DateField()
