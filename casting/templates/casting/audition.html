@@ -8,6 +8,9 @@
 
 {% block content %}
 <h2 class="text-center">{{ object }}</h2>
+<a href="{% url 'casting:audition_export' object.pk %}" class="text-center">
+  <h4 class="mb-0">Download Actor Information Spreadsheet</h4>
+</a>
 <table class="table table-responsive bt-table-responsive table-striped mt-3">
   <thead>
     <tr>

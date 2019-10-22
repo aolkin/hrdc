@@ -1,0 +1,59 @@
+{% extends "email/base.html" %}
+{% load email %}
+{% load bt %}
+{% load humanize %}
+
+{% block body %}
+<table cellpadding="0" cellspacing="8" width="100%">
+  <tr>
+    <td align="center">
+      {% if IS_HTML %}
+      <h2 style="margin-bottom: 4px; margin-top: 18px;">Reimbursement Requested for {{ expense.show }}</h2>
+      {% endif %}
+    </td>
+  </tr>
+  {% if IS_HTML %}
+  <style>
+    .special-link {
+    text-decoration: none;
+    color: #666666;
+    }
+    .special-link:hover {
+    text-decoration: underline;
+    color: #333333;
+    }
+    .subtle-link {
+    text-decoration: none;
+    color: #333333;
+    }
+    .subtle-link:hover {
+    text-decoration: underline;
+    color: #111111;
+    }
+  </style>
+  {% endif %}
+  <tr>
+    <td style="font-size: 1.2em">
+      {{ expense.submitting_user }} has requested reimbursement for {{ expense.item }} ({{ expense.amount_display }}), purchased by <a href="mailto:{{ expense.purchaser_email }}" class="subtle-link">{{ expense.purchaser_name }}</a> on {{ expense.date_purchased }}.
+    </td>
+  </tr>
+  <tr>
+    <td style="font-size: 1.2em; text-align: center; padding-top: 8px;">
+      <a href="{{ expense.receipt.url }}" class="special-link">DOWNLOAD RECEIPT</a>
+    </td>
+  </tr>
+  {% if expense.reimburse_via_mail %}
+  <tr>
+    <td style="font-size: 1.2em">
+      This reimbursement needs to be mailed to:<br>
+      <pre>{{ expense.mailing_address }}</pre>
+    </td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td style="font-size: 1.1em; text-align: center; padding-top: 12px;">
+      {% href 'admin:finance_expense_change' 'view this expense in the site administration portal' expense.pk class='special-link' %}
+    </td>
+  </tr>
+</table>
+{% endblock %}

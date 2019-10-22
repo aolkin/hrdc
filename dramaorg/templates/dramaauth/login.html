@@ -3,7 +3,7 @@
 {% block title %}Login{% endblock %}
 
 {% load bt %}
-{% load bootstrap %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 
@@ -11,31 +11,28 @@
   <h1 class="text-center display-heading">
     {% setting "ADMIN_SITE_TITLE" %}</h1>
 </div>
-<div class="row justify-content-center my-3">
+<div class="row justify-content-center mb-4">
   <div class="col-md-6">
-    <a href="{% url 'casting:public_index' %}"
-       class="btn btn-lg btn-info btn-block">
-      Common Casting
-    </a>
-  </div>
-</div>
-<div class="row justify-content-center mb-5">
-  <div class="col-md-6">
-    <a href="{% url 'dramaorg:register' %}?post={{ request.GET.next }}"
-       class="btn btn-md btn-secondary btn-block">
-      Create an {% setting "BT_SITE_TITLE" %} Account
-    </a>
+    {% include "dramaauth/social_login.html" with next=request.GET.next %}
   </div>
 </div>
 <div class="row justify-content-center">
   <form method="POST" class="col-md-6">
     <legend class="text-center">Login to {% setting 'BT_SITE_TITLE' %}</legend>
     {% csrf_token %}
-    {{ form|bootstrap }}
+    {{ form|crispy }}
     <p class="form-text text-center">
       <a href="{% url 'dramaorg:start_reset' %}">Forgot password?</a>
     </p>
     <button type="submit" class="btn btn-primary btn-block">Login</button>
   </form>
+</div>
+<div class="row justify-content-center mt-5">
+  <div class="col-md-6">
+    <a href="{% url 'dramaorg:register' %}?post={{ request.GET.next }}"
+       class="btn btn-md btn-secondary btn-block">
+      Create an {% setting "BT_SITE_TITLE" %} Account
+    </a>
+  </div>
 </div>
 {% endblock %}

@@ -1,0 +1,56 @@
+{% extends "archive/base.html" %}
+
+{% load bt config %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h3 class="text-center">Welcome to the Archival Tool</h3>
+    <p>
+      Select a show from the sidebar to manage its archival data and
+      upload production photos, posters, and programs.
+      For help and instructions on how to use this portal, please read
+      <a href="http://apphelp.hrdctheater.org/archival.html">
+      this page</a>.
+    </p>
+  </div>
+</div>
+
+{% if request.user.show_set.exists %}
+<h3 class="text-center">Your Shows</h3>
+<table class="table table-responsive bt-table-responsive table-striped">
+  <thead>
+    <tr>
+      <th class="table-col-md">Show</th>
+      <th class="table-col-sm table-col-desktop">Season</th>
+      <th class="table-col-lg">Executive Staff</th>
+      <th class="text-center">Submitted</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for show in request.user.show_set.all %}
+    {% if show.archival_info %}
+    {% with meta=show.archival_info %}
+    <tr>
+      <td>{{ show.title }}</td>
+      <td>{{ show.seasonstr }}</td>
+      <td>{{ show.people }}</td>
+      <td class="text-center">
+	<i class="fa {% if meta.complete %}fa-check text-success{% else %}fa-times text-danger{% endif %}"></i>
+      </td>
+    </tr>
+    {% endwith %}
+    {% endif %}
+    {% endfor %}
+</table>
+{% endif %}
+
+{% if not perms.archive.change_archivalinfo %}
+<p class="text-muted text-center">If any of this information is incorrect or
+  your shows are missing from the archival tool, please contact 
+  <a href="mailto:{% option 'site_contact_email' %}">
+    {% option 'site_contact_name' %}</a> to have them added.
+</p>
+{% endif %}
+
+{% endblock %}

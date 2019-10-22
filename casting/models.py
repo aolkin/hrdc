@@ -30,7 +30,7 @@ class CastingReleaseMeta(models.Model):
         (3, "Cast Lists Released"),
         (4, "Signing Open"),
         (5, "Sent Signing Reminder"),
-        (6, "Signing Closed"),
+        (6, "Alternate Signing Open"),
     )
     stage = models.PositiveSmallIntegerField(choices=STAGES, default=0)
     prevent_advancement = models.BooleanField(
@@ -54,6 +54,10 @@ class CastingReleaseMeta(models.Model):
     
     class Meta:
         verbose_name = "Casting Release Group"
+        permissions = (
+            ("view_first_cast_lists", "Can view first-round cast lists"),
+        )
+
 
     @property
     def association(self):
@@ -218,6 +222,11 @@ class CastingMeta(models.Model):
 
     class Meta:
         verbose_name = "Casting-Enabled Show"
+        permissions = (
+            ("modify_submission_status", "Can change list submission status"),
+            ("view_unreleased_callbacks", "Can view unreleased callbacks"),
+            ("view_unreleased_cast", "Can view unreleased cast"),
+        )
 
     def __str__(self):
         return str(self.show)
@@ -296,7 +305,7 @@ class AssociateShowMixin(models.Model):
 
 class ActorSeasonMeta(Season):
     actor = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-    conflicts = models.TextField()
+    conflicts = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return "{} Meta for {}".format(self.seasonstr(), self.actor)
@@ -321,6 +330,11 @@ class Audition(AssociateShowMixin):
     tech_interest = models.TextField(
         null=True, blank=True, default=None, verbose_name="Technical Interests")
 
+    class Meta:
+        permissions = (
+            ("table_auditions", "Can table at audition sign-ins"),
+        )
+    
     @property
     def actorseasonmeta(self):
         if not hasattr(self, "_cached_actorseasonmeta"):
@@ -414,7 +428,7 @@ class Character(AssociateShowMixin):
     def actors(self):
         responses = self.signing_set.filter(response=True)
         if responses:
-            if self.signing_set.filter(order__lt=responses[0].order,
+            if self.signing_set.filter(order__lt=responses.last().order,
                                        response__isnull=True):
                 return None
         if len(responses) >= self.allowed_signers:
@@ -463,7 +477,7 @@ class Signing(ActorMapping):
     tech_req = models.ForeignKey(CastingMeta, null=True, blank=True,
                                  on_delete=models.SET_NULL)
 
-    signed_time = models.DateTimeField(auto_now=True)
+    signed_time = models.DateTimeField(auto_now=True, null=True)
 
     def order_num(self):
         return self.order + 1
@@ -502,10 +516,6 @@ class Signing(ActorMapping):
                                             order__lt=self.order,
                                             response=True))
         return signed < self.character.allowed_signers
-
-    @property
-    def signing_open(self):
-        return self.character.show.release_meta.stage < 6
     
     class Meta:
         ordering = ("character__show", "character", "order")
@@ -533,17 +543,23 @@ STANDARD_TIMES = (
     datetime.time(hour=23, minute=59, second=59),
     datetime.time(hour=11),
     datetime.time(hour=19),
-    datetime.time()
 )
 ALL_TIMES = list(sorted(
     [datetime.time(hour=i) for i in range(9, 24)] +
     [datetime.time(hour=i, minute=30) for i in range(9, 24)]))
+
 def make_time_choices(times):
     return tuple(zip(times, [i.strftime("%I:%M %p") for i in times]))
-STANDARD_TIME_CHOICES = make_time_choices(STANDARD_TIMES)
+
+STANDARD_TIME_ENDS = make_time_choices(STANDARD_TIMES)
+STANDARD_TIME_STARTS = make_time_choices(STANDARD_TIMES + (datetime.time(),))
 ALL_TIME_CHOICES = make_time_choices(ALL_TIMES)
-TIME_CHOICES = (
-    ("Common Times", STANDARD_TIME_CHOICES),
+START_TIME_CHOICES = (
+    ("Common Times", STANDARD_TIME_STARTS),
+    ("All Times", ALL_TIME_CHOICES)
+)
+END_TIME_CHOICES = (
+    ("Common Times", STANDARD_TIME_ENDS),
     ("All Times", ALL_TIME_CHOICES)
 )
 
@@ -569,8 +585,8 @@ class Slot(models.Model):
     show = models.ForeignKey(CastingMeta, on_delete=models.CASCADE)
     space = models.ForeignKey(settings.SPACE_MODEL, on_delete=models.CASCADE)
     day = models.DateField()
-    start = models.TimeField(choices=TIME_CHOICES)
-    end = models.TimeField(choices=TIME_CHOICES)
+    start = models.TimeField(choices=START_TIME_CHOICES)
+    end = models.TimeField(choices=END_TIME_CHOICES)
     TYPES = (
         (0, "Audition"),
         (1, "Callback"),

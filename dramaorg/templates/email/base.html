@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {% if IS_HTML %}
+    <title>{{ SUBJECT }}</title>
+    {% endif %}
+  </head>
+  {% load bt %}
+  {% load email %}
+  <body leftmargin="0" marginwidth="0" topmargin="0" marginheight="0" offset="0" bgcolor="#CCCCCC" style="font-family: -apple-system,system-ui,BlinkMacSystemFont,&quot;Segoe UI&quot;,Roboto,&quot;Helvetica Neue&quot;,Arial,sans-serif; font-size: 14px">
+    <!--[if (gte mso 9)|(IE)]>
+    <table width="600" align="center" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td>
+	  <![endif]-->
+    <table width="100%">
+      <tr>
+	<td>&nbsp;</td>
+      </tr>
+      <tr>
+	<td>
+    <table width="100%" cellpadding="10" cellspacing="0" style="max-width: 600px; border-radius: 1em;" align="center" bgcolor="#FFFFFF">
+      <tr>
+	<td>
+	  <table cellpadding="0">
+      <!--<tr>
+	<td align="center" style="text-align: center; padding-bottom: 6px;">
+	  This email was sent to {{ user }} by the {% setting "FOOTER_OWNER" %}.</td>
+      </tr>-->
+      <tr>
+	<td>{% block header %}
+	  {% setting "LOGO_PATH" as logo %}
+	  {% image logo "Logo" style="max-width: 100%;" %}
+	{% endblock %}</td>
+      </tr>
+      <tr>
+	<td>{% block body %}{% endblock %}</td>
+      </tr>
+      <tr>
+	<td align="center" style="padding-top: 20px;">{% block footer %}
+	  {% setting 'FOOTER_SITE' as footer_site %}
+	  &copy;{% now "Y" %} {% setting "FOOTER_OWNER" %}
+	  {% if IS_HTML %}|{% endif %}
+	  <a href="{{ footer_site }}" style="color: #666666">
+	    {{ footer_site|cut:"http://"|cut:"https://" }}
+	  </a>
+	  {% endblock %}</td>
+      </tr>
+	  </table>
+	</td>
+      </tr>
+      </table>
+	</td>
+      </tr>
+      <tr>
+	<td>&nbsp;</td>
+      </tr>
+      </table>
+    <!--[if (gte mso 9)|(IE)]>
+        </td>
+      </tr>
+    </table>
+    <![endif]-->
+  </body>
+</html>

@@ -17,9 +17,9 @@ connect to the message broker to enqueue an email if you do not do this.
 
 Make sure to clone the repository recursively, as it contains submodules.
 
-Copy `sample.settings.py` to `settings.py` in the `hrdc` folder, then open your
-new file and adjust your settings as appropriate. For development, I reccomend
-the following:
+Copy `local_sample.py` to `local_settings.py` in the `hrdc` folder, then open
+your new file and adjust your settings as appropriate. For development, I
+reccomend the following:
 
 - Set `SECRET_KEY` to anything
 - You might want to delete some of the entries from `AUTH`
@@ -41,8 +41,11 @@ Make sure your desired message broker is running.
 
 Models generally applicable, such as users and spaces, are in `dramaorg`.
 `config` and `basetemplates` are reusable submodules with their own
-documentation. `casting` holds everything related to the Common Casting
-application. `chat` provides a somewhat reusable chat model.
+documentation. `chat` provides a somewhat reusable chat model.
+
+ `casting` holds everything related to the Common Casting application, while
+ `finance` and `publicity` provide the Finance and Publicity managers,
+ respectively.
 
 `emailtracker` provides email services, of which one should mostly just use the
 `render_to_queue` and `render_for_user(s)` interfaces from `emailtracker.tools`.
@@ -59,5 +62,5 @@ matching email has been sent already.
 
 ## Documentation
 
-The `docs` folder contains some markdown writeups of how to use this site.
-Unfortunately, they have not been updated since their initial writing.
+The `docs` folder contains some markdown writeups of how to use this site, which
+can also be browsed at https://apphelp.hrdctheater.org/

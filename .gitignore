@@ -113,4 +113,6 @@ ENV/
 *.db
 *.sqlite3
 
-*/settings.py
+/uploads/
+
+/src/

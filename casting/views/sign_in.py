@@ -2,6 +2,7 @@
 from django.views.generic.base import *
 from django.views.generic.edit import *
 from django.http import JsonResponse
+from django.shortcuts import redirect
 
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q
@@ -67,11 +68,19 @@ class ActorSignInBase(UserIsSeasonPdsmMixin, TemplateResponseMixin):
     def get_permission_denied_message(self):
         return PERMISSION_DENIED_MESSAGE
 
+    def actor_missing(self):
+        messages.error(
+            self.request, "An error has occurred. Please try again.")
+        return reverse("casting:sign_in_start",
+                       args=(self.request.session["building"],))
+    
     def get_success_url(self):
+        if "actor" not in self.request.session:
+            return self.actor_missing()
         if self.get_actor().is_initialized:
             for i in self.request.session.get("audition_ids", []):
                 audition = Audition.objects.get(id=i)
-                if not audition.actorseasonmeta.conflicts:
+                if audition.actorseasonmeta.conflicts == None:
                     return reverse("casting:sign_in_seasonmeta")
                 if audition.tech_interest == None:
                     return reverse("casting:sign_in_tech", args=(audition.id,))
@@ -175,7 +184,7 @@ class ActorSignInStart(ActorSignInBase, BaseUpdateView):
     def get_actor(self):
         return self.actor
 
-PROFILE_FIELDS = ["first_name", "last_name", "phone", "affiliation"]
+PROFILE_FIELDS = ["email", "first_name", "last_name", "phone", "affiliation"]
 PROFILE_WIDGETS = dict(zip(PROFILE_FIELDS, [
     forms.TextInput(attrs={ "autocomplete": "off" }) for i in range(len(
         PROFILE_FIELDS))]))
@@ -225,6 +234,8 @@ class ActorSignInDone(ActorSignInBase, TemplateView):
         for i in auditions:
             i.sign_in_complete=True
             i.save()
+        if "actor" not in self.request.session:
+            return redirect(self.actor_missing())
         render_for_user(self.get_actor(), "casting/email/signin-complete.html",
                         "signin-complete",
                         "-".join(self.request.session.get("show_ids", [])),

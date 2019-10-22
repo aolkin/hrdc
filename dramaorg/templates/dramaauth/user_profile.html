@@ -3,7 +3,7 @@
 {% block title %}User Profile{% endblock %}
 
 {% load bt %}
-{% load bootstrap %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 
@@ -16,7 +16,7 @@
     <legend class="text-center">
       User Profile Information</legend>
     {% csrf_token %}
-    {{ form|bootstrap }}
+    {{ form|crispy }}
     <button type="submit" class="btn btn-primary btn-block">Save</button>
   </form>
 </div>

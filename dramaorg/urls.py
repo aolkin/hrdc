@@ -13,7 +13,7 @@ def auth_view(name):
     return NewView.as_view()
 
 auth_urls = [
-    url(r'^login/$', auth_view("Login"), name='login'),
+    url(r'^login/$', LoginView.as_view(), name='login'),
     url(r'^logout/$', auth_view("Logout"), name='logout'),
     url(r'^password/$', auth_view("PasswordChange"),
         name='password_change'),
@@ -23,7 +23,8 @@ auth_urls = [
 
 app_name = "dramaorg"
 urlpatterns = [
-    url(r'^$', IndexView.as_view(), name="index"),
+    url(r'^$', HomePage.as_view(), name="home"),
+    url(r'^staff/$', StaffIndexView.as_view(), name="index"),
     url(r'^', include(auth_urls)),
     url(r'^profile/$', ProfileView.as_view(), name="profile"),
     url(r'^register/$', RegisterView.as_view(), name="register"),

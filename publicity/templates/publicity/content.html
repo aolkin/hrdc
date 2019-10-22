@@ -1,0 +1,59 @@
+{% if enabled.credits %}
+<p>{{ object.credits|linebreaksbr }}</p>
+{% endif %}
+{% if enabled.dates %}
+<{{ h }}>PERFORMANCE DATES</{{ h }}>
+<p>{{ object.show.space }}</p>
+<p>
+  {% for perf in object.performancedate_set.all %}
+  {{ perf }}<br>
+  {% empty %}
+  Performance Dates TBD
+  {% endfor %}
+</p>
+<p>Run time: {{ object.runtime|default:"TBD" }}</p>
+{% if object.ticket_link %}
+<p><a href="{{ object.ticket_link }}" target="_blank">Get tickets here!</a></p>
+{% endif %}
+{% endif %}
+{% if enabled.about %}
+<{{ h }}>ABOUT THE SHOW</{{ h }}>
+<p>{{ object.blurb|urlize|linebreaksbr }}</p>
+{% if object.contact_email %}
+<p>
+  Please reach out to
+  <a href="mailto:{{ object.contact_email }}">{{ object.contact_email }}</a>
+  with any questions.
+</p>
+{% endif %}
+{% endif %}
+{% if enabled.staff %}
+<{{ h }}>PRODUCTION STAFF</{{ h }}>
+<p>
+  {% for position, people in staff %}
+  {% include "publicity/position_people.html" %}
+  {% empty %}
+  To be announced!
+  {% endfor %}
+</p>
+{% endif %}
+{% if enabled.cast %}
+<{{ h }}>CAST</{{ h }}>
+<p>
+  {% for position, people in cast %}
+  {% include "publicity/position_people.html" %}
+  {% empty %}
+  To be announced!
+  {% endfor %}
+</p>
+{% endif %}
+{% if enabled.band and object.band_term %}
+<{{ h }}>{{ object.band_term|upper }}</{{ h }}>
+<p>
+  {% for position, people in band %}
+  {% include "publicity/position_people.html" %}
+  {% empty %}
+  To be announced!
+  {% endfor %}
+</p>
+{% endif %}

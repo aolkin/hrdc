@@ -1,6 +1,6 @@
 {% extends "casting/sign_in/base.html" %}
 
-{% load bootstrap %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 <div class="text-center">
@@ -16,8 +16,18 @@
 </p>
 <div class="row justify-content-center">
   <form method="POST" class="col-lg-6 col-md-8 audition-sign-in-shows">
+    {% if form.is_bound and not form.is_valid %}
+    <div class="alert alert-danger" role="alert">
+      There were errors in your profile! Please correct them below.
+    </div>
+    {% endif %}
+    {% if not form.is_bound %}
+    <div class="alert alert-info" role="alert">
+      Please double-check that your email address is correct!
+    </div>
+    {% endif %}
     {% csrf_token %}
-    {{ form|bootstrap }}
+    {{ form|crispy }}
     <button type="submit" class="btn btn-primary btn-block">Continue</button>
   </form>
 </div>

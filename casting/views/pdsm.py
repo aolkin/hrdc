@@ -10,6 +10,8 @@ from django.contrib import messages
 
 from django.utils import timezone
 
+import csv
+
 from config import config
 
 from chat.models import Message
@@ -67,7 +69,8 @@ class IndexView(StaffViewMixin, UserIsPdsmMixin, TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        if self.request.user.is_season_pdsm or self.request.user.is_board:
+        if self.request.user.is_season_pdsm or self.request.user.has_perm(
+                "casting.table_auditions"):
             building_ids = (get_current_slots().distinct()
                             .values_list("space__building"))
             context["buildings"] = building_model.objects.filter(
@@ -77,7 +80,8 @@ class IndexView(StaffViewMixin, UserIsPdsmMixin, TemplateView):
                     space__building=b["pk"]).distinct().values_list(
                         "show__show__title")
                 b["slots"] = ", ".join([i[0] for i in shows])
-            
+        if self.request.user.is_season_pdsm or self.request.user.has_perm(
+                "casting.view_first_cast_lists"):
             context["first_cast_lists"] = []
             shows = show_model.objects.current_season().filter(
                 casting_meta__isnull=False)
@@ -164,6 +168,50 @@ class AuditionView(ShowStaffMixin, UserIsPdsmMixin, DetailView):
                     :settings.CHAT_LOADING_LIMIT:-1]
         return context
 
+class ExportView(ShowStaffMixin, UserIsPdsmMixin, DetailView):
+    def get_objects(self):
+        return (self.get_object(),)
+    
+    def get(self, *args, **kwargs):
+        response = HttpResponse(content_type="text/csv")
+        response['Content-Disposition'] = 'attachment; filename="{}_{}s_{}.csv"'.format(
+            self.get_object().show.slug,
+            self.obj_,
+            timezone.localtime(timezone.now()).strftime("%Y-%m-%d_%H%M%S"))
+        writer = csv.writer(response)
+        objects = self.get_objects()
+        writer.writerow([
+            "Sign-in Time", "Name", "Email", "Phone", "Affiliation", "Year",
+            "PGPs", "Preferred Stage Gender"
+        ] + (["Conflicts", "Tech Interest"] if self.obj_ == "audition" else
+             ["Cast by Show"]))
+        for i in objects:
+            writer.writerow([
+                i.signed_in if hasattr(i, "signed_in") else "",
+                i.actor.get_full_name(False),
+                i.actor.email,
+                i.actor.phone,
+                i.actor.affiliation,
+                i.actor.year,
+                i.actor.pgps,
+                i.actor.gender_pref
+            ] + ([
+                i.actorseasonmeta.conflicts if hasattr(
+                    i, "actorseasonmeta") else "",
+                i.tech_interest if hasattr(i, "tech_interest") else ""
+            ] if type(i) == Audition else [i.character.show]))
+        return response
+
+class AuditionExportView(ExportView):
+    obj_ = "audition"
+    def get_objects(self):
+        return self.get_object().audition_set.all().order_by("signed_in")
+        
+class TechReqExportView(ExportView):
+    obj_ = "techreq"
+    def get_objects(self):
+        return self.get_object().tech_reqers.all()
+    
 class AuditionStatusBase(StaffViewMixin, SingleObjectMixin, View):
     model = Audition
 
@@ -280,7 +328,7 @@ class SubmitView(ShowStaffMixin, UserIsPdsmMixin, View):
         else:
             messages.error(self.request,
                            "Failed to submit {}, please try again.".format(
-                               self.verbose_name))
+                               getattr(self, "verbose_name", "")))
             return HttpResponseRedirect(reverse(self.edit_url,
                                                 args=(self.object.pk,)))
 
@@ -288,6 +336,7 @@ class CallbackSubmitView(SubmitView):
     var_name = "CALLBACK"
     redirect_url = "casting:view_callbacks"
     edit_url = "casting:callbacks"
+    verbose_name = "Callback List"
     
     def clean(self, warn=True):
         if self.object.callbacks_submitted:
@@ -341,6 +390,7 @@ class CastSubmitView(SubmitView):
     var_name = "CAST"
     redirect_url = "casting:view_cast"
     edit_url = "casting:cast_list"
+    verbose_name = "Cast List"
     
     def clean(self, warn=True):
         if self.object.cast_submitted:
@@ -419,8 +469,8 @@ class ShowActors(ShowStaffMixin, UserIsPdsmMixin, DetailView):
             Q(actor__suspended_until__isnull=True),
             sign_in_complete=True)
         for term in terms:
-            q = Q(actor__first_name__contains=term)
-            q |= Q(actor__last_name__contains=term)
+            q = Q(actor__first_name__icontains=term)
+            q |= Q(actor__last_name__icontains=term)
             auditions = auditions.filter(q)
         if config.get("only_auditioners",
                       "no").lower() == "yes" or auditions.exists():
@@ -435,7 +485,7 @@ class ShowActors(ShowStaffMixin, UserIsPdsmMixin, DetailView):
                 Q(suspended_until__lte=timezone.localdate()) |
                 Q(suspended_until__isnull=True))
             for term in terms:
-                q = Q(first_name__contains=term) | Q(last_name__contains=term)
+                q = Q(first_name__icontains=term) | Q(last_name__icontains=term)
                 users = users.filter(q)
             actors = list(users.values("id", "first_name", "last_name"))
             for i in actors:
@@ -472,7 +522,9 @@ urlpatterns = [
             url('^call/$', AuditionCallView.as_view(), name="audition_call"),
             url('^cancel/$', AuditionCancelView.as_view(),
                 name="audition_cancel"),
-            url('^done/$', AuditionDoneView.as_view(), name="audition_done")
+            url('^done/$', AuditionDoneView.as_view(), name="audition_done"),
+            url('^export/$', AuditionExportView.as_view(),
+                name="audition_export"),
         ])),
         
         url(r'^callbacks/', include([
@@ -488,6 +540,8 @@ urlpatterns = [
         
         url(r'^techreqs/', include([
             url('^$', TechReqView.as_view(), name="tech_reqs"),
+            url('^export/$', TechReqExportView.as_view(),
+                name="tech_req_export"),
         ])),
     ])),
     url('^show/\d+/[a-z]+/actor/(?P<pk>\d+)$', ActorName.as_view(),

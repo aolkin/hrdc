@@ -55,7 +55,8 @@ class CallbackView(PublicView):
             added_for_signing=False)
         menu = context["sidebar_menu"]
         submenu = menu[self.object.show.seasonstr() + " Callbacks"] = []
-        if self.request.user.is_authenticated and self.request.user.is_board:
+        if self.request.user.is_authenticated and self.request.user.has_perm(
+                "casting.view_unreleased_callbacks"):
             filter_args = {}
         else:
             filter_args = {
@@ -100,7 +101,8 @@ class CastView(PublicView):
             hidden_for_signing=False)
         menu = context["sidebar_menu"]
         submenu = menu[self.object.show.seasonstr() + " Cast Lists"] = []
-        if self.request.user.is_authenticated and self.request.user.is_board:
+        if self.request.user.is_authenticated and self.request.user.has_perm(
+                "casting.view_unreleased_cast"):
             filter_args = {}
         elif (self.request.user.is_authenticated and
               self.request.user.is_season_pdsm):
@@ -152,8 +154,6 @@ class SigningView(FixHeaderUrlMixin, ListView):
         context = super().get_context_data(*args, **kwargs)
         all_shows = show_model.objects.current_season().filter(
             casting_meta__isnull=False)
-        context["signing_open"] = all_shows.filter(
-            casting_meta__release_meta__stage__lt=6).exists()
         unpublished = all_shows.filter(
             casting_meta__release_meta__stage__lt=4)
         seconds = all_shows.filter(casting_meta__release_meta__stage__lt=6)
@@ -231,11 +231,6 @@ class SigningView(FixHeaderUrlMixin, ListView):
                                        "An error was encountered while saving "
                                        "your responses. Please try again.")
                         return HttpResponseRedirect(reverse("casting:signing"))
-                    if not obj.signing_open:
-                        messages.error(self.request,
-                                       "Unable to sign for roles: the " +
-                                       "signing period has ended.")
-                        return HttpResponseRedirect(reverse("casting:signing"))
                     obj.response = res
                     if res and tech:
                         tshow = CastingMeta.objects.get(pk=int(tech))
@@ -246,12 +241,16 @@ class SigningView(FixHeaderUrlMixin, ListView):
                                                tshow))
                             continue
                         obj.tech_req = tshow
+                    obj.save()
                     if res:
                         lower_signatures = obj.character.signing_set.exclude(
                             pk=obj.pk).filter(
                                 order__gt=obj.order, response=True)
-                        lower_signatures.update(response=None, tech_req=None)
-                    obj.save()
+                        for sig in lower_signatures:
+                            if not sig.signable:
+                                sig.response = None
+                                sig.tech_req = None
+                                sig.save()
                     signed.append(obj)
         if signed:
             messages.success(self.request,
@@ -283,7 +282,7 @@ def actor_token_logout(request):
 
 class IndexView(FixHeaderUrlMixin, TemplateView):
     verbose_name = "Common Casting"
-    help_text = "view schedules and posted lists or audition"
+    help_text = "view posted lists and schedules"
     
     template_name = "casting/public/index.html"
 

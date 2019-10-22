@@ -33,7 +33,7 @@ send_confirmation.short_description = ("Send confirmation emails for "
 def clear_response(modeladmin, request, qs):
     qs.update(response=None, tech_req=None)
     messages.success(request, "Cleared {} signatures.".format(qs.count()))
-clear_response.short_description = "Clear selected responses and tech reqs."
+clear_response.short_description = "Clear selected responses and tech reqs"
 
 @admin.register(Signing)
 class SigningAdmin(admin.ModelAdmin):
@@ -237,7 +237,7 @@ class MetaAdmin(admin.ModelAdmin):
     search_fields = ('show__title',)
     list_filter = ('show__season', 'show__year', 'callbacks_submitted',
                    'first_cast_submitted', 'cast_submitted')
-    autocomplete_fields = ('tech_req_pool',)
+    autocomplete_fields = ('show', 'tech_req_pool',)
     fieldsets = (
         ("", {
             "fields": ('show', 'release_meta',)
@@ -266,7 +266,7 @@ class MetaAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj):
         fields = list(self.readonly_fields)
-        if not request.user.is_superuser:
+        if not request.user.has_perm("casting.modify_submission_status"):
             fields += ['callbacks_submitted', 'first_cast_submitted',
                        'cast_submitted']
         if obj:

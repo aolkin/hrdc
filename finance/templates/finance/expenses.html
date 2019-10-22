@@ -1,0 +1,220 @@
+{% extends "finance/base.html" %}
+
+{% load bt crispy_forms_tags %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h3 class="text-center">{{ object }} Expenses</h3>
+  </div>
+</div>
+{% if user.is_staff and perms.finance.change_expense %}
+<div class="row justify-content-center mt-2">
+  <div class="col-md-8">
+    <p class="alert alert-info text-center">
+      You are a site administrator. For more options, use the
+      <a href="{% url 'admin:finance_expense_changelist' %}?show={{ object.pk }}">Expenses Administration</a> page.
+    </p>
+  </div>
+</div>
+{% endif %}
+{% if reimbursements.exists %}
+<div class="row justify-content-center mt-3">
+  <div class="col-md-8">
+    <h4 class="text-center">Requested Reimbursements</h4>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+	<tr>
+	  <th>Category</th>
+	  <th>Item</th>
+	  <th>Amount</th>
+	  <th>Date Purchased</th>
+	  <th>Purchaser</th>
+	  <th>Status</th>
+	</tr>
+      </thead>
+      <tbody>
+	{% for i in reimbursements %}
+	<tr class="{% if i.status == 62 %}table-success{% else %}table-warning{% endif %}">
+	  <td>{{ i.subcategory }}</td>
+	  <td>
+	    {{ i.item }}
+	    <a href="{{ i.receipt.url }}" class="ml-1" title="View Receipt"
+	       target="_blank">
+	      <i class="fa fa-file"></i>
+	    </a>
+	  </td>
+	  <td>{{ i.amount_display }}</td>
+	  <td>{{ i.date_purchased }}</td>
+	  <td>
+	    <a href="mailto:{{ i.purchaser_email }}">{{ i.purchaser_name }}</a>
+	  </td>
+	  <td>{{ i.get_status_display }}</td>
+	</tr>
+	{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% if p_card.exists %}
+<div class="row justify-content-center mt-3">
+  <div class="col-md-8">
+    <h4 class="text-center">P-Card Purchases</h4>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+	<tr>
+	  <th>Category</th>
+	  <th>Item</th>
+	  <th>Amount</th>
+	  <th>Date Purchased</th>
+	  <th>Purchaser</th>
+	  <th>Status</th>
+	</tr>
+      </thead>
+      <tbody>
+	{% for i in p_card %}
+	<tr>
+	  <td>{{ i.subcategory }}</td>
+	  <td>
+	    {{ i.item }}
+	    {% if i.receipt %}
+	    <a href="{{ i.receipt.url }}" class="ml-1" title="View Receipt"
+	       target="_blank">
+	      <i class="fa fa-file"></i>
+	    </a>
+	    {% endif %}
+	  </td>
+	  <td>{{ i.amount_display }}</td>
+	  <td>{{ i.date_purchased }}</td>
+	  <td>{{ i.purchaser_name }}</td>
+	  <td>{{ i.get_status_display }}</td>
+	</tr>
+	{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+<div class="row justify-content-center mt-3">
+  <div class="col-md-8">
+    <h4 class="text-center">New Expenses</h4>
+  </div>
+</div>
+<div class="row justify-content-center mt-2">
+  <div class="col-md-8">
+    <p class="lead text-center">
+      To add or modify expense subcategories,
+      <a href="{% url 'finance:budget' object.pk %}">edit your budget</a>.
+    </p>
+  </div>
+</div>
+<div class="row justify-content-center">
+  <form method="POST" class="col expenseform" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    <div class="row">
+      <button type="submit" class="btn btn-primary btn-block primary-submit">
+	Save Changes / Add Another
+      </button>
+    </div>
+    {% for form in formset %}
+    <div class="expense-form">
+      <div class="row">
+	<h5>Expense</h5>
+      </div>
+      <div class="row">
+	{{ form.id }}
+	{{ form.submitting_user }}
+	<div class="col-md-4 col-sm-6">
+	  {{ form.subcategory|as_crispy_field }}
+	</div>
+	<div class="col-md-5 col-sm-6">
+	  {{ form.item|as_crispy_field }}
+	</div>
+	<div class="col-md-2 col-sm-8 dollar-field">
+	  {{ form.amount|as_crispy_field }}
+	</div>
+	<div class="col-md-1 col-sm-4 mt-3">
+	  <button type="button"
+		  class="btn btn-sm btn-danger mt-4 remove-expense">
+	    <i class="fa fa-minus-square"></i>
+	  </button>
+	</div>
+	<div class="col-md-5 col-sm-6">
+	  {{ form.purchaser_name|as_crispy_field }}
+	</div>
+	<div class="col-md-4 col-sm-4 date-purchased">
+	  {{ form.date_purchased|as_crispy_field }}
+	</div>
+	<div class="col-md-3 col-sm-2 purchased-using">
+	  {{ form.purchased_using|as_crispy_field }}
+	</div>
+      </div>
+      <div class="row reimbursement-options">
+	<div class="col-md-5 col-sm-6">
+	  {{ form.purchaser_email|as_crispy_field }}
+	</div>
+	<div class="col-md-7 col-sm-6 reimburse-via-mail">
+	  {{ form.reimburse_via_mail|as_crispy_field }}
+	</div>
+      </div>
+      <div class="row reimbursement-options">
+	<div class="col-md-6 col-sm-6">
+	  <div class="form-group">
+	    <label class="col-form-label">Current Receipt</label>
+	    <div>
+	      {% if form.instance.receipt %}
+	      <a href="{{ form.instance.receipt.url }}" target="_blank">
+		<i class="fa fa-file"></i>
+		{{ form.receipt_filename }}
+	      </a>
+	      {% else %}
+	      <span class="text-muted">-</span>
+	      {% endif %}
+	    </div>
+	  </div>
+	</div>
+	<div class="col-md-6 col-sm-6 receipt-field">
+	  {{ form.receipt|as_crispy_field }}
+	</div>
+      </div>
+      <div class="row reimbursement-options justify-content-center">
+	<div class="col-md-6 col-sm-12 mailing-address">
+	  {{ form.mailing_address|as_crispy_field }}
+	</div>
+	<div class="col-md-6 col-sm-12">
+	  {% if form.instance.pk %}
+	  <button type="submit" name="request-reimbursement"
+		  value="{{ form.instance.pk }}"
+		  class="btn btn-block btn-warning">
+	    Request Reimbursement
+	  </button>
+	  <p class="text-center text-muted mt-2">
+	    Once reimbursement is requested, you cannot edit this item anymore.
+	  </p>
+	  {% else %}
+	  <p class="text-center">
+	    You must save this expense before requesting reimbursement.
+	  </p>
+	  {% endif %}
+	</div>
+      </div>
+      <div class="d-none delete-field">
+	{{ form.DELETE|as_crispy_field }}
+      </div>
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+      {% endif %}
+      {% if not forloop.last %}
+      <hr>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </form>
+</div>
+{% endblock %}

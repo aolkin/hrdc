@@ -2,7 +2,7 @@
     font-size: 1.5em;
 }
 .audition-sign-in-shows .custom-control {
-    padding-left: 3rem;
+    padding-left: 3.5rem;
 }
 .audition-sign-in-shows .custom-control-label::after,
 .audition-sign-in-shows .custom-control-label::before {
@@ -248,6 +248,13 @@ p.lead.only-small {
     #chat-window.chat-left .fa-chevron-left {
 	display: none;
     }
+}
+
+#chat-window:not(.minimized) .fa-window-maximize {
+    display: none;
+}
+#chat-window.minimized .fa-window-minimize {
+    display: none;
 }
 
 #chat-window .card-body {

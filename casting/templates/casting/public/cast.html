@@ -44,9 +44,10 @@
 	{% else %}
 	<p class="lead">
 	  Please re-read and confirm your first-round casting below.
-	  Note that once you have submitted, you cannot change the first
-	  actors up to the number allowed to sign for that character, nor the
-	  number allowed to sign.
+	  Note that once you have submitted, you may not add or remove
+	  characters, and you cannot change the first set of actors for a
+	  character up to the number allowed to sign for that character, nor the
+	  number allowed to sign for any character.
 	</p>
 	<button type="submit" class="btn btn-danger btn-block">
 	  Submit First-Round Casting</button>
@@ -132,15 +133,16 @@
 	    {{ character.allowed_signers|apnumber|capfirst }} actors can sign
 	    for this part.
 	  </small>
-	  <hr class="mb-1 mt-2">
 	  {% endif %}
 	  {% if character.allow_multiple_signatures %}
 	  <small class="text-muted">
 	    This role can be signed for in addition to other roles in this show.
 	  </small>
-	  <hr class="mb-1 mt-2">
 	  {% endif %}
 	  {% if character.cast_description %}
+	  {% if character.allowed_signers != 1 or character.allow_multiple_signatures %}
+	  <hr class="mb-1 mt-2">
+	  {% endif %}
 	  <small class="text-muted">
 	    {{ character.cast_description|urlize|linebreaksbr }}
 	  </small>
@@ -152,8 +154,7 @@
 	  <small>
 	    <span class="text-muted">This role has been filled by</span>
 	    {% for actor in character.actors %}
-	    {{ actor }}
-	    {% if forloop.revcounter0 == 1 %}
+	    {{ actor }}{% if forloop.revcounter0 == 1 %}
 	    and
 	    {% elif not forloop.last %},
 	    {% endif %}
@@ -169,7 +170,6 @@
 {% if object.cast_list_released and not popout %}
 <div class="row justify-content-center">
   <div class="col-md-6 text-center">
-    {% if object.release_meta.stage < 6 %}
     <p class="lead">
       If you have been cast in this show, please
       {% if request.user.is_authenticated %}
@@ -177,22 +177,18 @@
       {% else %}
       click the link in the notification email you received
       {% endif %}
-      to sign for your role.
+      to sign for your role{% if not request.user.is_authenticated %}, or
+      <a href="{% url 'social:begin' 'google-oauth2' %}?next={% url 'casting:signing' %}#{{ object.pk }}">sign in</a>
+      to your account via Google{% endif %}.
     </p>
     <p>
       If you cannot find the link or it does not work, please
       <a href="{% url 'casting:request_link' %}">request a new signing link</a>.
     </p>
-    {% else %}
-    <p class="lead">
-      The signing period has ended. Please contact the show staff directly with
-      any questions or to accept or decline roles.
-    </p>
-    {% endif %}
   </div>
 </div>
 {% endif %}
-{% elif request.user.is_authenticated and request.user.is_board %}
+{% elif request.user.is_authenticated and perms.casting.view_unreleased_cast %}
 <h3 class="text-center">
   {% if not object.cast_submitted %} First-Round {% endif %}
   Cast List for:

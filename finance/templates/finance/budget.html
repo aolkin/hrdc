@@ -1,0 +1,196 @@
+{% extends "finance/base.html" %}
+
+{% load bt crispy_forms_tags static %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h3 class="text-center">{{ object }} Budget</h3>
+  </div>
+</div>
+
+<div class="row justify-content-center mt-3">
+  <div class="col-md-8">
+    <h4 class="text-center">Grants and Income</h4>
+    <h5 class="text-center">
+      <a href="{% url 'finance:income' object.pk %}">
+	Edit your Grants and Income
+      </a>
+    </h5>
+  </div>
+  <div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+	<th>Income Source</th>
+	<th>Status</th>
+	<th>Requested</th>
+	<th>Received</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in object.income_set.all %}
+      <tr class="{% if i.status > 50 %}table-success{% elif i.status == 11 %}table-danger{% elif i.status > 0 %}table-warning{% endif %}">
+	<td>{{ i.name }}</td>
+	<td>{{ i.get_status_display }}</td>
+	<td>${{ i.requested }}</td>
+	<td>{% if i.received %}${{ i.received }}{% else %}-{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="row justify-content-end">
+  <div class="col-md-8">
+    <table class="table table-striped">
+      <thead>
+	<tr>
+	  <th>Total Requested</th>
+	  <th>Total Received</th>
+	  <th>Total Confirmed</th>
+	</tr>
+      </thead>
+      <tbody>
+	<tr>
+	  <td>{{ object.requested_income }}</td>
+	  <td>{{ object.received_income }}</td>
+	  <td>{{ object.confirmed_income }}</td>
+	</tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="row justify-content-center mt-3">
+  <div class="col-md-8">
+    <h4 class="text-center">Expenses</h4>
+  </div>
+  <div class="table-responsive">
+  <table class="table table-striped budget-worksheet">
+    <thead>
+      <tr>
+	<th>Item</th>
+	<th>Estimate</th>
+	<th>Reported</th>
+	<th>Actual</th>
+	<th>Notes</th>
+	<th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="table-secondary category-header">
+	<td colspan="5">Administrative</td>
+	<td>
+	  <button class="btn btn-sm btn-success add-item"
+		  data-category="10" data-stream="budgetexpense">
+	    <i class="fa fa-plus"></i>
+	  </button>
+	</td>
+      </tr>
+      {% for i in object.administrative_budget %}
+      {% include "finance/budget_line.html" with item=i category=i.category %}
+      {% endfor %}
+      {% include "finance/budget_line.html" with category=10 %}
+      <tr class="table-light subtotals-category" data-category="10">
+	<td>Subtotals:</td>
+	<td class="total-field total-field-estimate">...</td>
+	<td class="total-field total-field-reported">...</td>
+	<td class="total-field total-field-actual">...</td>
+	<td></td>
+	<td></td>
+      </tr>
+      <tr class="table-secondary category-header">
+	<td colspan="5">Production</td>
+	<td>
+	  <button class="btn btn-sm btn-success add-item"
+		  data-category="20" data-stream="budgetexpense">
+	    <i class="fa fa-plus"></i>
+	  </button>
+	</td>
+      </tr>
+      {% for i in object.production_budget %}
+      {% include "finance/budget_line.html" with item=i category=i.category  %}
+      {% endfor %}
+      {% include "finance/budget_line.html" with category=20 %}
+      <tr class="table-light subtotals-category" data-category="20">
+	<td>Subtotals:</td>
+	<td class="total-field total-field-estimate">...</td>
+	<td class="total-field total-field-reported">...</td>
+	<td class="total-field total-field-actual">...</td>
+	<td></td>
+	<td></td>
+      </tr>
+      <tr class="table-secondary category-header">
+	<td colspan="5">Other</td>
+	<td>
+	  <button class="btn btn-sm btn-success add-item"
+		  data-category="50" data-stream="budgetexpense">
+	    <i class="fa fa-plus"></i>
+	  </button>
+	</td>
+      </tr>
+      {% for i in object.other_budget %}
+      {% include "finance/budget_line.html" with item=i category=i.category  %}
+      {% endfor %}
+      {% include "finance/budget_line.html" with category=50 %}
+      <tr class="table-light subtotals-category" data-category="50">
+	<td>Subtotals:</td>
+	<td class="total-field total-field-estimate">...</td>
+	<td class="total-field total-field-reported">...</td>
+	<td class="total-field total-field-actual">...</td>
+	<td></td>
+	<td></td>
+      </tr>
+      <tr class="table-light">
+	<td colspan="6"></td>
+      </tr>
+      <tr class="table-secondary">
+	<th colspan="6">Totals</th>
+      </tr>
+      <tr class="table-light subtotals-all">
+	<td>Income:</td>
+	<td class="total-field">{{ object.requested_income }}</td>
+	<td class="total-field">{{ object.received_income }}</td>
+	<td class="total-field">{{ object.confirmed_income }}</td>
+	<td></td>
+	<td></td>
+      </tr>
+      <tr class="table-light subtotals-all">
+	<td>Expenses:</td>
+	<td class="total-field total-field-estimate">...</td>
+	<td class="total-field total-field-reported">...</td>
+	<td class="total-field total-field-actual">...</td>
+	<td></td>
+	<td></td>
+      </tr>
+      <tr class="table-light subtotals-net">
+	<td>
+	  Net: <br>
+	  <small class="text-muted">(income minus expenses)</small>
+	</td>
+	<td class="total-field total-field-estimate">...</td>
+	<td class="total-field total-field-reported">...</td>
+	<td class="total-field total-field-actual">...</td>
+	<td></td>
+	<td></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static "channels/js/websocketbridge.js" %}"></script>
+<script type="text/javascript">
+ let income_totals = {
+     estimate: {{ object.requested_income_val }},
+     reported: {{ object.received_income_val }},
+     actual: {{ object.confirmed_income_val }},
+ }
+
+ let stream_show = "{{ object.pk }}";
+</script>
+{% endblock %}

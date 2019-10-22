@@ -1,0 +1,63 @@
+{% extends "finance/base.html" %}
+
+{% load bt config %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h3 class="text-center">Welcome to the Finance Manager</h3>
+    <p>
+      Select a show from the sidebar to manage your financials.
+      For help and instructions on how to use this portal, please read
+      <a href="http://apphelp.hrdctheater.org/finance.html">
+      this page</a>.
+    </p>
+  </div>
+</div>
+
+{% if request.user.show_set.exists %}
+<h3 class="text-center">Your Shows</h3>
+<table class="table table-responsive bt-table-responsive table-striped">
+  <thead>
+    <tr>
+      <th class="table-col-md">Show</th>
+      <th class="table-col-sm table-col-desktop">Season</th>
+      <th class="table-col-lg">Executive Staff</th>
+      <th class="table-col-sm">Expected Balance</th>
+      <th class="table-col-sm">Reported Balance</th>
+      <th class="table-col-sm">Actual Balance</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for show in request.user.show_set.all %}
+    {% if show.finance_info %}
+    {% with meta=show.finance_info %}
+    <tr>
+      <td>{{ show.title }}</td>
+      <td>{{ show.seasonstr }}</td>
+      <td>{{ show.people }}</td>
+      <td {% if meta.expected_bal < 0 %}class="text-danger"{% endif %}>
+	{{ meta.expected_balance }}
+      </td>
+      <td {% if meta.reported_bal < 0 %}class="text-danger"{% endif %}>
+	{{ meta.reported_balance }}
+      </td>
+      <td {% if meta.actual_bal < 0 %}class="text-danger"{% endif %}>
+	{{ meta.actual_balance }}
+      </td>
+    </tr>
+    {% endwith %}
+    {% endif %}
+    {% endfor %}
+</table>
+{% endif %}
+
+{% if not perms.finance.change_financeinfo %}
+<p class="text-muted text-center">If any of this information is incorrect or
+  your shows are missing from the finance manager, please contact 
+  <a href="mailto:{% option 'fin_contact_email' %}">
+    {% option 'fin_contact_name' %}</a> to have them added.
+</p>
+{% endif %}
+
+{% endblock %}

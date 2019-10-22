@@ -1,0 +1,53 @@
+{% extends "publicity/base.html" %}
+
+{% load bt crispy_forms_tags %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h3 class="text-center">Directory: {{ object }}</h3>
+  </div>
+</div>
+<div class="row justify-content-center">
+  <form method="POST" class="col peopleform">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    {% for form in formset %}
+    <div class="person-form">
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+      {% endif %}
+      <div class="form-row">
+	{{ form.id }}
+	<div class="col-md-3 col-sm-6">
+	  {{ form.position|as_crispy_field }}
+	</div>
+	<div class="col-md-3 col-sm-6">
+	  {{ form.name|as_crispy_field }}
+	</div>
+	<div class="col-md-2 col-sm-4">
+	  {{ form.year|as_crispy_field }}
+	</div>
+	<div class="col-md-2 col-sm-3">
+	  {{ form.type|as_crispy_field }}
+	</div>
+	<div class="col-md-1 col-sm-3">
+	  {{ form.order|as_crispy_field }}
+	</div>
+	<div class="col-md-1 col-sm-2">
+	  <button type="button" class="btn btn-danger remove-person">
+	    <i class="fa fa-minus-square"></i>
+	  </button>
+	</div>
+      </div>
+      <div class="d-none">
+	{{ form.DELETE|as_crispy_field }}
+      </div>
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary btn-block">
+      Save Changes / Add Another
+    </button>
+  </form>
+</div>
+{% endblock %}

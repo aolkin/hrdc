@@ -62,6 +62,10 @@
     {% option 'tech_contact_name' %}</a> with any questions about the above.
 </p>
 
+<a href="{% url 'casting:tech_req_export' object.pk %}" class="text-center">
+  <h4 class="mb-0">Download Spreadsheet of Tech Reqers</h4>
+</a>
+
 <table class="table table-responsive bt-table-responsive table-striped mt-3">
   <thead>
     <tr>

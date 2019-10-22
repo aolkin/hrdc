@@ -15,7 +15,7 @@ signing.
 ## Help and Support
 
 If you run into problems or have a question about how to use this site, please
-email [support@app.hrdctheater.com](mailto:support@app.hrdctheater.com).
+email [support@app.hrdctheater.org](mailto:support@app.hrdctheater.org).
 
 If you encounter an error, please include when the error occurred, and as much
 specific information about what happened as possible.
@@ -23,7 +23,7 @@ specific information about what happened as possible.
 ## Account Activation
 
 If you are casting your show through common casting, you will be using this
-system, located at [app.hrdctheater.com](https://app.hrdctheater.com/). In
+system, located at [app.hrdctheater.org](https://app.hrdctheater.org/). In
 order to create an account, you must be invited by a board member. As part of
 your common casting registration, the campus liaison will invite you and you
 will receive an email from "HRDC Apps" allowing you to activate your account.
@@ -33,7 +33,7 @@ your show's auditions and casting!**
 
 > Note: if you have been invited, but the invite link no longer works or you
 > cannot find the email, you may go to
-> ["Forgot password?"](https://app.hrdctheater.com/reset/) to set a password
+> ["Forgot password?"](https://app.hrdctheater.org/reset/) to set a password
 > and activate your account.
 
 Once you log in, you should see a list of shows you are a member of the
@@ -42,7 +42,7 @@ missing or incorrect, please contact the campus liaison.
 
 # Common Casting Online
 
-The [Common Casting Portal](https://app.hrdctheater.com/casting/staff/) will
+The [Common Casting Portal](https://app.hrdctheater.org/casting/staff/) will
 be how you access auditioners' information, and also how you submit your
 callback and cast lists. Lists will also be published to the site, and actors
 will sign via it as well.

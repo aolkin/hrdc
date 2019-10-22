@@ -1,6 +1,6 @@
 {% extends "bt/default.html" %}
 
-{% load bootstrap %}
+{% load bootstrap crispy_forms_tags %}
 {% load drama %}
 {% load config %}
 
@@ -16,9 +16,9 @@
     <tr>
       <th class="table-col-md">Show</th>
       <th class="table-col-sm table-col-desktop">Season</th>
-      <th class="table-col-xs">Residency</th>
-      <th class="table-col-sm">Venue</th>
+      <th class="table-col-md">Residency &amp; Liaison(s)</th>
       <th class="table-col-lg">Administrative Staff</th>
+      <th class="table-col-xs">Enabled Apps</th>
     </tr>
   </thead>
   <tbody>
@@ -26,15 +26,30 @@
   <tr>
     <td>{{ show.title }}</td>
     <td>{{ show.seasonstr }}</td>
-    <td>{{ show.residency_starts|date:"M j" }}
+    <td>
+      {{ show.space }}
+      ({{ show.residency_starts|date:"M j" }}
       {% if show.residency_starts != show.residency_ends %}-
-      {{ show.residency_ends|date:"M j" }}{% endif %}</td>
-    <td>{{ show.space }}</td>
+      {{ show.residency_ends|date:"M j" }}{% endif %})
+      {% if show.liaisons.exists %} -
+      {% for liaison in show.liaisons.all %}
+      <a href="mailto:{{ liaison.email }}" title="{{ liaison.phone }}">
+	{{ liaison.get_full_name }}</a>{% if not forloop.last %}, {% endif %}
+      {% endfor %}
+      {% endif %}
+    </td>
     <td>{{ show.people }}</td>
+    <td>
+      {% for i in show.enabled_apps %}
+      <a href="{% url i|add:':index' %}">
+	{{ i|capfirst }}</a>{% if not forloop.last %},{% endif %}
+      {% empty %}-
+      {% endfor %}
+    </td>
   </tr>
   {% endfor %}
 </table>
-{% if not user.is_board %}
+{% if not perms.dramaorg.change_show %}
 <p class="text-muted text-center">If any of this information is incorrect or
   shows are missing from your dashboard, please contact
   <a href="mailto:{% option 'site_contact_email' %}">
@@ -47,9 +62,8 @@
       <h3>Welcome to HRDC Apps</h3>
       <p class="lead">
 	We couldn't find any shows that you are an executive staff member of.
-	Don't worry, you can still browse the public portal{{ public_indexes|length|pluralize }} below.
       </p>
-      {% if not user.is_board %}
+      {% if not not perms.dramaorg.add_show %}
       <p>
 	If this is incorrect, please contact
 	<a href="mailto:{% option 'site_contact_email' %}">
@@ -57,81 +71,26 @@
       </p>
       {% endif %}
     </div>
-    <p class="text-center mb-0">
-      If you need to update your profile information, you can do so
-      <a class="" href="{% url 'dramaorg:profile' %}">here</a>.
+  </div>
+</div>
+{% endif %}
+
+{% if request.user.is_pdsm %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <p class="lead text-center mt-3">
+      <strong>
+	To perform administrative tasks and manage aspects of your shows, use
+	the links under "Enabled Apps" above.
+      </strong>
     </p>
   </div>
 </div>
 {% endif %}
 
-{% if public_indexes %}
-<h3 class="text-center mt-5">
-  Public HRDC Apps
-  <br><small class="text-muted">public portals for HRDC apps</small>
-</h3>
-<div class="row justify-content-center">
-  <div class="col-md-6">
-    {% for index in public_indexes %}
-    <a href="{{ index.0 }}" class="list-group-item list-group-item-action">
-      <div class="d-flex w-100 justify-content-between">
-	<h5 class="mb-0">{{ index.1 }}</h5>
-	{% if index.2 %}
-	<small class="text-muted">{{ index.2 }}</small>
-	{% endif %}
-      </div>
-    </a>
-    {% endfor %}
-  </div>
-</div>
-{% endif %}
-
-{% if request.user.is_pdsm or request.user.is_board %}
-{% if all_indexes %}
-<h3 class="text-center mt-5">
-  HRDC Apps for PDSMs
-  <br><small class="text-muted">administrative tasks for your shows</small>
-</h3>
-<div class="row justify-content-center">
-  <div class="col-md-6">
-    {% for index in all_indexes %}
-    <a href="{{ index.0 }}" class="list-group-item list-group-item-action">
-      <div class="d-flex w-100 justify-content-between">
-	<h5 class="mb-0">{{ index.1 }}</h5>
-	{% if index.2 %}
-	<small class="text-muted">{{ index.2 }}</small>
-	{% endif %}
-      </div>
-    </a>
-    {% endfor %}
-  </div>
-</div>
-{% endif %}
-{% endif %}
-
-{% if user.is_board %}
-<h3 class="text-center mt-5">
-  HRDC Apps Administration
-  <br><small class="text-muted">controls for board members</small>
-</h3>
-<div class="row justify-content-center">
-  <div class="col-md-6">
-    {% for index in admin_indexes %}
-    <a href="{{ index.0 }}" class="list-group-item list-group-item-action">
-      <div class="d-flex w-100 justify-content-between">
-	<h5 class="mb-0">{{ index.1 }}</h5>
-	{% if index.2 %}
-	<small class="text-muted">{{ index.2 }}</small>
-	{% endif %}
-      </div>
-    </a>
-    {% endfor %}
-  </div>
-</div>
-{% endif %}
-
 <div class="row justify-content-center mt-5">
-{% if user.is_superuser %}
+{% if perms.dramaorg.change_current_season %}
+  <a name="update-season"></a>
   <form method="POST" class="col-md-6">
     {% csrf_token %}
     {{ form|bootstrap_inline }}

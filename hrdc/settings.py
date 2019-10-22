@@ -10,24 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
-import os
 from django.contrib import messages
-
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ''
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -37,6 +23,7 @@ INSTALLED_APPS = [
     'basetemplates',
     'chat',
     'hrdc',
+    'shortlinks',
     'django.contrib.humanize',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -44,9 +31,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_thumbs',
+    'social_django',
+    'rangefilter',
     'dramaorg',
-    'casting',
     'venueapp',
+    'casting',
+    'finance',
+    'publicity',
+    'archive',
+    'crispy_forms',
     'bootstrapform',
     'anymail',
     'channels',
@@ -82,43 +76,36 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'config.context_processors.configuration',
                 'basetemplates.context_processor',
             ],
         },
     },
 ]
 
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
 WSGI_APPLICATION = 'hrdc.wsgi.application'
 
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
-# Database
-# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'dramaorg.utils.social_create_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+    'social_core.pipeline.social_auth.associate_by_email',
+)
 
-
-# Password validation
-# https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-] if not DEBUG else []
 
 CSRF_USE_SESSIONS = True
 
@@ -133,13 +120,32 @@ TIME_ZONE = 'US/Eastern'
 
 USE_I18N = True
 
-USE_L10N = True
+USE_L10N = False
 
 USE_TZ = True
 
+DATETIME_FORMAT = "M j, Y, g:i A"
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.11/howto/static-files/
+DATETIME_OUTPUT_FILTER_FORMAT = "l, F d, Y [at] g:i A"
+DATETIME_INPUT_FORMAT = "%A, %B %-d, %Y at %-I:%M %p"
+
+DATETIME_INPUT_FORMATS = [
+    DATETIME_INPUT_FORMAT,
+    "%A, %B %d, %Y at %I:%M %p",
+    '%Y-%m-%d %I:%M %p',     # '2006-10-25 10:30 AM'
+    '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
+    '%Y-%m-%d %H:%M:%S.%f',  # '2006-10-25 14:30:59.000200'
+    '%Y-%m-%d %H:%M',        # '2006-10-25 14:30'
+    '%Y-%m-%d',              # '2006-10-25'
+    '%m/%d/%Y %H:%M:%S',     # '10/25/2006 14:30:59'
+    '%m/%d/%Y %H:%M:%S.%f',  # '10/25/2006 14:30:59.000200'
+    '%m/%d/%Y %H:%M',        # '10/25/2006 14:30'
+    '%m/%d/%Y',              # '10/25/2006'
+    '%m/%d/%y %H:%M:%S',     # '10/25/06 14:30:59'
+    '%m/%d/%y %H:%M:%S.%f',  # '10/25/06 14:30:59.000200'
+    '%m/%d/%y %H:%M',        # '10/25/06 14:30'
+    '%m/%d/%y',              # '10/25/06'
+]
 
 STATIC_URL = '/static/'
 
@@ -157,61 +163,29 @@ SHOW_MODEL = "dramaorg.Show"
 SPACE_MODEL = "dramaorg.Space"
 BUILDING_MODEL = "dramaorg.Building"
 
-ANYMAIL = {
-    "MAILGUN_API_KEY": "",
-    "MAILGUN_SENDER_DOMAIN": ""
-}
+
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 
-DEFAULT_FROM_EMAIL = "HRDC Apps <user@domain.com>"
-
-CONFIGURATION_APP_TITLE = "Global Settings"
-
-ADMIN_SITE_TITLE = "HRDC Apps"
-
-ADMIN_GROUP_NAME = "HRDC Board"
+CONFIGURATION_APP_TITLE = "Settings"
 
 LOGIN_URL = "dramaorg:login"
 LOGOUT_URL = "dramaorg:logout"
-LOGIN_REDIRECT_URL = "dramaorg:index"
-LOGOUT_REDIRECT_URL = LOGIN_URL
+LOGIN_REDIRECT_URL = "dramaorg:home"
+LOGOUT_REDIRECT_URL = LOGIN_REDIRECT_URL
 
-LOGO_PATH = os.path.join(BASE_DIR, "hrdc/static/logo.png")
-
-BT_SITE_TITLE = "HRDC Apps"
 BT_FAVICON_URL = STATIC_URL + "icon.png"
 BT_POPPER_VERSION = "1.12.9"
 BT_POPPER_INTEGRITY = "sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
 
-FOOTER_OWNER = "Harvard-Radcliffe Dramatic Club"
-FOOTER_SITE = "http://hrdctheater.com"
 BT_HEADER_IMAGE = "logo.png"
-BT_HEADER_URL = "dramaorg:index"
+BT_HEADER_URL = "dramaorg:home"
 
 BT_JS_FILES = ["profilefields.js"]
-
-GROUP_LOCATION = "Harvard"
-SITE_URL = "http://localhost:8000"
-
-CASTING_IS_COMMON = True
+BT_CSS_FILES = ["global.css"]
 
 ACTIVE_SEASON_KEY = "season"
 ACTIVE_YEAR_KEY = "year"
 
-CELERY_BEAT_SCHEDULE = {
-    'update-casting-releases': {
-        'task': 'casting.tasks.update_releases',
-        'schedule': 10.0,
-        'relative': True,
-    },
-    'send-missed-emails': {
-        'task': 'emailtracker.tasks.send_missing',
-        'schedule': 60.0 * 10.0,
-        'relative': False,
-    },
-}
+THUMBS_JPG = False
 
-QUEUED_EMAIL_TEMP = None
-QUEUED_EMAIL_DEBUG = False
-
-CHAT_LOADING_LIMIT = 80
+from .local_settings import *

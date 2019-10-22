@@ -33,7 +33,7 @@ process, please ask the common casting representative.
 
 Since the system will remember your contact information, if you ever need to
 update it you must set a password and log in to edit your profile. You may do
-this by going to the ["Forgot password?"](https://app.hrdctheater.com/reset/)
+this by going to the ["Forgot password?"](https://app.hrdctheater.org/reset/)
 page on the website and following the instructions to set a password and log in.
 You may then edit your contact information and profile.
 
@@ -48,7 +48,7 @@ Please read the email carefully for locations, dates, and times, and contact any
 shows you have questions about.
 
 You may also view callback lists for the entire season
-[online](https://app.hrdctheater.com/casting/actor/) once they have been
+[online](https://app.hrdctheater.org/casting/actor/) once they have been
 released.
 
 # Cast Lists
@@ -61,7 +61,7 @@ Remember, shows cannot reach out to you at this point, so please contact them
 if you have any questions!
 
 Again, you may also view cast lists for the entire season
-[online](https://app.hrdctheater.com/casting/actor/) once they have been
+[online](https://app.hrdctheater.org/casting/actor/) once they have been
 released. These cast lists will be updated instantly as actors sign for their
 roles.
 
@@ -79,9 +79,9 @@ you do not accept them by the end of the signing period, and we cannot help
 you if you run into problems at the last minute.
 
 If the link in your casting email notification does not work, you may
-[get a new link](https://app.hrdctheater.com/casting/actor/getlink/)
+[get a new link](https://app.hrdctheater.org/casting/actor/getlink/)
 emailed to you. If you are still unable to sign, please contact the
-[campus liason](mailto:campus@hrdctheater.com) immediately.
+[campus liason](mailto:campus@hrdctheater.org) immediately.
 
 ## Alternates
 
@@ -99,10 +99,10 @@ decline, additional actors, if listed, will be able to sign.
 # Help and Support
 
 If you are unable to sign, please contact the
-[president](mailto:president@hrdctheater.com) or
-[campus liason](mailto:campus@hrdctheater.com) immediately.
+[president](mailto:president@hrdctheater.org) or
+[campus liason](mailto:campus@hrdctheater.org) immediately.
 
 If you run into problems or have a question about how to use this site, please
-email [support@app.hrdctheater.com](mailto:support@app.hrdctheater.com). If you
+email [support@app.hrdctheater.org](mailto:support@app.hrdctheater.org). If you
 encounter an error, please include when the error occurred, and as much
 specific information about what happened as possible.

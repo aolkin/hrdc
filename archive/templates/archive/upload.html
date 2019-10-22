@@ -1,0 +1,87 @@
+{% extends "archive/base.html" %}
+
+{% load bt crispy_forms_tags bootstrap %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h3 class="text-center">{{ object }}</h3>
+  </div>
+</div>
+<div class="row justify-content-center">
+  <form method="POST" class="col-md-8" enctype="multipart/form-data">
+    {% csrf_token %}
+    <h4>Upload Production Photos</h4>
+    <div class="form-group mt-3">
+      <div class="custom-file">
+	<input type="file" class="custom-file-input"
+	       id="photos" name="photos" multiple>
+	<label class="custom-file-label" for="photos">Choose photos(s)</label>
+      </div>
+      <small class="form-text text-muted">
+	Hold Ctrl on Windows or Cmd on Mac to select multiple files at once,
+	or drag and drop files into the box above.
+      </small>
+    </div>
+    <div class="form-group">
+      <label for="photo-credit">Photo Credit</label>
+      <input class="form-control" id="photo-credit" name="photo-credit"
+	     required placeholder="John Harvard '20" maxlength="100">
+      <small class="form-text text-muted">
+	Please submit this form separately for each different photo credit
+	required, if applicable.
+      </small>
+    </div>
+    <div class="form-check form-group">
+      <input type="checkbox" class="form-check-input" checked
+	     id="allow_in_publicity" name="allow_in_publicity">
+      <label class="form-check-label" for="allow_in_publicity">
+	Allow these images to be used in HRDC publicity materials,
+	such as the weekly newsletter
+      </label>
+    </div>
+    <button type="submit" class="btn btn-primary btn-block btn-lg">
+      Upload
+    </button>
+  </form>
+
+  <form method="POST" class="col-md-8" enctype="multipart/form-data">
+    {% csrf_token %}
+    <h4 class="mt-5">Upload Additional Materials</h4>
+    <div class="form-group mt-3">
+      <label>Upload extra files to archive (designs, sketches, etc)...</label>
+      <div class="custom-file">
+	<input type="file" class="custom-file-input"
+	       id="files" name="files" multiple>
+	<label class="custom-file-label" for="files">Choose file(s)</label>
+      </div>
+      <small class="form-text text-muted">
+	Hold Ctrl on Windows or Cmd on Mac to select multiple files at once,
+	or drag and drop files into the box above.
+      </small>
+    </div>
+    <div class="form-group">
+      <label for="file-credit">File Credit</label>
+      <input class="form-control" id="file-credit" name="file-credit"
+	     required placeholder="John Harvard '20" maxlength="100">
+    </div>
+    <div class="form-group">
+      <label for="file-desc">File Description</label>
+      <input class="form-control" id="file-desc" name="file-desc"
+	     required maxlength="200"
+	     placeholder="Scenic sketch, light plot, Facebook cover photo, etc">
+      <small class="form-text text-muted">
+	Please submit this form separately for files with different
+	descriptions.
+      </small>
+    </div>
+    <button type="submit" class="btn btn-primary btn-block btn-lg">
+      Upload
+    </button>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js" crossorigin="anonymous"></script>
+{% endblock %}

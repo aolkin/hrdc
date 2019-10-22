@@ -1,0 +1,128 @@
+{% extends "archive/base.html" %}
+
+{% load bt crispy_forms_tags bootstrap %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h3 class="text-center">{{ object }}</h3>
+  </div>
+</div>
+
+<h4 class="px-5">Archival Checklist</h4>
+<ul class="px-5 fa-ul checklist">
+  <li>
+    <span class="fa-li">
+      <i class="fa {% if object.poster %}fa-check text-success{% else %}fa-times text-danger{% endif %}"></i>
+    </span>
+    Poster submitted
+  </li>
+  <li>
+    <span class="fa-li">
+      <i class="fa {% if object.program %}fa-check text-success{% else %}fa-times text-danger{% endif %}"></i>
+    </span>
+    Program submitted
+  </li>
+  <li>
+    <span class="fa-li">
+      <i class="fa {% if object.productionphoto_set.count >= numeric_options.archive_min_photos %}fa-check text-success{% else %}fa-times text-danger{% endif %}"></i>
+    </span>
+    At least {{ options.archive_min_photos }} photos submitted
+  </li>
+</ul>
+{% if object.complete %}
+<p class="px-5 lead text-info">All required materials have been submitted!</p>
+{% endif %}
+
+<h4 class="px-5">Publicity Materials</h4>
+<form method="POST" enctype="multipart/form-data">
+  {% csrf_token %}
+  <div class="row justify-content-center px-5">
+    <div class="col-sm-4">
+      <div class="form-group">
+	<label for="poster">Poster</label>
+	<div class="custom-file">
+	  <input type="file" class="custom-file-input"
+		 id="poster" name="poster">
+	  <label class="custom-file-label" for="poster">Choose file</label>
+	</div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="form-group">
+	<label for="program">Program</label>
+	<div class="custom-file">
+	  <input type="file" class="custom-file-input"
+		 id="program" name="program">
+	  <label class="custom-file-label" for="program">Choose file</label>
+	</div>
+      </div>
+    </div>
+    <div class="col-sm-4 pt-1">
+      <button type="submit" class="btn btn-primary btn-block btn btn-lg py-3">
+	Upload
+      </button>
+    </div>
+  </form>
+</div>
+<div class="row justify-content-start px-5">
+  <div class="col-sm-4">
+    Submitted poster:
+    {% if object.poster %}
+    <a href="{{ object.poster.url }}" target="_blank">
+      {{ object.poster_name }}
+    </a>
+    {% else %}
+    <span class="text-muted">&lt;none&gt;</span>
+    {% endif %}
+  </div>
+  <div class="col-sm-4">
+    Submitted program:
+    {% if object.program %}
+    <a href="{{ object.program.url }}" target="_blank">
+      {{ object.program_name }}
+    </a>
+    {% else %}
+    <span class="text-muted">&lt;none&gt;</span>
+    {% endif %}
+  </div>
+</div>
+<div class="row justify-content-center mt-2 px-5">
+  <div class="col">
+    <h4>Production Photos</h4>
+    <div class="row justify-content-start">
+      {% for photo in object.productionphoto_set.all %}
+      <div class="col-md-3 col-sm-6 col-xs-1 pb-2 px-1">
+	<a href="{{ photo.img.url }}" target="_blank"
+	   data-toggle="lightbox" data-gallery="photos"
+	   data-remote="{{ photo.img.url_preview }}">
+	  <img src="{{ photo.img.url_thumb }}" class="img-fluid img-thumbnail"
+	       data-preview="{{ photo.img.url_preview }}">
+	</a>
+      </div>
+      {% empty %}
+      <div class="col">No photos uploaded!</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<div class="row justify-content-center mt-3 px-5">
+  <div class="col">
+    <h4>Uploaded Files</h4>
+    {% for file in object.extrafile_set.all %}
+    <div>
+      {{ file.description }} by {{ file.credit }}:
+      <a href="{{ file.file.url }}" target="_blank">{{ file.filename }}</a>
+    </div>
+    {% empty %}
+    <div>No files uploaded!</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.css">
+{% endblock %}

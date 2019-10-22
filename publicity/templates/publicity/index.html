@@ -1,0 +1,64 @@
+{% extends "publicity/base.html" %}
+
+{% load bt config %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h3 class="text-center">Welcome to the Publicity Manager</h3>
+    <p>
+      Select a show from the sidebar to edit your publicity presence on the
+      public website. For help and instructions on how to use this portal,
+      please read <a href="http://apphelp.hrdctheater.org/publicity.html">
+      this page</a>.
+    </p>
+  </div>
+</div>
+
+{% if request.user.show_set.exists %}
+<h3 class="text-center">Your Shows</h3>
+<table class="table table-responsive bt-table-responsive table-striped">
+  <thead>
+    <tr>
+      <th class="table-col-md">Show</th>
+      <th class="table-col-sm table-col-desktop">Season</th>
+      <th class="table-col-md">Executive Staff</th>
+      <th class="table-col-md">Next Performance</th>
+      <th class="table-col-md">Website Link</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for show in request.user.show_set.all %}
+    {% if show.publicity_info %}
+    {% with meta=show.publicity_info %}
+    <tr>
+      <td>{{ show.title }}</td>
+      <td>{{ show.seasonstr }}</td>
+      <td>{{ show.people }}</td>
+      <td>{{ meta.next_performance|default:"-" }}</td>
+      <td>
+	{% if meta.website_page %}
+	<a href="{{ meta.website_page }}">{{ meta.website_page }}</a>
+	{% else %}
+	<small class="text-muted">Unknown or not yet linked</small>
+	{% endif %}
+      </td>
+    </tr>
+    {% endwith %}
+    {% endif %}
+    {% endfor %}
+</table>
+{% endif %}
+
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    {% if not perms.publicity.add_publicityinfo %}
+    <p class="text-muted text-center">
+      Please contact <a href="mailto:{% option 'pub_contact_email' %}">
+      {% option 'pub_contact_name' %}</a> to have your shows added to the
+      publicity manager.
+    </p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
