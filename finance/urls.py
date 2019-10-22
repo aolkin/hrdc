@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'^show/(?P<pk>\d+)/budget/$', BudgetView.as_view(), name="budget"),
     url(r'^show/(?P<pk>\d+)/expenses/$', ExpenseView.as_view(),
         name="expenses"),
+    url(r'^tax-certificate/$', view_tax_certificate, name="tax_certificate"),
 ]
