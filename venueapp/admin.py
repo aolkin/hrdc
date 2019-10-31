@@ -51,9 +51,9 @@ class RoleAdmin(admin.ModelAdmin):
     fields = (
         ("category", "name"),
         ("statement_length", "accepts_attachment"),
-        ("other",),
+        ("archived",),
     )
     list_display = ("__str__", "category", "statement_length",
-                    "accepts_attachment",)
-    list_filter = "category",
+                    "accepts_attachment", "archived")
+    list_filter = "category", "archived"
     inlines = QuestionInline,

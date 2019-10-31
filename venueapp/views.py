@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from django.views.generic import TemplateView
-from django.views.generic.detail import DetailView
+from django.views.generic import TemplateView, View
+from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.views.generic.edit import FormView, CreateView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
@@ -9,7 +9,10 @@ from django.forms import widgets
 from django.contrib import messages    
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 from utils import InitializedLoginMixin, UserStaffMixin, ShowStaffMixin
+
+from itertools import groupby
 
 from .models import *
 
@@ -83,7 +86,7 @@ class VenueSelectionForm(forms.Form):
         queryset=VenueApp.objects.live(),
         widget=widgets.CheckboxSelectMultiple)
 
-class ApplicationFormMixin(MenuMixin, InitializedLoginMixin):
+class ApplicationFormMixin:
     template_name = "venueapp/application.html"
 
     def get_forms(self):
@@ -113,7 +116,8 @@ class ApplicationFormMixin(MenuMixin, InitializedLoginMixin):
             kwargs['show_form'], kwargs["app_form"], kwargs["venue_form"] = self.get_forms()
         return super().get_context_data(**kwargs)
 
-class NewApplication(ApplicationFormMixin, TemplateView):
+class NewApplication(ApplicationFormMixin, MenuMixin, InitializedLoginMixin,
+                     TemplateView):
     def post(self, request, *args, **kwargs):
         show_form, app_form, venue_form = self.get_forms()
         if (show_form.is_valid() and app_form.is_valid() and
@@ -134,7 +138,8 @@ class NewApplication(ApplicationFormMixin, TemplateView):
             return self.render_to_response(self.get_context_data(
                 show_form=show_form, app_form=app_form, venue_form=venue_form))
 
-class UpdateApplication(ApplicationFormMixin, DetailView):
+class UpdateApplication(ApplicationFormMixin, MenuMixin, UserStaffMixin,
+                        DetailView):
     model = Application
 
     def post(self, request, *args, **kwargs):
@@ -150,3 +155,73 @@ class UpdateApplication(ApplicationFormMixin, DetailView):
         else:
             return self.render_to_response(self.get_context_data(
                 show_form=show_form, app_form=app_form, venue_form=venue_form))
+
+class RoleChoiceIterator(forms.models.ModelChoiceIterator):
+    def __iter__(self):
+        for group, objs in groupby(self.queryset,
+                                   lambda r: r.get_category_display()):
+            yield (group, [self.choice(obj) for obj in objs])
+
+class RoleChoiceField(forms.ModelChoiceField):
+    iterator = RoleChoiceIterator
+
+class StaffMemberForm(forms.ModelForm):
+    role = RoleChoiceField(queryset=StaffRole.objects.active())
+    class Meta:
+        model = StaffMember
+        fields = "role", "other_role"
+
+StaffFormSet = forms.inlineformset_factory(
+    Application, StaffMember, form=StaffMemberForm,
+    fields=("role", "other_role"), extra=0,
+)
+
+class AddStaffMemberForm(forms.Form):
+    role = RoleChoiceField(queryset=StaffRole.objects.active())
+    email = forms.EmailField()
+
+class StaffView(MenuMixin, UserStaffMixin, DetailView):
+    template_name = "venueapp/staff.html"
+    model = Application
+
+    def get_form(self):
+        form_args = {}
+        if self.request.method in ('POST', 'PUT'):
+            form_args.update({
+                'data': self.request.POST,
+                'files': self.request.FILES,
+            })
+        return StaffFormSet(
+            **form_args,
+            instance=hasattr(self, "object") and self.object or None
+        )
+
+    def get_context_data(self, **kwargs):
+        if 'form' not in kwargs:
+            kwargs['form'] = self.get_form()
+        kwargs["add_form"] = AddStaffMemberForm()
+        return super().get_context_data(**kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Staff list updated.")
+        return self.render_to_response(self.get_context_data(form=form))
+
+class AddStaffView(UserStaffMixin, SingleObjectMixin, View):
+    model = Application
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = AddStaffMemberForm(self.request.POST)
+        if form.is_valid():
+            user, uc = get_user_model().objects.get_or_create(
+                email=form.cleaned_data["email"])
+            staff = StaffMember.objects.create_from_user(
+                self.object, user, role=form.cleaned_data["role"])
+            messages.success(request, "Staff member added.")
+        else:
+            messages.error(request, "Failed to add staff member.")
+        return redirect("venueapp:staff", self.object.pk)

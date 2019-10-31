@@ -1,0 +1,27 @@
+.other-field {
+    display: none;
+}
+
+.role-field .select2-container .select2-selection--single {
+    height: 38px;
+    padding-top: 4px;
+}
+
+.role-field .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 35px;
+}
+
+.staff-form.pending-delete {
+    opacity: 0.5;
+}
+.staff-form.pending-delete :not(.deletion-message) {
+    text-decoration: line-through;
+}
+.staff-form .deletion-message {
+    display: none;
+}
+.staff-form.pending-delete .deletion-message {
+    display: block;
+    margin-top: -1rem;
+    margin-bottom: 1rem;
+}

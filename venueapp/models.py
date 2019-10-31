@@ -108,6 +108,10 @@ class SeasonStaffMeta(Season):
     def __str__(self):
         return str(self.user)
 
+class RoleManager(models.Manager):
+    def active(self):
+        return self.filter(archived=False)
+
 class StaffRole(models.Model):
     CATEGORIES = (
         (5, "Author"),
@@ -125,7 +129,13 @@ class StaffRole(models.Model):
     statement_length = models.PositiveIntegerField(default=0)
     accepts_attachment = models.BooleanField(default=False)
 
-    other = models.BooleanField(default=False)
+    archived = models.BooleanField(default=False)
+
+    objects = RoleManager()
+
+    @property
+    def other(self):
+        return self.category == 60
 
     class Meta:
         ordering = "category", "name"
@@ -136,8 +146,15 @@ class StaffRole(models.Model):
 class RoleQuestion(AbstractQuestion):
     role = models.ForeignKey(StaffRole, on_delete=models.CASCADE)
 
+class MemberManager(models.Manager):
+    def create_from_user(self, show, user, **kwargs):
+        meta, created = SeasonStaffMeta.objects.get_or_create_in_season(
+            show.show, user=user)
+        return self.create(show=show, person=meta, **kwargs)
+
 class StaffMember(models.Model):
-    show = models.ForeignKey(Application, on_delete=models.CASCADE)
+    show = models.ForeignKey(Application, on_delete=models.CASCADE,
+                             db_index=True)
     person = models.ForeignKey(SeasonStaffMeta,
                                on_delete=models.CASCADE)
     signed_on = models.BooleanField(default=False)
@@ -147,21 +164,44 @@ class StaffMember(models.Model):
     statement = models.TextField(blank=True)
     attachment = models.FileField(blank=True)
 
+    objects = MemberManager()
+
     @property
-    def seasonmeta(self):
-        return SeasonStaffMeta.objects.get_or_create_in_season(self.show.show,
-                                                               user=self.person)
+    def supplement_status(self):
+        statement = bool(self.statement) or self.role.statement_length == 0
+        attachment = bool(self.attachment) or not self.role.accepts_attachment
+        return statement and attachment
+
+    @property
+    def question_status(self):
+        return (
+            self.role.rolequestion_set.filter(required=True).count() <=
+            self.roleanswer_set.exclude(answer="").count()
+        )
 
     @property
     def role_name(self):
-        self.other_role if self.role.other else str(self.role)
+        return self.other_role if self.role.other else str(self.role)
 
     def __str__(self):
         return "{}: {}".format(self.role_name, self.person)
 
+    class Meta:
+        ordering = "role__category", "role__name", "other_role"
+
+@receiver(pre_save)
+def coerce_role(sender, instance, raw, **kwargs):
+    if sender == StaffMember and not raw:
+        if instance.role.other:
+            role = StaffRole.objects.filter(name__iexact=instace.other_role)
+            if role.exists():
+                instance.role = role[0]
+        if not instance.role.other:
+            instance.other_role = ""
+
 @receiver(post_save)
 def add_show_staff(sender, instance, created, raw, **kwargs):
-    if sender == StaffMember:
+    if sender == StaffMember and not raw:
         if instance.role.category == 10:
             instance.show.show.staff.add(instance.person.user)
         else:

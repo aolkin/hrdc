@@ -79,7 +79,8 @@ class UserStaffMixin:
     @method_decorator(login_required)
     @method_decorator(user_is_initialized)
     def dispatch(self, *args, **kwargs):
-        if not self.request.user.show_set.contains(self.get_object().show):
+        if not self.request.user.show_set.filter(
+                pk=self.get_object().show.pk).exists():
             return PermissionDenied
         return super().dispatch(*args, **kwargs)
 

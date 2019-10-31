@@ -1,0 +1,115 @@
+{% extends "venueapp/base.html" %}
+
+{% load bt crispy_forms_tags bootstrap %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h3 class="text-center">{{ object }} Staff</h3>
+  </div>
+</div>
+
+<div class="row justify-content-center">
+  <form method="POST" class="col">
+    {% csrf_token %}
+    {{ form.management_form }}
+    {% for form in form %}
+    <div class="staff-form">
+      <div class="row">
+	{{ form.id }}
+	<div class="col-md-3 col-sm-4 role-field">
+	  {{ form.role|as_crispy_field }}
+	</div>
+	<div class="col-md-3 col-sm-4 other-field">
+	  {{ form.other_role|as_crispy_field }}
+	</div>
+	<div class="col-md-3 col-sm-4 person-field">
+	  <div class="form-group">
+            <label class="col-form-label">Person</label>
+	    <input readonly class="form-control-plaintext"
+		   value="{{ form.instance.person }}">
+	  </div>
+	</div>
+	<div class="col-md-1 col-sm-3">
+	  <div class="form-group text-center">
+            <label class="col-form-label">Signed&nbsp;On</label>
+	    <div class="form-control-plaintext">
+	      {% include "venueapp/checkmark.html" with value=form.instance.signed_on only %}
+	    </div>
+	  </div>
+	</div>
+	<div class="col-md-1 col-sm-3">
+	  <div class="form-group text-center">
+            <label class="col-form-label">Resume</label>
+	    <div class="form-control-plaintext">
+	      {% include "venueapp/checkmark.html" with value=form.instance.person.resume only %}
+	    </div>
+	  </div>
+	</div>
+	<div class="col-md-1 col-sm-3">
+	  <div class="form-group text-center">
+            <label class="col-form-label">Conflicts</label>
+	    <div class="form-control-plaintext">
+	      {% include "venueapp/checkmark.html" with value=form.instance.person.conflicts only %}
+	    </div>
+	  </div>
+	</div>
+	<div class="col-md-1 col-sm-3">
+	  <div class="form-group text-center">
+            <label class="col-form-label">Supplement</label>
+	    <div class="form-control-plaintext">
+	      {% include "venueapp/checkmark.html" with value=form.instance.supplement_status only %}
+	    </div>
+	  </div>
+	</div>
+	<div class="col-md-1 col-sm-3">
+	  <div class="form-group text-center">
+            <label class="col-form-label">Questions</label>
+	    <div class="form-control-plaintext">
+	      {% include "venueapp/checkmark.html" with value=form.instance.question_status only %}
+	    </div>
+	  </div>
+	</div>
+	<div class="col-md-1 col-sm-3 mt-3">
+	  <button type="button"
+		  class="btn btn-sm btn-danger mt-4 remove-person">
+	    <i class="fa fa-minus-square"></i>
+	  </button>
+	</div>
+      </div>
+      <div class="text-center deletion-message">
+	You must save changes to confirm deletion of this staff member.
+      </div>
+      <div class="d-none">
+	{{ form.DELETE|as_crispy_field }}
+      </div>
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary btn-block">
+      Save Changes
+    </button>
+  </form>
+</div>
+
+<form method="POST" action="{% url 'venueapp:add_staff' object.pk %}">
+  {% csrf_token %}
+  <div class="row justify-content-center mt-5">
+    <div class="col-md-4 col-sm-6 role-field">
+      {{ add_form.role|as_crispy_field }}
+    </div>
+    <div class="col-md-4 col-sm-6">
+      {{ add_form.email|as_crispy_field }}
+    </div>
+    <div class="col-md-3 col-sm-8 mt-3">
+      <div class="form-group mt-1">
+	<button type="submit" class="btn btn-secondary mt-3 form-control">
+	  Invite Staff Member
+	</button>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}
