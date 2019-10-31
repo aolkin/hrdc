@@ -81,7 +81,7 @@ class UserStaffMixin:
     def dispatch(self, *args, **kwargs):
         if not self.request.user.show_set.filter(
                 pk=self.get_object().show.pk).exists():
-            return PermissionDenied
+            raise PermissionDenied()
         return super().dispatch(*args, **kwargs)
 
     

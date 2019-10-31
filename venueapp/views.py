@@ -221,7 +221,8 @@ class AddStaffView(UserStaffMixin, SingleObjectMixin, View):
                 email=form.cleaned_data["email"])
             staff = StaffMember.objects.create_from_user(
                 self.object, user, role=form.cleaned_data["role"])
-            messages.success(request, "Staff member added.")
+            # TODO Send email to staff member with instructions
+            messages.success(request, "Staff member invited. They must now log in themselves to upload their resume and sign on to the show.")
         else:
             messages.error(request, "Failed to add staff member.")
         return redirect("venueapp:staff", self.object.pk)

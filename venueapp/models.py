@@ -193,7 +193,7 @@ class StaffMember(models.Model):
 def coerce_role(sender, instance, raw, **kwargs):
     if sender == StaffMember and not raw:
         if instance.role.other:
-            role = StaffRole.objects.filter(name__iexact=instace.other_role)
+            role = StaffRole.objects.filter(name__iexact=instance.other_role)
             if role.exists():
                 instance.role = role[0]
         if not instance.role.other:
@@ -227,6 +227,7 @@ class BudgetLine(models.Model):
     show = models.ForeignKey(Application, on_delete=models.CASCADE,
                              db_index=True)
     venue = models.ForeignKey(VenueApp, on_delete=models.CASCADE, db_index=True)
+
     category = models.PositiveSmallIntegerField(choices=BUDGET_CATEGORIES,
                                                 default=10)
     name = models.CharField(max_length=80)
