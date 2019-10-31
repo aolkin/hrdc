@@ -12,6 +12,16 @@
       <a href="http://apphelp.hrdctheater.org/finance.html">
       this page</a>.
     </p>
+    {% if options.finance_tax_certificate and request.user.is_season_pdsm or request.user.is_board %}
+    <p>
+      All purchases made towards productions are tax exempt, so please make
+      sure to use <a href="{% url 'finance:tax_certificate' %}">this tax
+      exemption certificate</a> when purchasing with a p-card or personal funds
+      (sales tax will not be reimbursed). Contact
+      <a href="mailto:{% option 'fin_contact_email' %}">
+	{% option 'fin_contact_name' %}</a> with any questions about this.
+    </p>
+    {% endif %}
   </div>
 </div>
 

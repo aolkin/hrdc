@@ -12,6 +12,7 @@ Here are some writeups and instructions on how to use the HRDC web applications:
 - [Common Casting for Actors](/actors.html) - updated Feb 2019
 - [Finance Manager (aimed at PDSMs)](/finance.html) - updated Sep 2019
 - [Publicity Manager (aimed at PDSMs)](/publicity.html) - updated Sep 2019
+- [Archive Tool (aimed at PDSMs)](/archival.html) - updated Oct 2019
 
 ## Help and Support
 

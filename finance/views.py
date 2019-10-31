@@ -7,6 +7,7 @@ from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django import forms
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
     
 from utils import InitializedLoginMixin
 
@@ -240,3 +241,8 @@ class ExpenseView(MenuMixin, ShowStaffMixin, TemplateView):
             )
         )
         return context
+
+def view_tax_certificate(request):
+    if request.user.is_season_pdsm or request.user.is_board:
+        return redirect(config.finance_tax_certificate)
+    raise PermissionDenied()
