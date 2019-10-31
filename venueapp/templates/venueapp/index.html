@@ -1,19 +1,45 @@
-{% extends "bt/default.html" %}
-
-{% block title %}Venue Applications{% endblock %}
+{% extends "venueapp/base.html" %}
 
 {% load bt %}
 
 {% block content %}
-
-{% include "dramaorg/user_dropdown.html" %}
-
 <div class="row justify-content-center">
   <div class="col-md-8">
-    <h3 class="text-center">Welcome</h3>
+    <h3 class="text-center">Apply to put on a show!</h3>
     <p>
-      <a href="{% url 'venueapp:form' %}">Go to the form</a>
+      <a href="{% url 'venueapp:new' %}">Create a new application</a>
     </p>
   </div>
 </div>
+
+{% if request.user.show_set.exists %}
+<h3 class="text-center">Your Shows</h3>
+<table class="table table-responsive bt-table-responsive table-striped">
+  <thead>
+    <tr>
+      <th class="table-col-md">Show</th>
+      <th class="table-col-sm table-col-desktop">Season</th>
+      <th class="table-col-lg">Executive Staff</th>
+      <th class="text-center">Submitted</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for show in request.user.show_set.all %}
+    {% if show.application %}
+    {% with meta=show.application %}
+    <tr>
+      <td>{{ show.title }}</td>
+      <td>{{ show.seasonstr }}</td>
+      <td>{{ show.people }}</td>
+      <td class="text-center">
+	<i class="fa {% if meta.full_submitted %}fa-check text-success{% else %}fa-times text-danger{% endif %}"></i>
+	{% if meta.full_submitted %}{{ meta.full_submitted }}{% endif %}
+      </td>
+    </tr>
+    {% endwith %}
+    {% endif %}
+    {% endfor %}
+</table>
+{% endif %}
+
 {% endblock %}

@@ -1,8 +1,9 @@
 from django.db.utils import OperationalError, ProgrammingError
 from django.db.models import Q
-
+from django.views.generic.detail import SingleObjectMixin
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core.exceptions import PermissionDenied
 
 from importlib import import_module
 from django.conf import settings
@@ -57,6 +58,29 @@ class InitializedLoginMixin:
     @method_decorator(login_required)
     @method_decorator(user_is_initialized)
     def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+
+class ShowStaffMixin(InitializedLoginMixin, SingleObjectMixin):
+    test_silent = False
+    
+    def test_func(self):
+        if super().test_func():
+            if self.get_object().show.user_is_staff(self.request.user):
+                return True
+            else:
+                if not self.test_silent:
+                    messages.error(self.request, "You are not a member of the "
+                                   "executive staff of that show. Log in as a "
+                                   "different user?")
+        return False
+
+class UserStaffMixin:
+    @method_decorator(login_required)
+    @method_decorator(user_is_initialized)
+    def dispatch(self, *args, **kwargs):
+        if not self.request.user.show_set.contains(self.get_object().show):
+            return PermissionDenied
         return super().dispatch(*args, **kwargs)
 
     

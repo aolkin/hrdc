@@ -3,9 +3,10 @@ from django.contrib import auth
 from django.conf import settings
 from django.utils import timezone
 from django.db.models.functions import Concat
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.contrib.auth.signals import user_logged_in
 from django.dispatch import receiver
+from django.utils.text import slugify
 
 from django.core.exceptions import ValidationError
 
@@ -241,10 +242,24 @@ class Season(models.Model):
         abstract = True
 
 class Show(Season):
+    TYPES = (
+        ("play", "Play"),
+        ("musical", "Musical or Opera"),
+        ("dance", "Dance Performance"),
+        ("devised", "Devised Piece"),
+        ("workshop", "Workshop"),
+        ("other", "Other"),
+    )
+
     title = models.CharField(max_length=150)
 
-    creator_credit = models.CharField(max_length=300, blank=True)
-    group_affiliation = models.CharField(max_length=40, blank=True)
+    creator_credit = models.CharField(max_length=300,
+                                      verbose_name="Author/Creator")
+    affiliation = models.CharField(
+        max_length=60, blank=True, verbose_name="Sponsorship/Affiliation",
+        help_text="Producing or sponsoring group, if applicable.")
+    prod_type = models.CharField(default="play", choices=TYPES, max_length=30,
+                                 verbose_name="Production Type")
     
     staff = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
     space = models.ForeignKey(Space, null=True, on_delete=models.SET_NULL,
@@ -292,7 +307,8 @@ class Show(Season):
     def enabled_apps(self):
         return [v.related_model.__module__.partition(".")[0]
                 for k, v in self._meta.fields_map.items()
-                if type(v) == models.OneToOneRel and hasattr(self, k)]
+                if type(v) == models.OneToOneRel and hasattr(self, k) and
+                k != "application"]
     
     @property
     def apps_str(self):
@@ -303,15 +319,14 @@ class Show(Season):
             ("change_current_season", "Can change the current season"),
         )
 
-class StaffMember(models.Model):
-    show = models.ForeignKey(Show, on_delete=models.CASCADE)
-    person = models.ForeignKey(settings.AUTH_USER_MODEL,
-                               on_delete=models.CASCADE)
-
-    role = models.CharField(max_length=32)
-    executive = models.BooleanField(default=True)
-    
-    advisor = models.BooleanField(default=False)
-    assistant = models.BooleanField(default=False)
-    
-    # Write code to clean/coerce roles
+@receiver(pre_save)
+def fix_slug(sender, instance, raw, *args, **kwargs):
+    if sender == Show and not raw:
+        if not instance.slug:
+            instance.slug = slugify(instance.title)
+        i = 2
+        slug = instance.slug
+        while Show.objects.filter(slug=instance.slug).exclude(
+                pk=instance.pk).exists():
+            instance.slug = "{}-{}".format(slug, i)
+            i += 1

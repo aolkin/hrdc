@@ -1,0 +1,33 @@
+{% extends "venueapp/base.html" %}
+
+{% load bt crispy_forms_tags bootstrap %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    {% if object %}
+    <h3 class="text-center">{{ object }}</h3>
+    {% else %}
+    <h3 class="text-center">Start a New Application</h3>
+    {% endif %}
+  </div>
+</div>
+<div class="row justify-content-center">
+  <form method="POST" class="col-md-8" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ venue_form|crispy }}
+    {% if venue_form.errors %}
+    <strong class="text-danger">Please select at least one venue.</strong>
+    {% endif %}
+    {{ show_form|crispy }}
+    {{ app_form|crispy }}
+    <button type="submit" class="btn btn-primary btn-block btn-lg">
+      {% if object %}
+      Save Changes
+      {% else %}
+      Create Application
+      {% endif %}
+    </button>
+  </form>
+</div>
+{% endblock %}
