@@ -11,10 +11,7 @@
     </div>
     {% endif %}
     <h3 class="text-center">Preferred Residencies for {{ object }}</h3>
-    <p class="mt-3 lead text-center">
-      To add or remove venues, use the
-      <a href="{% url 'venueapp:details' object.pk %}">Show Details</a> page
-    </p>
+    {% include "venueapp/pieces/addremove_venues.html" %}
     <p class="mt-3 text-center">
       Rank your preferred residencies below starting with 1 being your top priority. For venues without specific dates listed for each slot, you may enter the same preference for multiple slots to denote multi-week residencies. Elaborate on your length preferences at the bottom of the page.
     </p>

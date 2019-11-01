@@ -31,44 +31,19 @@
 	  </div>
 	</div>
 	<div class="col-md-1 col-sm-3">
-	  <div class="form-group text-center">
-            <label class="col-form-label">Signed&nbsp;On</label>
-	    <div class="form-control-plaintext">
-	      {% include "venueapp/checkmark.html" with value=form.instance.signed_on only %}
-	    </div>
-	  </div>
+	  {% include "venueapp/pieces/checkmark_group.html" with name="Signed&nbsp;On" value=form.instance.signed_on only %}
 	</div>
 	<div class="col-md-1 col-sm-3">
-	  <div class="form-group text-center">
-            <label class="col-form-label">Resume</label>
-	    <div class="form-control-plaintext">
-	      {% include "venueapp/checkmark.html" with value=form.instance.person.resume only %}
-	    </div>
-	  </div>
+	  {% include "venueapp/pieces/checkmark_group.html" with name="Resume" value=form.instance.person.resume only %}
 	</div>
 	<div class="col-md-1 col-sm-3">
-	  <div class="form-group text-center">
-            <label class="col-form-label">Conflicts</label>
-	    <div class="form-control-plaintext">
-	      {% include "venueapp/checkmark.html" with value=form.instance.person.conflicts only %}
-	    </div>
-	  </div>
+	  {% include "venueapp/pieces/checkmark_group.html" with name="Conflicts" value=form.instance.person.conflicts only %}
 	</div>
 	<div class="col-md-1 col-sm-3">
-	  <div class="form-group text-center">
-            <label class="col-form-label">Supplement</label>
-	    <div class="form-control-plaintext">
-	      {% include "venueapp/checkmark.html" with value=form.instance.supplement_status only %}
-	    </div>
-	  </div>
+	  {% include "venueapp/pieces/checkmark_group.html" with name="Supplement" value=form.instance.supplement_status only %}
 	</div>
 	<div class="col-md-1 col-sm-3">
-	  <div class="form-group text-center">
-            <label class="col-form-label">Questions</label>
-	    <div class="form-control-plaintext">
-	      {% include "venueapp/checkmark.html" with value=form.instance.question_status only %}
-	    </div>
-	  </div>
+	  {% include "venueapp/pieces/checkmark_group.html" with name="Questions" value=form.instance.question_status only %}
 	</div>
 	<div class="col-md-1 col-sm-3 mt-3">
 	  <button type="button"

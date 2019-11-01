@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
-from django.db.models.signals import post_save, pre_delete, pre_save
+from django.db.models.signals import (post_save, pre_delete, pre_save,
+                                      m2m_changed)
 from django.dispatch import receiver
 
 from django.conf import settings
@@ -103,11 +104,18 @@ class Application(models.Model):
         return self.show.seasonstr()
     venuestr.short_description = "Venues"
 
-@receiver(post_save)
-def clean_venues(sender, instance, created, raw, **kwargs):
-    if sender == Application and not raw:
-        SlotPreference.objects.filter(app=instance).exclude(
-            venue__in=instance.venues.all()).delete()
+def update_venues(sender, instance, **kwargs):
+    SlotPreference.objects.filter(app=instance).exclude(
+        venue__in=instance.venues.all()).delete()
+    BudgetLine.objects.filter(show=instance).exclude(
+        venue__in=instance.venues.all()).delete()
+    for venue in instance.venues.all():
+        if not BudgetLine.objects.filter(show=instance, venue=venue).exists():
+            for line in DefaultBudgetLine.objects.filter(
+                    venue=venue).values("venue_id", "category", "name",
+                                        "amount", "notes"):
+                BudgetLine.objects.create(show=instance, required=True, **line)
+m2m_changed.connect(update_venues, sender=Application.venues.through)
 
 class AbstractAnswer(models.Model):
     answer = models.TextField()
@@ -241,20 +249,17 @@ class RoleAnswer(AbstractAnswer):
     question = models.ForeignKey(RoleQuestion, on_delete=models.PROTECT)
     person = models.ForeignKey(StaffMember, on_delete=models.CASCADE)
 
-class BudgetLine(models.Model):
+class AbstractBudgetLine(models.Model):
     BUDGET_CATEGORIES = (
         (0, "Income"),
-        (10, "Administrative Expense"),
-        (20, "Production Expense"),
-        (50, "Other Expense"),
+        (10, "Administrative Expenses"),
+        (20, "Production Expenses"),
+        (50, "Other Expenses"),
     )
-    
-    show = models.ForeignKey(Application, on_delete=models.CASCADE,
-                             db_index=True)
-    venue = models.ForeignKey(VenueApp, on_delete=models.CASCADE, db_index=True)
 
-    category = models.PositiveSmallIntegerField(choices=BUDGET_CATEGORIES,
-                                                default=10)
+    venue = models.ForeignKey(VenueApp, on_delete=models.CASCADE, db_index=True)
+    category = models.PositiveSmallIntegerField(
+        choices=BUDGET_CATEGORIES, default=10)
     name = models.CharField(max_length=80)
     amount = models.DecimalField(decimal_places=2, max_digits=7, default=0)
     notes = models.CharField(max_length=255, blank=True)
@@ -263,7 +268,19 @@ class BudgetLine(models.Model):
         return "{} - {}".format(self.get_category_display(), self.name)
 
     class Meta:
+        abstract = True
+
+class BudgetLine(AbstractBudgetLine):    
+    show = models.ForeignKey(
+        Application, on_delete=models.CASCADE, db_index=True)
+    required = models.BooleanField(default=False)
+
+    class Meta:
         ordering = "show", "venue", "category",
+
+class DefaultBudgetLine(AbstractBudgetLine):
+    class Meta:
+        ordering = "venue", "category"
 
 class SlotPreference(models.Model):
     app = models.ForeignKey(Application, on_delete=models.CASCADE)

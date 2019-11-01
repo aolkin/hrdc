@@ -6,6 +6,10 @@ class ResidencyInline(admin.TabularInline):
     model = AvailableResidency
     extra = 1
 
+class DefaultBudgetInline(admin.TabularInline):
+    model = DefaultBudgetLine
+    extra = 1
+
 @admin.register(VenueApp)
 class VenueAdmin(admin.ModelAdmin):
     fields = (
@@ -16,7 +20,7 @@ class VenueAdmin(admin.ModelAdmin):
         ("questions",),
     )
     autocomplete_fields = "managers", "readers",
-    inlines = ResidencyInline,
+    inlines = ResidencyInline, DefaultBudgetInline
 
 class StaffInline(admin.TabularInline):
     model = StaffMember

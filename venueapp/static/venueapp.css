@@ -1,3 +1,7 @@
+.venue-removal-warning {
+    display: none;
+}
+
 .other-field {
     display: none;
 }
@@ -11,16 +15,16 @@
     height: 35px;
 }
 
-.staff-form.pending-delete {
+.pending-delete {
     opacity: 0.5;
 }
-.staff-form.pending-delete :not(.deletion-message) {
+.pending-delete :not(.deletion-message) {
     text-decoration: line-through;
 }
-.staff-form .deletion-message {
+.deletion-message {
     display: none;
 }
-.staff-form.pending-delete .deletion-message {
+.pending-delete .deletion-message {
     display: block;
     margin-top: -1rem;
     margin-bottom: 1rem;
@@ -31,4 +35,19 @@
 }
 .view-residencies tbody td, .view-residencies tbody th {
     vertical-align: middle;
+}
+
+.view-budget .nav-tabs {
+    padding: 0 25px;
+    margin: 0 -25px 1rem;
+}
+
+.view-budget .tab-content {
+    margin: -25px;
+    padding: 25px;
+}
+
+.view-budget .nav-tabs .nav-link.active, .view-budget .tab-content {    
+    background-color: #E8E8E8;
+    border-bottom: none;
 }

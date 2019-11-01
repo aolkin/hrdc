@@ -45,8 +45,8 @@ class MenuMixin:
         urls = [
             ("Show Details", "venueapp:details"),
             ("Staff", "venueapp:staff"),
-            ("Residencies", "venueapp:residencies"),
-            ("Budget", "venueapp:budget"),
+            ("Residency", "venueapp:residencies"),
+            ("Budget(s)", "venueapp:budget"),
             ("Questions", "venueapp:questions"),
             ("Submit", "venueapp:submit"),
         ]
@@ -91,7 +91,7 @@ class VenueSelectionForm(forms.Form):
         widget=widgets.CheckboxSelectMultiple)
 
 class ApplicationFormMixin:
-    template_name = "venueapp/application.html"
+    template_name = "venueapp/details.html"
 
     def get_forms(self):
         form_args = {}
@@ -166,6 +166,35 @@ class RoleChoiceIterator(forms.models.ModelChoiceIterator):
                                    lambda r: r.get_category_display()):
             yield (group, [self.choice(obj) for obj in objs])
 
+class FormMixin:
+    def get_form(self):
+        form_args = {}
+        if self.request.method in ('POST', 'PUT'):
+            form_args.update({
+                'data': self.request.POST,
+                'files': self.request.FILES,
+            })
+        return self.form_class(
+            **form_args,
+            instance=hasattr(self, "object") and self.object or None
+        )
+
+    def get_context_data(self, **kwargs):
+        if 'form' not in kwargs:
+            kwargs['form'] = self.get_form()
+        return super().get_context_data(**kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            form.save()
+            messages.success(request, self.get_success_message(form))
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def get_success_message(self, form):
+        return "Success!"
+
 class RoleChoiceField(forms.ModelChoiceField):
     iterator = RoleChoiceIterator
 
@@ -184,35 +213,17 @@ class AddStaffMemberForm(forms.Form):
     role = RoleChoiceField(queryset=StaffRole.objects.active())
     email = forms.EmailField()
 
-class StaffView(MenuMixin, UserStaffMixin, DetailView):
+class StaffView(MenuMixin, UserStaffMixin, FormMixin, DetailView):
     template_name = "venueapp/staff.html"
     model = Application
-
-    def get_form(self):
-        form_args = {}
-        if self.request.method in ('POST', 'PUT'):
-            form_args.update({
-                'data': self.request.POST,
-                'files': self.request.FILES,
-            })
-        return StaffFormSet(
-            **form_args,
-            instance=hasattr(self, "object") and self.object or None
-        )
+    form_class = StaffFormSet
 
     def get_context_data(self, **kwargs):
-        if 'form' not in kwargs:
-            kwargs['form'] = self.get_form()
         kwargs["add_form"] = AddStaffMemberForm()
         return super().get_context_data(**kwargs)
 
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        form = self.get_form()
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Staff list updated.")
-        return self.render_to_response(self.get_context_data(form=form))
+    def get_success_message(self, form):
+        return "Staff list updated."
 
 class AddStaffView(UserStaffMixin, SingleObjectMixin, View):
     model = Application
@@ -344,3 +355,43 @@ class ResidencyView(MenuMixin, UserStaffMixin, DetailView):
                 messages.warning(
                     request, "No residency preferences saved!")
         return self.get(request, *args, **kwargs)
+
+BudgetFormSet = forms.inlineformset_factory(
+    Application, BudgetLine,
+    fields=("name", "amount", "notes"), extra=0,
+)
+
+class AddBudgetLineForm(forms.ModelForm):
+    class Meta:
+        model = BudgetLine
+        fields = ("venue", "category", "name", "amount", "notes")
+
+class BudgetView(MenuMixin, UserStaffMixin, FormMixin, DetailView):
+    template_name = "venueapp/budget.html"
+    model = Application
+    form_class = BudgetFormSet
+
+    def get_context_data(self, **kwargs):
+        kwargs["add_form"] = AddBudgetLineForm()
+        return super().get_context_data(**kwargs)
+
+    def get_success_message(self, form):
+        return "Budget{} updated.".format(
+            "s" if self.object.venues.all().count() != 1 else "")
+
+class AddBudgetView(UserStaffMixin, SingleObjectMixin, View):
+    model = Application
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = AddBudgetLineForm(self.request.POST)
+        if form.is_valid():
+            user, uc = get_user_model().objects.get_or_create(
+                email=form.cleaned_data["email"])
+            budget = BudgetLine.objects.create_from_user(
+                self.object, user, role=form.cleaned_data["role"])
+            # TODO Send email to budget member with instructions
+            messages.success(request, "Budget member invited. They must now log in themselves to upload their resume and sign on to the show.")
+        else:
+            messages.error(request, "Failed to add budget member.")
+        return redirect("venueapp:budget", self.object.pk)

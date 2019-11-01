@@ -15,10 +15,17 @@
 <div class="row justify-content-center">
   <form method="POST" class="col-md-8" enctype="multipart/form-data">
     {% csrf_token %}
+
     {{ venue_form|crispy }}
     {% if venue_form.errors %}
     <strong class="text-danger">Please select at least one venue.</strong>
     {% endif %}
+    {% if object %}
+    <div class="alert alert-danger venue-removal-warning">
+      Removing venues will permanently delete all portions of your application specific to that venue (such as residency preferences, budgets, etc). Please make sure you intend to do so before saving your changes.
+    </div>
+    {% endif %}
+
     {{ show_form|crispy }}
     {{ app_form|crispy }}
     <button type="submit" class="btn btn-primary btn-block btn-lg">

@@ -10,7 +10,7 @@ from shortlinks.views import link
 urlpatterns = [
     url(r'^', include("dramaorg.urls")),
     url(r'^autocomplete/$', autocomplete_json),
-    url(r'^apply/', include("venueapp.urls")),
+    url(r'^venues/', include("venueapp.urls")),
     url(r'^casting/', include("casting.urls")),
     url(r'^publicity/', include("publicity.urls")),
     url(r'^finance/', include("finance.urls")),
