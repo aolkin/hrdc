@@ -47,7 +47,7 @@
 	  <td rowspan="{{ slot.weeks }}" class="text-center">
 	    {% if slot %}
 	    <div>
-	      {% if slot.weeks > 1 %}
+	      {% if slot.type %}
 	      <div class="mb-3">
 		{{ slot.start|date:"M d" }} - {{ slot.end|date:"M d" }}
 	      </div>
@@ -73,7 +73,7 @@
 	</tr>
 	{% else %}
 	{% ifchanged date %}
-	<tr class="table-light">
+	<tr class="table-secondary">
 	  <td colspan="{{ row }}"></td>
 	</tr>
 	{% endifchanged %}

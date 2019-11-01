@@ -69,6 +69,7 @@ class AvailableResidency(models.Model):
 
     class Meta:
         ordering = "start",
+        verbose_name_plural = "Available Residencies"
 
 class Application(models.Model):
     def upload_destination(instance, filename):
