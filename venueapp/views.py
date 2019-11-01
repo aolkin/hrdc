@@ -10,8 +10,12 @@ from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
+from django.db import transaction
+
 from utils import InitializedLoginMixin, UserStaffMixin, ShowStaffMixin
 
+from datetime import timedelta, date, datetime
+from collections import defaultdict
 from itertools import groupby
 
 from .models import *
@@ -226,3 +230,117 @@ class AddStaffView(UserStaffMixin, SingleObjectMixin, View):
         else:
             messages.error(request, "Failed to add staff member.")
         return redirect("venueapp:staff", self.object.pk)
+
+class VenueDateRange:
+    def __init__(self, venue, start, end):
+        self.venue = venue
+        self.start = start
+        self.end = end
+
+    def extend(self, start, end):
+        if start < self.start:
+            self.start = start
+        if end > self.end:
+            self.end = end
+
+    def __str__(self):
+        return "{} - {}".format(self.start, self.end)
+
+class ResidencyView(MenuMixin, UserStaffMixin, DetailView):
+    template_name = "venueapp/residencies.html"
+    model = Application
+
+    def get_residency(self, venue, current):
+        res = venue.availableresidency_set.filter(
+            start__lt=current + timedelta(days=7), end__gt=current).first()
+        if res:
+            if not hasattr(venue, "dow"):
+                venue.dow = "{:%a} - {:%a}".format(res.start, res.end)
+            res.weeks = 1
+            if res.type:
+                if res.start < current:
+                    res.continuation = True
+                    res.weeks = 0
+                else:
+                    res.weeks = ((res.end - current).days + 6) // 7
+                pref = res.slotpreference_set.filter(app=self.object).first()
+            else:
+                pref = SlotPreference.objects.filter(
+                    app=self.object, venue=res.venue,
+                    start__lte=current, end__gt=current).first()
+            res.pref = pref and pref.ordering
+        return res
+
+    def get_context_data(self, **kwargs):
+        venues = kwargs["venues"] = self.object.venues.all()[:]
+        residencies = AvailableResidency.objects.filter(venue__in=venues)
+        calendar = []
+        current = residencies.first().start
+        end = residencies.last().end
+        while current <= end:
+            slots = [
+                self.get_residency(venue, current) for venue in venues
+            ]
+            if any(slots):
+                calendar.append((current, current + timedelta(days=6), slots))
+            else:
+                calendar.append((None, None, len(venues) + 1))
+            current += timedelta(days=7)
+        kwargs["calendar"] = calendar
+        return super().get_context_data(**kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        dates = {}
+        slots = defaultdict(dict)
+        highest = 0
+        for k, v in request.POST.items():
+            if k.startswith("date"):
+                dates[k.lstrip("date")] = datetime.strptime(
+                    v, "%Y-%m-%d").date()
+            elif k.startswith("slot"):
+                slot, i = k.lstrip("slot").split("-")
+                if v:
+                    slots[slot][i] = int(v)
+                    highest = max(highest, int(v))
+        preferences = dict()
+        for slotid, prefs in slots.items():
+            res = AvailableResidency.objects.get(id=slotid)
+            if res.type:
+                pref = list(prefs.values())[0]
+                if pref in preferences:
+                    messages.error(request, "Assigned preference {} to multiple residencies.".format(pref))
+                preferences[pref] = res
+            else:
+                for week, pref in prefs.items():
+                    if pref in preferences:
+                        if type(preferences[pref]) == VenueDateRange:
+                            preferences[pref].extend(
+                                dates[week], dates[week] + timedelta(days=6))
+                        else:
+                            messages.error(request, "Assigned preference {} to multiple residencies.".format(pref))
+                    else:
+                        preferences[pref] = VenueDateRange(
+                            res.venue, dates[week],
+                            dates[week] + timedelta(days=6))
+        with transaction.atomic():
+            SlotPreference.objects.filter(app=self.object).delete()
+            for pref in range(1, highest + 1):
+                if pref in preferences:
+                    slot = preferences[pref]
+                    preference = SlotPreference(
+                        app=self.object, venue=slot.venue, ordering=pref)
+                    if type(slot) == VenueDateRange:
+                        preference.start = slot.start
+                        preference.end = slot.end
+                    else:
+                        preference.slot = slot
+                    preference.save()
+                    messages.info(request, "Preference {} is {} weeks ({:%b %d} - {:%b %d}) in {venue}.".format(pref, ((slot.end - slot.start).days + 6) // 7, slot.start, slot.end, venue=slot.venue.venue))
+                else:
+                    messages.warning(
+                        request, "Missing preference {}.".format(pref))
+            if not highest:
+                messages.warning(
+                    request, "No residency preferences saved!")
+        return self.get(request, *args, **kwargs)

@@ -25,3 +25,10 @@
     margin-top: -1rem;
     margin-bottom: 1rem;
 }
+
+.view-residencies thead td, .view-residencies thead th {
+    vertical-align: bottom;
+}
+.view-residencies tbody td, .view-residencies tbody th {
+    vertical-align: middle;
+}

@@ -11,5 +11,6 @@ urlpatterns = [
         url(r'^details/$', UpdateApplication.as_view(), name="details"),
         url(r'^staff/$', StaffView.as_view(), name="staff"),
         url(r'^staff/add/$', AddStaffView.as_view(), name="add_staff"),
+        url(r'^residencies/$', ResidencyView.as_view(), name="residencies"),
     ])),
 ]

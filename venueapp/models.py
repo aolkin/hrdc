@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
 
@@ -44,15 +45,30 @@ class VenueApp(Season):
     def __str__(self):
         return "{} - {}".format(self.venue, self.seasonstr())
 
-class AvailableDates(models.Model):
+class AvailableResidency(models.Model):
     venue = models.ForeignKey(VenueApp, on_delete=models.CASCADE)
     start = models.DateField()
     end = models.DateField()
+    type = models.BooleanField(choices=(
+        (False, "Available Range"),
+        (True, "Single Residency"),
+    ))
 
-class AvailableSlot(models.Model):
-    venue = models.ForeignKey(VenueApp, on_delete=models.CASCADE)
-    start = models.DateField()
-    end = models.DateField()
+    def clean(self):
+        if self.end < self.start:
+            raise ValidationError(
+                {"end": "End date must come after start date."})
+        if AvailableResidency.objects.filter(venue=self.venue,
+                                             type=not self.type):
+            raise ValidationError(
+                {"type": "A venue cannot have a mix of ranges and residencies."}
+            )
+
+    def __str__(self):
+        return "{} from {} to {}".format(self.venue.venue, self.start, self.end)
+
+    class Meta:
+        ordering = "start",
 
 class Application(models.Model):
     def upload_destination(instance, filename):
@@ -73,6 +89,8 @@ class Application(models.Model):
     pre_submitted = models.DateTimeField(null=True)
     full_submitted = models.DateTimeField(null=True)
 
+    length_description = models.TextField(help_text="Please elaborate on your preferences for residency length, if necessary.", blank=True)
+
     def __str__(self):
         return str(self.show)
 
@@ -83,6 +101,12 @@ class Application(models.Model):
     def season(self):
         return self.show.seasonstr()
     venuestr.short_description = "Venues"
+
+@receiver(post_save)
+def clean_venues(sender, instance, created, raw, **kwargs):
+    if sender == Application and not raw:
+        SlotPreference.objects.filter(app=instance).exclude(
+            venue__in=instance.venues.all()).delete()
 
 class AbstractAnswer(models.Model):
     answer = models.TextField()
@@ -247,11 +271,9 @@ class SlotPreference(models.Model):
 
     start = models.DateField(null=True, blank=True)
     end = models.DateField(null=True, blank=True)
-    slot = models.ForeignKey(AvailableSlot, on_delete=models.CASCADE,
-                             null=True, blank=True)
-    length_description = models.TextField(
-        help_text="Describe your preferences for residency length, " +
-        "if applicable.")
+    slot = models.ForeignKey(AvailableResidency, on_delete=models.CASCADE,
+                             null=True, blank=True,
+                             limit_choices_to={ "type": True })
 
     class Meta:
         unique_together = ("app", "ordering")

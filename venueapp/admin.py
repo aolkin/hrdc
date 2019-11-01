@@ -2,11 +2,9 @@ from django.contrib import admin
 
 from .models import *
 
-class DateInline(admin.TabularInline):
-    model = AvailableDates
-
-class SlotInline(admin.TabularInline):
-    model = AvailableSlot
+class ResidencyInline(admin.TabularInline):
+    model = AvailableResidency
+    extra = 1
 
 @admin.register(VenueApp)
 class VenueAdmin(admin.ModelAdmin):
@@ -18,13 +16,15 @@ class VenueAdmin(admin.ModelAdmin):
         ("questions",),
     )
     autocomplete_fields = "managers", "readers",
-    inlines = DateInline, SlotInline
+    inlines = ResidencyInline,
 
 class StaffInline(admin.TabularInline):
     model = StaffMember
+    extra = 1
 
 class SlotPrefInline(admin.TabularInline):
     model = SlotPreference
+    extra = 1
 
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
@@ -45,6 +45,7 @@ class QuestionAdmin(admin.ModelAdmin):
 
 class QuestionInline(admin.TabularInline):
     model = RoleQuestion
+    extra = 1
 
 @admin.register(StaffRole)
 class RoleAdmin(admin.ModelAdmin):
