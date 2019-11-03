@@ -14,4 +14,8 @@ $(() => {
 	$el.parent().addClass("input-group");
 	$el.parent().prepend(prepend);
     });
+
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+	$(".add-budget-venue input").val($(this).data("venue"));
+    }).eq(0).trigger("shown.bs.tab");
 });

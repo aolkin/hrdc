@@ -365,6 +365,9 @@ class AddBudgetLineForm(forms.ModelForm):
     class Meta:
         model = BudgetLine
         fields = ("venue", "category", "name", "amount", "notes")
+        widgets = {
+            "venue": forms.widgets.HiddenInput()
+        }
 
 class BudgetView(MenuMixin, UserStaffMixin, FormMixin, DetailView):
     template_name = "venueapp/budget.html"
@@ -372,7 +375,7 @@ class BudgetView(MenuMixin, UserStaffMixin, FormMixin, DetailView):
     form_class = BudgetFormSet
 
     def get_context_data(self, **kwargs):
-        kwargs["add_form"] = AddBudgetLineForm()
+        kwargs["add_form"] = AddBudgetLineForm(prefix="create")
         return super().get_context_data(**kwargs)
 
     def get_success_message(self, form):
@@ -384,14 +387,13 @@ class AddBudgetView(UserStaffMixin, SingleObjectMixin, View):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        form = AddBudgetLineForm(self.request.POST)
+        form = AddBudgetLineForm(self.request.POST, prefix="create")
         if form.is_valid():
-            user, uc = get_user_model().objects.get_or_create(
-                email=form.cleaned_data["email"])
-            budget = BudgetLine.objects.create_from_user(
-                self.object, user, role=form.cleaned_data["role"])
+            budget = BudgetLine.objects.create(
+                show=self.object, **form.cleaned_data)
             # TODO Send email to budget member with instructions
-            messages.success(request, "Budget member invited. They must now log in themselves to upload their resume and sign on to the show.")
+            messages.success(request, "Budget line added to {}.".format(
+                budget.venue.venue))
         else:
-            messages.error(request, "Failed to add budget member.")
+            messages.error(request, "Failed to add budget line.")
         return redirect("venueapp:budget", self.object.pk)

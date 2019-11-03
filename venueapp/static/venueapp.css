@@ -26,8 +26,8 @@
 }
 .pending-delete .deletion-message {
     display: block;
-    margin-top: -1rem;
-    margin-bottom: 1rem;
+    margin-top: -0.75rem;
+    margin-bottom: .25rem;
 }
 
 .view-residencies thead td, .view-residencies thead th {
@@ -50,4 +50,8 @@
 .view-budget .nav-tabs .nav-link.active, .view-budget .tab-content {    
     background-color: #E8E8E8;
     border-bottom: none;
+}
+
+.view-budget .col-form-label {
+    display: none;
 }
