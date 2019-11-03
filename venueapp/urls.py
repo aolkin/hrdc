@@ -14,5 +14,6 @@ urlpatterns = [
         url(r'^residencies/$', ResidencyView.as_view(), name="residencies"),
         url(r'^budget/$', BudgetView.as_view(), name="budget"),
         url(r'^budget/add/$', AddBudgetView.as_view(), name="add_budget"),
+        url(r'^questions/$', QuestionsView.as_view(), name="questions"),
     ])),
 ]

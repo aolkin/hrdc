@@ -43,12 +43,11 @@ class MenuMixin:
                  not i.application.full_submitted]
 
         urls = [
+            ("Preview and Submit", "venueapp:submit"),
             ("Show Details", "venueapp:details"),
             ("Staff", "venueapp:staff"),
             ("Residency", "venueapp:residencies"),
             ("Budget(s)", "venueapp:budget"),
-            ("Questions", "venueapp:questions"),
-            ("Submit", "venueapp:submit"),
         ]
 
         for show in shows:
@@ -65,6 +64,12 @@ class MenuMixin:
                     "name": name,
                     "url": reverse_lazy(url, args=(show.pk,)),
                     "active": is_active and current_url == url.split(":")[-1]
+                })
+            if any([app.questions.exists() for app in show.venues.all()]):
+                submenu.append({
+                    "name": "Questions",
+                    "url": reverse_lazy("venueapp:questions", args=(show.pk,)),
+                    "active": is_active and current_url == "questions"
                 })
         return context
 
@@ -391,9 +396,21 @@ class AddBudgetView(UserStaffMixin, SingleObjectMixin, View):
         if form.is_valid():
             budget = BudgetLine.objects.create(
                 show=self.object, **form.cleaned_data)
-            # TODO Send email to budget member with instructions
             messages.success(request, "Budget line added to {}.".format(
                 budget.venue.venue))
         else:
             messages.error(request, "Failed to add budget line.")
         return redirect("venueapp:budget", self.object.pk)
+
+AnswerFormSet = forms.inlineformset_factory(
+    Application, Answer, fields=("answer",), extra=0, can_delete=False,
+)
+
+class QuestionsView(MenuMixin, UserStaffMixin, FormMixin, DetailView):
+    template_name = "venueapp/questions.html"
+    model = Application
+    form_class = AnswerFormSet
+
+    def get_success_message(self, form):
+        return "Answer{} updated.".format(
+            "s" if self.object.venues.all().count() != 1 else "")

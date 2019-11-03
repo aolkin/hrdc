@@ -1,0 +1,62 @@
+{% extends "venueapp/base.html" %}
+
+{% load bt crispy_forms_tags bootstrap %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h3 class="text-center">Supplemental Question{{ form|length|pluralize }} for {{ object }}</h3>
+    {% include "venueapp/pieces/addremove_venues.html" %}
+    <p class="mt-3 text-center">
+      Please answer all applicable questions.
+    </p>
+  </div>
+</div>
+
+<div class="row justify-content-center">
+  <form method="POST" class="col">
+    {% csrf_token %}
+    {{ form.management_form }}
+    <ul class="nav nav-tabs" role="tablist">
+      {% for form in form %}
+      {% ifchanged form.instance.venue %}
+      <li class="nav-item">
+	<a class="nav-link {% if forloop.first %}active{% endif %}"
+	   data-venue="{{ form.instance.venue.id }}"
+	   data-toggle="tab" href="#question-tab-{{ form.instance.venue.id }}">
+	  {{ form.instance.venue.venue }}
+	</a>
+      </li>
+      {% endifchanged %}
+      {% endfor %}
+    </ul>
+    <div class="tab-content">
+      {% for form in form %}
+      {% ifchanged form.instance.venue %}
+      {% if forloop.first %}
+      <div class="tab-pane show active" role="tabpanel"
+	   id="question-tab-{{ form.instance.venue.id }}">
+	{% else %}
+      </div>
+      <div class="tab-pane" role="tabpanel"
+	   id="question-tab-{{ form.instance.venue.id }}">
+	{% endif %}
+	{% endifchanged %}
+	<div class="question row justify-content-center">
+	  <div class="col-md-8">
+	    <label class="mt-1">{{ form.instance.question.question }}</label>
+	    {{ form|crispy }}
+	    {% if form.non_field_errors %}
+	    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+	    {% endif %}
+	  </div>
+	</div>
+	{% endfor %}
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary btn-block mt-3" formnovalidate>
+      Save Changes
+    </button>
+  </form>
+</div>
+{% endblock %}

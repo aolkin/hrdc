@@ -109,13 +109,19 @@ def update_venues(sender, instance, **kwargs):
         venue__in=instance.venues.all()).delete()
     BudgetLine.objects.filter(show=instance).exclude(
         venue__in=instance.venues.all()).delete()
+    Answer.objects.filter(app=instance).exclude(
+        venue__in=instance.venues.all()).delete()
     for venue in instance.venues.all():
         if not BudgetLine.objects.filter(show=instance, venue=venue).exists():
             for line in DefaultBudgetLine.objects.filter(
                     venue=venue).values("venue_id", "category", "name",
                                         "amount", "notes"):
                 BudgetLine.objects.create(show=instance, required=True, **line)
+        for question in venue.questions.all():
+            a, created = Answer.objects.get_or_create(
+                question=question, app=instance, venue=venue)
 m2m_changed.connect(update_venues, sender=Application.venues.through)
+
 
 class AbstractAnswer(models.Model):
     answer = models.TextField()

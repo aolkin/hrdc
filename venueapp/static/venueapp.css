@@ -37,21 +37,25 @@
     vertical-align: middle;
 }
 
-.view-budget .nav-tabs {
+.nav-tabs {
     padding: 0 25px;
     margin: 0 -25px 1rem;
 }
 
-.view-budget .tab-content {
+.tab-content {
     margin: -25px;
     padding: 25px;
 }
 
-.view-budget .nav-tabs .nav-link.active, .view-budget .tab-content {    
+.nav-tabs .nav-link.active, .tab-content {    
     background-color: #E8E8E8;
     border-bottom: none;
 }
 
 .view-budget .col-form-label {
+    display: none;
+}
+
+.view-questions .col-form-label {
     display: none;
 }
