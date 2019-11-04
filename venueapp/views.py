@@ -15,6 +15,8 @@ from django.db.models import Q
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 
+from emailtracker.tools import render_for_user, render_to_queue
+
 from utils import InitializedLoginMixin, UserStaffMixin, ShowStaffMixin
 
 from datetime import timedelta, date, datetime
@@ -288,7 +290,11 @@ class AddStaffView(UserStaffMixin, UnsubmittedAppMixin, View):
                 email=form.cleaned_data["email"])
             staff = StaffMember.objects.create_from_user(
                 self.object, user, role=form.cleaned_data["role"])
-            # TODO Send email to staff member with instructions
+            render_for_user(
+                user, "venueapp/email/invite.html", "venueapp", staff.pk,
+                { "role": staff, "app": self.object, "who": request.user },
+                subject="Added to Application for {}".format(self.object),
+                tags=["venueapp", "staff_invite"])
             messages.success(request, "Staff member invited. They must now log in themselves to upload their resume and sign on to the show.")
         else:
             messages.error(request, "Failed to add staff member.")
@@ -381,16 +387,20 @@ class ResidencyView(MenuMixin, UserStaffMixin, FormMixin, UnsubmittedAppMixin,
             if res.type:
                 pref = list(prefs.values())[0]
                 if pref in preferences:
-                    messages.error(request, "Assigned preference {} to multiple residencies.".format(pref))
+                    messages.error(request, "Cannot assign same preference ({}) to multiple residencies.".format(pref))
                 preferences[pref] = res
             else:
                 for week, pref in prefs.items():
                     if pref in preferences:
                         if type(preferences[pref]) == VenueDateRange:
-                            preferences[pref].extend(
-                                dates[week], dates[week] + timedelta(days=6))
+                            if preferences[pref].venue == res.venue:
+                                preferences[pref].extend(
+                                    dates[week],
+                                    dates[week] + timedelta(days=6))
+                            else:
+                                messages.error(request, "Cannot assign same preference ({}) to multiple venues.".format(pref))
                         else:
-                            messages.error(request, "Assigned preference {} to multiple residencies.".format(pref))
+                            messages.error(request, "Cannot assign same preference ({}) to multiple residencies.".format(pref))
                     else:
                         preferences[pref] = VenueDateRange(
                             res.venue, dates[week],
@@ -408,7 +418,8 @@ class ResidencyView(MenuMixin, UserStaffMixin, FormMixin, UnsubmittedAppMixin,
                     else:
                         preference.slot = slot
                     preference.save()
-                    messages.info(request, "Preference {} is {} weeks ({:%b %d} - {:%b %d}) in {venue}.".format(pref, ((slot.end - slot.start).days + 6) // 7, slot.start, slot.end, venue=slot.venue.venue))
+                    length = ((slot.end - slot.start).days + 6) // 7
+                    messages.info(request, "Preference {} is {} week{} ({:%b %d} - {:%b %d}) in {venue}.".format(pref, length, "s" if length != 1 else "", slot.start, slot.end, venue=slot.venue.venue))
                 else:
                     messages.warning(
                         request, "Missing preference {}.".format(pref))
@@ -590,3 +601,8 @@ class SignOnView(MembershipMixin, UnsubmittedAppMixin, View):
         messages.success(request, "Signed on to {}.".format(
                 self.get_object()))
         return redirect("venueapp:individual", self.get_object().pk, staff.pk)
+
+
+class PreviewSubmitView(MenuMixin, UserStaffMixin, DetailView):
+    template_name = "venueapp/preview.html"
+    model = Application

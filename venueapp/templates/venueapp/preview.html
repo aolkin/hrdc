@@ -1,0 +1,14 @@
+{% extends "venueapp/base.html" %}
+
+{% load bt crispy_forms_tags %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h3 class="text-center">Preview {% if not object.pre_submitted %}Pre-{% endif %}Application for {{ object }}</h3>
+  </div>
+</div>
+
+<div class="row justify-content-center">
+</div>
+{% endblock %}

@@ -64,8 +64,9 @@ class AvailableResidency(models.Model):
         if self.end < self.start:
             raise ValidationError(
                 {"end": "End date must come after start date."})
-        if AvailableResidency.objects.filter(venue=self.venue,
-                                             type=not self.type):
+        if AvailableResidency.objects.filter(
+                venue=self.venue, type=not self.type).exclude(
+                    pk=self.pk).exists():
             raise ValidationError(
                 {"type": "A venue cannot have a mix of ranges and residencies."}
             )

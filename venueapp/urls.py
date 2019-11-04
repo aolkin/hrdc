@@ -22,5 +22,6 @@ urlpatterns = [
             url(r'^join/$', SignOnView.as_view(), name="join"),
         ])),
         url(r'^delete/$', DeleteApplication.as_view(), name="deleteapp"),
+        url(r'^submit/$', PreviewSubmitView.as_view(), name="submit"),
     ])),
 ]

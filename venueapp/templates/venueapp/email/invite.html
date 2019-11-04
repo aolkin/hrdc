@@ -1,0 +1,51 @@
+{% extends "email/base.html" %}
+{% load email %}
+{% load bt %}
+{% load humanize %}
+
+{% block body %}
+<table cellpadding="0" cellspacing="8" width="100%">
+  <tr>
+    <td align="center">
+      {% if IS_HTML %}
+      <h2 style="margin-bottom: 4px; margin-top: 18px;">Join the application for <em>{{ app }}</em></h2>
+      {% endif %}
+    </td>
+  </tr>
+  {% if IS_HTML %}
+  <style>
+    .special-link {
+    text-decoration: none;
+    color: #666666;
+    }
+    .special-link:hover {
+    text-decoration: underline;
+    color: #333333;
+    }
+    .subtle-link {
+    text-decoration: none;
+    color: #333333;
+    }
+    .subtle-link:hover {
+    text-decoration: underline;
+    color: #111111;
+    }
+  </style>
+  {% endif %}
+  <tr>
+    <td style="font-size: 1.2em">
+      {{ who }} has added you to their application for <em>{{ app }}</em> as a <strong>{{ role.role }}</strong>.
+    </td>
+  </tr>
+  <tr>
+    <td style="font-size: 1.2em; text-align: center; padding-top: 8px;">
+      {% href 'venueapp:join' 'Click here to join the application,' app.pk role.pk class='special-link' %} or log into the Venue Application Manager within the HRDC app and click "Sign On" to this show.
+    </td>
+  </tr>
+  <tr>
+    <td style="font-size: 1.1em; text-align: center; padding-top: 12px;">
+      {% href 'venueapp:public_index' 'venue application manager' class='special-link' %}
+    </td>
+  </tr>
+</table>
+{% endblock %}
