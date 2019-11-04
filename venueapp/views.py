@@ -78,7 +78,7 @@ class MenuMixin:
             if (role.statement_length or role.accepts_attachment or
                 role.rolequestion_set.count()):
                 submenu.append({
-                    "name": "{}'s Supplement".format(role),
+                    "name": "{} Supplement".format(role),
                     "url": reverse_lazy("venueapp:individual",
                                         args=(show.pk, person.pk)),
                     "active": (active and current_url == "individual" and

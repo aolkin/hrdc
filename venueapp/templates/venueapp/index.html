@@ -20,9 +20,11 @@
       <th class="table-col-md">Show</th>
       <th class="table-col-sm table-col-desktop">Season</th>
       <th class="table-col-md">Role</th>
-      <th class="text-center">Pre-app Submitted</th>
-      <th class="text-center">Fully Submitted</th>
+      <th class="text-center">Resume</th>
+      <th class="text-center">Supplement</th>
       <th class="text-right">Your Status</th>
+      <th class="text-center">Pre App</th>
+      <th class="text-center">Full App</th>
     </tr>
   </thead>
   <tbody>
@@ -33,14 +35,11 @@
       <td>{{ show.seasonstr }}</td>
       <td>{{ role.role }}</td>
       <td class="text-center">
-	{% include "venueapp/pieces/checkmark.html" with value=meta.pre_submitted %}
-	{% if meta.full_submitted %}{{ meta.pre_submitted }}{% endif %}
+	{% include "venueapp/pieces/checkmark.html" with value=role.person.resume only %}
       </td>
       <td class="text-center">
-	{% include "venueapp/pieces/checkmark.html" with value=meta.full_submitted %}
-	{% if meta.full_submitted %}{{ meta.full_submitted }}{% endif %}
+	  {% include "venueapp/pieces/checkmark.html" with value=role.supplement_status only %}
       </td>
-      {% include "venueapp/pieces/staff_status.html" with table=0 role=role only %}
       <td class="text-right">
 	{% if role.signed_on %}
 	<span class="text-success">&lt;signed on&gt;</span>
@@ -48,6 +47,12 @@
 	<a href="{% url 'venueapp:join' meta.pk role.pk %}"
 	   class="btn btn-success">Sign On</a>
 	{% endif %}
+      </td>
+      <td class="text-center" title="{{ meta.pre_submitted|default:'' }}">
+	{% include "venueapp/pieces/checkmark.html" with value=meta.pre_submitted %}
+      </td>
+      <td class="text-center" title="{{ meta.full_submitted|default:'' }}">
+	{% include "venueapp/pieces/checkmark.html" with value=meta.full_submitted %}
       </td>
     </tr>
     {% endwith %}
