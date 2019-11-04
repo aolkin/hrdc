@@ -26,11 +26,9 @@
   <thead>
     <tr>
       <th class="table-col-md">Show</th>
-      <th class="table-col-sm table-col-desktop">Season</th>
+      <th class="table-col-md">Venue(s)</th>
       <th class="table-col-md">Role</th>
-      <th class="text-center">Resume</th>
-      <th class="text-center">Supplement</th>
-      <th class="text-right">Your Status</th>
+      <th class="text-center">Status</th>
       <th class="text-center">Pre App</th>
       <th class="text-center">Full App</th>
     </tr>
@@ -40,17 +38,19 @@
     {% with show=role.show.show meta=role.show %}
     <tr>
       <td>{{ show.title }}</td>
-      <td>{{ show.seasonstr }}</td>
-      <td>{{ role.role }}</td>
-      <td class="text-center">
-	{% include "venueapp/pieces/checkmark.html" with value=role.person.resume only %}
-      </td>
-      <td class="text-center">
-	  {% include "venueapp/pieces/checkmark.html" with value=role.supplement_status only %}
-      </td>
-      <td class="text-right">
+      <td>{{ show.seasonstr }} &ndash; {{ meta.venuestr }}</td>
+      <td>
 	{% if role.signed_on %}
-	<span class="text-success">&lt;signed on&gt;</span>
+	<a href="{% url 'venueapp:individual' meta.pk role.pk %}">
+	  {% endif %}
+	  {{ role.role }}
+	  {% if role.signed_on %}
+	</a>
+	{% endif %}
+      </td>
+      <td class="text-center" {% if not role.all_status %}title="Your portion of the application is missing components"{% endif %}>
+	{% if role.signed_on %}
+	{% include "venueapp/pieces/checkmark.html" with value=role.all_status only %}
 	{% else %}
 	<a href="{% url 'venueapp:join' meta.pk role.pk %}"
 	   class="btn btn-success">Sign On</a>
@@ -58,9 +58,15 @@
       </td>
       <td class="text-center" title="{{ meta.pre_submitted|default:'' }}">
 	{% include "venueapp/pieces/checkmark.html" with value=meta.pre_submitted %}
+	{% if not meta.pre_submitted %}
+	<div><small>Due {{ meta.prelim_due|date:"M j g:i A" }}</small></div>
+	{% endif %}
       </td>
       <td class="text-center" title="{{ meta.full_submitted|default:'' }}">
 	{% include "venueapp/pieces/checkmark.html" with value=meta.full_submitted %}
+	{% if not meta.full_submitted %}
+	<div><small>Due {{ meta.full_due|date:"M j g:i A" }}</small></div>
+	{% endif %}
       </td>
     </tr>
     {% endwith %}

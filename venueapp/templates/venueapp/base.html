@@ -1,7 +1,30 @@
 {% extends "bt/sidebar.html" %}
 
+{% load bt %}
+
 {% block title %}Venue Applications{% endblock %}
 
 {% block extra_header %}
 {% include "dramaorg/user_dropdown.html" %}
+{% endblock %}
+
+{% block footer %}
+{% if object and object.venues.all|length %}
+<div class="text-center my-5">
+  {% for venue in object.venues.all %}
+  <p class="lead">
+    With questions about applying to {{ venue.venue }}, please reach out to
+    <a href="{{ venue.contact_email }}">{{ venue.contact_email }}</a>.
+  </p>
+  {% endfor %}
+</div>
+{% endif %}
+<hr>
+<div>
+  &copy;{% now "Y" %} {% setting "BT_FOOTER_OWNER" %}
+  {% if BT_footer_site %}|
+  <a href="{{ BT_footer_site }}">
+    {{ BT_footer_site|cut:"http://"|cut:"https://" }}</a>
+  {% endif %}
+</div>
 {% endblock %}

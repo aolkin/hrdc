@@ -99,6 +99,14 @@ class Application(models.Model):
 
     length_description = models.TextField(help_text="Please elaborate on your preferences for residency length, if necessary.", verbose_name="Residency Length Preferences", blank=True)
 
+    @property
+    def prelim_due(self):
+        return self.venues.all().order_by("prelim_due").first().prelim_due
+
+    @property
+    def full_due(self):
+        return self.venues.all().order_by("full_due").first().full_due
+
     def __str__(self):
         return str(self.show)
 
@@ -230,7 +238,7 @@ class StaffMember(models.Model):
     def supplement_status(self):
         statement = bool(self.statement) or self.role.statement_length == 0
         attachment = bool(self.attachment) or not self.role.accepts_attachment
-        return statement and attachment
+        return statement and attachment and self.question_status
 
     @property
     def question_status(self):
@@ -238,6 +246,10 @@ class StaffMember(models.Model):
             self.role.rolequestion_set.filter(required=True).count() <=
             self.roleanswer_set.exclude(answer="").count()
         )
+
+    @property
+    def all_status(self):
+        return self.supplement_status and self.person.resume
 
     @property
     def role_name(self):

@@ -35,6 +35,9 @@ class VenueAdmin(admin.ModelAdmin):
             "classes": ("collapse",),
         }),
     )
+    list_display = ("__str__", "live", "seasonstr",
+                    "prelim_due", "full_due", "contact_email")
+    list_filter = "live", "year", "season", "prelim_due", "full_due"
     filter_horizontal = "questions",
     autocomplete_fields = "managers", "readers",
     inlines = ResidencyInline, DefaultBudgetInline
