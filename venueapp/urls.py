@@ -21,5 +21,6 @@ urlpatterns = [
             url(r'^$', IndividualView.as_view(), name="individual"),
             url(r'^join/$', SignOnView.as_view(), name="join"),
         ])),
+        url(r'^delete/$', DeleteApplication.as_view(), name="deleteapp"),
     ])),
 ]

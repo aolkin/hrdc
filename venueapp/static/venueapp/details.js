@@ -10,4 +10,8 @@ $(() => {
 	})
     });
     $(".venue-removal-warning").hide();
+
+    $(".delete-app").click(() => {
+	$("#delete-confirm-modal").modal("show");
+    });
 });

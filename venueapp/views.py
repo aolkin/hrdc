@@ -202,7 +202,8 @@ class NewApplication(ApplicationFormMixin, MenuMixin, InitializedLoginMixin,
                 app, request.user, signed_on=True,
                 role=StaffRole.objects.active().order_by("pk").first()
             )
-            messages.success(request, "New application created. Use the sidebar navigate through the rest of the application.")
+            messages.success(request, "Your new application has been created! Use the sidebar navigate through the rest of the application.")
+            messages.info(request, "To allow others to edit this application, add them as Executive staff members.")
             return redirect("venueapp:staff", app.pk)
         else:
             return self.render_to_response(self.get_context_data(
@@ -224,6 +225,17 @@ class UpdateApplication(ApplicationFormMixin, MenuMixin, UserStaffMixin,
         else:
             return self.render_to_response(self.get_context_data(
                 show_form=show_form, app_form=app_form, venue_form=venue_form))
+
+class DeleteApplication(UserStaffMixin, UnsubmittedAppMixin, View):
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if request.POST.get("delete-confirmation") == "DELETE":
+            self.object.delete()
+            messages.success(request, "Application deleted.")
+            return redirect("venueapp:public_index")
+        else:
+            messages.warning(request, 'Did not delete application. Please type "DELETE" to delete your application.')
+            return redirect("venueapp:details", self.object.pk)
 
 class RoleChoiceIterator(forms.models.ModelChoiceIterator):
     def __iter__(self):
