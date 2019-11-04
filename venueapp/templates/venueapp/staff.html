@@ -40,10 +40,12 @@
 	  {% include "venueapp/pieces/checkmark_group.html" with name="Supplement" value=form.instance.supplement_status only %}
 	</div>
 	<div class="col-md-1 col-sm-3 mt-3">
+	  {% if form.instance.person.user != request.user or not form.instance.role.admin %}
 	  <button type="button"
 		  class="btn btn-sm btn-danger mt-4 remove-person">
 	    <i class="fa fa-minus-square"></i>
 	  </button>
+	  {% endif %}
 	</div>
       </div>
       <div class="text-center deletion-message">
