@@ -54,7 +54,7 @@
 
 .view-budget .col-form-label,
 .view-questions .col-form-label,
-.view-individual .question .col-form-label,
+.view-individual .questions .col-form-label,
 .no-form-label .col-form-label {
     display: none;
 }

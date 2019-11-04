@@ -110,8 +110,11 @@ class FormMixin:
         form = self.get_form()
         if form.is_valid():
             form.save()
-            messages.success(request, self.get_success_message(form))
-        return redirect(request.path)
+            msg = self.get_success_message(form)
+            if msg:
+                messages.success(request, msg)
+            return redirect(request.path)
+        return self.render_to_response(self.get_context_data(form=form))
 
     def get_success_message(self, form):
         return "Success!"
@@ -146,6 +149,9 @@ class ApplicationForm(forms.ModelForm):
     class Meta:
         model = Application
         fields = "cast_breakdown", "band_size", "script"
+        widgets = {
+            "script": forms.ClearableFileInput(attrs={'accept':'application/pdf'})
+        }
 
 class VenueSelectionForm(forms.Form):
     venues = forms.ModelMultipleChoiceField(
@@ -457,6 +463,9 @@ class AddBudgetView(UserStaffMixin, UnsubmittedAppMixin, View):
 
 AnswerFormSet = forms.inlineformset_factory(
     Application, Answer, fields=("answer",), extra=0, can_delete=False,
+    widgets={
+        "answer": forms.Textarea(attrs={"rows": 6, "cols": 40}),
+    }
 )
 
 class QuestionsView(MenuMixin, UserStaffMixin, FormMixin, UnsubmittedAppMixin,
@@ -488,18 +497,34 @@ class SeasonStaffForm(forms.ModelForm):
         model = SeasonStaffMeta
         widgets = {
             "conflicts": forms.Textarea(attrs={"rows": 2, "cols": 40}),
+            "resume": forms.ClearableFileInput(attrs={'accept':'application/pdf'})
         }
 
 RoleAnswerFormSet = forms.inlineformset_factory(
     StaffMember, RoleAnswer, fields=("answer",), extra=0, can_delete=False,
+    widgets={
+        "answer": forms.Textarea(attrs={"rows": 4, "cols": 40}),
+    }
 )
-## TODO add attachment/statement
+
+class SupplementForm(forms.ModelForm):
+    class Meta:
+        fields = "statement", "attachment"
+        model = StaffMember
+        widgets = {
+            "answer": forms.Textarea(attrs={"rows": 6, "cols": 60}),
+            "attachment": forms.ClearableFileInput(attrs={'accept':'application/pdf'})
+        }
+
 class IndividualView(MenuMixin, FormMixin, MembershipMixin, UnsubmittedAppMixin,
                      DetailView):
     template_name = "venueapp/individual.html"
     form_class = RoleAnswerFormSet
 
     def get_context_data(self, **kwargs):
+        if "supplement" not in kwargs:
+            kwargs["supplement"] = SupplementForm(
+                instance=self.get_membership(), prefix="supplement")
         kwargs["season_form"] = SeasonStaffForm(
             instance=self.get_membership().person)
         return super().get_context_data(**kwargs)
@@ -507,9 +532,34 @@ class IndividualView(MenuMixin, FormMixin, MembershipMixin, UnsubmittedAppMixin,
     def get_form(self):
         return super().get_form(self.get_membership())
 
-    def get_success_message(self, form):
-        return "Answer{} updated.".format(
-            "s" if self.object.venues.all().count() != 1 else "")
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        errors = False
+        supplement = SupplementForm(
+            data=self.request.POST, files=self.request.FILES,
+            instance=self.get_membership(), prefix="supplement"
+        )
+        if (self.get_membership().role.statement_length or
+            self.get_membership().role.accepts_attachment):
+            if supplement.is_valid():
+                supplement.save()
+                messages.success(self.request, "Supplement saved.")
+            else:
+                errors = True
+        form = self.get_form()
+        if self.get_membership().roleanswer_set.all().exists():
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Answer{} updated.".format(
+                    "s" if self.get_membership().roleanswer_set.all().count()
+                    != 1 else ""))
+            else:
+                errors = True
+        if errors:
+            return self.render_to_response(self.get_context_data(
+                form=form, supplement=supplement))
+        else:
+            return redirect(request.path)
 
 class SeasonStaffView(SingleObjectMixin, View):
     model = SeasonStaffMeta

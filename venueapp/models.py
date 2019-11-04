@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator
 from django.db.models.signals import (post_save, pre_delete, pre_save,
                                       m2m_changed)
 from django.dispatch import receiver
@@ -88,7 +89,8 @@ class Application(models.Model):
     cast_breakdown = models.CharField(max_length=80)
     script = models.FileField(
         upload_to=upload_destination,
-        blank=True, help_text="Only include for original or unknown works.")
+        blank=True, help_text="Only include for original or unknown works.",
+        validators=[FileExtensionValidator(allowed_extensions=['pdf'])])
 
     created = models.DateTimeField(auto_now_add=True)
 
@@ -142,8 +144,13 @@ class Answer(AbstractAnswer):
     app = models.ForeignKey(Application, on_delete=models.CASCADE)
 
 class SeasonStaffMeta(Season):
+    def upload_destination(instance, filename):
+        return "venueapp/{}/{}/resumes/{}".format(
+            instance.year, instance.get_season_display(), filename)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    resume = models.FileField()
+    resume = models.FileField(
+        upload_to=upload_destination,
+        validators=[FileExtensionValidator(allowed_extensions=['pdf'])])
     conflicts = models.TextField(help_text="Big-picture conflicts for the upcoming season, such as other leadership positions or involvements.")
 
     objects = SeasonManager()
@@ -200,6 +207,10 @@ class MemberManager(models.Manager):
         return self.create(show=show, person=meta, **kwargs)
 
 class StaffMember(models.Model):
+    def upload_destination(instance, filename):
+        return "venueapp/{}/{}/shows/{}/supplements/{}".format(
+            instance.show.show.year, instance.show.show.get_season_display(),
+            instance.show.show.slug, filename)
     show = models.ForeignKey(Application, on_delete=models.CASCADE,
                              db_index=True)
     person = models.ForeignKey(SeasonStaffMeta,
@@ -209,7 +220,9 @@ class StaffMember(models.Model):
     other_role = models.CharField(max_length=40, blank=True)
 
     statement = models.TextField(blank=True)
-    attachment = models.FileField(blank=True)
+    attachment = models.FileField(
+        blank=True, upload_to=upload_destination,
+        validators=[FileExtensionValidator(allowed_extensions=['pdf'])])
 
     objects = MemberManager()
 
@@ -246,13 +259,17 @@ def coerce_role(sender, instance, raw, **kwargs):
         if not instance.role.other:
             instance.other_role = ""
 
+def update_admin(show, person):
+    if StaffMember.objects.filter(
+            person=person, show=show, role__category=10).exists():
+        show.show.staff.add(person.user)
+    else:
+        show.show.staff.remove(person.user)
+
 @receiver(post_save)
 def add_show_staff(sender, instance, created, raw, **kwargs):
     if sender == StaffMember and not raw:
-        if instance.role.category == 10:
-            instance.show.show.staff.add(instance.person.user)
-        else:
-            instance.show.show.staff.remove(instance.person.user)
+        update_admin(instance.show, instance.person)
         RoleAnswer.objects.filter(person=instance).exclude(
             question__role=instance.role).delete()
         for question in instance.role.rolequestion_set.all():
@@ -261,8 +278,8 @@ def add_show_staff(sender, instance, created, raw, **kwargs):
 
 @receiver(pre_delete)
 def remove_show_staff(sender, instance, **kwargs):
-    if sender == StaffMember and instance.role.category == 10:
-        instance.show.show.staff.remove(instance.person.user)
+    if sender == StaffMember:
+        update_admin(instance.show, instance.person)
 
 class RoleAnswer(AbstractAnswer):
     question = models.ForeignKey(RoleQuestion, on_delete=models.PROTECT)
