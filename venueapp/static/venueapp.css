@@ -52,10 +52,8 @@
     border-bottom: none;
 }
 
-.view-budget .col-form-label {
-    display: none;
-}
-
-.view-questions .col-form-label {
+.view-budget .col-form-label,
+.view-questions .col-form-label,
+.view-individual .question .col-form-label {
     display: none;
 }

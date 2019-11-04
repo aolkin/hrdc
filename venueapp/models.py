@@ -91,7 +91,7 @@ class Application(models.Model):
     pre_submitted = models.DateTimeField(null=True)
     full_submitted = models.DateTimeField(null=True)
 
-    length_description = models.TextField(help_text="Please elaborate on your preferences for residency length, if necessary.", blank=True)
+    length_description = models.TextField(help_text="Please elaborate on your preferences for residency length, if necessary.", verbose_name="Residency Length Preferences", blank=True)
 
     def __str__(self):
         return str(self.show)
@@ -173,6 +173,10 @@ class StaffRole(models.Model):
     objects = RoleManager()
 
     @property
+    def admin(self):
+        return self.category == 10
+
+    @property
     def other(self):
         return self.category == 60
 
@@ -245,6 +249,11 @@ def add_show_staff(sender, instance, created, raw, **kwargs):
             instance.show.show.staff.add(instance.person.user)
         else:
             instance.show.show.staff.remove(instance.person.user)
+        RoleAnswer.objects.filter(person=instance).exclude(
+            question__role=instance.role).delete()
+        for question in instance.role.rolequestion_set.all():
+            a, created = RoleAnswer.objects.get_or_create(
+                question=question, person=instance)
 
 @receiver(pre_delete)
 def remove_show_staff(sender, instance, **kwargs):

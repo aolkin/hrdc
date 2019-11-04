@@ -1,0 +1,55 @@
+{% extends "venueapp/base.html" %}
+
+{% load bt crispy_forms_tags bootstrap %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h3 class="text-center">Resume and Conflicts for {{ staff.person.seasonstr }}</h3>
+  </div>
+</div>
+
+<form method="POST" action="{% url 'venueapp:seasonmeta' staff.person.pk %}?redirect={{ request.path }}" enctype="multipart/form-data">
+  <div class="row justify-content-center">
+    {% csrf_token %}
+    <div class="col-md-5">
+      {{ season_form.conflicts|as_crispy_field }}
+    </div>
+    <div class="col-md-6">
+      {{ season_form.resume|as_crispy_field }}
+      <button type="submit" class="btn btn-primary btn-block mt-3">
+	Submit Resume and Conflicts
+	</button>
+    </div>
+  </div>
+  <p class="text-center text-muted">
+    Your resume and conflicts are shared by all applications for this season.
+  </p>
+</form>
+
+<div class="row justify-content-center mt-4">
+  <div class="col-md-8">
+    <h3 class="text-center">{{ staff.role }} Question{{ form|length|pluralize }} for {{ object }}</h3>
+    <p class="mt-3 text-center">
+      Please answer all applicable questions.
+    </p>
+  </div>
+</div>
+
+<div class="row justify-content-center">
+  <form method="POST" class="col-md-8 questions">
+    {% csrf_token %}
+    {{ form.management_form }}
+    {% for form in form %}
+	<label class="mt-1">{{ form.instance.question.question }}</label>
+	{{ form|crispy }}
+	{% if form.non_field_errors %}
+	<div class="alert alert-danger">{{ form.non_field_errors }}</div>
+	{% endif %}
+    {% endfor %}
+    <button type="submit" class="btn btn-primary btn-block mt-3">
+      Save Changes
+    </button>
+  </form>
+</div>
+{% endblock %}
