@@ -41,6 +41,7 @@
       <div class="tab-pane" role="tabpanel"
 	   id="budget-tab-{{ form.instance.venue.id }}">
 	{% endif %}
+	<p class="alert alert-light">{{ form.instance.venue.budget_instr }}</p>
 	{% endifchanged %}
 	{% ifchanged form.instance.category %}
 	<div class="row">

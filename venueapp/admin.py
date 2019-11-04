@@ -1,24 +1,41 @@
 from django.contrib import admin
+from django import forms
 
 from .models import *
 
 class ResidencyInline(admin.TabularInline):
     model = AvailableResidency
-    extra = 1
+    extra = 0
 
 class DefaultBudgetInline(admin.TabularInline):
     model = DefaultBudgetLine
-    extra = 1
+    extra = 0
 
 @admin.register(VenueApp)
 class VenueAdmin(admin.ModelAdmin):
-    fields = (
-        ("year", "season", "venue"),
-        ("managers", "readers"),
-        ("prelim_due", "full_due", "live"),
-        ("instructions",),
-        ("questions",),
+    fieldsets = (
+        ("", {
+            "fields": (
+                ("year", "season",),
+                ("venue",),
+                ("live",),
+                ("contact_email",),
+                ("managers", "readers"),
+            ),
+        }),
+        ("Due Dates", {
+            "fields": (("prelim_due", "full_due",),),
+        }),
+        ("General Questions", {
+            "fields": ("questions",),
+            "classes": ("collapse",),
+        }),
+        ("Instructions and Notes", {
+            "fields": ("residency_instr", "budget_instr",),
+            "classes": ("collapse",),
+        }),
     )
+    filter_horizontal = "questions",
     autocomplete_fields = "managers", "readers",
     inlines = ResidencyInline, DefaultBudgetInline
 

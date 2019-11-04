@@ -111,7 +111,7 @@ class FormMixin:
         if form.is_valid():
             form.save()
             messages.success(request, self.get_success_message(form))
-        return self.render_to_response(self.get_context_data(form=form))
+        return redirect(request.path)
 
     def get_success_message(self, form):
         return "Success!"
@@ -132,6 +132,7 @@ class IndexView(MenuMixin, InitializedLoginMixin, TemplateView):
     template_name = "venueapp/index.html"
 
     def get_context_data(self, **kwargs):
+        kwargs["live"] = VenueApp.objects.live()
         kwargs["roles"] = StaffMember.objects.filter(
             person__user=self.request.user)
         return super().get_context_data(**kwargs)
@@ -202,7 +203,7 @@ class NewApplication(ApplicationFormMixin, MenuMixin, InitializedLoginMixin,
                 role=StaffRole.objects.active().order_by("pk").first()
             )
             messages.success(request, "New application created. Use the sidebar navigate through the rest of the application.")
-            return redirect("venueapp:details", app.pk)
+            return redirect("venueapp:staff", app.pk)
         else:
             return self.render_to_response(self.get_context_data(
                 show_form=show_form, app_form=app_form, venue_form=venue_form))

@@ -32,13 +32,17 @@ class VenueApp(Season):
     readers = models.ManyToManyField(
         settings.AUTH_USER_MODEL, blank=True,
         help_text="These users can view submitted applications.")
+    contact_email = models.EmailField(help_text="Displayed to applicants as the point of contact for this application.")
 
     venue = models.ForeignKey(Space, on_delete=models.PROTECT)
     prelim_due = models.DateTimeField()
     full_due = models.DateTimeField()
     live = models.BooleanField(default=False)
 
-    instructions = models.TextField(blank=True)
+    residency_instr = models.TextField(
+        blank=True, verbose_name="Residency Description")
+    budget_instr = models.TextField(
+        blank=True, verbose_name="Budget Notes or Instructions")
     questions = models.ManyToManyField(Question, blank=True)
 
     objects = AppManager()
