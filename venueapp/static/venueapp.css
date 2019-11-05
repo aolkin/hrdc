@@ -58,3 +58,7 @@
 .no-form-label .col-form-label {
     display: none;
 }
+
+.nowrap {
+    white-space: nowrap;
+}

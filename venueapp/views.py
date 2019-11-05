@@ -297,7 +297,7 @@ class AddStaffView(UserStaffMixin, UnsubmittedAppMixin, View):
             render_for_user(
                 user, "venueapp/email/invite.html", "venueapp", staff.pk,
                 { "role": staff, "app": self.object, "who": request.user },
-                subject="Added to Application for {}".format(self.object),
+                subject="Added to {} Venue Application".format(self.object),
                 tags=["venueapp", "staff_invite"])
             messages.success(request, "Staff member invited. They must now log in themselves to upload their resume and sign on to the show.")
         else:

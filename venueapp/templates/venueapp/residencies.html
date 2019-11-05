@@ -41,7 +41,7 @@
 	<input type="hidden" name="date{{ forloop.counter }}"
 	       value="{{ date|date:'Y-m-d' }}">
 	<tr>
-	  <th>{{ date|date:"M d" }} - {{ end|date:"M d" }}</th>
+	  <th class="nowrap">{{ date|date:"M d" }} - {{ end|date:"M d" }}</th>
 	  {% for slot in row %}
 	  {% if not slot.continuation %}
 	  <td rowspan="{{ slot.weeks }}" class="text-center">
