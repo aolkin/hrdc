@@ -69,6 +69,26 @@ class ApplicationAdmin(admin.ModelAdmin):
     list_filter = ("venues__venue", "show__year", "show__season", "submitted")
     readonly_fields = "submitted",
     inlines = StaffInline, SlotPrefInline
+    fieldsets = (
+        ("", {
+            "fields": (
+                ("show", "prod_type"),
+                ("creator_credit", "affiliation",),
+                ("venues",),
+                ("cast_breakdown", "band_size"),
+                ("script",),
+                ("length_description",),
+                ("submitted", "created"),
+            ),
+        }),
+    )
+    readonly_fields = "created", "prod_type", "creator_credit", "affiliation",
+    def prod_type(self, obj):
+        return obj.show and obj.show.prod_type
+    def creator_credit(self, obj):
+        return obj.show and obj.show.creator_credit
+    def affiliation(self, obj):
+        return obj.show and obj.show.affiliation
 
 @admin.register(SeasonStaffMeta)
 class SeasonStaffAdmin(admin.ModelAdmin):

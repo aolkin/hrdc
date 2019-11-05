@@ -72,6 +72,10 @@ column is an example of the second.
 
 ![Residency Selection Page](venueapp_images/residency-selection.png)
 
+Production teams also have the ability to elaborate on their residency
+length preferences via a free-form text field, so they can clarify their
+preferences if necessary.
+
 ## Default Budget
 
 When a production team starts a new application, their budget will be populated
@@ -86,6 +90,14 @@ application had when it was created. In other words, if a production team starts
 an application, and then you add or remove a default budget line from the venue
 application they are applying to, that addition or removal will not be
 reflected on their application unless they start over.
+
+# Viewing Unsubmitted Applications
+
+To view unsubmitted applications, navigate to "Applications" in the site admin.
+There you will see a list of every in progress (and submitted) application in
+the system. By clicking on an application, you can then view the current cover
+page information (title, cast and band sizes, etc), staff list, and residency
+preferences.
 
 # Available Staff Roles
 
@@ -131,7 +143,8 @@ The system supports three kinds of supplements from individual staff members,
 statements, attachments, and extra questions. If "Statement length" is non-zero,
 the individual will be asked to provide a statement of "up to _" words, even
 though the system will not actually enforce a word minimum or maximum. If
-"Accepts attachment" is enabled, they will be asked to "Please attach a design plan, statement, or other PDF document". Finally, one or more questions may be
+"Accepts attachment" is enabled, they will be asked to "Please attach a design
+plan, statement, or other PDF document". Finally, one or more questions may be
 listed for the role. The short name is entirely for internal administrative use,
 and will not be shown to the user, only the question itself. The "required"
 checkbox is currently ignored, and all questions are always required.
