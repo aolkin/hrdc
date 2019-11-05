@@ -17,14 +17,11 @@ class VenueAdmin(admin.ModelAdmin):
         ("", {
             "fields": (
                 ("year", "season",),
-                ("venue",),
+                ("venue", "due"),
                 ("live",),
                 ("contact_email",),
                 ("managers", "readers"),
             ),
-        }),
-        ("Due Dates", {
-            "fields": (("prelim_due", "full_due",),),
         }),
         ("General Questions", {
             "fields": ("questions",),
@@ -36,11 +33,26 @@ class VenueAdmin(admin.ModelAdmin):
         }),
     )
     list_display = ("__str__", "live", "seasonstr",
-                    "prelim_due", "full_due", "contact_email")
-    list_filter = "live", "year", "season", "prelim_due", "full_due"
+                    "due", "contact_email")
+    list_filter = "live", "year", "season", "due"
     filter_horizontal = "questions",
     autocomplete_fields = "managers", "readers",
     inlines = ResidencyInline, DefaultBudgetInline
+
+@admin.register(OldStyleApp)
+class OldStyleAppAdmin(admin.ModelAdmin):
+    fieldsets = (
+        ("", {
+            "fields": (
+                ("year", "season",),
+                ("venue", "due"),
+                ("live",),
+                ("url", "download"),
+            ),
+        }),
+    )
+    list_display = ("__str__", "live", "seasonstr", "due",)
+    list_filter = "live", "year", "season", "due"
 
 class StaffInline(admin.TabularInline):
     model = StaffMember
@@ -52,11 +64,9 @@ class SlotPrefInline(admin.TabularInline):
 
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
-    list_display = ("show", "venuestr", "season",
-                    "pre_submitted", "full_submitted")
-    list_filter = ("venues__venue", "show__year", "show__season",
-                   "pre_submitted", "full_submitted")
-    readonly_fields = "pre_submitted", "full_submitted"
+    list_display = ("show", "venuestr", "season", "submitted")
+    list_filter = ("venues__venue", "show__year", "show__season", "submitted")
+    readonly_fields = "submitted",
     inlines = StaffInline, SlotPrefInline
 
 @admin.register(SeasonStaffMeta)

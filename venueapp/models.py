@@ -26,7 +26,20 @@ class AppManager(SeasonManager):
     def live(self):
         return self.filter(live=True)
 
-class VenueApp(Season):
+class AbstractApp(Season):
+    venue = models.ForeignKey(Space, on_delete=models.PROTECT)
+    due = models.DateTimeField()
+    live = models.BooleanField(default=False)
+
+    objects = AppManager()
+
+    def __str__(self):
+        return "{} - {}".format(self.venue, self.seasonstr())
+
+    class Meta:
+        abstract = True
+
+class VenueApp(AbstractApp):
     managers = models.ManyToManyField(
         settings.AUTH_USER_MODEL, blank=True, related_name="venue_manager",
         help_text="These users will get application submission notifications.")
@@ -35,21 +48,11 @@ class VenueApp(Season):
         help_text="These users can view submitted applications.")
     contact_email = models.EmailField(help_text="Displayed to applicants as the point of contact for this application.")
 
-    venue = models.ForeignKey(Space, on_delete=models.PROTECT)
-    prelim_due = models.DateTimeField()
-    full_due = models.DateTimeField()
-    live = models.BooleanField(default=False)
-
     residency_instr = models.TextField(
         blank=True, verbose_name="Residency Description")
     budget_instr = models.TextField(
         blank=True, verbose_name="Budget Notes or Instructions")
     questions = models.ManyToManyField(Question, blank=True)
-
-    objects = AppManager()
-
-    def __str__(self):
-        return "{} - {}".format(self.venue, self.seasonstr())
 
 class AvailableResidency(models.Model):
     venue = models.ForeignKey(VenueApp, on_delete=models.CASCADE)
@@ -95,18 +98,13 @@ class Application(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
 
-    pre_submitted = models.DateTimeField(null=True)
-    full_submitted = models.DateTimeField(null=True)
+    submitted = models.DateTimeField(null=True)
 
     length_description = models.TextField(help_text="Please elaborate on your preferences for residency length, if necessary.", verbose_name="Residency Length Preferences", blank=True)
 
     @property
-    def prelim_due(self):
-        return self.venues.all().order_by("prelim_due").first().prelim_due
-
-    @property
-    def full_due(self):
-        return self.venues.all().order_by("full_due").first().full_due
+    def due(self):
+        return self.venues.all().order_by("due").first().due
 
     def __str__(self):
         return str(self.show)
@@ -254,7 +252,8 @@ class StaffMember(models.Model):
 
     @property
     def role_name(self):
-        return self.other_role if self.role.other else str(self.role)
+        return (self.other_role if self.role.other and self.other_role else
+                str(self.role))
 
     def __str__(self):
         return "{}: {}".format(self.role_name, self.person)
@@ -344,3 +343,23 @@ class SlotPreference(models.Model):
 
     class Meta:
         unique_together = ("app", "ordering")
+
+class OldStyleApp(AbstractApp):
+    def upload_destination(instance, filename):
+        return "venueapp/{}/{}/applications/{}/{}".format(
+            instance.year, instance.get_season_display(),
+            instance.venue, filename)
+
+    url = models.URLField(blank=True)
+    download = models.FileField(blank=True, upload_to=upload_destination)
+
+    def clean(self):
+        if self.url and self.download:
+            raise ValidationError({
+                "url": "Cannot provide both URL and download.",
+                "download": "Cannot provide both URL and download.",
+            })
+
+    @property
+    def link(self):
+        return self.url or self.download.url

@@ -42,19 +42,22 @@ class MenuMixin:
         if self.request.user.is_anonymous:
             return context
 
-        shows = [(i.show, i.role, i) for i in StaffMember.objects.filter(
-            person__user=self.request.user)
-                 if i.signed_on and not i.show.full_submitted]
+        staff = StaffMember.objects.filter(
+            person__user=self.request.user, signed_on=True
+        )
+        shows = [Application.objects.get(id=i) for i in staff.values_list(
+            "show", flat=True).order_by("-show").distinct()]
+        print(staff, shows)
 
         urls = [
-            ("Preview and Submit", "venueapp:submit"),
+            #("Preview and Submit", "venueapp:submit"),
             ("Show Details", "venueapp:details"),
             ("Staff", "venueapp:staff"),
             ("Residency", "venueapp:residencies"),
             ("Budget(s)", "venueapp:budget"),
         ]
 
-        for show, role, person in shows:
+        for show in shows:
             title = str(show)
             i = 2
             while title in menu:
@@ -63,7 +66,8 @@ class MenuMixin:
             submenu = menu[title] = []
             active = (hasattr(self, "object") and
                          self.object.pk == show.pk)
-            if role.admin:
+            showstaff = staff.filter(show=show)
+            if showstaff.filter(role__category=10).exists():
                 for name, url in urls:
                     submenu.append({
                         "name": name,
@@ -77,10 +81,9 @@ class MenuMixin:
                                             args=(show.pk,)),
                         "active": active and current_url == "questions"
                     })
-            if (role.statement_length or role.accepts_attachment or
-                role.rolequestion_set.count()):
+            for person in showstaff:
                 submenu.append({
-                    "name": "{} Supplement".format(role),
+                    "name": "{} Supplement".format(person.role_name),
                     "url": reverse_lazy("venueapp:individual",
                                         args=(show.pk, person.pk)),
                     "active": (active and current_url == "individual" and
@@ -126,7 +129,7 @@ class UnsubmittedAppMixin(SingleObjectMixin):
 
     def get_object(self):
         obj = super().get_object()
-        if obj.full_submitted:
+        if obj.submitted:
             raise PermissionDenied("Cannot modify submitted applications.")
         return obj
 
@@ -138,6 +141,7 @@ class IndexView(MenuMixin, InitializedLoginMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         kwargs["live"] = VenueApp.objects.live()
+        kwargs["old"] = OldStyleApp.objects.live()
         kwargs["roles"] = StaffMember.objects.filter(
             person__user=self.request.user)
         return super().get_context_data(**kwargs)

@@ -11,6 +11,11 @@
 
 <div class="row justify-content-center">
   <form method="POST" class="col">
+    <p class="text-muted text-center">
+      To add a staff member in a role not listed in the dropdown menu, invite or
+      change a staff member to one of the "Other" roles listed towards the end. 
+      You will then be able to input a custom position for this staff member.
+    </p>
     {% csrf_token %}
     {{ form.management_form }}
     {% for form in form %}

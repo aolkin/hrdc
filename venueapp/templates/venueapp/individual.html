@@ -27,9 +27,10 @@
   </p>
 </form>
 
+{% if staff.role.statement_length or staff.role.accepts_attachment or form|length %}
 <div class="row justify-content-center mt-4">
   <div class="col-md-8">
-    <h3 class="text-center">{{ staff.role }} Question{{ form|length|pluralize }} for {{ object }}</h3>
+    <h3 class="text-center">{{ staff.role_name }} Question{{ form|length|pluralize }} for {{ object }}</h3>
   </div>
 </div>
 
@@ -65,4 +66,11 @@
     </button>
   </form>
 </div>
+{% else %}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-8">
+    <h4 class="text-center">No supplement is needed from the {{ staff.role_name }} for <em>{{ object }}</em>.</h4>
+  </div>
+</div>
+{% endif %}
 {% endblock %}
