@@ -13,6 +13,7 @@ Here are some writeups and instructions on how to use the HRDC web applications:
 - [Finance Manager (aimed at PDSMs)](/finance.html) - updated Sep 2019
 - [Publicity Manager (aimed at PDSMs)](/publicity.html) - updated Sep 2019
 - [Archive Tool (aimed at PDSMs)](/archival.html) - updated Oct 2019
+- [Venue Application Administration](/venueapp_admin.html) - updated Nov 2019
 
 ## Help and Support
 

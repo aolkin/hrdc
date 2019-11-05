@@ -38,6 +38,7 @@ class AbstractApp(Season):
 
     class Meta:
         abstract = True
+        verbose_name = "Venue Application"
 
 class VenueApp(AbstractApp):
     managers = models.ManyToManyField(
@@ -200,6 +201,7 @@ class StaffRole(models.Model):
 
     class Meta:
         ordering = "category", "name"
+        verbose_name = "Staff Role"
 
     def __str__(self):
         return self.name
@@ -359,7 +361,15 @@ class OldStyleApp(AbstractApp):
                 "url": "Cannot provide both URL and download.",
                 "download": "Cannot provide both URL and download.",
             })
+        if self.live:
+            if not (self.url or self.download):
+                raise ValidationError({
+                    "live": "This application cannot be live without either a URL or downloadable application.",
+                })
 
     @property
     def link(self):
-        return self.url or self.download.url
+        return self.url or (self.download and self.download.url)
+
+    class Meta:
+        verbose_name = "Old-Style Application"
