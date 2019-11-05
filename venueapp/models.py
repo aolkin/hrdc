@@ -343,8 +343,13 @@ class SlotPreference(models.Model):
                              null=True, blank=True,
                              limit_choices_to={ "type": True })
 
+    def __str__(self):
+        return str(self.slot) if self.slot else "{} from {} to {}".format(
+            self.venue.venue, self.start, self.end)
+
     class Meta:
         unique_together = ("app", "ordering")
+        ordering = ("-app", "ordering")
 
 class OldStyleApp(AbstractApp):
     def upload_destination(instance, filename):

@@ -57,6 +57,7 @@ class OldStyleAppAdmin(admin.ModelAdmin):
 class StaffInline(admin.TabularInline):
     model = StaffMember
     extra = 1
+    fields = ("person", "role", "other_role", "signed_on",)
 
 class SlotPrefInline(admin.TabularInline):
     model = SlotPreference

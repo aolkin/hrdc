@@ -18,7 +18,74 @@ at least be listed in one place.
 
 # Creating a Venue Application
 
-## Setting up a show
+New Venue Applications must be created for each application cycle, as the
+majority of the information within them will vary from year to year.
+
+![Blank Venue Application Configuration](venueapp_images/blank-venueapp.png)
+
+The year, season, venue, and due date are hopefully self-explanatory (although
+note that the time entry for the due date uses 24hr time, i.e. 23:59:59 for
+11:59 PM). Venue applications will only be available to be applied to before the
+due date AND while "Live" is checked.
+
+The contact email is displayed to users at the bottom of every part of their
+application while they are working on it, but is not used by the system for
+any other purpose.
+
+Managers will receive notifications when applications are submitted, and be
+able to view the cover page, staff list, and residency preferences of
+unsubmitted applications. Additionally, both managers and readers will be able
+to view all submitted applications.
+
+## General Questions
+
+Admins may create and select general questions for the application on a
+per-venue basis (if the same question is added to multiple venue apps, the team
+will be asked to answer it once for each venue) that will be available to the
+entire executive team as a part of the application.
+
+For each application, you can select questions from the library of previous
+questions, or add new ones. The "Short name" is purely for internal reference,
+and is not visible publicly on applications.
+
+Note that an application will only contain the questions that the venue
+application had when it was created. In other words, if a production team starts
+an application, and then you add or remove a question from the venue application
+they are applying to, that addition or removal will not be reflected on their
+application unless they start over.
+
+## Instructions and Notes
+
+These fields allow you to further customize your application, by providing
+instructions that will be displayed at the top of the residency selection and
+budget pages for this venue, respectively.
+
+## Available Residencies
+
+The system supports two types of availability ranges: single residencies and
+available date ranges. The former is ideal for situations where you would
+like to list inseparable ranges of dates that must be selected in blocks. The
+latter is ideal when you have a range of dates within which variable-length
+residencies can be assigned arbitrarily. The column on the left in the image
+below is an example of the first type of available residencies, while the right
+column is an example of the second.
+
+![Residency Selection Page](venueapp_images/residency-selection.png)
+
+## Default Budget
+
+When a production team starts a new application, their budget will be populated
+based on the defaults provided here. They will be able to add additional
+budget lines that you do not specify, but will be unable to delete those you
+provide (though they can rename them or set them to $0). Budget lines can fall
+into one of four categories, Income, Administrative Expenses, Production
+Expenses, or Other Expenses.
+
+Note that an application will only be given the budget lines that the venue
+application had when it was created. In other words, if a production team starts
+an application, and then you add or remove a default budget line from the venue
+application they are applying to, that addition or removal will not be
+reflected on their application unless they start over.
 
 # Available Staff Roles
 
