@@ -151,8 +151,8 @@ class IndexView(MenuMixin, TemplateView):
     template_name = "venueapp/index.html"
 
     def get_context_data(self, **kwargs):
-        kwargs["live"] = VenueApp.objects.live()
-        kwargs["old"] = OldStyleApp.objects.live()
+        kwargs["live"] = VenueApp.objects.available()
+        kwargs["old"] = OldStyleApp.objects.available()
         if not self.request.user.is_anonymous:
             kwargs["roles"] = StaffMember.objects.filter(
                 person__user=self.request.user)

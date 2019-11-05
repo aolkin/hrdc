@@ -24,6 +24,9 @@ class Question(AbstractQuestion): pass
 
 class AppManager(SeasonManager):
     def live(self):
+        return self.filter(live=True)
+
+    def available(self):
         return self.filter(live=True, due__gt=timezone.now())
 
 class AbstractApp(Season):
