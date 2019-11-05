@@ -14,7 +14,7 @@ $(() => {
 
     function recalculate() {
 	let net = 0;
-	$(".budget-line .dollar-field input").each((index, el) => {
+	$(".tab-pane.active .dollar-field input").each((index, el) => {
 	    let multiplier = $(el).parents(".dollar-field").hasClass(
 		"category-income") ? 1 : -1;
 	    net += $(el).val() * multiplier;
@@ -34,5 +34,6 @@ $(() => {
 
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 	$(".add-budget-venue input").val($(this).data("venue"));
+	recalculate();
     }).eq(0).trigger("shown.bs.tab");
 });

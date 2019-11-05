@@ -88,18 +88,9 @@
 	  {% endif %}
 	</div>
 	{% endfor %}
-	<div class="row mt-2">
-	  <div class="col-md-4 col-sm-4">
-	    <h5 class="mt-2">Net (Income minus Expenses)</h5>
-	  </div>
-	  <div class="col-md-2 col-sm-3 text-right">
-	    <input class="text-right form-control form-control-plaintext"
-		   readonly id="net-total">
-	  </div>
-	</div>
       </div>
     </div>
-    <div class="row mt-5 mb-2">
+    <div class="row my-2">
       <div class="col-md-4 col-sm-4">Item</div>
       <div class="col-md-2 col-sm-3">Amount</div>
       <div class="col-md-4 col-sm-2">Category</div>
@@ -122,6 +113,15 @@
 		formaction="{% url 'venueapp:add_budget' object.pk %}">
 	  Add Item
 	</button>
+      </div>
+    </div>
+    <div class="row mt-2">
+      <div class="col-md-4 col-sm-4">
+	<h5 class="mt-2">Net (Income minus Expenses)</h5>
+      </div>
+      <div class="col-md-2 col-sm-3 text-right">
+	<input class="text-right form-control form-control-plaintext"
+	       readonly id="net-total">
       </div>
     </div>
     <button type="submit" class="btn btn-primary btn-block mt-3" formnovalidate>
