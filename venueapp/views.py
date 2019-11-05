@@ -144,7 +144,7 @@ class UnsubmittedAppMixin(SingleObjectMixin):
             raise PermissionDenied("Cannot modify submitted applications.")
         return obj
 
-class IndexView(MenuMixin, InitializedLoginMixin, TemplateView):
+class IndexView(MenuMixin, TemplateView):
     verbose_name = "Venue Applications"
     help_text = "apply for space"
 
@@ -153,8 +153,9 @@ class IndexView(MenuMixin, InitializedLoginMixin, TemplateView):
     def get_context_data(self, **kwargs):
         kwargs["live"] = VenueApp.objects.live()
         kwargs["old"] = OldStyleApp.objects.live()
-        kwargs["roles"] = StaffMember.objects.filter(
-            person__user=self.request.user)
+        if not self.request.user.is_anonymous:
+            kwargs["roles"] = StaffMember.objects.filter(
+                person__user=self.request.user)
         return super().get_context_data(**kwargs)
 
 class ShowForm(forms.ModelForm):

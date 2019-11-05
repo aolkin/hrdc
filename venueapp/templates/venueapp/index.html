@@ -89,11 +89,18 @@
     {% endfor %}
 </table>
 {% else %}
+{% if request.user.is_anonymous %}
+<p class="lead mx-5 mt-3 text-center">
+  To see shows you are a staff member on, please
+  <a href="{% url 'dramaorg:login' %}">log in</a>.
+</p>
+{% else %}
 <p class="lead mx-5 mt-3">
   You do not have any applications in this system. If you have been invited to
   join an application but do not see it here, check who you are logged in as
   and make sure you were added with the correct email address.
 </p>
+{% endif %}
 {% endif %}
 
 {% endblock %}
