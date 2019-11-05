@@ -84,7 +84,7 @@ class ApplicationAdmin(admin.ModelAdmin):
     )
     readonly_fields = "created", "prod_type", "creator_credit", "affiliation",
     def prod_type(self, obj):
-        return obj.show and obj.show.prod_type
+        return obj.show and obj.show.get_prod_type_display()
     def creator_credit(self, obj):
         return obj.show and obj.show.creator_credit
     def affiliation(self, obj):
