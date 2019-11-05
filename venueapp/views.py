@@ -67,6 +67,17 @@ class MenuMixin:
             active = (hasattr(self, "object") and
                          self.object.pk == show.pk)
             showstaff = staff.filter(show=show)
+            if show.submitted:
+                submenu.append({
+                    "name": "<<submitted>>",
+                })
+                submenu.append({
+                    "name": "View Application",
+                    "url": reverse_lazy("venueapp:submit", args=(show.pk,)),
+                    "active": active and current_url == "submit"
+                })
+                continue
+
             if showstaff.filter(role__category=10).exists():
                 for name, url in urls:
                     submenu.append({

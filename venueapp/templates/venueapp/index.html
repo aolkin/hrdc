@@ -40,7 +40,7 @@
       <th class="table-col-md">Show</th>
       <th class="table-col-md">Venue(s)</th>
       <th class="table-col-md">Role</th>
-      <th class="text-center">Your Status</th>
+      <th class="text-center">Supplement</th>
       <th class="text-center">Submitted</th>
     </tr>
   </thead>
@@ -64,7 +64,7 @@
 	{% include "venueapp/pieces/checkmark.html" with value=role.all_status only %}
 	{% if not role.all_status %}
 	<div><small>
-	  supplement incomplete
+	  incomplete
 	</small></div>
 	{% endif %}
 	{% else %}
@@ -74,8 +74,14 @@
       </td>
       <td class="text-center" title="{{ meta.submitted|default:'' }}">
 	{% include "venueapp/pieces/checkmark.html" with value=meta.submitted %}
-	{% if not meta.submitted %}
-	<div><small>Due {{ meta.due|date:"M j g:i A" }}</small></div>
+	{% if meta.submitted %}
+	<div>
+	  <small class="nowrap">{{ meta.submitted|date:"M j g:i A" }}</small>
+	</div>
+	{% else %}
+	<div>
+	  <small class="nowrap">Due {{ meta.due|date:"M j g:i A" }}</small>
+	</div>
 	{% endif %}
       </td>
     </tr>
