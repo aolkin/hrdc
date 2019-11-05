@@ -72,10 +72,13 @@ class ApplicationAdmin(admin.ModelAdmin):
     fieldsets = (
         ("", {
             "fields": (
-                ("show", "prod_type"),
-                ("creator_credit", "affiliation",),
+                ("show",),
+                ("creator_credit",),
+                ("prod_type"),
+                ("affiliation",),
                 ("venues",),
-                ("cast_breakdown", "band_size"),
+                ("cast_breakdown",),
+                ("band_size"),
                 ("script",),
                 ("length_description",),
                 ("submitted", "created"),
