@@ -4,7 +4,7 @@ from django.core.validators import FileExtensionValidator
 from django.db.models.signals import (post_save, pre_delete, pre_save,
                                       m2m_changed)
 from django.dispatch import receiver
-
+from django.utils import timezone
 from django.conf import settings
 
 from dramaorg.models import Space, Season, Show, SeasonManager
@@ -24,7 +24,7 @@ class Question(AbstractQuestion): pass
 
 class AppManager(SeasonManager):
     def live(self):
-        return self.filter(live=True)
+        return self.filter(live=True, due__gt=timezone.now())
 
 class AbstractApp(Season):
     venue = models.ForeignKey(Space, on_delete=models.PROTECT)
