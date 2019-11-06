@@ -3,12 +3,196 @@
 {% load bt crispy_forms_tags %}
 
 {% block content %}
-<div class="row justify-content-center">
+<div class="row justify-content-center mb-3">
   <div class="col-md-8">
-    <h3 class="text-center">Preview {% if not object.pre_submitted %}Pre-{% endif %}Application for {{ object }}</h3>
+    <h3 class="text-center">Complete Application Preview</h3>
+    <h2 class="text-center">{{ object }}</h2>
   </div>
 </div>
 
-<div class="row justify-content-center">
+<ul class="nav nav-tabs" role="tablist">
+  {% for venue in object.venues.all %}
+  <li class="nav-item">
+    <a class="nav-link {% if forloop.first %}active{% endif %}"
+       data-venue="{{ venue.id }}"
+       data-toggle="tab" href="#preview-tab-{{ venue.id }}">
+      {{ venue }}
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+<div class="tab-content">
+{% for venue in object.venues.all %}
+  {% if forloop.first %}
+  <div class="tab-pane pt-3 show active" role="tabpanel"
+       id="preview-tab-{{ venue.id }}">
+    {% else %}
+  </div>
+  <div class="tab-pane pt-3" role="tabpanel" id="preview-tab-{{ venue.id }}">
+    {% endif %}
+    <!-- Application Cover Page -->
+    <h3 class="text-center">Cover Page</h3>
+    <div class="row justify-content-center">
+      <div class="col-md-9">
+	<table class="table">
+	  <tbody>
+	    {% for attr, val in cover.items %}
+	    <tr>
+	      <td class="text-right"><em>{{ attr }}</em></td>
+	      <td>{{ val|default:"<em>N/A</em>" }}</td>
+	    </tr>
+	    {% endfor %}
+	  </tbody>
+	</table>
+      </div>
+    </div>
+
+    <!-- Staff List -->
+    <h3 class="text-center">Staff List</h3>
+    <div class="row justify-content-center">
+      <div class="col-md-10">
+	<table class="table">
+	  <thead>
+	    <tr>
+	      <th>Position</td>
+	      <th>Name</td>
+	      <th>Email</td>
+	      <th>Phone</td>
+	      <th>Conflicts</td>
+	      <th>Resume</td>
+	    </tr>
+	  </thead>
+	  <tbody>
+	    {% for staff in object.staffmember_set.signed_on %}
+	    <tr>
+	      <td>{{ staff.role_name }}</td>
+	      <td>{{ staff.person }}</td>
+	      <td><a href="mailto:{{ staff.person.user.email }}">
+		{{ staff.person.user.email }}</a></td>
+	      <td><a href="tel:{{ staff.person.user.phone }}">
+		{{ staff.person.user.phone }}</a></td>
+	      <td>{{ staff.person.conflicts }}</td>
+	      <td>
+		{% if staff.person.resume %}
+		<a href="{{ staff.person.resume.url }}" target="_blank">view</a>
+		{% else %}
+		<em>N/A</em>
+		{% endif %}
+	      </td>
+	    </tr>
+	    {% endfor %}
+	  </tbody>
+	</table>
+      </div>
+    </div>
+    <!-- Residency Preferences -->
+    <h3 class="text-center">Residency Preferences</h3>
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+	<table class="table">
+	  <thead>
+	    <tr>
+	      <th class="text-right"></th>
+	      <th>Venue</th>
+	      <th>Dates</th>
+	      <th>Length</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	    {% for pref in object.slotpreference_set.all %}
+	    <tr>
+	      <td class="text-right">{{ pref.ordering }}</td>
+	      <td>{{ pref.venue.venue }}</td>
+	      <td>{{ pref.start_date|date:"M j" }} -
+		{{ pref.end_date|date:"M j" }}</td>
+	      <td>{{ pref.weeks }} week{{ pref.weeks|pluralize }}</td>
+	    </tr>
+	    {% endfor %}
+	  </tbody>
+	</table>
+      </div>
+    </div>
+    <!-- Budget -->
+    <h3 class="text-center">Budget</h3>
+    <div class="row justify-content-center">
+      <div class="col-md-10">
+	<table class="table">
+	  <thead>
+	    <tr>
+	      <th>Category</th>
+	      <th>Item</th>
+	      <th>Amount</th>
+	      <th>Notes</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	    {% for line in object.budgetline_set.all %}
+	    {% if line.venue == venue %}
+	    <tr>
+	      <td>{{ line.get_category_display }}</td>
+	      <td>{{ line.name }}</td>
+	      <td>${{ line.amount }}</td>
+	      <td>{{ line.notes }}</td>
+	    </tr>
+	    {% endif %}
+	    {% endfor %}
+	  </tbody>
+	</table>
+      </div>
+    </div>
+    <!-- Questions -->
+    <h3 class="text-center">Questions</h3>
+    <div class="row justify-content-center">
+      <div class="col-md-12">
+	<table class="table">
+	  <!--<thead>
+	    <tr>
+	      <th>Question</th>
+	      <th>Answer</th>
+	    </tr>
+	  </thead>-->
+	  <tbody>
+	    {% for answer in object.answer_set.all %}
+	    {% if answer.venue == venue %}
+	    <tr>
+	      <td>{{ answer.question.question }}</td>
+	      <td>{{ answer.answer }}</td>
+	    </tr>
+	    {% endif %}
+	    {% endfor %}
+	  </tbody>
+	</table>
+      </div>
+    </div>
+    <!-- Supplements -->
+    <h3 class="text-center">Supplements</h3>
+    {% for staff in object.staffmember_set.signed_on %}
+    <h4>{{ staff }}</h4>
+    <div class="row justify-content-center">
+      <div class="col-md-12">
+	<table class="table">
+	  <!--<thead>
+	    <tr>
+	      <th>Question</th>
+	      <th>Answer</th>
+	    </tr>
+	  </thead>-->
+	  <tbody>
+	    {% for answer in object.answer_set.all %}
+	    {% if answer.venue == venue %}
+	    <tr>
+	      <td>{{ answer.question.question }}</td>
+	      <td>{{ answer.answer }}</td>
+	    </tr>
+	    {% endif %}
+	    {% endfor %}
+	  </tbody>
+	</table>
+      </div>
+    </div>
+    {% endfor %}
+
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}

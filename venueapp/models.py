@@ -93,8 +93,10 @@ class Application(models.Model):
     
     show = models.OneToOneField(Show, on_delete=models.PROTECT)
     venues = models.ManyToManyField(VenueApp)
-    band_size = models.CharField(max_length=80)
-    cast_breakdown = models.CharField(max_length=80)
+    band_size = models.CharField(max_length=80,
+                                 verbose_name="Band/Orchestra Size")
+    cast_breakdown = models.CharField(max_length=80,
+                                      verbose_name="Cast Gender Breakdown")
     script = models.FileField(
         upload_to=upload_destination,
         blank=True, help_text="Only include for original or unknown works.",
@@ -141,7 +143,7 @@ m2m_changed.connect(update_venues, sender=Application.venues.through)
 
 
 class AbstractAnswer(models.Model):
-    answer = models.TextField()
+    answer = models.TextField(blank=True)
 
     class Meta:
         abstract = True
@@ -217,6 +219,9 @@ class MemberManager(models.Manager):
         meta, created = SeasonStaffMeta.objects.get_or_create_in_season(
             show.show, user=user)
         return self.create(show=show, person=meta, **kwargs)
+
+    def signed_on(self):
+        return self.filter(signed_on=True)
 
 class StaffMember(models.Model):
     def upload_destination(instance, filename):
@@ -349,6 +354,18 @@ class SlotPreference(models.Model):
     def __str__(self):
         return str(self.slot) if self.slot else "{} from {} to {}".format(
             self.venue.venue, self.start, self.end)
+
+    @property
+    def start_date(self):
+        return self.slot.start if self.slot else self.start
+
+    @property
+    def end_date(self):
+        return self.slot.end if self.slot else self.end
+
+    @property
+    def weeks(self):
+        return ((self.end_date - self.start_date).days + 6) // 7
 
     class Meta:
         unique_together = ("app", "ordering")

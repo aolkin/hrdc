@@ -20,7 +20,7 @@ from emailtracker.tools import render_for_user, render_to_queue
 from utils import InitializedLoginMixin, UserStaffMixin, ShowStaffMixin
 
 from datetime import timedelta, date, datetime
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from itertools import groupby
 
 from .models import *
@@ -50,7 +50,7 @@ class MenuMixin:
         print(staff, shows)
 
         urls = [
-            #("Preview and Submit", "venueapp:submit"),
+            ("Preview and Submit", "venueapp:submit"),
             ("Show Details", "venueapp:details"),
             ("Staff", "venueapp:staff"),
             ("Residency", "venueapp:residencies"),
@@ -618,7 +618,20 @@ class SignOnView(MembershipMixin, UnsubmittedAppMixin, View):
                 self.get_object()))
         return redirect("venueapp:individual", self.get_object().pk, staff.pk)
 
-
 class PreviewSubmitView(MenuMixin, UserStaffMixin, DetailView):
     template_name = "venueapp/preview.html"
     model = Application
+
+    def get_context_data(self, **kwargs):
+        cover = kwargs["cover"] = OrderedDict()
+        cover["Production"] = self.object.show.title
+        cover["Production Type"] = self.object.show.get_prod_type_display()
+        cover["Author/Composer"] = self.object.show.creator_credit
+        cover["Sponsorship/Affiliation"] = self.object.show.affiliation
+        cover["Executive Staff"] = ", ".join(
+            [str(i) for i in self.object.staffmember_set.filter(
+                role__category=10)])
+        cover["Cast Gender Breakdown"] = self.object.cast_breakdown
+        cover["Band/Orchestra Size"] = self.object.band_size
+        cover["Application Submitted"] = self.object.submitted
+        return super().get_context_data(**kwargs)

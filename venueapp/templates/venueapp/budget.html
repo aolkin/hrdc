@@ -17,7 +17,7 @@
   <form method="POST" class="col">
     {% csrf_token %}
     {{ form.management_form }}
-    <ul class="nav nav-tabs" role="tablist">
+    <ul class="nav nav-tabs shaded-bg" role="tablist">
       {% for form in form %}
       {% ifchanged form.instance.venue %}
       <li class="nav-item">
@@ -30,7 +30,7 @@
       {% endifchanged %}
       {% endfor %}
     </ul>
-    <div class="tab-content">
+    <div class="tab-content shaded-bg">
       {% for form in form %}
       {% ifchanged form.instance.venue %}
       {% if forloop.first %}

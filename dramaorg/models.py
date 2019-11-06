@@ -254,7 +254,7 @@ class Show(Season):
     title = models.CharField(max_length=150)
 
     creator_credit = models.CharField(max_length=300,
-                                      verbose_name="Author/Creator")
+                                      verbose_name="Author/Composer")
     affiliation = models.CharField(
         max_length=60, blank=True, verbose_name="Sponsorship/Affiliation",
         help_text="Producing or sponsoring group, if applicable.")

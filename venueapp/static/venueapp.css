@@ -37,17 +37,17 @@
     vertical-align: middle;
 }
 
-.nav-tabs {
+.nav-tabs.shaded-bg {
     padding: 0 25px;
     margin: 0 -25px 1rem;
 }
 
-.tab-content {
+.tab-content.shaded-bg {
     margin: -25px -25px 16px -25px;
     padding: 25px 25px 8px 25px;
 }
 
-.nav-tabs .nav-link.active, .tab-content {    
+.nav-tabs.shaded-bg .nav-link.active, .tab-content.shaded-bg {    
     background-color: #E8E8E8;
     border-bottom: none;
 }
