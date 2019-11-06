@@ -7,6 +7,8 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django.conf import settings
 
+import os.path
+
 from dramaorg.models import Space, Season, Show, SeasonManager
 
 class AbstractQuestion(models.Model):
@@ -168,6 +170,10 @@ class SeasonStaffMeta(Season):
 
     objects = SeasonManager()
 
+    @property
+    def resume_filename(self):
+        return self.resume and os.path.basename(self.resume.name)
+
     def __str__(self):
         return str(self.user)
 
@@ -264,6 +270,10 @@ class StaffMember(models.Model):
     def role_name(self):
         return (self.other_role if self.role.other and self.other_role else
                 str(self.role))
+
+    @property
+    def attachment_filename(self):
+        return self.attachment and os.path.basename(self.attachment.name)
 
     def __str__(self):
         return "{}: {}".format(self.role_name, self.person)

@@ -47,7 +47,6 @@ class MenuMixin:
         )
         shows = [Application.objects.get(id=i) for i in staff.values_list(
             "show", flat=True).order_by("-show").distinct()]
-        print(staff, shows)
 
         urls = [
             ("Preview and Submit", "venueapp:submit"),

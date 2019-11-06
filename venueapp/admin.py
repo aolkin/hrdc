@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django import forms
+from django.utils.html import mark_safe, format_html
 
 from .models import *
 
@@ -80,12 +81,15 @@ class ApplicationAdmin(admin.ModelAdmin):
                 ("cast_breakdown",),
                 ("band_size"),
                 ("script",),
+                ("contact_executive_staff",),
                 ("length_description",),
                 ("submitted", "created"),
             ),
         }),
     )
-    readonly_fields = "created", "prod_type", "creator_credit", "affiliation",
+    readonly_fields = ("created", "prod_type", "creator_credit", "affiliation",
+                       "contact_executive_staff",)
+
     def prod_type(self, obj):
         return obj.show and obj.show.get_prod_type_display()
     prod_type.short_description = Show._meta.get_field("prod_type").verbose_name
@@ -97,6 +101,13 @@ class ApplicationAdmin(admin.ModelAdmin):
         return obj.show and obj.show.affiliation
     affiliation.short_description = Show._meta.get_field(
         "affiliation").verbose_name
+
+    def contact_executive_staff(self, obj):
+        return mark_safe(", ".join([format_html(
+            '<a href="mailto:{0}">{1}</a>', i.email,
+            "{} <{}>".format(i.get_full_name(False), i.email))
+                                    for i in obj.show.staff.all()]))
+
 
 @admin.register(SeasonStaffMeta)
 class SeasonStaffAdmin(admin.ModelAdmin):

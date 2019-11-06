@@ -1,6 +1,6 @@
 {% extends "venueapp/base.html" %}
 
-{% load bt crispy_forms_tags %}
+{% load bt crispy_forms_tags venueapp %}
 
 {% block content %}
 <div class="row justify-content-center mb-3">
@@ -54,31 +54,22 @@
 	<table class="table">
 	  <thead>
 	    <tr>
-	      <th>Position</td>
-	      <th>Name</td>
-	      <th>Email</td>
-	      <th>Phone</td>
-	      <th>Conflicts</td>
-	      <th>Resume</td>
+	      <th>Position</th>
+	      <th>Name</th>
+	      <th>Email</th>
+	      <th>Phone</th>
 	    </tr>
 	  </thead>
 	  <tbody>
 	    {% for staff in object.staffmember_set.signed_on %}
 	    <tr>
-	      <td>{{ staff.role_name }}</td>
+	      <td><a href="#supplement-{{ staff.id }}">{{ staff.role_name }}
+	      </a></td>
 	      <td>{{ staff.person }}</td>
 	      <td><a href="mailto:{{ staff.person.user.email }}">
 		{{ staff.person.user.email }}</a></td>
 	      <td><a href="tel:{{ staff.person.user.phone }}">
 		{{ staff.person.user.phone }}</a></td>
-	      <td>{{ staff.person.conflicts }}</td>
-	      <td>
-		{% if staff.person.resume %}
-		<a href="{{ staff.person.resume.url }}" target="_blank">view</a>
-		{% else %}
-		<em>N/A</em>
-		{% endif %}
-	      </td>
 	    </tr>
 	    {% endfor %}
 	  </tbody>
@@ -126,73 +117,105 @@
 	    </tr>
 	  </thead>
 	  <tbody>
-	    {% for line in object.budgetline_set.all %}
-	    {% if line.venue == venue %}
+	    {% for line in object.budgetline_set|forvenue:venue %}
 	    <tr>
 	      <td>{{ line.get_category_display }}</td>
 	      <td>{{ line.name }}</td>
 	      <td>${{ line.amount }}</td>
 	      <td>{{ line.notes }}</td>
 	    </tr>
-	    {% endif %}
 	    {% endfor %}
 	  </tbody>
 	</table>
       </div>
     </div>
     <!-- Questions -->
+    {% if object.answer_set|forvenue_exists:venue %}
     <h3 class="text-center">Questions</h3>
-    <div class="row justify-content-center">
-      <div class="col-md-12">
-	<table class="table">
-	  <!--<thead>
-	    <tr>
-	      <th>Question</th>
-	      <th>Answer</th>
-	    </tr>
-	  </thead>-->
-	  <tbody>
-	    {% for answer in object.answer_set.all %}
-	    {% if answer.venue == venue %}
-	    <tr>
-	      <td>{{ answer.question.question }}</td>
-	      <td>{{ answer.answer }}</td>
-	    </tr>
-	    {% endif %}
-	    {% endfor %}
-	  </tbody>
-	</table>
+    <div class="row justify-content-center mb-3">
+      <div class="col-md-8">
+	{% for ans in object.answer_set|forvenue:venue %}
+	{% include "venueapp/pieces/render_answer.html" with answer=ans only %}
+	{% endfor %}
       </div>
     </div>
+    {% else %}
+    <h4 class="text-center mb-3">No questions for this venue.</h4>
+    {% endif %}
     <!-- Supplements -->
     <h3 class="text-center">Supplements</h3>
     {% for staff in object.staffmember_set.signed_on %}
-    <h4>{{ staff }}</h4>
+    <h4 class="mx-5">
+      <a name="supplement-{{ staff.id }}">{{ staff }}</a>
+    </h4>
     <div class="row justify-content-center">
-      <div class="col-md-12">
-	<table class="table">
-	  <!--<thead>
-	    <tr>
-	      <th>Question</th>
-	      <th>Answer</th>
-	    </tr>
-	  </thead>-->
-	  <tbody>
-	    {% for answer in object.answer_set.all %}
-	    {% if answer.venue == venue %}
-	    <tr>
-	      <td>{{ answer.question.question }}</td>
-	      <td>{{ answer.answer }}</td>
-	    </tr>
-	    {% endif %}
-	    {% endfor %}
-	  </tbody>
-	</table>
+      <div class="col-md-9">
+	<h5>Resume:
+	{% if staff.person.resume %}
+	  <a href="{{ staff.person.resume.url }}" target="_blank">
+	    {{ staff.person.resume_filename }}
+	  </a>
+	  {% else %}
+	  <em>None supplied.</em>
+	  {% endif %}
+	</h5>
       </div>
     </div>
+    <div class="row justify-content-center">
+      <div class="col-md-9">
+	<h5>Conflicts:
+	  <small>
+	    {{ staff.person.conflicts|default:"<em>None supplied.</em>" }}
+	  </small>
+	</h5>
+      </div>
+    </div>
+    {% if staff.role.statement_length %}
+    <div class="row justify-content-center">
+      <div class="col-md-9">
+	<h5>Statement</h5>
+	<p class="mx-4">
+	  {{ staff.statement|default:"<em>None supplied.</em>" }}
+	</p>
+      </div>
+    </div>
+    {% endif %}
+    {% if staff.role.accepts_attachment %}
+    <div class="row justify-content-center">
+      <div class="col-md-9">
+	<h5>Design Plan or Attachment:
+	  {% if staff.attachment %}
+	  <a href="{{ staff.attachment.url }}" target="_blank">
+	    {{ staff.attachment_filename }}
+	  </a>
+	  {% else %}
+	  <em>None supplied.</em>
+	  {% endif %}
+	</h5>
+      </div>
+    </div>
+    {% endif %}
+    {% if staff.roleanswer_set.all.exists %}
+    <div class="row justify-content-center">
+      <h5 class="col-md-9">Questions</h5>
+      <div class="col-md-8">
+	{% for ans in staff.roleanswer_set.all %}
+	{% include "venueapp/pieces/render_answer.html" with answer=ans only %}
+	{% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    <div class="mb-2"></div><!-- Spacer -->
     {% endfor %}
 
     {% endfor %}
   </div>
 </div>
+
+<hr class="mt-5">
+<h4 class="text-center"><em>
+  Submitting applications is not available at this time. We apologize for any
+  inconvenience.
+</em></h4>
+<hr>
 {% endblock %}

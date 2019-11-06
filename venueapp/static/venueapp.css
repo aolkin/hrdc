@@ -62,3 +62,14 @@
 .nowrap {
     white-space: nowrap;
 }
+
+.view-submit textarea.form-control[readonly] {
+    background: inherit;
+}
+
+.preview-question {
+    font-size: 1.15em;
+}
+.preview-answer {
+    
+}
