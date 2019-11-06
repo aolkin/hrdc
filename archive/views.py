@@ -92,6 +92,7 @@ class IndexView(MenuMixin, InitializedLoginMixin, TemplateView):
     def get(self, *args, **kwargs):
         if not self.request.user.is_anonymous:
             for i in self.request.user.show_set.filter(
+                    space__isnull=False,
                     archival_info__isnull=True):
                 ArchivalInfo(show=i).save()
         return super().get(*args, **kwargs)
