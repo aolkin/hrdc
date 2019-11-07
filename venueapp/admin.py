@@ -70,7 +70,6 @@ class SlotPrefInline(admin.TabularInline):
 class ApplicationAdmin(admin.ModelAdmin):
     list_display = ("show", "venuestr", "season", "submitted")
     list_filter = ("venues__venue", "show__year", "show__season", "submitted")
-    readonly_fields = "submitted",
     inlines = StaffInline, SlotPrefInline
     fieldsets = (
         ("", {
@@ -90,7 +89,7 @@ class ApplicationAdmin(admin.ModelAdmin):
         }),
     )
     readonly_fields = ("created", "prod_type", "creator_credit", "affiliation",
-                       "contact_executive_staff",)
+                       "contact_executive_staff", "submitted", "show",)
 
     def prod_type(self, obj):
         return obj.show and obj.show.get_prod_type_display()
