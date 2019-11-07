@@ -375,7 +375,9 @@ class SlotPreference(models.Model):
 
     @property
     def weeks(self):
-        return ((self.end_date - self.start_date).days + 6) // 7
+        if self.end_date and self.start_date:
+            return ((self.end_date - self.start_date).days + 6) // 7
+        return 0
 
     class Meta:
         unique_together = ("app", "ordering")

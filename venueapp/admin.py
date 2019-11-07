@@ -57,12 +57,14 @@ class OldStyleAppAdmin(admin.ModelAdmin):
 
 class StaffInline(admin.TabularInline):
     model = StaffMember
-    extra = 1
+    extra = 0
     fields = ("person", "role", "other_role", "signed_on",)
 
 class SlotPrefInline(admin.TabularInline):
     model = SlotPreference
-    extra = 1
+    extra = 0
+    fields = ("venue", "ordering", "start", "end", "slot", "weeks",)
+    readonly_fields = ("weeks",)
 
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
