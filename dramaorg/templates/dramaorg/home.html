@@ -2,14 +2,14 @@
 
 {% load bootstrap crispy_forms_tags %}
 {% load drama %}
-{% load config %}
+{% load config bt %}
 
 {% block title %}Welcome{% endblock %}
 
 {% block content %}
 {% include "dramaorg/user_dropdown.html" %}
 
-<h2 class="display-3 text-center">Welcome to HRDC Apps</h2>
+<h2 class="display-3 text-center">Welcome to {% setting "BT_SITE_TITLE" %}</h2>
 <h3 class="text-center text-uppercase">Online tools for the HRDC</h3>
 
 <div class="row justify-content-center">
@@ -55,7 +55,7 @@
       <a href="{% url 'dramaorg:login' %}">log in</a>.
     </p>
     {% else %}
-    {% if user.show_set.exists or user.is_board %}
+    {% if user.show_set.occurring.exists or user.is_board %}
     {% for index in staff_indexes %}
     <a href="{{ index.0 }}" class="list-group-item list-group-item-action">
       <div class="d-flex w-100 justify-content-between">

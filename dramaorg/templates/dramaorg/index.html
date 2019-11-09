@@ -2,14 +2,14 @@
 
 {% load bootstrap crispy_forms_tags %}
 {% load drama %}
-{% load config %}
+{% load config bt %}
 
 {% block title %}Your Shows{% endblock %}
 
 {% block content %}
 {% include "dramaorg/user_dropdown.html" %}
 
-{% if request.user.show_set.exists %}
+{% if request.user.show_set.occurring.exists %}
 <h3 class="text-center">Your Shows</h3>
 <table class="table table-responsive bt-table-responsive table-striped">
   <thead>
@@ -22,7 +22,7 @@
     </tr>
   </thead>
   <tbody>
-  {% for show in request.user.show_set.all %}
+  {% for show in request.user.show_set.occurring %}
   <tr>
     <td>{{ show.title }}</td>
     <td>{{ show.seasonstr }}</td>
@@ -59,7 +59,7 @@
 <div class="row justify-content-center">
   <div class="col-md-8">
     <div class="jumbotron text-center pt-4 pb-3">
-      <h3>Welcome to HRDC Apps</h3>
+      <h3>Welcome to {% setting "BT_SITE_TITLE" %}</h3>
       <p class="lead">
 	We couldn't find any shows that you are an executive staff member of.
       </p>

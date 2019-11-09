@@ -241,6 +241,11 @@ class Season(models.Model):
     class Meta:
         abstract = True
 
+class ShowManager(SeasonManager):
+    def occurring(self):
+        return self.exclude(
+            space=None, residency_starts=None, residency_ends=None)
+
 class Show(Season):
     TYPES = (
         ("play", "Play"),
@@ -276,6 +281,8 @@ class Show(Season):
     
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+
+    objects = ShowManager()
 
     def __contains__(self, other):
         return ((other.residency_starts < self.residency_ends and
