@@ -503,7 +503,7 @@ class QuestionsView(MenuMixin, UserStaffMixin, FormMixin, UnsubmittedAppMixin,
         return "Answer{} updated.".format(
             "s" if self.object.venues.all().count() != 1 else "")
 
-class MembershipMixin:
+class MembershipMixin(InitializedLoginMixin):
     def get_membership(self):
         if not hasattr(self, "membership"):
             self.membership = self.get_object().staffmember_set.filter(
