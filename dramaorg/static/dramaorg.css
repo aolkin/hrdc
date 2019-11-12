@@ -1,6 +1,13 @@
 .season-block {
     min-height: 400px;
 }
+.season-block.card-group {
+    flex-flow: row;
+}
+
+.season-block .card {
+    min-width: 200px;
+}
 
 .season-venue-block {
     position: relative;
