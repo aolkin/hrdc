@@ -307,7 +307,7 @@ class ManagementView(PermissionRequiredMixin, SeasonSidebarMixin, TemplateView):
     verbose_name = "Manage Seasons"
     help_text = "view and arrange shows"
 
-    permission_required = ("dramaorg.can_change_show",)
+    permission_required = ("dramaorg.change_show",)
     template_name = "dramaorg/admin.html"
 
     def get_context_data(self, **kwargs):
@@ -319,7 +319,7 @@ ShowFormSet = forms.modelformset_factory(
 )
 
 class SeasonView(PermissionRequiredMixin, SeasonSidebarMixin, FormView):
-    permission_required = ("dramaorg.can_change_show",)
+    permission_required = ("dramaorg.change_show",)
     template_name = "dramaorg/season.html"
     form_class = ShowFormSet
     success_url = reverse_lazy("dramaorg:admin")
