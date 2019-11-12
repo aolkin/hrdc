@@ -17,7 +17,8 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.forms import SetPasswordForm
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import (LoginRequiredMixin,
+                                        PermissionRequiredMixin)
 from django.contrib.auth.decorators import login_required
 
 from .utils import user_is_initialized
@@ -26,98 +27,6 @@ from .models import *
 
 from config import config
 import time
-
-indexes = {
-    "staff_indexes": [],
-    "admin_indexes": [
-        (reverse_lazy("admin:index"), "Site Management",
-         "administer shows, users, etc."),
-    ],
-    "public_indexes": []
-}
-
-def get_link(u):
-    r = resolve(u)
-    func = r.func.view_class if hasattr(r.func, "view_class") else r.func
-    name = func.verbose_name if hasattr(func, "verbose_name") else r.view_name
-    return (u, name, getattr(func, "help_text", ""))
-
-def load_indexes():
-    for i in settings.INSTALLED_APPS:
-        try:
-            u = reverse(i+":index")
-            indexes["staff_indexes"].append(get_link(u))
-        except NoReverseMatch:
-            pass
-        try:
-            u = reverse(i+":admin")
-            indexes["admin_indexes"].append(get_link(u))
-        except NoReverseMatch:
-            pass
-        try:
-            u = reverse(i+":public_index")
-            indexes["public_indexes"].append(get_link(u))
-        except NoReverseMatch:
-            pass
-
-class SeasonForm(forms.ModelForm):
-    class Meta:
-        model = Season
-        fields = "__all__"
-
-    def __init__(self, *args, **kwargs):
-        if not kwargs["initial"]:
-            kwargs["initial"] = {
-                "year": config.get(settings.ACTIVE_YEAR_KEY, None),
-                "season": config.get(settings.ACTIVE_SEASON_KEY, None)
-            }
-        super().__init__(*args, **kwargs)
-        
-    def save(self, *args):
-        config[settings.ACTIVE_SEASON_KEY] = self.cleaned_data["season"]
-        config[settings.ACTIVE_YEAR_KEY] = self.cleaned_data["year"]
-                        
-class StaffIndexView(SuccessMessageMixin, FormView):
-    verbose_name = "Your Shows"
-    help_text = "view and manage your shows"
-
-    template_name = "dramaorg/index.html"
-    success_url = reverse_lazy("dramaorg:index")
-    form_class = SeasonForm
-
-    def get_success_message(self, data):
-        return "Season updated successfully."
-    
-    @method_decorator(login_required)
-    @method_decorator(user_is_initialized)
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def post(self, *args, **kwargs):
-        if self.request.user.has_perm("dramaorg.change_current_season"):
-            return super().post(*args, **kwargs)
-        else:
-            messages.error(self.request,
-                           "Illegal operation: cannot set current season")
-            return super().get(*args, **kwargs)
-        
-    def form_valid(self, form):
-        if self.request.user.has_perm("dramaorg.change_current_season"):
-            form.save()
-        return super().form_valid(form)
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(indexes)
-        return context
-
-class HomePage(TemplateView):
-    template_name = "dramaorg/home.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(indexes)
-        return context
 
 class LoginView(DjangoLoginView):
     template_name = "dramaauth/login.html"
@@ -277,3 +186,166 @@ class ProfileView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return self.request.GET.get("next", reverse("dramaorg:home"))
+
+indexes = {
+    "staff_indexes": [],
+    "admin_indexes": [
+        (reverse_lazy("admin:index"), "Site Management",
+         "administer shows, users, etc."),
+    ],
+    "public_indexes": []
+}
+
+def get_link(u):
+    r = resolve(u)
+    func = r.func.view_class if hasattr(r.func, "view_class") else r.func
+    name = func.verbose_name if hasattr(func, "verbose_name") else r.view_name
+    return (u, name, getattr(func, "help_text", ""))
+
+def load_indexes():
+    for i in settings.INSTALLED_APPS:
+        try:
+            u = reverse(i+":index")
+            indexes["staff_indexes"].append(get_link(u))
+        except NoReverseMatch:
+            pass
+        try:
+            u = reverse(i+":admin")
+            indexes["admin_indexes"].append(get_link(u))
+        except NoReverseMatch:
+            pass
+        try:
+            u = reverse(i+":public_index")
+            indexes["public_indexes"].append(get_link(u))
+        except NoReverseMatch:
+            pass
+
+class SeasonForm(forms.ModelForm):
+    class Meta:
+        model = Season
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        if not kwargs["initial"]:
+            kwargs["initial"] = {
+                "year": config.get(settings.ACTIVE_YEAR_KEY, None),
+                "season": config.get(settings.ACTIVE_SEASON_KEY, None)
+            }
+        super().__init__(*args, **kwargs)
+        
+    def save(self, *args):
+        config[settings.ACTIVE_SEASON_KEY] = self.cleaned_data["season"]
+        config[settings.ACTIVE_YEAR_KEY] = self.cleaned_data["year"]
+                        
+class StaffIndexView(SuccessMessageMixin, FormView):
+    verbose_name = "Your Shows"
+    help_text = "view and manage your shows"
+
+    template_name = "dramaorg/index.html"
+    success_url = reverse_lazy("dramaorg:index")
+    form_class = SeasonForm
+
+    def get_success_message(self, data):
+        return "Season updated successfully."
+    
+    @method_decorator(login_required)
+    @method_decorator(user_is_initialized)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def post(self, *args, **kwargs):
+        if self.request.user.has_perm("dramaorg.change_current_season"):
+            return super().post(*args, **kwargs)
+        else:
+            messages.error(self.request,
+                           "Illegal operation: cannot set current season")
+            return super().get(*args, **kwargs)
+        
+    def form_valid(self, form):
+        if self.request.user.has_perm("dramaorg.change_current_season"):
+            form.save()
+        return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(indexes)
+        return context
+
+class HomePage(TemplateView):
+    template_name = "dramaorg/home.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(indexes)
+        return context
+
+class SeasonSidebarMixin:
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        current_url = self.request.resolver_match.url_name
+        menu = context["sidebar_menu"] = {}
+        menu[""] = [{
+            "name": "Seasons",
+            "url": reverse_lazy("dramaorg:admin"),
+            "active": current_url == "admin"
+        }]
+
+        submenu = menu["Manage Seasons"] = []
+
+        for year, season in Show.objects.all().values_list(
+                "year", "season").distinct():
+            submenu.append({
+                "name": "{} {}".format(Show.SEASONS[season][1], year),
+                "url": reverse_lazy("dramaorg:season", args=(year, season,)),
+                "active": (current_url == "season" and
+                           self.kwargs.get("year", None) == str(year) and
+                           self.kwargs.get("season", None) == str(season))
+            })
+        return context
+
+class ManagementView(PermissionRequiredMixin, SeasonSidebarMixin, TemplateView):
+    verbose_name = "Manage Seasons"
+    help_text = "view and arrange shows"
+
+    permission_required = ("dramaorg.can_change_show",)
+    template_name = "dramaorg/admin.html"
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs)
+
+ShowFormSet = forms.modelformset_factory(
+    Show, fields=("residency_starts", "residency_ends", "space"),
+    extra=0
+)
+
+class SeasonView(PermissionRequiredMixin, SeasonSidebarMixin, FormView):
+    permission_required = ("dramaorg.can_change_show",)
+    template_name = "dramaorg/season.html"
+    form_class = ShowFormSet
+    success_url = reverse_lazy("dramaorg:admin")
+
+    def get_season(self):
+        return int(self.kwargs["season"])
+
+    def get_year(self):
+        return int(self.kwargs["year"])
+
+    def get_context_data(self, **kwargs):
+        kwargs["title"] = "{} {}".format(
+            Show.SEASONS[self.get_season()][1], self.get_year())
+        kwargs["shows"] = list(Show.objects.filter(
+            year=self.get_year(), season=self.get_season()).values(
+                "id", "title", "affiliation", "prod_type", "space",
+                "residency_starts", "residency_ends"))
+        kwargs["spaces"] = dict([(i, str(Space.objects.filter(id=i).first()))
+                                 for i in Show.objects.filter(
+                                         year=self.get_year(),
+                                         season=self.get_season()).values_list(
+                                             "space", flat=True).distinct()])
+        return super().get_context_data(**kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["queryset"] = Show.objects.filter(
+            year=self.get_year(), season=self.get_season())
+        return kwargs

@@ -25,6 +25,10 @@ app_name = "dramaorg"
 urlpatterns = [
     url(r'^$', HomePage.as_view(), name="home"),
     url(r'^staff/$', StaffIndexView.as_view(), name="index"),
+    url(r'^season/$', ManagementView.as_view(), name="admin"),
+    url(r'^season/(?P<year>\d+)/(?P<season>\d+)/', include([
+        url(r'^$', SeasonView.as_view(), name="season"),
+    ])),
     url(r'^', include(auth_urls)),
     url(r'^profile/$', ProfileView.as_view(), name="profile"),
     url(r'^register/$', RegisterView.as_view(), name="register"),

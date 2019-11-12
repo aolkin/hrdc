@@ -1,0 +1,16 @@
+.season-block {
+    min-height: 400px;
+}
+
+.season-venue-block {
+    position: relative;
+}
+
+.season-show-block {
+    position: absolute;
+    width: 100%;
+    min-height: 28px;
+    background-color: #eee;
+    border-radius: 4px;
+    padding: 2px 8px;
+}

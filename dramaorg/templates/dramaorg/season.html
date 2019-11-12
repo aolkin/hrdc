@@ -1,0 +1,64 @@
+{% extends "bt/sidebar.html" %}
+
+{% load bootstrap crispy_forms_tags %}
+{% load drama %}
+{% load config bt %}
+
+{% block title %}{{ title }} | Season Management{% endblock %}
+
+{% block extra_header %}
+{% include "dramaorg/user_dropdown.html" %}
+{% endblock %}
+
+{% block content %}
+<h2 class="text-center">{{ title }}</h2>
+
+<form method="POST" class="d-none">
+{% csrf_token %}
+{{ form.management_form }}
+{% for form in form %}
+<div id="show-form-{{ form.instance.id }}">
+{{ form }}
+</div>
+{% endfor %}
+<input type="submit">
+</form>
+
+{% verbatim %}
+<div class="season-block card-group" id="season-vue">
+  <div v-for="venue in venues" class="card"
+       v-if="venue[0].space != 'None'">
+    <div class="card-body">
+      <h5 class="card-title">{{ venue[0].space }}</h5>
+      <div class="season-venue-block" :style="{ height: height + 'px' }">
+	<show v-for="show in venue" :show="show" :key="show.id"></show>
+      </div>
+    </div>
+  </div>
+</div>
+{% endverbatim %}
+
+<div class="row justify-content-center mt-5">
+  <div class="text-muted">current season:</div>
+</div>
+<div class="row justify-content-center">
+  <h4 class="display-4 text-muted">{% current_season %}</h4>
+</div>
+{% if perms.dramaorg.change_current_season %}
+<div class="row justify-content-center">
+  <p class="lead text-muted">
+    To update the current season, use the form on
+    <a href="{% url 'dramaorg:index'%}#update-season">this page</a>.
+  </p>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.{% if not SETTINGS.DEBUG %}min.{% endif %}js"></script>
+{{ shows|json_script:"show-data" }}
+{{ spaces|json_script:"space-data" }}
+{% endblock %}
