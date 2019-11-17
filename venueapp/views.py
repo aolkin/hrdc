@@ -617,6 +617,15 @@ class SignOnView(MembershipMixin, UnsubmittedAppMixin, View):
                 self.get_object()))
         return redirect("venueapp:individual", self.get_object().pk, staff.pk)
 
+class SignOffView(MembershipMixin, UnsubmittedAppMixin, View):
+    def get(self, request, *args, **kwargs):
+        staff = self.get_membership()
+        staff.signed_on = False
+        staff.save()
+        messages.success(request, "Left application for {}.".format(
+                self.get_object()))
+        return redirect("venueapp:public_index")
+
 class PreviewSubmitView(MenuMixin, UserStaffMixin, DetailView):
     template_name = "venueapp/preview.html"
     model = Application

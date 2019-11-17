@@ -20,6 +20,7 @@ urlpatterns = [
         url(r'^role/(?P<role>\d+)/', include([
             url(r'^$', IndividualView.as_view(), name="individual"),
             url(r'^join/$', SignOnView.as_view(), name="join"),
+            url(r'^leave/$', SignOffView.as_view(), name="leave"),
         ])),
         url(r'^delete/$', DeleteApplication.as_view(), name="deleteapp"),
         url(r'^submit/$', PreviewSubmitView.as_view(), name="submit"),
