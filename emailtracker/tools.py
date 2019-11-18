@@ -51,7 +51,7 @@ def queue_msg(msg, name, ident="", silent=True):
         return True
 
 def _fix_to(kwargs):
-    if type(kwargs["to"]) not in ("list", "tuple"):
+    if type(kwargs["to"]) not in (list, tuple):
         kwargs["to"] = [kwargs["to"]]
         
 def queue_email(name, ident="", silent=True, **kwargs):
@@ -64,14 +64,14 @@ WHITESPACE_COLLAPSE_RE = re.compile('[ \t]{2,}')
 
 def render_to_queue(template, name, ident="", context={}, silent=True,
                     **kwargs):
-    existing = get(name, ident, kwargs["to"])
+    _fix_to(kwargs)
+    existing = get(name, ident, kwargs["to"][0])
     if existing and existing.sent:
         if silent:
             return
         else:
             raise EmailSent("Attempting to render and queue email that has "
                             "already been sent.")
-    _fix_to(kwargs)
     msg = AnymailMessage(**kwargs)
     if "tags" in kwargs:
         msg.tags = kwargs["tags"]

@@ -1,0 +1,49 @@
+{% extends "bt/default.html" %}
+
+{% load bt crispy_forms_tags %}
+
+{% block title %}Emailer{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    {% if not target %}
+    <h3>Select an Email Target</h3>
+    {% else %}
+    <h3>Send Email to {{ target.verbose_name }}</h3>
+    {% endif %}
+    {% if emails %}
+    <h4 class="text-center mt-3">Preview Emails to be Sent</h4>
+    {% for to, body in emails %}
+    <div class="card mt-1 mb-3">
+      <div class="card-body">
+	<div class="card-title">
+	  <strong>To:</strong>
+	  {{ to|join:", " }}
+	</div>
+	<div class="card-text">{{ body }}</div>
+      </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+    <form {% if target %}method="POST"{% endif %}>
+      {% if target %}
+      {% csrf_token %}
+      <h6 class="mt-3">Email body variables:</h6>
+      {{ target.variables_description|linebreaks }}
+      {% endif %}
+      {{ form|crispy }}
+      {% if target %}
+      <input type="submit" name="form_action" value="Preview"
+	     class="btn btn-block btn-info">
+      {% if request.method == "POST" %}
+      <input type="submit" name="form_action" value="Send"
+	     class="btn btn-block btn-danger">
+      {% endif %}
+      {% else %}
+      <button class="btn btn-block btn-info">Load Target</button>
+      {% endif %}
+    </form>
+  </div>
+</div>
+{% endblock %}

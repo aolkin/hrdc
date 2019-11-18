@@ -16,7 +16,7 @@ urlpatterns = [
     url(r'^finance/', include("finance.urls")),
     url(r'^archive/', include("archive.urls")),
     url(r'^admin/', admin.site.urls),
-    url(r'^email/', include('emailtracker.views')),
+    url(r'^email/', include('emailtracker.urls')),
     path(r'shortlinks/<slug:slug>', link, name="shortlink"),
     path('social/', include('social_django.urls', namespace='social')),
 ]
