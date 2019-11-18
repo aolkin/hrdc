@@ -12,6 +12,5 @@ class EmailtrackerConfig(AppConfig):
         for i in settings.INSTALLED_APPS:
             try:
                 import_module(i + ".emails")
-                print("Loaded", i)
             except ImportError:
                 pass
