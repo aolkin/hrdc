@@ -2,7 +2,7 @@ from django import forms
 
 from emailtracker.mailer import *
 
-from dramaorg.models import Season
+from dramaorg.models import Season, Space
 from .models import *
 
 class ApplicationMailForm(MailForm):
@@ -10,6 +10,8 @@ class ApplicationMailForm(MailForm):
                               help_text="Applications for this year")
     season = forms.ChoiceField(choices=Season.SEASONS,
                                help_text="Applications for this season")
+    venue = forms.ModelChoiceField(required=False, queryset=Space.objects.all(),
+                                   help_text="Only applications for this venue - optional")
 
 @register
 class ApplicationTarget(MailTarget):
@@ -23,6 +25,10 @@ class ApplicationTarget(MailTarget):
         apps = Application.objects.filter(
             show__year=form.cleaned_data["year"],
             show__season=form.cleaned_data["season"])
+        if form.cleaned_data["venue"]:
+            apps = apps.filter(venues__venue=form.cleaned_data["venue"])
+        if not apps.exists():
+            return []
         for app in apps:
             yield ["{} <{}>".format(i.get_full_name(False), i.email)
                    for i in app.show.staff.all()], self.render_body(

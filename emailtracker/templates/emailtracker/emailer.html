@@ -24,6 +24,10 @@
 	<div class="card-text">{{ body }}</div>
       </div>
     </div>
+    {% empty %}
+    <p class="lead mt-1 mb-3">
+      No emails were created - try adjusting your filters below.
+    </p>
     {% endfor %}
     {% endif %}
     <form {% if target %}method="POST"{% endif %}>
@@ -36,7 +40,7 @@
       {% if target %}
       <input type="submit" name="form_action" value="Preview"
 	     class="btn btn-block btn-info">
-      {% if request.method == "POST" %}
+      {% if emails %}
       <input type="submit" name="form_action" value="Send"
 	     class="btn btn-block btn-danger">
       {% endif %}
