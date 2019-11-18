@@ -3,7 +3,7 @@ from django import forms
 from django.template import Template, Context
 from django.utils.html import mark_safe
 
-from .tools import render_to_queue
+from .tools import render_to_queue, render_for_user
 
 class MailForm(forms.Form):
     reply_to = forms.EmailField(label="Reply-to")
@@ -19,6 +19,7 @@ class MailTarget:
     tags = ["sample-target"]
     template = "emailtracker/mailer.html"
     form_class = MailForm
+    permission = None
 
     verbose_name = "Sample Target"
     variables_description = """show - the name of the show being applied for
@@ -52,6 +53,18 @@ class MailTarget:
             )
             count += 1
         return count
+
+    def send_preview(self, emails, form, user):
+        kwargs = {}
+        kwargs["reply_to"] = form.cleaned_data["reply_to"].split(";")
+        for to, body in emails:
+            render_for_user(
+                user, self.template, self.name, context={ "body": body },
+                tags=list(self.tags) + ["emailer-preview-test"],
+                subject="[Test] " + form.cleaned_data["subject"], **kwargs
+            )
+            return 1
+        return 0
 
 targets = {}
 

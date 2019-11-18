@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views.generic.base import TemplateView
 from django.http import Http404
+from django.core.exceptions import PermissionDenied
 
 from django import forms
 from django.contrib import messages
@@ -37,6 +38,9 @@ class EmailerView(TemplateView):
         if "target" in self.request.GET:
             target = targets.get(self.request.GET["target"], None)
             if target:
+                if target.permission:
+                    if not self.request.user.has_perm(target.permission):
+                        raise PermissionDenied()
                 self.target = target()
             else:
                 raise Http404("Mail target not found.")
@@ -71,6 +75,15 @@ class EmailerView(TemplateView):
         if form.is_valid():
             emails = self.target.get_emails(form)
             if request.POST["form_action"] == "Preview":
+                return self.render_to_response(
+                    self.get_context_data(form=form, emails=emails))
+            elif request.POST["form_action"] == "Send Test to Yourself":
+                res = self.target.send_preview(
+                    self.target.get_emails(form), form, request.user)
+                if res:
+                    messages.success(request, "Sent first previewed email as test email - check your inbox!")
+                else:
+                    messages.error(request, "Failed to send test email!")
                 return self.render_to_response(
                     self.get_context_data(form=form, emails=emails))
             elif request.POST["form_action"] == "Send":

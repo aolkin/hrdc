@@ -18,6 +18,7 @@ class ApplicationTarget(MailTarget):
     name = "venueapp-target"
     tags = "venueapp", "venueapp-application-mailer"
     form_class = ApplicationMailForm
+    permission = "venueapp.view_application"
 
     verbose_name = "Venue Application Executive Staffs" 
 
