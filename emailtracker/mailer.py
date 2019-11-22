@@ -6,10 +6,11 @@ from django.utils.html import mark_safe
 from .tools import render_to_queue, render_for_user
 
 class MailForm(forms.Form):
-    reply_to = forms.EmailField(label="Reply-to")
-    subject = forms.CharField(max_length=160)
+    reply_to = forms.EmailField(
+        label="Reply-to", help_text="All emails will be sent from the server")
     cc = forms.CharField(max_length=160, label="CC", required=False,
                          help_text="Separate with semicolons")
+    subject = forms.CharField(max_length=160)
     body = forms.CharField(
         widget=forms.Textarea,
         help_text="Variables described above may be referenced in the email body by wrapping them in {{ curly braces }}.")
