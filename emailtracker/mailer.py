@@ -23,8 +23,11 @@ class MailTarget:
 
     verbose_name = "Sample Target"
 
-    def get_form_args(self):
-        return {}
+    def get_form_args(self, request, **kwargs):
+        kwargs.setdefault("initial", {})
+        kwargs["initial"].setdefault("reply_to", request.user.email)
+        kwargs["initial"].setdefault("cc", request.user.email)
+        return kwargs
 
     def render_body(self, form, context):
         template = Template(form.cleaned_data["body"].strip().replace(

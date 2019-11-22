@@ -53,7 +53,8 @@ class EmailerView(TemplateView):
         return super().dispatch(*args, **kwargs)
 
     def get_form(self):
-        form_args = self.target.get_form_args() if self.target else {}
+        form_args = self.target.get_form_args(
+            self.request) if self.target else {}
         if self.request.method in ('POST', 'PUT'):
             form_args.update({
                 'data': self.request.POST,
