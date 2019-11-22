@@ -112,7 +112,9 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
             return phone
 
     def affiliationyear(self):
-        return "{} ({})".format(self.affiliation, self.year)
+        if self.year:
+            return "{} ({})".format(self.affiliation, self.year)
+        return self.affiliation
     affiliationyear.short_description = "Affiliation"
     affiliationyear.admin_order_field = Concat("affiliation", "year")
     
