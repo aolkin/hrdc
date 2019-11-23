@@ -22,29 +22,29 @@
     <div class="staff-form">
       <div class="row">
 	{{ form.id }}
-	<div class="col-md-3 col-sm-4 role-field">
+	<div class="col-md-3 col-sm-6 role-field">
 	  {{ form.role|as_crispy_field }}
 	</div>
-	<div class="col-md-3 col-sm-4 other-field">
+	<div class="col-md-3 col-sm-6 other-field">
 	  {{ form.other_role|as_crispy_field }}
 	</div>
-	<div class="col-md-3 col-sm-4 person-field">
+	<div class="col-md-3 col-sm-6 person-field">
 	  <div class="form-group">
             <label class="col-form-label">Person</label>
 	    <input readonly class="form-control-plaintext"
 		   value="{{ form.instance.person }}">
 	  </div>
 	</div>
-	<div class="col-md-2 col-sm-3">
+	<div class="col-md-2 col-3">
 	  {% include "venueapp/pieces/checkmark_group.html" with name="Signed&nbsp;On" value=form.instance.signed_on only %}
 	</div>
-	<div class="col-md-1 col-sm-3">
+	<div class="col-md-1 col-3">
 	  {% include "venueapp/pieces/checkmark_group.html" with name="Resume" value=form.instance.person.resume only %}
 	</div>
-	<div class="col-md-2 col-sm-3">
+	<div class="col-md-2 col-3">
 	  {% include "venueapp/pieces/checkmark_group.html" with name="Supplement" value=form.instance.supplement_status only %}
 	</div>
-	<div class="col-md-1 col-sm-3 mt-3">
+	<div class="col-md-1 col-3 mt-3">
 	  {% if form.instance.person.user != request.user or not form.instance.role.admin %}
 	  <button type="button"
 		  class="btn btn-sm btn-danger mt-4 remove-person">

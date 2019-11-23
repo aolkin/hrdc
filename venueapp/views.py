@@ -253,7 +253,12 @@ class DeleteApplication(UserStaffMixin, UnsubmittedAppMixin, View):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         if request.POST.get("delete-confirmation") == "DELETE":
+            show = self.object.show
             self.object.delete()
+            try:
+                show.delete()
+            except Exception:
+                messages.warning(request, "Failed to entirely delete your show from the system.")
             messages.success(request, "Application deleted.")
             return redirect("venueapp:public_index")
         else:

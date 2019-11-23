@@ -47,33 +47,33 @@
 	{% endifchanged %}
 	{% ifchanged form.instance.category %}
 	<div class="row">
-	  <div class="col-md-4 col-sm-4">
+	  <div class="col-md-4 col-7">
 	    <h5>{{ form.instance.get_category_display }}</h5>
 	  </div>
-	  <div class="col-md-2 col-sm-3 dollar-field">Amount</div>
-	  <div class="col-md-5 col-sm-3">Note</div>
+	  <div class="col-md-2 col-5 dollar-field">Amount</div>
+	  <div class="col-md-5 col-10 d-none d-sm-block">Note</div>
 	</div>
 	{% endifchanged %}
 	<div class="budget-line">
-	  <div class="row">
+	  <div class="row justify-content-center">
 	    {{ form.id }}
-	    <div class="col-md-4 col-sm-4">
+	    <div class="col-md-4 col-7">
 	      {{ form.name|as_crispy_field }}
 	    </div>
-	    <div class="col-md-2 col-sm-3 dollar-field category-{{ form.instance.get_category_display|slugify }}">
+	    <div class="col-md-2 col-5 px-0 dollar-field category-{{ form.instance.get_category_display|slugify }}">
 	      {{ form.amount|as_crispy_field }}
 	    </div>
-	    <div class="col-md-5 col-sm-3">
+	    <div class="col-md-5 col-9">
 	      {{ form.notes|as_crispy_field }}
 	    </div>
-	    {% if not form.instance.required %}
-	    <div class="col-md-1 col-sm-2">
+	    <div class="col-md-1 col-1">
+	      {% if not form.instance.required %}
 	      <button type="button"
 		      class="btn btn-sm btn-danger remove-line mt-1">
 		<i class="fa fa-minus-square"></i>
 	      </button>
+	      {% endif %}
 	    </div>
-	    {% endif %}
 	  </div>
 	  {% if not form.instance.required %}
 	  <div class="text-center deletion-message">
