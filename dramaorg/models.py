@@ -159,9 +159,9 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
                 get_admin_group().name)
         return self.get_full_name()
 
-@receiver(post_save)
+@receiver(post_save, sender=User)
 def invite_user(sender, instance, created, raw, **kwargs):
-    if sender == User and created and not instance.has_usable_password():
+    if sender == User and created and not instance.password:
         if instance.source == "default":
             email.activate(instance)
 

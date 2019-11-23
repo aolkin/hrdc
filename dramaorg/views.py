@@ -63,7 +63,7 @@ class TokenView(FormView):
         try:
             t = self.request.session[SESSION_TOKEN_KEY]
             self.user = get_user_model().objects.get(login_token=t)
-            if (self.user.has_usable_password() and
+            if (self.user.password and self.user.has_usable_password() and
                 self.user.token_expiry < timezone.now()):
                 self.user = None
         except (TypeError, KeyError, ValueError, OverflowError,
