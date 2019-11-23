@@ -1,0 +1,178 @@
+{% load venueapp %}
+    <!-- Application Cover Page -->
+    <h3 class="text-center">Cover Page</h3>
+    <div class="row justify-content-center">
+      <div class="col-md-9">
+	<table class="table">
+	  <tbody>
+	    {% for attr, val in cover.items %}
+	    <tr>
+	      <td class="text-right"><em>{{ attr }}</em></td>
+	      <td>{{ val|default:"<em>N/A</em>" }}</td>
+	    </tr>
+	    {% endfor %}
+	  </tbody>
+	</table>
+      </div>
+    </div>
+
+    <!-- Staff List -->
+    <h3 class="text-center">Staff List</h3>
+    <div class="row justify-content-center">
+      <div class="col-md-10">
+	<table class="table">
+	  <thead>
+	    <tr>
+	      <th>Position</th>
+	      <th>Name</th>
+	      <th>Email</th>
+	      <th>Phone</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	    {% for staff in object.staffmember_set.signed_on %}
+	    <tr>
+	      <td><a href="#supplement-{{ staff.id }}">{{ staff.role_name }}
+	      </a></td>
+	      <td>{{ staff.person }}</td>
+	      <td><a href="mailto:{{ staff.person.user.email }}">
+		{{ staff.person.user.email }}</a></td>
+	      <td><a href="tel:{{ staff.person.user.phone }}">
+		{{ staff.person.user.phone }}</a></td>
+	    </tr>
+	    {% endfor %}
+	  </tbody>
+	</table>
+      </div>
+    </div>
+    <!-- Residency Preferences -->
+    <h3 class="text-center">Residency Preferences</h3>
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+	<table class="table">
+	  <thead>
+	    <tr>
+	      <th class="text-right"></th>
+	      <th>Venue</th>
+	      <th>Dates</th>
+	      <th>Length</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	    {% for pref in object.slotpreference_set.all %}
+	    <tr>
+	      <td class="text-right">{{ pref.ordering }}</td>
+	      <td>{{ pref.venue.venue }}</td>
+	      <td>{{ pref.start_date|date:"M j" }} -
+		{{ pref.end_date|date:"M j" }}</td>
+	      <td>{{ pref.weeks }} week{{ pref.weeks|pluralize }}</td>
+	    </tr>
+	    {% endfor %}
+	  </tbody>
+	</table>
+      </div>
+    </div>
+    <!-- Budget -->
+    <h3 class="text-center">Budget</h3>
+    <div class="row justify-content-center">
+      <div class="col-md-10">
+	<table class="table">
+	  <thead>
+	    <tr>
+	      <th>Category</th>
+	      <th>Item</th>
+	      <th>Amount</th>
+	      <th>Notes</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	    {% for line in object.budgetline_set|forvenue:venue %}
+	    <tr>
+	      <td>{{ line.get_category_display }}</td>
+	      <td>{{ line.name }}</td>
+	      <td>${{ line.amount }}</td>
+	      <td>{{ line.notes }}</td>
+	    </tr>
+	    {% endfor %}
+	  </tbody>
+	</table>
+      </div>
+    </div>
+    <!-- Questions -->
+    {% if object.answer_set|forvenue_exists:venue %}
+    <h3 class="text-center">Questions</h3>
+    <div class="row justify-content-center mb-3">
+      <div class="col-md-9">
+	{% for ans in object.answer_set|forvenue:venue %}
+	{% include "venueapp/pieces/render_answer.html" with answer=ans only %}
+	{% endfor %}
+      </div>
+    </div>
+    {% else %}
+    <h4 class="text-center mb-3">No questions for this venue.</h4>
+    {% endif %}
+    <!-- Supplements -->
+    <h3 class="text-center">Supplements</h3>
+    {% for staff in object.staffmember_set.signed_on %}
+    <h4 class="mx-5">
+      <a name="supplement-{{ staff.id }}">{{ staff }}</a>
+    </h4>
+    <div class="row justify-content-center">
+      <div class="col-md-9">
+	<h5>Resume:
+	{% if staff.person.resume %}
+	  <a href="{{ staff.person.resume.url }}" target="_blank">
+	    {{ staff.person.resume_filename }}
+	  </a>
+	  {% else %}
+	  <em>None supplied.</em>
+	  {% endif %}
+	</h5>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-md-9">
+	<h5>Conflicts:
+	  <small>
+	    {{ staff.person.conflicts|default:"<em>None supplied.</em>" }}
+	  </small>
+	</h5>
+      </div>
+    </div>
+    {% if staff.role.statement_length %}
+    <div class="row justify-content-center">
+      <div class="col-md-9">
+	<h5>Statement</h5>
+	<p class="mx-4">
+	  {{ staff.statement|default:"<em>None supplied.</em>" }}
+	</p>
+      </div>
+    </div>
+    {% endif %}
+    {% if staff.role.accepts_attachment %}
+    <div class="row justify-content-center">
+      <div class="col-md-9">
+	<h5>Design Plan or Attachment:
+	  {% if staff.attachment %}
+	  <a href="{{ staff.attachment.url }}" target="_blank">
+	    {{ staff.attachment_filename }}
+	  </a>
+	  {% else %}
+	  <em>None supplied.</em>
+	  {% endif %}
+	</h5>
+      </div>
+    </div>
+    {% endif %}
+    {% if staff.roleanswer_set.all.exists %}
+    <div class="row justify-content-center">
+      <h5 class="col-md-9">Questions</h5>
+      <div class="col-md-8">
+	{% for ans in staff.roleanswer_set.all %}
+	{% include "venueapp/pieces/render_answer.html" with answer=ans only %}
+	{% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    <div class="mb-2"></div><!-- Spacer -->
+    {% endfor %}

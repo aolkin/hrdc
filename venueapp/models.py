@@ -121,6 +121,20 @@ class Application(models.Model):
         return ", ".join(
             [str(i.venue) for i in self.venues.all()])
 
+    def venuesand(self):
+        out = ""
+        count = self.venues.all().count()
+        for i, v in enumerate(self.venues.all()):
+            out += str(v.venue)
+            if i < count - 2:
+                out += ", "
+            elif i < count - 1:
+                if count > 2:
+                    out += ", and "
+                else:
+                    out += " and "
+        return out
+
     def season(self):
         return self.show.seasonstr()
     venuestr.short_description = "Venues"

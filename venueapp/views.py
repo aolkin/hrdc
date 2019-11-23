@@ -631,20 +631,30 @@ class SignOffView(MembershipMixin, UnsubmittedAppMixin, View):
                 self.get_object()))
         return redirect("venueapp:public_index")
 
+def make_cover_page(app):
+        cover = OrderedDict()
+        cover["Production"] = app.show.title
+        cover["Production Type"] = app.show.get_prod_type_display()
+        cover["Author/Composer"] = app.show.creator_credit
+        cover["Sponsorship/Affiliation"] = app.show.affiliation
+        cover["Executive Staff"] = ", ".join(
+            [str(i) for i in app.staffmember_set.filter(
+                role__category=10)])
+        cover["Cast Gender Breakdown"] = app.cast_breakdown
+        cover["Band/Orchestra Size"] = app.band_size
+        cover["Application Submitted"] = app.submitted
+        return cover
+
 class PreviewSubmitView(MenuMixin, UserStaffMixin, DetailView):
     template_name = "venueapp/preview.html"
     model = Application
 
     def get_context_data(self, **kwargs):
-        cover = kwargs["cover"] = OrderedDict()
-        cover["Production"] = self.object.show.title
-        cover["Production Type"] = self.object.show.get_prod_type_display()
-        cover["Author/Composer"] = self.object.show.creator_credit
-        cover["Sponsorship/Affiliation"] = self.object.show.affiliation
-        cover["Executive Staff"] = ", ".join(
-            [str(i) for i in self.object.staffmember_set.filter(
-                role__category=10)])
-        cover["Cast Gender Breakdown"] = self.object.cast_breakdown
-        cover["Band/Orchestra Size"] = self.object.band_size
-        cover["Application Submitted"] = self.object.submitted
+        kwargs["cover"] = make_cover_page(self.object)
         return super().get_context_data(**kwargs)
+
+    def post(self, *args, **kwargs):
+        messages.success(
+            self.request, "Application for {} submitted to {}!".format(
+                self.get_object(), self.get_object().venuesand()))
+        return redirect("venueapp:public_index")
