@@ -1,0 +1,60 @@
+{% extends "email/base.html" %}
+{% load email %}
+{% load bt %}
+{% load humanize %}
+
+{% block body %}
+<table cellpadding="0" cellspacing="8" width="100%">
+  <tr>
+    <td align="center">
+      {% if IS_HTML %}
+      <h2 style="margin-bottom: 4px; margin-top: 18px;">Application for <em>{{ app }}</em> in {{ venue.venue }}</h2>
+      {% endif %}
+    </td>
+  </tr>
+  {% if IS_HTML %}
+  <style>
+    .special-link {
+    text-decoration: none;
+    color: #666666;
+    }
+    .special-link:hover {
+    text-decoration: underline;
+    color: #333333;
+    }
+    .subtle-link {
+    text-decoration: none;
+    color: #333333;
+    }
+    .subtle-link:hover {
+    text-decoration: underline;
+    color: #111111;
+    }
+  </style>
+  {% endif %}
+  <tr>
+    <td style="font-size: 1.2em">
+      An application for <em>{{ app }}</em> was submitted, and may be viewed through the online portal or via the attached PDF.
+    </td>
+  </tr>
+  <tr>
+    <td style="font-size: 1em; padding-top: 8px;">
+      <table style="width: 100%">
+	<tbody>
+	  {% for attr, val in cover.items %}
+	  <tr>
+	    <td style="text-align: right;"><em>{{ attr }}:</em></td>
+	    <td>{{ val|default:"<em>N/A</em>" }}</td>
+	  </tr>
+	  {% endfor %}
+	</tbody>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td style="font-size: 1.1em; text-align: center; padding-top: 12px;">
+      {% href 'venueapp:public_index' 'venue application manager' class='special-link' %}
+    </td>
+  </tr>
+</table>
+{% endblock %}

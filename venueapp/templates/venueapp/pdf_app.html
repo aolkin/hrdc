@@ -1,0 +1,89 @@
+{% load bt static %}
+<html>
+  <head>
+    {% _bt_style "https://stackpath.bootstrapcdn.com/bootstrap/{}/css/bootstrap.min.css" "bootstrap" %}
+    <style>
+     @page {
+	 size: Letter;
+	 margin: 0.75in;
+
+	 @top-left {
+	     font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+	     content: counter(page);
+	     font-size: 11pt;
+	     color: #212529;
+	 }
+	 @top-center {
+	     font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+	     content: '{{ object }}';
+	     font-style: italic;
+	     font-size: 11pt;
+	     color: #212529;
+	 }
+	 @top-right {
+	     font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+	     content: '{{ venue.venue }}';
+	     font-size: 11pt;
+	     color: #212529;
+	 }
+     }
+     @page :first {
+	 @top-left {
+	     content: '';
+	 }
+	 @top-center {
+	     content: '';
+	 }
+	 @top-right {
+	     content: '';
+	 }
+     }
+
+     .pdf-container {
+	 width: 7in;
+	 font-size: 10pt;
+	 line-height: 12pt;
+     }
+     footer {
+	 position: fixed;
+	 text-align: center;
+	 width: 100%;
+	 bottom: -0.5in;
+     }
+     h3 {
+	 margin-top: 0.5em;
+     }
+     .newpage {
+	 page-break-before: always;
+     }
+     a {
+	 text-decoration: none !important;
+     }
+     table {
+	 margin-top: 0.5em;
+     }
+     h2, h4, h5 {
+	 bookmark-level: none
+     }
+    </style>
+    <title>{{ object }} - {{ object.venue }}</title>
+  </head>
+  <body>
+    <div class="pdf-container">
+      <header class="mb-5">
+	<img src="file://{{ logo }}" class="img-responsive img-fluid">
+      </header>
+      <main>
+	<h2 class="text-center">{{ object }}</h2>
+	{% include "venueapp/render_app.html" %}
+      </main>
+      <footer>
+	<hr>
+	<div>
+	  &copy;2019 Harvard-Radcliffe Dramatic Club |
+	  <a href="https://hrdctheater.org">hrdctheater.org</a>
+	</div>
+      </footer>
+    </div>
+  </body>
+</html>

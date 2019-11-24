@@ -1,9 +1,8 @@
-from django.shortcuts import render
 from django.views.generic import TemplateView, View
 from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.views.generic.edit import FormView, CreateView, UpdateView
 from django.urls import reverse_lazy
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django import forms
 from django.forms import widgets
 from django.contrib import messages    
@@ -13,7 +12,8 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.db.models import Q
 from django.core.exceptions import PermissionDenied
-from django.http import Http404
+from django.http import Http404, HttpResponse
+from django.utils import timezone
 
 from emailtracker.tools import render_for_user, render_to_queue
 
@@ -24,6 +24,7 @@ from collections import defaultdict, OrderedDict
 from itertools import groupby
 
 from .models import *
+from .tasks import render_and_send_app
 
 class ApplicationStaffMixin(ShowStaffMixin):
     model = Application
@@ -654,7 +655,10 @@ class PreviewSubmitView(MenuMixin, UserStaffMixin, DetailView):
         return super().get_context_data(**kwargs)
 
     def post(self, *args, **kwargs):
-        messages.success(
-            self.request, "Application for {} submitted to {}!".format(
-                self.get_object(), self.get_object().venuesand()))
+        self.object = self.get_object()
+        self.object.submitted = timezone.now()
+        self.object.save()
+        transaction.on_commit(
+            lambda id=self.object.pk: render_and_send_app.delay(id))
+        messages.success(self.request, "Application for {} submitted to {}! Check your email for confirmation.".format(self.object, self.object.venuesand()))
         return redirect("venueapp:public_index")

@@ -62,16 +62,7 @@ def queue_email(name, ident="", silent=True, **kwargs):
 NEWLINE_COLLAPSE_RE = re.compile('\n\\W*\n')
 WHITESPACE_COLLAPSE_RE = re.compile('[ \t]{2,}')
 
-def render_to_queue(template, name, ident="", context={}, silent=True,
-                    **kwargs):
-    _fix_to(kwargs)
-    existing = get(name, ident, kwargs["to"][0])
-    if existing and existing.sent:
-        if silent:
-            return
-        else:
-            raise EmailSent("Attempting to render and queue email that has "
-                            "already been sent.")
+def render_msg(template, context={}, **kwargs):
     msg = AnymailMessage(**kwargs)
     if "tags" in kwargs:
         msg.tags = kwargs["tags"]
@@ -91,6 +82,19 @@ def render_to_queue(template, name, ident="", context={}, silent=True,
     context["IS_HTML"] = True
     msg.attach_alternative(template.render(context), 'text/html')
 
+    return msg
+
+def render_to_queue(template, name, ident="", context={}, silent=True,
+                    **kwargs):
+    _fix_to(kwargs)
+    existing = get(name, ident, kwargs["to"][0])
+    if existing and existing.sent:
+        if silent:
+            return
+        else:
+            raise EmailSent("Attempting to render and queue email that has "
+                            "already been sent.")
+    msg = render_msg(template, context, **kwargs)
     return queue_msg(msg, name, ident, silent=silent)
 
 def render_for_user(user, *args, **kwargs):

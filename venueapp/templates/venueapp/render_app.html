@@ -15,7 +15,7 @@
 	</table>
       </div>
     </div>
-
+    <div class="newpage"></div>
     <!-- Staff List -->
     <h3 class="text-center">Staff List</h3>
     <div class="row justify-content-center">
@@ -45,6 +45,7 @@
 	</table>
       </div>
     </div>
+    <div class="newpage"></div>
     <!-- Residency Preferences -->
     <h3 class="text-center">Residency Preferences</h3>
     <div class="row justify-content-center">
@@ -72,6 +73,7 @@
 	</table>
       </div>
     </div>
+    <div class="newpage"></div>
     <!-- Budget -->
     <h3 class="text-center">Budget</h3>
     <div class="row justify-content-center">
@@ -98,6 +100,7 @@
 	</table>
       </div>
     </div>
+    <div class="newpage"></div>
     <!-- Questions -->
     {% if object.answer_set|forvenue_exists:venue %}
     <h3 class="text-center">Questions</h3>
@@ -111,12 +114,19 @@
     {% else %}
     <h4 class="text-center mb-3">No questions for this venue.</h4>
     {% endif %}
+    <div class="newpage"></div>
     <!-- Supplements -->
-    <h3 class="text-center">Supplements</h3>
+    {% if not pdf %}<h3 class="text-center">Supplements</h3>{% endif %}
     {% for staff in object.staffmember_set.signed_on %}
+    {% if pdf %}
+    <a name="supplement-{{ staff.id }}"></a>
+    <h3 class="text-center" style="bookmark-label: &quot;{{ staff.role_name|escapejs }} {{ staff.person|escapejs }}'s Supplement&quot;">{{ staff.role_name }} Supplement</h3>
+    <h4 class="text-center">{{ staff.person }}</h4>
+    {% else %}
     <h4 class="mx-5">
       <a name="supplement-{{ staff.id }}">{{ staff }}</a>
     </h4>
+    {% endif %}
     <div class="row justify-content-center">
       <div class="col-md-9">
 	<h5>Resume:
@@ -134,7 +144,7 @@
       <div class="col-md-9">
 	<h5>Conflicts:
 	  <small>
-	    {{ staff.person.conflicts|default:"<em>None supplied.</em>" }}
+	    {{ staff.person.conflicts|linebreaksbr|default:"<em>None supplied.</em>" }}
 	  </small>
 	</h5>
       </div>
@@ -144,7 +154,7 @@
       <div class="col-md-9">
 	<h5>Statement</h5>
 	<p class="mx-4">
-	  {{ staff.statement|default:"<em>None supplied.</em>" }}
+	  {{ staff.statement|linebreaksbr|default:"<em>None supplied.</em>" }}
 	</p>
       </div>
     </div>
@@ -157,6 +167,11 @@
 	  <a href="{{ staff.attachment.url }}" target="_blank">
 	    {{ staff.attachment_filename }}
 	  </a>
+	  {% if pdf and staff.attachment.size < max_attachment_size %}
+	  <small class="text-muted">
+	    (also included below)
+	  </small>
+	  {% endif %}
 	  {% else %}
 	  <em>None supplied.</em>
 	  {% endif %}
@@ -175,4 +190,7 @@
     </div>
     {% endif %}
     <div class="mb-2"></div><!-- Spacer -->
+    {% if not forloop.last %}
+    <div class="newpage"></div>
+    {% endif %}
     {% endfor %}

@@ -35,6 +35,8 @@
   </div>
 </div>
 
+{% if not object.submitted %}
+{% if request.user.is_superuser %}
 <div class="row justify-content-center mt-5">
   <div class="col-md-10">
     <button type="button" class="btn btn-primary btn-block btn-lg submit-app">
@@ -88,11 +90,12 @@
     </div>
   </form>
 </div>
-
-<!--<hr class="mt-5">
+{% endif %}
+<hr class="mt-5">
 <h4 class="text-center"><em>
   Submitting applications is not available at this time. We apologize for any
   inconvenience.
 </em></h4>
-<hr>-->
+<hr>
+{% endif %}
 {% endblock %}
