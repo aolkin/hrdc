@@ -70,8 +70,7 @@ def render_and_send_app(pk):
         try:
             msg.send()
         except Exception as err:
-            LOGGER.warn("Application submission sending failed: {}".format(
+            LOGGER.error("Application submission sending failed: {}".format(
                 repr(err)))
         finally:
             merger.close()
-    

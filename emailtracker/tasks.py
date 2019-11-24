@@ -15,4 +15,4 @@ def send_queued(pk):
 def send_missing():
     n = import_module('emailtracker.tools').reschedule_all()
     if n:
-        LOGGER.warn("{} unsent emails rescheduled.".format(n))
+        LOGGER.error("{} unsent emails rescheduled.".format(n))

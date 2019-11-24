@@ -88,7 +88,7 @@ class QueuedEmail(models.Model):
             except Exception as err:
                 self.status = "<Failed>"
                 if quiet:
-                    LOGGER.warn("Message {} sending failed: {}".format(
+                    LOGGER.error("Message {} sending failed: {}".format(
                         self.pk, repr(err)))
                 else:
                     print_exc()
