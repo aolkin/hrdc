@@ -65,7 +65,7 @@ def render_and_send_app(pk):
                 app, venue.venue),
             tags=["venueapp", "venueapp-submission"]
         )
-        msg.attach("{} - {}.pdf".format(app, venue), pdf.getbuffer(),
+        msg.attach("{} - {}.pdf".format(app, venue), BytesIO(pdf.getbuffer()),
                    "application/pdf")
         try:
             msg.send()

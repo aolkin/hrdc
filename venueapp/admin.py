@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django import forms
 from django.utils.html import mark_safe, format_html
+from django.contrib import messages
 
 from .models import *
 
@@ -66,6 +67,12 @@ class SlotPrefInline(admin.TabularInline):
     fields = ("venue", "ordering", "start", "end", "slot", "weeks",)
     readonly_fields = ("weeks",)
 
+def unsubmit_apps(modeladmin, request, qs):
+    qs = qs.exclude(submitted=None)
+    qs.update(submitted=None)
+    messages.success(request, "Un-submitted {} applications.".format(qs.count()))
+unsubmit_apps.short_description = "Un-submit selected applications"
+
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
     list_display = ("show", "venuestr", "season", "submitted")
@@ -90,6 +97,7 @@ class ApplicationAdmin(admin.ModelAdmin):
     )
     readonly_fields = ("created", "prod_type", "creator_credit", "affiliation",
                        "contact_executive_staff", "submitted", "show",)
+    actions = [unsubmit_apps]
 
     def prod_type(self, obj):
         return obj.show and obj.show.get_prod_type_display()
