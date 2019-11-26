@@ -23,7 +23,8 @@ class ApplicationTarget(MailTarget):
     verbose_name = "Venue Application Executive Staffs" 
     variables_description = """show - the name of the show being applied for
     venues - the venues being applied to
-    venue - the selected venue in your filters
+    venue - the selected venue in your filters,
+    people - the people to whom this email is addressed
     """
 
     def get_emails(self, form):
@@ -39,6 +40,7 @@ class ApplicationTarget(MailTarget):
                    for i in app.show.staff.all()], self.render_body(
                            form, {
                                "show": str(app.show),
-                               "venues": app.venuestr(),
-                               "venue": form.cleaned_data["venue"]
+                               "venues": app.venuesand(),
+                               "venue": form.cleaned_data["venue"],
+                               "people": app.exec_staff_names(),
                            })

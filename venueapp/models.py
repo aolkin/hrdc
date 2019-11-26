@@ -140,6 +140,21 @@ class Application(models.Model):
     def exec_staff_list(self):
         return ", ".join([str(i) for i in self.staffmember_set.filter(
             role__category=10)])
+
+    def exec_staff_names(self):
+        qs = self.staffmember_set.filter(role__category=10)
+        out = ""
+        count = qs.count()
+        for i, v in enumerate(qs.all()):
+            out += str(v.person)
+            if i < count - 2:
+                out += ", "
+            elif i < count - 1:
+                if count > 2:
+                    out += ", and "
+                else:
+                    out += " and "
+        return out
     
     def season(self):
         return self.show.seasonstr()

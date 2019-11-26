@@ -31,8 +31,7 @@ class MailTarget:
         return kwargs
 
     def render_body(self, form, context):
-        template = Template(form.cleaned_data["body"].strip().replace(
-            "\n", "<br>"))
+        template = Template(form.cleaned_data["body"].strip())
         try:
             return mark_safe(template.render(Context(context)))
         except Exception as e:
