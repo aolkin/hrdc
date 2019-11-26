@@ -687,7 +687,7 @@ class VenueSidebarMixin:
         menu = context["sidebar_menu"] = {}
         menu[""] = [{
             "name": str(self.object),
-            "url": reverse_lazy("venueapp:applist", self.object.pk),
+            "url": reverse_lazy("venueapp:applist", args=(self.object.pk,)),
             "active": current_url == "applist"
         }]
         
