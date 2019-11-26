@@ -9,16 +9,13 @@ def auth_view(name):
     v = getattr(auth_views, name + "View")
     class NewView(v):
         template_name = v.template_name.replace("registration","dramaauth")
-        success_url = reverse_lazy("dramaorg:{}_done".format(name))
+        success_url = reverse_lazy("dramaorg:home")
     return NewView.as_view()
 
 auth_urls = [
     url(r'^login/$', LoginView.as_view(), name='login'),
     url(r'^logout/$', auth_view("Logout"), name='logout'),
-    url(r'^password/$', auth_view("PasswordChange"),
-        name='password_change'),
-    url(r'^password/done/$', auth_view("PasswordChangeDone"),
-        name='password_change_done'),
+    url(r'^password/$', auth_view("PasswordChange"), name='password_change')
 ]
 
 app_name = "dramaorg"
