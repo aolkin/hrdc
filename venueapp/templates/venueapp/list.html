@@ -1,0 +1,85 @@
+{% extends "bt/sidebar.html" %}
+
+{% load bt %}
+
+{% block title %}Read Venue Applications{% endblock %}
+
+{% block extra_header %}
+{% include "dramaorg/user_dropdown.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mb-3">
+  <div class="col-md-8">
+    <h2 class="text-center">Applications to {{ object }}</h2>
+  </div>
+</div>
+
+{% if preapps.exists %}
+<h3 class="text-center mt-5 mb-3">Pre-Application{{ preapps.count|pluralize }} to {{ object }}</h3>
+<table class="table table-responsive bt-table-responsive table-striped">
+  <thead>
+    <tr>
+      <th class="table-col-md">Show</th>
+      <th class="table-col-md">Venue(s)</th>
+      <th class="table-col-lg">Exec Staff</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for app in preapps %}
+    {% with show=app.show %}
+    <tr>
+      <td>
+	<a href="{% url 'venueapp:read' object.pk app.pk %}">
+	  {{ show.title }}
+	</a>
+      </td>
+      <td>{{ app.venuestr }}</td>
+      <td>{{ app.exec_staff_list }}</td>
+    </tr>
+    {% endwith %}
+    {% endfor %}
+</table>
+{% endif %}
+
+{% if apps.exists %}
+<h3 class="text-center mt-5 mb-3">Full Application{{ apps.count|pluralize }} to {{ object }}</h3>
+<table class="table table-responsive bt-table-responsive table-striped">
+  <thead>
+    <tr>
+      <th class="table-col-md">Show</th>
+      <th class="table-col-md">Venue(s)</th>
+      <th class="table-col-md">First-Choice Slot</th>
+      <th class="text-center">Submitted</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for app in apps %}
+    {% with show=app.show %}
+    <tr>
+      <td>
+	<a href="{% url 'venueapp:read' object.pk app.pk %}">
+	  {{ show.title }}
+	</a>
+      </td>
+      <td>{{ app.venuestr }}</td>
+      <td>{{ app.slotpreference_set.first }}</td>
+      <td class="text-center" title="{{ app.submitted|default:'' }}">
+	{% include "venueapp/pieces/checkmark.html" with value=app.submitted %}
+	{% if app.submitted %}
+	<div>
+	  <small class="nowrap">{{ app.submitted|date:"M j g:i A" }}</small>
+	</div>
+	{% else %}
+	<div>
+	  <small class="nowrap">Due {{ app.due|date:"M j g:i A" }}</small>
+	</div>
+	{% endif %}
+      </td>
+    </tr>
+    {% endwith %}
+    {% endfor %}
+</table>
+{% endif %}
+
+{% endblock %}

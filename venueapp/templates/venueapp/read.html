@@ -1,0 +1,20 @@
+{% extends "bt/sidebar.html" %}
+
+{% load bt %}
+
+{% block title %}Read Venue Applications{% endblock %}
+
+{% block extra_header %}
+{% include "dramaorg/user_dropdown.html" %}
+{% endblock %}
+
+{% block content %}
+<h2 class="text-center mb-3">{{ app }} - {{ object }}</h2>
+
+{% if app.submitted %}
+{% include "venueapp/render_app.html" with venue=object object=app cover=cover only %}
+{% else %}
+{% include "venueapp/render_preapp.html" with venue=object object=app cover=cover only %}
+{% endif %}
+
+{% endblock %}

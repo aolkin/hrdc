@@ -2,6 +2,7 @@ from django.views.generic import TemplateView, View
 from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.views.generic.edit import FormView, CreateView, UpdateView
 from django.urls import reverse_lazy
+from django.utils.html import mark_safe, format_html
 from django.shortcuts import redirect, render
 from django import forms
 from django.forms import widgets
@@ -639,9 +640,7 @@ def make_cover_page(app):
         cover["Production Type"] = app.show.get_prod_type_display()
         cover["Author/Composer"] = app.show.creator_credit
         cover["Sponsorship/Affiliation"] = app.show.affiliation
-        cover["Executive Staff"] = ", ".join(
-            [str(i) for i in app.staffmember_set.filter(
-                role__category=10)])
+        cover["Executive Staff"] = app.exec_staff_list()
         cover["Cast Gender Breakdown"] = app.cast_breakdown
         cover["Band/Orchestra Size"] = app.band_size
         cover["Application Submitted"] = app.submitted
@@ -666,3 +665,76 @@ class PreviewSubmitView(MenuMixin, UserStaffMixin, DetailView):
             lambda id=self.object.pk: render_and_send_app.delay(id))
         messages.success(self.request, "Application for {} submitted to {}! Check your email for confirmation.".format(self.object, self.object.venuesand()))
         return redirect("venueapp:public_index")
+
+class AdminIndexView(TemplateView):
+    verbose_name = "Venue Applications"
+    help_text = "read applications"
+
+    template_name = "venueapp/admin.html"
+
+    def get_context_data(self, **kwargs):
+        if self.request.user.is_anonymous:
+            raise PermissionDenied()
+        kwargs["readable"] = self.request.user.venueapp_set.all()
+        return super().get_context_data(**kwargs)
+
+class VenueSidebarMixin:
+    def get_context_data(self, *args, **kwargs):
+        if not self.object.readers.filter(pk=self.request.user.pk).exists():
+            raise PermissionDenied()
+        context = super().get_context_data(*args, **kwargs)
+        current_url = self.request.resolver_match.url_name
+        menu = context["sidebar_menu"] = {}
+        menu[""] = [{
+            "name": str(self.object),
+            "url": reverse_lazy("venueapp:applist", self.object.pk),
+            "active": current_url == "applist"
+        }]
+        
+        for name, qs in (
+                ("Pre-Applications",
+                 self.object.application_set.filter(submitted=None)),
+                ("Full Applications",
+                 self.object.application_set.exclude(submitted=None)),
+        ):
+            submenu = menu[name] = []
+            for app in qs:
+                submenu.append({
+                    "name": str(app),
+                    "url": reverse_lazy("venueapp:read",
+                                        args=(self.object.pk, app.pk,)),
+                    "active": hasattr(self, "app") and self.app.pk == app.pk
+                })
+            if not submenu:
+                submenu.append({
+                    "name": mark_safe('<em class="text-muted">(None currently available)</em>')
+                })
+        return context
+
+class AdminListView(VenueSidebarMixin, DetailView):
+    template_name = "venueapp/list.html"
+    model = VenueApp
+    
+    def get_context_data(self, **kwargs):
+        if self.request.user.is_anonymous:
+            raise PermissionDenied()
+        kwargs["preapps"] = self.object.application_set.filter(submitted=None)
+        kwargs["apps"] = self.object.application_set.exclude(submitted=None)
+        return super().get_context_data(**kwargs)
+
+class AdminReadView(VenueSidebarMixin, DetailView):
+    template_name = "venueapp/read.html"
+    model = VenueApp
+
+    def get_app(self):
+        if not hasattr(self, "app"):
+            self.app = self.get_object().application_set.filter(
+                pk=self.kwargs["app"]).first()
+            if not self.app:
+                raise Http404("Application not found")
+        return self.app
+
+    def get_context_data(self, **kwargs):
+        kwargs['app'] = self.get_app()
+        kwargs["cover"] = make_cover_page(self.app)
+        return super().get_context_data(**kwargs)

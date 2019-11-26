@@ -25,4 +25,9 @@ urlpatterns = [
         url(r'^delete/$', DeleteApplication.as_view(), name="deleteapp"),
         url(r'^submit/$', PreviewSubmitView.as_view(), name="submit"),
     ])),
+    url(r'^read/$', AdminIndexView.as_view(), name="admin"),
+    url(r'^read/(?P<pk>\d+)/', include([
+        url(r'^$', AdminListView.as_view(), name="applist"),
+        url(r'^app/(?P<app>\d+)/', AdminReadView.as_view(), name="read"),
+    ])),
 ]

@@ -1,0 +1,27 @@
+{% extends "bt/default.html" %}
+
+{% load bt %}
+
+{% block title %}Read Venue Applications{% endblock %}
+
+{% block extra_header %}
+{% include "dramaorg/user_dropdown.html" %}
+{% endblock %}
+
+{% block content %}
+<h3 class="text-center mb-4">
+  Please select a venue from the list to read applications for:
+</h3>
+{% for venue in readable %}
+<p class="text-center lead">
+  <a href="{% url 'venueapp:applist' venue.pk %}">{{ venue }}</a>
+</p>
+{% empty %}
+<p class="lead mx-5 mt-3 text-center">
+  You are not currently listed as a reader on any Venue Applications. Please
+  contact the administrator of the venues you expect to be able to read for
+  access.
+</p>
+{% endfor %}
+
+{% endblock %}

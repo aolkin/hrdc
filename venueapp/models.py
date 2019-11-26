@@ -6,6 +6,7 @@ from django.db.models.signals import (post_save, pre_delete, pre_save,
 from django.dispatch import receiver
 from django.utils import timezone
 from django.conf import settings
+from django.urls import reverse_lazy
 
 import os.path
 
@@ -81,7 +82,8 @@ class AvailableResidency(models.Model):
             )
 
     def __str__(self):
-        return "{} from {} to {}".format(self.venue.venue, self.start, self.end)
+        return "{} from {:%m-%d} to {:%m-%d}".format(self.venue.venue,
+                                                     self.start, self.end)
 
     class Meta:
         ordering = "start",
@@ -135,6 +137,10 @@ class Application(models.Model):
                     out += " and "
         return out
 
+    def exec_staff_list(self):
+        return ", ".join([str(i) for i in self.staffmember_set.filter(
+            role__category=10)])
+    
     def season(self):
         return self.show.seasonstr()
     venuestr.short_description = "Venues"
@@ -376,8 +382,9 @@ class SlotPreference(models.Model):
                              limit_choices_to={ "type": True })
 
     def __str__(self):
-        return str(self.slot) if self.slot else "{} from {} to {}".format(
-            self.venue.venue, self.start, self.end)
+        return (str(self.slot) if self.slot else
+                "{} from {:%m-%d} to {:%m-%d}".format(
+                    self.venue.venue, self.start, self.end))
 
     @property
     def start_date(self):

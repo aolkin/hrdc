@@ -50,6 +50,8 @@ class EmailerView(TemplateView):
 
     def dispatch(self, *args, **kwargs):
         self.get_target()
+        if not self.request.user.is_staff:
+            raise PermissionDenied()
         return super().dispatch(*args, **kwargs)
 
     def get_form(self):
