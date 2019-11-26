@@ -39,6 +39,7 @@ class VenueAdmin(admin.ModelAdmin):
     list_filter = "live", "year", "season", "due"
     filter_horizontal = "questions",
     autocomplete_fields = "managers", "readers",
+    search_fields = "venue__name", "venue__nickname", "season", "year"
     inlines = ResidencyInline, DefaultBudgetInline
 
 @admin.register(OldStyleApp)
@@ -59,13 +60,15 @@ class OldStyleAppAdmin(admin.ModelAdmin):
 class StaffInline(admin.TabularInline):
     model = StaffMember
     extra = 0
-    fields = ("person", "role", "other_role", "signed_on",)
+    fields = ("person", "role", "other_role", "role_name", "signed_on",)
+    autocomplete_fields = ("person",)
+    readonly_fields = ("signed_on", "role_name")
 
 class SlotPrefInline(admin.TabularInline):
     model = SlotPreference
     extra = 0
-    fields = ("venue", "ordering", "start", "end", "slot", "weeks",)
-    readonly_fields = ("weeks",)
+    fields = ("ordering", "venue", "start_date", "end_date", "weeks")
+    readonly_fields = ("venue", "start_date", "end_date", "weeks")
 
 def unsubmit_apps(modeladmin, request, qs):
     qs = qs.exclude(submitted=None)
@@ -97,6 +100,7 @@ class ApplicationAdmin(admin.ModelAdmin):
     )
     readonly_fields = ("created", "prod_type", "creator_credit", "affiliation",
                        "contact_executive_staff", "submitted", "show",)
+    autocomplete_fields = ("venues",)
     actions = [unsubmit_apps]
 
     def prod_type(self, obj):
@@ -120,7 +124,7 @@ class ApplicationAdmin(admin.ModelAdmin):
 
 @admin.register(SeasonStaffMeta)
 class SeasonStaffAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ("user__first_name", "user__last_name", "user__email")
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):

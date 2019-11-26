@@ -99,6 +99,22 @@ the system. By clicking on an application, you can then view the current cover
 page information (title, cast and band sizes, etc), staff list, and residency
 preferences.
 
+# Submitted Applications
+
+When a production team submits their application, the application will be
+compiled into a PDF and emailed to the venue application "Managers", with the
+executive staff of the show CC'd. At this point, the production team will be
+unable to further edit their application, though they can still view it through
+the portal.
+
+## "Un-submitting" Applications
+
+Should it become necessary, Venue Application admins can enter the admin site
+and use the "Un-submit selected applications" action to remove the submission
+of one or more selected apps. When this is done, the production team will be
+able to continue editing their application and then submit it again, at which
+point a new PDF will be compiled and emailed.
+
 # Available Staff Roles
 
 On the staff list page presented to executive teams applying for space, they

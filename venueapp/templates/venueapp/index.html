@@ -51,11 +51,11 @@
       <td>{{ show.title }}</td>
       <td>{{ show.seasonstr }} &ndash; {{ meta.venuestr }}</td>
       <td>
-	{% if role.signed_on %}
+	{% if role.signed_on and not meta.submitted %}
 	<a href="{% url 'venueapp:individual' meta.pk role.pk %}">
 	  {% endif %}
 	  {{ role.role_name }}
-	  {% if role.signed_on %}
+	  {% if role.signed_on and not meta.submitted %}
 	</a>
 	<div class="float-right">
 	  <a href="{% url 'venueapp:leave' meta.pk role.pk %}"
@@ -64,7 +64,7 @@
 	{% endif %}
       </td>
       <td class="text-center">
-	{% if role.signed_on %}
+	{% if role.signed_on or meta.submitted %}
 	{% include "venueapp/pieces/checkmark.html" with value=role.all_status only %}
 	{% if not role.all_status %}
 	<div><small>

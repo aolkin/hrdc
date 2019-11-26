@@ -71,11 +71,12 @@ class MenuMixin:
                 submenu.append({
                     "name": "<<submitted>>",
                 })
-                submenu.append({
-                    "name": "View Application",
-                    "url": reverse_lazy("venueapp:submit", args=(show.pk,)),
-                    "active": active and current_url == "submit"
-                })
+                if showstaff.filter(role__category=10).exists():
+                    submenu.append({
+                        "name": "View Application",
+                        "url": reverse_lazy("venueapp:submit", args=(show.pk,)),
+                        "active": active and current_url == "submit"
+                    })
                 continue
 
             if showstaff.filter(role__category=10).exists():
@@ -656,6 +657,9 @@ class PreviewSubmitView(MenuMixin, UserStaffMixin, DetailView):
 
     def post(self, *args, **kwargs):
         self.object = self.get_object()
+        if self.object.submitted:
+            messages.error(self.request, "Application already submitted!")
+            return redirect("venueapp:public_index")
         self.object.submitted = timezone.now()
         self.object.save()
         transaction.on_commit(
