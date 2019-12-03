@@ -119,6 +119,12 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     affiliationyear.admin_order_field = Concat("affiliation", "year")
     
     @property
+    def apostrophe_year(self):
+        if self.year and len(str(self.year)) >= 2:
+            return "'" + str(self.year)[-2:]
+        return ""
+
+    @property
     def is_initialized(self):
         return bool(self.first_name and self.last_name and self.phone and
                     self.affiliation)
