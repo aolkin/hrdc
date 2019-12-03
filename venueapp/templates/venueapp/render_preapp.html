@@ -78,10 +78,12 @@
 	  </tbody>
 	</table>
       </div>
+      {% if object.length_description %}
       <div class="col-md-8">
-	<h4 class="text-center">Additional Residency Length Preferences</h4>
+	<h4 class="text-center">Residency Preference Clarifications</h4>
 	<p>
 	  {{ object.length_description|linebreaks }}
-	  </p>
+	</p>
       </div>
+      {% endif %}
     </div>
