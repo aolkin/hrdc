@@ -64,17 +64,8 @@
       </td>
       <td>{{ app.venuestr }}</td>
       <td>{{ app.slotpreference_set.first }}</td>
-      <td class="text-center" title="{{ app.submitted|default:'' }}">
-	{% include "venueapp/pieces/checkmark.html" with value=app.submitted %}
-	{% if app.submitted %}
-	<div>
-	  <small class="nowrap">{{ app.submitted|date:"M j g:i A" }}</small>
-	</div>
-	{% else %}
-	<div>
-	  <small class="nowrap">Due {{ app.due|date:"M j g:i A" }}</small>
-	</div>
-	{% endif %}
+      <td class="text-center nowrap" title="{{ app.submitted|default:'' }}">
+	{{ app.submitted|date:"M j g:i A" }}
       </td>
     </tr>
     {% endwith %}
