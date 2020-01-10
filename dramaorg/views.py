@@ -3,7 +3,8 @@ from django.urls import reverse_lazy, reverse, resolve
 from django.urls.exceptions import NoReverseMatch
 from django.conf import settings
 from django.utils import timezone
-from django.utils.decorators import method_decorator 
+from django.utils.decorators import method_decorator
+from django.shortcuts import redirect
 
 from django import forms
 from django.views.generic.base import TemplateView
@@ -32,6 +33,8 @@ class LoginView(DjangoLoginView):
     template_name = "dramaauth/login.html"
     
     def get(self, *args, **kwargs):
+        if not self.request.user.is_anonymous:
+            return redirect(self.request.GET.get("next", "/"))
         if self.request.GET.get("next", None):
             messages.warning(
                 self.request,
