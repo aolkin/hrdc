@@ -290,17 +290,19 @@ class SeasonSidebarMixin:
             "active": current_url == "admin"
         }]
 
-        submenu = menu["Manage Seasons"] = []
-
-        for year, season in Show.objects.all().values_list(
-                "year", "season").distinct():
-            submenu.append({
-                "name": "{} {}".format(Show.SEASONS[season][1], year),
-                "url": reverse_lazy("dramaorg:season", args=(year, season,)),
-                "active": (current_url == "season" and
-                           self.kwargs.get("year", None) == str(year) and
-                           self.kwargs.get("season", None) == str(season))
-            })
+        for year in Show.objects.all().values_list(
+                "year", flat=True).distinct().order_by("-year"):
+            submenu = menu[str(year)] = []
+            for season in Show.objects.filter(year=year).values_list(
+                "season", flat=True).distinct().order_by("-season"):
+                submenu.append({
+                    "name": "{} {}".format(Show.SEASONS[season][1], year),
+                    "url": reverse_lazy("dramaorg:season",
+                                        args=(year, season,)),
+                    "active": (current_url == "season" and
+                               self.kwargs.get("year", None) == str(year) and
+                               self.kwargs.get("season", None) == str(season))
+                })
         return context
 
 class ManagementView(PermissionRequiredMixin, SeasonSidebarMixin, TemplateView):
@@ -337,11 +339,7 @@ class SeasonView(PermissionRequiredMixin, SeasonSidebarMixin, FormView):
             year=self.get_year(), season=self.get_season()).values(
                 "id", "title", "affiliation", "prod_type", "space",
                 "residency_starts", "residency_ends"))
-        kwargs["spaces"] = dict([(i, str(Space.objects.filter(id=i).first()))
-                                 for i in Show.objects.filter(
-                                         year=self.get_year(),
-                                         season=self.get_season()).values_list(
-                                             "space", flat=True).distinct()])
+        kwargs["spaces"] = dict([(i.id, str(i)) for i in Space.objects.all()])
         return super().get_context_data(**kwargs)
 
     def get_form_kwargs(self):
@@ -349,3 +347,4 @@ class SeasonView(PermissionRequiredMixin, SeasonSidebarMixin, FormView):
         kwargs["queryset"] = Show.objects.filter(
             year=self.get_year(), season=self.get_season())
         return kwargs
+    

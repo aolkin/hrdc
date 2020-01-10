@@ -1,5 +1,6 @@
 .season-block {
     min-height: 400px;
+    position: relative;
 }
 .season-block.card-group {
     flex-flow: row;
@@ -7,6 +8,7 @@
 
 .season-block .card {
     min-width: 200px;
+    background: transparent;
 }
 
 .season-venue-block {
@@ -18,6 +20,16 @@
     width: 100%;
     min-height: 28px;
     background-color: #eee;
+    border: 1px grey dashed;
     border-radius: 4px;
     padding: 2px 8px;
+}
+
+.season-calendar-week {
+    height: 49px;
+    position: absolute;
+    border-top: 1px grey dashed;
+    width: 100%;
+    margin-top: 3.5em;
+    padding: 0.25rem 1.25rem;
 }

@@ -22,45 +22,41 @@ $(() => {
 
     let shows = JSON.parse($("#show-data").text());
     let spaces = JSON.parse($("#space-data").text());
-    let venues = {};
-    let first = moment().add(10, "years").endOf("year");
-    let last = moment(0);
+
     for (var i = 0; i < shows.length; i++) {
 	shows[i].space = spaces[shows[i].space];
-	shows[i].start = moment(shows[i].residency_starts);
-	shows[i].end = moment(shows[i].residency_ends);
-
-	if (shows[i].start.isValid()) {
-	    first = moment.min(shows[i].start, first);
-	}
-	if (shows[i].end.isValid()) {
-	    last = moment.max(shows[i].end, last);
-	}
-
-	if (venues[shows[i].space] === undefined) {
-	    venues[shows[i].space] = [];
-	}
-	venues[shows[i].space].push(shows[i]);
     }
-    let total_days = last.diff(first, "days");
-    console.log(shows, spaces, venues, total_days);
 
     let HEIGHT = 7;
+    let MIN_DAYS = 4;
+    let MIN_HEIGHT = MIN_DAYS + 1;
 
     Vue.component("show", {
 	template: `
 	  <div class="season-show-block"
-	    :style="{ height: height + 'px', top: top + 'px' }">
+	    :style="{ height: height + 'px', top: top + 'px' }"
+	    @click="$emit('select', show)">
 	    {{ show.title }}
 	  </div>
 	`,
-	props: ["show"],
+	props: ["show", "first", "index"],
 	computed: {
+	    start() {
+		return moment(this.show.residency_starts);
+	    },
+	    end() {
+		return moment(this.show.residency_ends);
+	    },
 	    top() {
-		return this.show.start.diff(first, "days") * HEIGHT;
+		if (this.start.isValid()) {
+		    return this.start.diff(this.first, "days") * HEIGHT;
+		}
+		return this.index * HEIGHT * MIN_HEIGHT;
 	    },
 	    height() {
-		return this.show.end.diff(this.show.start, "days") * HEIGHT;
+		return Math.max(
+		    (this.end.diff(this.start, "days") + 1) * HEIGHT,
+		    MIN_DAYS * HEIGHT);
 	    }
 	}
     });
@@ -68,13 +64,70 @@ $(() => {
     let app = new Vue({
 	el: "#season-vue",
 	data: {
-	    "venues": venues,
-	    "total_days": total_days,
+	    "shows": shows,
+	    "spaces": spaces,
+	    "editing": null,
 	},
 	computed: {
+	    first() {
+		let first = moment().add(10, "years").endOf("year");
+		for (var i = 0; i < this.shows.length; i++) {
+		    let start = moment(this.shows[i].residency_starts);
+	    	    if (start.isValid()) {
+			first = moment.min(start, first);
+		    }
+		}
+		return first.day(0);
+	    },
+	    last() {
+		let last = moment(0);
+		for (var i = 0; i < this.shows.length; i++) {
+		    let start = moment(this.shows[i].residency_starts);
+		    let end = moment(this.shows[i].residency_ends);
+	    	    if (end.isValid()) {
+			last = moment.max(end, last);
+		    }
+	    	    if (start.isValid()) {
+			last = moment.max(start.add(MIN_DAYS, "d"), last);
+		    }
+		}
+		return last.day(6).add(7, "d");
+	    },
+	    total_days() {
+		return this.last.diff(this.first, "days");
+	    },
 	    height() {
 		return this.total_days * HEIGHT;
-	    }
+	    },
+	    venues() {
+		let venues = {};
+		for (var i = 0; i < this.shows.length; i++) {
+		    if (venues[this.shows[i].space] === undefined) {
+			venues[this.shows[i].space] = [];
+		    }
+		    venues[this.shows[i].space].push(this.shows[i]);
+		}
+		return venues;
+	    },
+	    calendar() {
+		let weeks = [];
+		let date = this.first.clone();
+		while (date.isBefore(this.last)) {
+		    weeks.push(date.format("MMM D") + " - " +
+			       date.add(6, "d").format("MMM D"));
+		    date.add(1, "d");
+		}
+		return weeks;
+	    },
+	},
+	methods: {
+	    edit(show) {
+		this.editing = show;
+		console.log(show);
+	    },
+	    close() {
+		this.editing = null;
+	    },
 	}
     });
 });
