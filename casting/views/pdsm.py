@@ -141,12 +141,18 @@ class ShowEditor(ShowStaffMixin, UserIsPdsmMixin, UpdateView):
             messages.error(self.request,
                            "You do not have access to that show.")
             return HttpResponseRedirect(reverse("login"))
-        
+
     def get(self, *args, **kwargs):
         if not self.request.is_ajax():
             return HttpResponseRedirect(reverse("casting:index"))
         else:
             return super().get(*args, **kwargs)
+
+    def form_invalid(self, form):
+        messages.error(self.request,
+                       "Please provide a valid email address for {}.".format(
+                       self.object))
+        return HttpResponseRedirect(reverse("casting:index"))
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
