@@ -95,7 +95,7 @@ def social_create_user(strategy, details, backend, user=None, *args, **kwargs):
     }
 
     User = import_module("django.contrib.auth").get_user_model()
-    qs = User.objects.filter(email=fields["email"])
+    qs = User.objects.filter(email__iexact=fields["email"])
     if qs.exists():
         return {
             'is_new': False,
