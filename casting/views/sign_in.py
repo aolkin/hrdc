@@ -129,8 +129,9 @@ class ActorSignInStart(ActorSignInBase, BaseUpdateView):
             self.actor = self.request.user
         else:
             self.actor, created = get_user_model().objects.get_or_create(
-                email=form.cleaned_data["email"],
-                defaults={"source": "casting"})
+                email__iexact=form.cleaned_data["email"],
+                defaults={ "source": "casting",
+                           "email": form.cleaned_data["email"] })
         self.request.session["actor"] = self.actor.pk
         self.request.session["building"] = self.object.pk
         self.request.session["show_ids"] = form.cleaned_data["shows"]

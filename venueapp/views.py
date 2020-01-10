@@ -310,7 +310,8 @@ class AddStaffView(UserStaffMixin, UnsubmittedAppMixin, View):
         form = AddStaffMemberForm(self.request.POST)
         if form.is_valid():
             user, uc = get_user_model().objects.get_or_create(
-                email=form.cleaned_data["email"])
+                email__iexact=form.cleaned_data["email"],
+                defaults={ "email": form.cleaned_data["email"] })
             staff = StaffMember.objects.create_from_user(
                 self.object, user, role=form.cleaned_data["role"])
             render_for_user(
