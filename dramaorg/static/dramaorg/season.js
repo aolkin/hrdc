@@ -34,6 +34,7 @@ $(() => {
     Vue.component("show", {
 	template: `
 	  <div class="season-show-block"
+	    :class="{ 'no-residency': !start.isValid() }"
 	    :style="{ height: height + 'px', top: top + 'px' }"
 	    @click="$emit('select', show)">
 	    {{ show.title }}
@@ -67,6 +68,7 @@ $(() => {
 	    "shows": shows,
 	    "spaces": spaces,
 	    "editing": null,
+	    "dirty": false,
 	},
 	computed: {
 	    first() {
@@ -91,7 +93,7 @@ $(() => {
 			last = moment.max(start.add(MIN_DAYS, "d"), last);
 		    }
 		}
-		return last.day(6).add(7, "d");
+		return last.day(6);
 	    },
 	    total_days() {
 		return this.last.diff(this.first, "days");
@@ -123,9 +125,20 @@ $(() => {
 	methods: {
 	    edit(show) {
 		this.editing = show;
-		console.log(show);
 	    },
 	    close() {
+		let form = $(`#show-form-${this.editing.id}`);
+		form.children("input[name$=residency_starts]").val(
+		    this.editing.residency_starts);
+		form.children("input[name$=residency_ends]").val(
+		    this.editing.residency_ends);
+		let space = null;
+		for (var id in this.spaces) {
+		    if (this.spaces[id] == this.editing.space) {
+			space = id;
+		    }
+		}
+		form.children("select[name$=space]").val(space);
 		this.editing = null;
 	    },
 	}

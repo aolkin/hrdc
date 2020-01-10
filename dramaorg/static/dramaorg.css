@@ -1,8 +1,8 @@
 .season-block {
-    min-height: 400px;
+    min-height: 180px;
     position: relative;
 }
-.season-block .card-group {
+.season-block.card-group {
     flex-flow: row !important;
 }
 
@@ -25,11 +25,19 @@
     padding: 2px 8px;
 }
 
+.season-show-block.no-residency {
+    background-color: #f4d0b5;
+}
+
 .season-calendar-week {
-    height: 49px;
+    height: 50px;
     position: absolute;
-    border-top: 1px grey dashed;
+    border-bottom: 1px grey dashed;
     width: 100%;
     margin-top: 3.5em;
     padding: 0.25rem 1.25rem;
+}
+
+.view-season ul.errorlist {
+    margin-bottom: auto;
 }

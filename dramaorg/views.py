@@ -315,16 +315,24 @@ class ManagementView(PermissionRequiredMixin, SeasonSidebarMixin, TemplateView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs)
 
+class ShowForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for i, f in self.fields.items():
+            f.required = False
+
 ShowFormSet = forms.modelformset_factory(
     Show, fields=("residency_starts", "residency_ends", "space"),
-    extra=0
+    extra=0, form=ShowForm
 )
 
 class SeasonView(PermissionRequiredMixin, SeasonSidebarMixin, FormView):
     permission_required = ("dramaorg.change_show",)
     template_name = "dramaorg/season.html"
     form_class = ShowFormSet
-    success_url = reverse_lazy("dramaorg:admin")
+
+    def get_success_url(self):
+        return self.request.path
 
     def get_season(self):
         return int(self.kwargs["season"])
@@ -348,3 +356,6 @@ class SeasonView(PermissionRequiredMixin, SeasonSidebarMixin, FormView):
             year=self.get_year(), season=self.get_season())
         return kwargs
     
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)

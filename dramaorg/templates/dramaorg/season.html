@@ -13,7 +13,11 @@
 {% block content %}
 <h2 class="text-center">{{ title }}</h2>
 
-<form method="POST" class="d-none">
+<p class="lead mt-2 mb-4 text-center">
+  Select a show to modify its residency.
+</p>
+
+<form method="POST" class="d-none" id="edit-form">
 {% csrf_token %}
 {{ form.management_form }}
 {% for form in form %}
@@ -21,12 +25,30 @@
 {{ form }}
 </div>
 {% endfor %}
-<input type="submit">
 </form>
 
+{% if form.errors %}
+<div class="alert alert-danger">
+  One or more errors occurred and your changes were not saved:
+</div>
+{% for d in form.errors %}
+{% if d %}
+<div class="alert alert-danger">
+  {% for e in d.values %}
+  <div>{{ e }}</div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endfor %}
+{% endif %}
+
 {% verbatim %}
-<div class="season-block" id="season-vue">
-  <div class="card-group">
+<div id="season-vue">
+<button type="submit" form="edit-form" v-if="dirty"
+	class="btn btn-block btn-lg btn-primary my-3">
+  Save All Changes
+</button>
+  <div class="card-group season-block">
     <div class="card">
       <div class="card-body">
 	<h5 class="card-title"><i>Calendar</i></h5>
@@ -50,7 +72,8 @@
     </div>
   </div>
   <div class="season-editor modal fade"
-       :class="{ show: editing, 'd-block': editing }">
+       :class="{ show: editing, 'd-block': editing }"
+       @click.self="close">
     <div class="modal-dialog modal-dialog-centered" role="document"
 	 v-if="editing">
       <div class="modal-content">
@@ -66,6 +89,7 @@
 	      Residency Starts</label>
 	    <div class="col-sm-7">
 	      <input type="date" class="form-control" id="r-starts"
+		     @input="dirty = true"
 		     v-model="editing.residency_starts" required>
 	    </div>
 	  </div>
@@ -74,6 +98,7 @@
 	      Residency Ends</label>
 	    <div class="col-sm-7">
 	      <input type="date" class="form-control" id="r-ends"
+		     @input="dirty = true"
 		     v-model="editing.residency_ends" required>
 	    </div>
 	  </div>
@@ -82,6 +107,7 @@
 	      Venue</label>
 	    <div class="col-sm-7">
 	      <select class="custom-select" id="r-venue"
+		      @input="dirty = true"
 		      v-model="editing.space">
 		<option value="undefined">-</option>
 		<option v-for="venue in spaces" :value="venue">
