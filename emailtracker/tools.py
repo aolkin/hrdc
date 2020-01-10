@@ -87,6 +87,8 @@ def render_msg(template, context={}, **kwargs):
 def render_to_queue(template, name, ident="", context={}, silent=True,
                     **kwargs):
     _fix_to(kwargs)
+    if not kwargs["to"]:
+        return False
     existing = get(name, ident, kwargs["to"][0])
     if existing and existing.sent:
         if silent:

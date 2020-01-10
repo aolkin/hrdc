@@ -23,7 +23,7 @@ class ApplicationTarget(MailTarget):
     verbose_name = "Venue Application Executive Staffs" 
     variables_description = """show - the name of the show being applied for
     venues - the venues being applied to
-    venue - the selected venue in your filters,
+    venue - the selected venue in your filters
     people - the people to whom this email is addressed
     """
 
