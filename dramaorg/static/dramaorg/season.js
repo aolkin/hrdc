@@ -30,8 +30,12 @@ $(() => {
 	shows[i].start = moment(shows[i].residency_starts);
 	shows[i].end = moment(shows[i].residency_ends);
 
-	first = moment.min(shows[i].start, first);
-	last = moment.max(shows[i].end, last);
+	if (shows[i].start.isValid()) {
+	    first = moment.min(shows[i].start, first);
+	}
+	if (shows[i].end.isValid()) {
+	    last = moment.max(shows[i].end, last);
+	}
 
 	if (venues[shows[i].space] === undefined) {
 	    venues[shows[i].space] = [];
