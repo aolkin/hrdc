@@ -2,8 +2,8 @@
     min-height: 400px;
     position: relative;
 }
-.season-block.card-group {
-    flex-flow: row;
+.season-block .card-group {
+    flex-flow: row !important;
 }
 
 .season-block .card {
