@@ -29,3 +29,18 @@
 	margin-bottom: auto;
     }
 }
+
+.peopleform .deleted-row {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.select2-container .select2-selection--single {
+    height: 38px;
+    padding-top: 4px;
+    border-color: #ced4da
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 35px;
+}

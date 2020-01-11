@@ -86,14 +86,15 @@ class ShowPerson(models.Model):
     
     show = models.ForeignKey(PublicityInfo, on_delete=models.PROTECT,
                              db_index=True)
+    person = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
 
-    name = models.CharField(max_length=120)
-    year = models.PositiveSmallIntegerField(blank=True, null=True)
+    @property
+    def name(self):
+        return self.person.get_full_name()
 
-    email = models.EmailField(blank=True,
-                              help_text="This will not be shown publicly.")
-    phone = models.CharField(max_length=20, blank=True,
-                             help_text="This will not be shown publicly.")
+    @property
+    def year(self):
+        return self.person.year
     
     position = models.CharField(max_length=120, verbose_name="Role or Position",
                                 blank=True)

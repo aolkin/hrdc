@@ -1,12 +1,14 @@
 from django.shortcuts import render
-from django.views.generic import TemplateView
-from django.views.generic.edit import UpdateView, CreateView
+from django.views.generic import View, TemplateView
+from django.views.generic.edit import UpdateView, CreateView, BaseCreateView
 from django.views.generic.detail import SingleObjectMixin, DetailView
+from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django import forms
 from django.contrib import messages
+from django.db.models import Q
 
 from utils import InitializedLoginMixin
 
@@ -122,7 +124,10 @@ class InfoView(MenuMixin, ShowStaffMixin, UpdateView):
 
 PersonFormSet = forms.inlineformset_factory(
     PublicityInfo, ShowPerson,
-    fields=("position", "name", "year", "type","order"), extra=1)
+    fields=("position", "person", "type","order"), extra=1,
+    widgets={
+        "person": forms.HiddenInput(),
+    })
 
 class PeopleView(MenuMixin, ShowStaffMixin, TemplateView):
     template_name = "publicity/people.html"
@@ -152,6 +157,46 @@ class PeopleView(MenuMixin, ShowStaffMixin, TemplateView):
             )
         )
         return context
+
+class SearchPerson(ShowStaffMixin, DetailView):
+    def get(self, *args, **kwargs):
+        if "term" in self.request.GET:
+            terms = self.request.GET["term"].split(" ")
+        else:
+            terms = ("",)
+        
+        users = get_user_model().objects.all()
+        for term in terms:
+            q = Q(first_name__icontains=term)
+            q |= Q(last_name__icontains=term)
+            q |= Q(email__icontains=term)
+            q |= Q(phone__icontains=term)
+            users = users.filter(q)
+        if users.count() > 20:
+            return JsonResponse([
+                { "text": "Too many results, please narrow your search..." }
+            ], safe=False)
+        people = [{
+            "text": str(i) + " " + i.apostrophe_year,
+            "id": i.id
+        } for i in users]
+        return JsonResponse(people, safe=False)
+
+class AddUser(BaseCreateView):
+    model = get_user_model()
+    fields = "email", "first_name", "last_name", "year"
+    
+    def form_valid(self, form):
+        person = form.save()
+        return JsonResponse({
+            "text": str(person) + " " + person.apostrophe_year,
+            "id": person.id
+        })
+
+    def form_invalid(self, form):
+        return JsonResponse({
+            "errors": form.errors
+        })
 
 class DisplayView(MenuMixin, DetailView):
     template_name = "publicity/display.html"

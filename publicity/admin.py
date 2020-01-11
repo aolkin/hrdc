@@ -14,10 +14,10 @@ class ShowPersonAdmin(admin.StackedInline):
     model = ShowPerson
     extra = 0
     fields = (
-        ("name", "year"),
+        ("person"),
         ("position", "type", "order"),
-        ("email", "phone"),
     )
+    autocomplete_fields = "person",
 
 @admin.register(PublicityInfo)
 class MetaAdmin(admin.ModelAdmin):
