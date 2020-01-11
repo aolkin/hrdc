@@ -8,6 +8,7 @@ from django.shortcuts import redirect
 
 from django import forms
 from django.views.generic.base import TemplateView
+from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView, UpdateView
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
@@ -189,6 +190,13 @@ class ProfileView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return self.request.GET.get("next", reverse("dramaorg:home"))
+
+class AccountView(LoginRequiredMixin, DetailView):
+    model = User
+    template_name = "dramaorg/account.html"
+
+    def get_object(self):
+        return self.request.user
 
 indexes = {
     "staff_indexes": [],

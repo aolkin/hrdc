@@ -28,6 +28,7 @@ urlpatterns = [
     ])),
     url(r'^', include(auth_urls)),
     url(r'^profile/$', ProfileView.as_view(), name="profile"),
+    url(r'^account/$', AccountView.as_view(), name="account"),
     url(r'^register/$', RegisterView.as_view(), name="register"),
     url(r'^u/([A-Za-z0-9+-]{86})/$', capture_token, name="token_reset"),
     url(r'^password/token/$', TokenView.as_view(), name="password_token"),
