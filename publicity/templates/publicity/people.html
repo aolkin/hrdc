@@ -8,6 +8,22 @@
     <h3 class="text-center">Directory: {{ object }}</h3>
   </div>
 </div>
+<div class="row justify-content-end mt-2 mb-4">
+  <div class="col">
+    {% if object.show.casting_meta %}
+    <a href="{% url 'publicity:import_cast' object.id %}"
+       class="btn btn-primary">
+      Import Cast from Common Casting
+    </a>
+    {% endif %}
+    {% if object.show.application %}
+    <a href="{% url 'publicity:import_staff' object.id %}"
+       class="btn btn-primary float-right">
+      Import Staff from Venue Application
+    </a>
+    {% endif %}
+  </div>
+</div>
 <div class="row justify-content-center">
   <form method="POST" class="col peopleform">
     {% csrf_token %}

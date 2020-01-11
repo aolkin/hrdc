@@ -16,6 +16,8 @@ from django.conf import settings
 
 from .models import *
 
+from casting.models import Signing
+
 class MenuMixin:
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -197,6 +199,47 @@ class AddUser(BaseCreateView):
         return JsonResponse({
             "errors": form.errors
         })
+
+class ImportStaff(ShowStaffMixin, DetailView):
+    def get(self, *args, **kwargs):
+        self.object = self.get_object()
+        try:
+            count = 0
+            for i in self.object.show.application.staffmember_set.all():
+                p, created = ShowPerson.objects.get_or_create(
+                    show=self.object, person=i.person.user,
+                    type=1, position=i.role_name)
+                if created:
+                    count += 1
+            messages.success(
+                self.request,
+                "Successfully imported {} staff members.".format(count))
+        except AttributeError:
+            messages.error(
+                self.request,
+                "No venue application attached to this show.")
+        return redirect("publicity:people", self.object.id)
+
+class ImportCast(ShowStaffMixin, DetailView):
+    def get(self, *args, **kwargs):
+        self.object = self.get_object()
+        try:
+            cm = self.object.show.casting_meta
+            count = 0
+            for i in Signing.objects.filter(response=True, character__show=cm):
+                p, created = ShowPerson.objects.get_or_create(
+                    show=self.object, person=i.actor,
+                    type=2, position=i.character.name)
+                if created:
+                    count += 1
+            messages.success(
+                self.request,
+                "Successfully imported {} cast members.".format(count))
+        except AttributeError:
+            messages.error(
+                self.request,
+                "This show is not set up for Common Casting.")
+        return redirect("publicity:people", self.object.id)
 
 class DisplayView(MenuMixin, DetailView):
     template_name = "publicity/display.html"
