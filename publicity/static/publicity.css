@@ -76,5 +76,5 @@
 
 .calendar-show-item .calendar-show-time {
     font-size: 0.85rem;
-    
+    white-space: nowrap;
 }

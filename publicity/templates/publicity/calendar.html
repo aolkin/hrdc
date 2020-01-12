@@ -14,9 +14,35 @@
     <h2 class="text-center">Calendar of Events</h2>
   </div>
 </div>
+{% if upcoming.exists %}
+<h3 class="text-center mt-3">Upcoming Events</h3>
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <ul class="list-group">
+      {% for i in upcoming %}
+      <li class="list-group-item">
+	<a {% if i.show.link %}href="{{ i.show.link }}"{% endif %}
+	   target="_blank">{{ i.show }}</a>
+	{% if i.note %}
+	<i class="fa fa-info-circle text-dark"
+	   title="{{ i.note }}" data-toggle="tooltip"></i>
+	{% endif %}
+	<span class="badge badge-secondary">
+	  {{ i.show.show.space }}
+	</span>
+	<span class="pull-right">
+	  {{ i.performance|date:"M j @ f A" }}
+	</span>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+<h3 class="text-center mt-4 mb-3">Calendar</h3>
+{% endif %}
 <div class="row justify-content-center">
   <div class="col">
-    <div class="calendar-select mb-3 mt-4"
+    <div class="calendar-select mb-3"
 	 data-url="{% url 'publicity:public_index' %}">
       <div class="input-group input-group-lg">
 	<div class="input-group-prepend">
@@ -65,13 +91,15 @@
 		   target="_blank">
 		  {{ i.show }}</a>
 	      </span>
-	      <span class="calendar-show-time text-secondary">
-		{{ i.performance|date:"f A" }}
-	      </span>
 	      {% if i.note %}
 	      <i class="fa fa-info-circle text-dark"
 		 title="{{ i.note }}" data-toggle="tooltip"></i>
 	      {% endif %}
+	      <i class="fa fa-map-marker"
+		 title="{{ i.show.show.space }}" data-toggle="tooltip"></i>
+	      <span class="calendar-show-time text-secondary">
+		{{ i.performance|date:"f A" }}
+	      </span>
 	    </div>
 	    {% endfor %}
 	  </td>

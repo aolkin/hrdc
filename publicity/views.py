@@ -15,7 +15,7 @@ from django.utils import timezone
 import calendar, datetime
 
 from utils import InitializedLoginMixin
-
+from config import config
 from django.conf import settings
 
 from .models import *
@@ -376,4 +376,8 @@ class CalendarView(TemplateView):
             (date, PerformanceDate.objects.filter(performance__date=date))
             for date in dates
         ], generic_calendar.monthdatescalendar(year, month))
+
+        kwargs["upcoming"] = PerformanceDate.objects.filter(
+            performance__gte=now, performance__lte=now + datetime.timedelta(
+                days=config.get_int("upcoming_performances_future_days", 14)))
         return super().get_context_data(**kwargs)
