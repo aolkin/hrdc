@@ -86,9 +86,10 @@ class AnnouncementAdmin(admin.ModelAdmin):
     )
 
     list_display = ("__str__", "user", "start_date", "end_date", "graphic_link",
-                    "modified", "published")
+                    "active", "published")
     list_editable = "published",
-    list_filter = ("published", "start_date", "end_date", "submitted")
+    list_filter = ("published", ("start_date", DateRangeFilter),
+                   ("end_date", DateRangeFilter), "submitted")
 
     def has_add_permission(self, arg):
         return False

@@ -146,7 +146,7 @@ class Announcement(models.Model):
     published = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ("-start_date", "-end_date", "-submitted")
+        ordering = ("-end_date", "start_date", "-submitted")
     
     def clean(self):
         if self.end_date < self.start_date:
@@ -160,3 +160,8 @@ class Announcement(models.Model):
 
     def get_absolute_url(self):
         return reverse_lazy("publicity:edit_announcement", args=(self.pk,))
+
+    def active(self):
+        return (timezone.now().date() >= self.start_date and
+                timezone.now().date() <= self.end_date)
+    active.boolean = True
