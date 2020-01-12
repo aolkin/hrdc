@@ -28,37 +28,101 @@
   Common Casting Schedule
   {% if object %}- {{ object }}{% endif %}
 </h3>
-<div class="card-deck schedule-deck">
-  {% for show in schedule %}
-  <div class="card">
-    <div class="card-header">
-      <h5 class="card-title mb-0">{{ show }}</h5>
-    </div>
-    <div class="card-body bg-light text-info">
-      <em>{{ show }}</em>'s residency is
-      {{ show.show.residency_starts|date:"n/j" }} to
-      {{ show.show.residency_ends|date:"n/j" }} in the {{ show.show.space }}.
-    </div>
-    <ul class="list-group list-group-flush card-body">
-      {% for slot in show.audition_slots %}
-      <li class="list-group-item">
-	<div>
-	  {{ slot.day|date:"l" }},
-	  {{ slot.start|time:"g:i A" }} - {{ slot.end|time:"g:i A" }}
+<ul class="nav nav-tabs nav-fill mt-3">
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#by-show">By Show</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#by-day">By Date</a>
+  </li>
+</ul>
+<div class="tab-content">
+  <div class="tab-pane fade card" id="by-show">
+    <div class="card-body">
+      <div class="card-deck schedule-deck">
+	{% for show in schedule %}
+	<div class="card">
+	  <div class="card-header">
+	    <h5 class="card-title mb-0">{{ show }}</h5>
+	  </div>
+	  <div class="card-body bg-light text-info">
+	    <em>{{ show }}</em>'s residency is
+	    {{ show.show.residency_starts|date:"n/j" }} to
+	    {{ show.show.residency_ends|date:"n/j" }} in the
+	    {{ show.show.space }}.
+	  </div>
+	  <ul class="list-group list-group-flush card-body">
+	    {% for slot in show.audition_slots %}
+	    <li class="list-group-item">
+	      <div>
+		{{ slot.day|date:"l" }},
+		{{ slot.start|time:"g:i A" }} - {{ slot.end|time:"g:i A" }}
+	      </div>
+	      <div class="text-muted text-right">{{ slot.space }}</div>
+	    </li>
+	    {% endfor %}
+	  </ul>
+	  <div class="card-footer text-muted font-weight-light">
+	    {% if show.contact_email %}
+	    Email <a href="mailto:{{ show.contact_email }}">{{ show.contact_email }}</a> with questions about this show.
+	    {% endif %}
+	  </div>
 	</div>
-	<div class="text-muted text-right">{{ slot.space }}</div>
-      </li>
-      {% endfor %}
-    </ul>
-    <div class="card-footer text-muted font-weight-light">
-      {% if show.contact_email %}
-      Email
-      <a href="mailto:{{ show.contact_email }}">{{ show.contact_email }}</a>
-      with questions about this show.
-      {% endif %}
+	{% endfor %}
+      </div>
     </div>
   </div>
-  {% endfor %}
+  <div class="tab-pane fade show active card" id="by-day">
+    <div class="accordion" id="day-accordion">
+      {% for day, spaces in days %}
+      <div class="card">
+	<div class="card-header" id="headingOne">
+	  <h2 class="mb-0">
+            <button class="btn btn-link{% if not forloop.first %} collapsed{% endif %}"
+		    type="button" data-toggle="collapse"
+		    data-target="#day-collapse-{{ forloop.counter }}">
+              {{ day }}
+            </button>
+	  </h2>
+	</div>
+	<div id="day-collapse-{{ forloop.counter }}"
+	     data-parent="#day-accordion"
+	     class="collapse{% if forloop.first %} show{% endif %}">
+	  <div class="card-body">
+	    <div class="card-deck">
+	      {% for building, slots in spaces %}
+	      <div class="card by-day-building-card">
+		<div class="card-header">
+		  <h5 class="card-title mb-0">{{ building }}</h5>
+		</div>
+		<ul class="list-group list-group-flush card-body">
+		  {% for slot in slots %}
+		  <li class="list-group-item">
+		    {{ slot.start|time:"g:i A" }} - {{ slot.end|time:"g:i A" }}
+		    - <b>{{ slot.show }}</b>
+		    (<i>{{ slot.space.nickname|default:slot.space.name }}</i>)
+		  </li>
+		  {% endfor %}
+		</ul>
+		{% if building.address %}
+		<div class="card-footer text-secondary footer-address">
+		  <div class="media">
+		    <i class="fa fa-map-marker fa-2x mr-3 pt-1"></i>
+		    <div class="media-body">
+		      {{ building.address|linebreaksbr }}
+		    </div>
+		  </div>
+		</div>
+		{% endif %}
+	      </div>
+	      {% endfor %}
+	    </div>
+	  </div>
+	</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
 </div>
 {% endif %}
 {% for i in shows %}

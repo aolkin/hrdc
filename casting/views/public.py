@@ -280,6 +280,8 @@ def actor_token_logout(request):
     finally:
         return HttpResponseRedirect(reverse("casting:signing"))
 
+defdictlist = lambda: defaultdict(list)
+
 class IndexView(FixHeaderUrlMixin, TemplateView):
     verbose_name = "Common Casting"
     help_text = "view posted lists and schedules"
@@ -296,6 +298,7 @@ class IndexView(FixHeaderUrlMixin, TemplateView):
         context["shows"] = (("Cast", "casting:view_cast", [], "primary"),
                             ("Callback", "casting:view_callbacks", [], "info"))
         context["schedule"] = []
+        days = defaultdict(defdictlist)
         for show in self.get_shows():
             if show.callbacks_released: # and show.release_meta.stage < 3:
                 context["shows"][1][2].append(show)
@@ -303,6 +306,11 @@ class IndexView(FixHeaderUrlMixin, TemplateView):
                 context["shows"][0][2].append(show)
             if show.release_meta.stage == 0:
                 context["schedule"].append(show)
+                for slot in show.audition_slots:
+                    days[slot.day][slot.space.building].append(slot)
+        context["days"] = sorted([(k, sorted([
+            (i, sorted(j, key=lambda x: x.start)) for i, j in v.items()
+        ], key=lambda x: x[0].pk)) for k, v in days.items()])
         context["current"] = get_current_slots()
         return context
 
