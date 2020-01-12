@@ -19,4 +19,13 @@ $(() => {
     }).on("blur", function () {
 	$(this).datetimepicker("hide");
     });
+
+    $(".calendar-select input, .calendar-select select").change(function() {
+	let year = $(".calendar-select input").val();
+	let month = $(".calendar-select select").val();
+	location.assign($(".calendar-select").data("url") +
+			year + "/" + month + "/");
+    });
+
+    $('[data-toggle="tooltip"]').tooltip()
 });

@@ -228,6 +228,8 @@ def load_indexes():
         try:
             u = reverse(i+":public_index")
             indexes["public_indexes"].append(get_link(u))
+            u = reverse(i+":public_app")
+            indexes["public_indexes"].append(get_link(u))
         except NoReverseMatch:
             pass
 

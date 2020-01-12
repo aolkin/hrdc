@@ -1,5 +1,6 @@
 
 from django.conf.urls import url, include
+from django.urls import path
 
 from .views import *
 
@@ -18,7 +19,10 @@ urlpatterns = [
         url(r'^people/import/cast$', ImportCast.as_view(),
             name="import_cast"),
     ])),
-    url(r'^newsletter/$', NewsletterView.as_view(), name="public_index"),
+    url(r'^newsletter/$', NewsletterView.as_view(), name="public_app"),
     url(r'^newsletter/(?P<pk>\d+)/$', NewsletterEditView.as_view(),
         name="edit_announcement"),
+    path('calendar/', CalendarView.as_view(), name="public_index"),
+    path('calendar/<int:year>/<int:month>/', CalendarView.as_view(),
+         name="calendar"),
 ]

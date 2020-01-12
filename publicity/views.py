@@ -9,6 +9,10 @@ from django.template.loader import render_to_string
 from django import forms
 from django.contrib import messages
 from django.db.models import Q
+from django.utils.html import mark_safe
+from django.utils import timezone
+
+import calendar, datetime
 
 from utils import InitializedLoginMixin
 
@@ -282,8 +286,8 @@ class NewsletterMixin:
         menu = context["sidebar_menu"] = {}
         menu["HRDC Newsletter"] = [{
             "name": "Submit an Announcement",
-            "url": reverse_lazy("publicity:public_index"),
-            "active": current_url == "public_index"
+            "url": reverse_lazy("publicity:public_app"),
+            "active": current_url == "public_app"
         }]
 
         qs = self.request.user.announcement_set.filter(published=False)
@@ -350,3 +354,26 @@ class NewsletterEditView(InitializedLoginMixin, NewsletterMixin, UpdateView):
 
     ## TODO: Check that user submitted the announcement
     ## TODO: Check that announcement has not been published
+
+generic_calendar = calendar.Calendar()
+
+class CalendarView(TemplateView):
+    verbose_name = "Calendar"
+    help_text = "view upcoming performances"
+
+    template_name = "publicity/calendar.html"
+
+    def get_context_data(self, **kwargs):
+        now = timezone.now()
+        kwargs["year"] = year = self.kwargs.get("year", now.year)
+        kwargs["month"] = month = self.kwargs.get("month", now.month)
+        date = datetime.date(year, month, 1)
+        kwargs["prev"] = date - datetime.timedelta(days=1)
+        kwargs["next"] = date + datetime.timedelta(days=31)
+        kwargs["month_name"] = calendar.month_name[month]
+        kwargs["calendar"] = calendar
+        kwargs["cal"] = map(lambda dates: [
+            (date, PerformanceDate.objects.filter(performance__date=date))
+            for date in dates
+        ], generic_calendar.monthdatescalendar(year, month))
+        return super().get_context_data(**kwargs)

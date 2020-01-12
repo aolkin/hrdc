@@ -50,6 +50,10 @@ class PublicityInfo(models.Model):
     def get_absolute_url(self):
         return reverse_lazy("publicity:display", args=(self.id,))
     
+    @property
+    def link(self):
+        return self.website_page #or self.get_absolute_url()
+
     def __str__(self):
         return str(self.show)
 

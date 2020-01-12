@@ -44,3 +44,37 @@
 .select2-container--default .select2-selection--single .select2-selection__arrow {
     height: 35px;
 }
+
+.calendar-select {
+    width: 360px;
+    margin: auto;
+}
+
+.calendar-select .input-group select {
+    flex: 1.75 1 auto;
+    font-weight: bold;
+}
+
+.calendar-select .input-group input {
+    font-weight: bold;
+}
+
+.calendar-table td {
+    width: 0.1428571429%;
+    height: 120px;
+}
+
+.calendar-day {
+    float: right;
+    margin-top: -0.5rem;
+    margin-right: -0.25rem;
+}
+
+.calendar-show-item {
+    font-size: 0.95rem;
+}
+
+.calendar-show-item .calendar-show-time {
+    font-size: 0.85rem;
+    
+}
