@@ -16,6 +16,8 @@
       {{ i.performance|date:"M j @ f A" }}
     </span>
   </li>
+  {% empty %}
+  <li class="list-group-item">No upcoming performances!</li>
   {% endfor %}
 </ul>
 {% endblock %}
