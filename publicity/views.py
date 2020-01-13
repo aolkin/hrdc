@@ -11,6 +11,8 @@ from django.contrib import messages
 from django.db.models import Q
 from django.utils.html import mark_safe
 from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views.decorators.clickjacking import xframe_options_exempt
 
 import calendar, datetime
 
@@ -357,14 +359,22 @@ class NewsletterEditView(InitializedLoginMixin, NewsletterMixin, UpdateView):
 
 generic_calendar = calendar.Calendar()
 
+@method_decorator(xframe_options_exempt, name="dispatch")
 class CalendarView(TemplateView):
     verbose_name = "Calendar"
     help_text = "view upcoming performances"
 
-    template_name = "publicity/calendar.html"
+    def get_template_names(self):
+        if self.request.GET.get("upcoming"):
+            return "publicity/embed_upcoming.html"
+        if self.request.GET.get("embed", False):
+            return "publicity/embed_calendar.html"
+        else:
+            return "publicity/calendar.html"
 
     def get_context_data(self, **kwargs):
         now = timezone.now()
+        kwargs["embed"] = self.request.GET.get("embed", False)
         kwargs["year"] = year = self.kwargs.get("year", now.year)
         kwargs["month"] = month = self.kwargs.get("month", now.month)
         date = datetime.date(year, month, 1)

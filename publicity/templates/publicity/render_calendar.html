@@ -1,0 +1,70 @@
+<div class="row justify-content-center">
+  <div class="col">
+    <div class="calendar-select mt-3 mb-3"
+	 data-url="{% url 'publicity:public_index' %}">
+      <div class="input-group input-group-lg">
+	<div class="input-group-prepend">
+	  <a href="{% url 'publicity:calendar' prev.year prev.month %}{% if embed %}?embed=1{% endif %}"
+	     class="btn btn-outline-secondary">
+	    <i class="fa fa-chevron-circle-left"></i>
+	  </a>
+	</div>
+	<select class="custom-select custom-select-lg">
+	  {% for name in calendar.month_name %}
+	  {% if name %}
+	  <option value="{{ forloop.counter0 }}"
+		{% if name == month_name %}selected{% endif %}>
+	    {{ name }}</option>
+	  {% endif %}
+	  {% endfor %}
+	</select>
+	<input type="number" value="{{ year }}" min="1900" max="2100"
+	       class="form-control text-right">
+	<div class="input-group-append">
+	  <a href="{% url 'publicity:calendar' next.year next.month %}{% if embed %}?embed=1{% endif %}"
+	     class="btn btn-outline-secondary">
+	    <i class="fa fa-chevron-circle-right"></i>
+	  </a>
+	</div>
+      </div>
+    </div>
+    <table class="table table-bordered calendar-table">
+      <thead>
+	<tr>
+	  {% for day in calendar.day_name %}
+	  <th>{{ day }}</th>
+	  {% endfor %}
+	</tr>
+      </thead>
+      <tbody>
+	{% for week in cal %}
+	<tr>
+	  {% for date, events in week %}
+	  <td {% if date.month != month %}class="table-secondary"{% endif %}>
+	    <div class="text-muted calendar-day">{{ date.day }}</div>
+	    {% for i in events %}
+	    <div class="calendar-show-item mb-1">
+	      <span class="calendar-show-title">
+		<a {% if i.show.link %}href="{{ i.show.link }}"{% endif %}
+		   target="_blank">
+		  {{ i.show }}</a>
+	      </span>
+	      {% if i.note %}
+	      <i class="fa fa-info-circle text-dark"
+		 title="{{ i.note }}" data-toggle="tooltip"></i>
+	      {% endif %}
+	      <i class="fa fa-map-marker text-secondary"
+		 title="{{ i.show.show.space }}" data-toggle="tooltip"></i>
+	      <span class="calendar-show-time text-secondary">
+		{{ i.performance|date:"f A" }}
+	      </span>
+	    </div>
+	    {% endfor %}
+	  </td>
+	  {% endfor %}
+	</tr>
+	{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

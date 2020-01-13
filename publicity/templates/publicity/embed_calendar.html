@@ -1,0 +1,9 @@
+{% extends "bt/base.html" %}
+
+{% block title %}{{ month_name }} {{ year }} Events{% endblock %}
+
+{% load bt config %}
+
+{% block body %}
+{% include "publicity/render_calendar.html" %}
+{% endblock %}

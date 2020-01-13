@@ -23,8 +23,10 @@ $(() => {
     $(".calendar-select input, .calendar-select select").change(function() {
 	let year = $(".calendar-select input").val();
 	let month = $(".calendar-select select").val();
+	let embed = new URLSearchParams(location.search).get("embed");
+	console.log(embed);
 	location.assign($(".calendar-select").data("url") +
-			year + "/" + month + "/");
+			year + "/" + month + "/" + (embed?"?embed="+embed:""));
     });
 
     $('[data-toggle="tooltip"]').tooltip()
