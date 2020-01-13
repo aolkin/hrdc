@@ -18,7 +18,20 @@
       <th>Name</th>
       <th class="table-col-xs">PGPs</th>
       <th></th>
-      <th class="table-col-sm table-col-desktop">Status</th>
+
+      <th class="filterable filterable-instructions
+		 table-col-sm table-col-desktop status-header" data-html="true"
+	  data-title="Filtering by Audition Status" data-placement="right"
+	  data-trigger="manual"
+	  data-content="<p>You can now filter this list and hide actors based on their audition status!</p><p>Try clicking one of the three icons to hide actors who are still waiting, in their audition, or all done.</p><button class=&quot;filterable-instructions-dismiss btn btn-primary btn-sm px-3&quot;>Okay!</button><small><a href=&quot;javascript:hideFilteringMessage(true)&quot; class=&quot;filterable-instructions-never&quot;>Don't Show Again</a></small>">
+	Status
+	<a href="#" class="text-warning" data-marker="Waiting">
+	  <i class="fa fa-clock-o"></i></a>
+	<a href="#" class="text-danger" data-marker="Fetched">
+	  <i class="fa fa-cog"></i></a>
+	<a href="#" class="text-success" data-marker="Auditioned">
+	  <i class="fa fa-check-circle"></i></a>
+      </th>
     </tr>
   </thead>
   <tbody>
