@@ -19,7 +19,7 @@ LinkFormSet = forms.inlineformset_factory(
 
 class LinksView(UserIsPdsmMixin, FormView):
     verbose_name = "Shortlinks"
-    help_text = "create {} links".format(settings.SHORTLINK_PREFIX)
+    help_text = "create {} links".format(settings.SHORTLINK_PREFIX.strip("/"))
 
     template_name = "shortlinks/editor.html"
     model = Link
