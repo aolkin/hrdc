@@ -3,7 +3,8 @@ from django.conf import settings
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
-from django.urls import reverse_lazy
+from django.utils.html import format_html
+from django.urls import reverse_lazy, reverse
 
 from django_thumbs.fields import ImageThumbsField
 
@@ -63,6 +64,15 @@ class PublicityInfo(models.Model):
     def get_absolute_url(self):
         return reverse_lazy("publicity:display", args=(self.id,))
     
+    @property
+    def embed_code(self):
+        if self.id:
+            code = '<script src="{}{}"></script>'.format(
+                settings.SITE_URL, reverse("publicity:script", args=(self.id,)))
+            return format_html("<pre>{}</pre>", code)
+        return format_html(
+            "<i>Please save this object to view the embed code.</i>")
+
     @property
     def link(self):
         return self.website_page #or self.get_absolute_url()

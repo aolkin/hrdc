@@ -1,5 +1,4 @@
 from django.contrib import admin
-
 from django.utils.html import format_html
 
 from rangefilter.filter import DateRangeFilter
@@ -27,7 +26,7 @@ class MetaAdmin(admin.ModelAdmin):
     autocomplete_fields = ('show',)
     fieldsets = (
         ("", {
-            "fields": ('show', "website_page",)
+            "fields": ('show', "website_page", "embed_code")
         }),
         ("Publicity Header", {
             "fields": ('cover', 'credits',)
@@ -56,7 +55,7 @@ class MetaAdmin(admin.ModelAdmin):
         return obj.show.seasonstr()
 
     def get_readonly_fields(self, modeladmin, obj):
-        return ("show",) if obj and obj.show else []
+        return (["show"] if obj and obj.show else []) + ["embed_code"]
 
 @admin.register(PerformanceDate)
 class PerformanceDateAdmin(admin.ModelAdmin):
