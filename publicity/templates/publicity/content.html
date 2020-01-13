@@ -1,4 +1,4 @@
-{% if enabled.cover %}
+{% if enabled.cover and object.cover %}
 <p>
   <a href="{{ object.cover.url }}" target="_blank">
     <img src="{{ object.cover.url_cover }}" style="max-width: 650px">

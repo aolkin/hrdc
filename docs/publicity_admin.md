@@ -48,11 +48,6 @@ format is:
 >
 > ...etc
 
-#### Cover Graphic
-
-You may choose to supply a cover graphic (if you have a Facebook cover photo,
-it should work well here too) to be displayed at the top of your webpage.
-
 #### Email for Publicity
 
 This email address will be listed as a contact email for questions. We suggest
@@ -98,7 +93,8 @@ The directory editor will always display all of the people you have already
 added, plus one blank person at the bottom, so after adding each person just
 hit "Save Changes" to be able to add another.
 
-
+Most fields should be fairly self-explanatory. You must include the person's
+role or position, name, and year if applicable.
 
 The "Type" selector controls whether the given person will appear in the "Cast",
 "Staff", or "Musician" section on the webpage, or for people listed in the
@@ -115,18 +111,6 @@ For ensemble roles or large crew positions, list each individual separately. The
 system will combine them and display them together in the cast or crew list.
 You can also omit the "Role or Position" field if desired, for shows with a
 purely ensemble cast of performers.
-
-### Import
-
-You also have the ability to import your staff list from your venue application.
-Upon pressing that button, all of the staff members from your application will
-be copied into the publicity manager. You may then further edit your staff list,
-adding or removing people or changing their roles.
-
-After your cast has signed through the Common Casting portal, you can also
-import your cast list from there. Pressing that button will add an entry to the
-publicity manager for each person who has accepted their role in the Common
-Casting portal. You can then further edit your cast list as well.
 
 # The Preview Page
 

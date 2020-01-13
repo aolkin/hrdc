@@ -233,11 +233,12 @@ class ImportCast(ShowStaffMixin, DetailView):
             cm = self.object.show.casting_meta
             count = 0
             for i in Signing.objects.filter(response=True, character__show=cm):
-                p, created = ShowPerson.objects.get_or_create(
-                    show=self.object, person=i.actor,
-                    type=2, position=i.character.name)
-                if created:
-                    count += 1
+                if i.signable:
+                    p, created = ShowPerson.objects.get_or_create(
+                        show=self.object, person=i.actor,
+                        type=2, position=i.character.name)
+                    if created:
+                        count += 1
             messages.success(
                 self.request,
                 "Successfully imported {} cast members.".format(count))
