@@ -1,0 +1,55 @@
+{% extends "bt/default.html" %}
+
+{% block title %}Shortlinks{% endblock %}
+
+{% block extra_header %}
+{% include "dramaorg/user_dropdown.html" %}
+{% endblock %}
+
+{% load bt crispy_forms_tags %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h3 class="text-center">Your {{ SETTINGS.SHORTLINK_PREFIX }} Shortlinks</h3>
+  </div>
+</div>
+<div class="row justify-content-center">
+  <form method="POST" class="col-md-10 lg-8">
+    {% csrf_token %}
+    {{ form.management_form }}
+    {% for form in form %}
+    <div class="person-form">
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+      {% endif %}
+      <div class="form-row">
+	{{ form.id }}
+	<div class="col-md-5 col-sm-8">
+	  {{ form.destination|as_crispy_field }}
+	</div>
+	<div class="col-md-3 col-sm-4 url-field"
+	     data-shortened="#id_link_set-{{ forloop.counter0 }}-link">
+	  {{ form.url|as_crispy_field }}
+	</div>
+	<div class="col-md-4 col-sm-8">
+	  <div class="form-group">
+            <label for="id_link_set-{{ forloop.counter0 }}-link"
+		   class="col-form-label">
+              Shortened Link
+            </label>
+            <input type="url" class="urlinput form-control" readonly
+		   id="id_link_set-{{ forloop.counter0 }}-link"
+		   value="{{ form.instance.link }}"
+		   data-prefix="{{ SETTINGS.SHORTLINK_PREFIX }}">
+	  </div>
+	</div>
+      </div>
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary btn-block">
+      Save Changes / Add Another
+    </button>
+  </form>
+</div>
+{% endblock %}

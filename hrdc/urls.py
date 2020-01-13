@@ -5,7 +5,7 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from django.conf import settings
 from config.views import autocomplete_json
-from shortlinks.views import link
+from shortlinks.views import link, LinksView
 
 urlpatterns = [
     url(r'^', include("dramaorg.urls")),
@@ -18,6 +18,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^email/', include('emailtracker.urls')),
     path(r'shortlinks/<slug:slug>', link, name="shortlink"),
+    path('links/', include('shortlinks.urls')),
     path('social/', include('social_django.urls', namespace='social')),
 ]
 

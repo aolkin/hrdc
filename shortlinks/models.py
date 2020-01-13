@@ -3,11 +3,16 @@ from django.db import models
 from django.urls import reverse
 from django.utils.html import mark_safe
 
+from django.contrib.auth import get_user_model
+
 from django.conf import settings
 
 class Link(models.Model):
     url = models.SlugField(unique=True, verbose_name="Short URL")
     destination = models.URLField()
+
+    owner = models.ForeignKey(get_user_model(), null=True,
+                              on_delete=models.CASCADE)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
