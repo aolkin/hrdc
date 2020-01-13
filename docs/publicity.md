@@ -102,11 +102,12 @@ When adding personnel, you can search by name, email, or phone from within the
 app's existing database of users to find your staff, cast, or band member. If
 the system cannot find the person you are looking for, you will be given the
 option to add a new person to the system. To do so, you must provide their name,
-email, year, and affiliation. Doing so will also invite them to fill out their
-own profile in the system.
+email, year, and affiliation. Doing so will also invite them to fill out and
+update their profile in the system themselves.
 
 If someone is not happy with how their name is displayed, they must log into
-the app themselves and edit their profile [here](https://app.hrdctheater.org/profile/). Any changes they make will be reflected immediately.
+the app themselves and edit their profile [here](https://app.hrdctheater.org/profile/).
+Any changes they make will be reflected immediately.
 
 The "Type" selector controls whether the given person will appear in the "Cast",
 "Staff", or "Musician" section on the webpage, or for people listed in the
