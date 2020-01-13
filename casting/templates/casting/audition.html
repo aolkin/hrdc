@@ -25,11 +25,14 @@
 	  data-trigger="manual"
 	  data-content="<p>You can now filter this list and hide actors based on their audition status!</p><p>Try clicking one of the three icons to hide actors who are still waiting, in their audition, or all done.</p><button class=&quot;filterable-instructions-dismiss btn btn-primary btn-sm px-3&quot;>Okay!</button><small><a href=&quot;javascript:hideFilteringMessage(true)&quot; class=&quot;filterable-instructions-never&quot;>Don't Show Again</a></small>">
 	Status
-	<a href="#" class="text-warning" data-marker="Waiting">
+	<a href="#" class="text-warning" data-marker="Waiting"
+	   title="Waiting" data-toggle="tooltip">
 	  <i class="fa fa-clock-o"></i></a>
-	<a href="#" class="text-danger" data-marker="Fetched">
+	<a href="#" class="text-danger" data-marker="Fetched"
+	   title="In-Progress" data-toggle="tooltip">
 	  <i class="fa fa-cog"></i></a>
-	<a href="#" class="text-success" data-marker="Auditioned">
+	<a href="#" class="text-success" data-marker="Auditioned"
+	   title="Auditioned" data-toggle="tooltip">
 	  <i class="fa fa-check-circle"></i></a>
       </th>
     </tr>
