@@ -202,11 +202,18 @@ class ShowAdmin(admin.ModelAdmin):
                     'residency_starts', 'residency_ends', 'liaison_display')
     list_filter = ('season', 'year', 'space')
     autocomplete_fields = ('staff', 'liaisons')
-    fields = ('title', ('season', 'year'), 'space',
-              ('residency_starts', 'residency_ends'),
-              ('staff', 'liaisons'), 'slug',
-              ('created', 'modified'),
-              'contact_staff_members')
+    fieldsets = (
+        ("Show Information",
+         {"fields": (("title", "prod_type"), ("creator_credit"),
+                     ("season", "year"), ("affiliation"), "slug")}),
+        ("Residency",
+         {"fields": (("space"), ("residency_starts", "residency_ends"),)}),
+        ("People",
+         {"fields": (("staff", "liaisons"), "contact_staff_members")}),
+        ("Metadata",
+         {"fields": (("created", "modified"),)}),
+                                         
+    )
     readonly_fields = "created", "modified", 'contact_staff_members'
     exclude = ('invisible',)
     search_fields = ('title',)
