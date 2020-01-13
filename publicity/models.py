@@ -3,8 +3,9 @@ from django.conf import settings
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
-
 from django.urls import reverse_lazy
+
+from django_thumbs.fields import ImageThumbsField
 
 from collections import defaultdict
 
@@ -31,6 +32,18 @@ class PublicityInfo(models.Model):
     ), default="", verbose_name="Term for Pit Musicians")
 
     website_page = models.URLField(blank=True)
+
+    def upload_destination(instance, filename):
+        return "publicity/{}/{}/{}/covers/{}".format(
+            instance.show.year, instance.show.get_season_display(),
+            instance.show.slug, filename)
+    THUMB_SIZES = (
+        { "code": "thumb", "wxh": "320x240", "resize": "crop" },
+        { "code": "cover", "wxh": "650x250", "resize": "scale" }
+    )
+    cover = ImageThumbsField(upload_to=upload_destination, sizes=THUMB_SIZES,
+                             null=True, blank=True,
+                             verbose_name="Cover Graphic")
 
     class Meta:
         verbose_name = "Publicity-Enabled Show"

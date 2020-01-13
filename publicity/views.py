@@ -91,7 +91,7 @@ DateFormSet = forms.inlineformset_factory(
 class InfoForm(forms.ModelForm):
     class Meta:
         model = PublicityInfo
-        fields = ('credits', 'contact_email', 'ticket_link',
+        fields = ('credits', 'cover', 'contact_email', 'ticket_link',
                   'blurb', 'runtime', 'band_term') # 'content_warning')
         widgets = {
             'credits': forms.Textarea(attrs={'rows': 4, 'cols': 40}),
@@ -262,6 +262,7 @@ class ScriptView(DetailView):
                 "object": context["object"],
                 "h": self.request.GET.get("h", "h3"),
                 "enabled": {
+                    "cover": self.request.GET.get("cover", "") != "0",
                     "credits": self.request.GET.get("credits", "") != "0",
                     "cast": self.request.GET.get("cast", "") != "0",
                     "staff": self.request.GET.get("staff", "") != "0",

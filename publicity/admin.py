@@ -30,7 +30,7 @@ class MetaAdmin(admin.ModelAdmin):
             "fields": ('show', "website_page",)
         }),
         ("Publicity Header", {
-            "fields": ('credits',)
+            "fields": ('cover', 'credits',)
         }),
         ("Show Information", {
             "fields": ('blurb', 'runtime', 'contact_email', 'ticket_link',
