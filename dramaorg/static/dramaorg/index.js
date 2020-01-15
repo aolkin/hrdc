@@ -2,6 +2,14 @@
 
 $(() => {
     
+    function insert_spinner(modal) {
+	modal.html('<div class="spinner-grow" role="status"></div>');
+	modal.children(".spinner-grow").css({
+	    display: "block",
+	    margin: "auto",
+	});
+    }
+
     function initialize_select2() {
 	$("#id_staff").select2({
 	    placeholder: "Search by name, email, or phone...",
@@ -36,6 +44,7 @@ $(() => {
 	$("#edit-show-modal").data("dirty", false);
 	if (target) {
             var modal = $(this).find(".modal-body");
+	    insert_spinner(modal);
             modal.load(target, (response, status, xhr) => {
 		initialize_select2();
 	    });
@@ -50,6 +59,7 @@ $(() => {
     $("#edit-show-modal .body-submit").click(function() {
 	var modal = $(this).closest(".modal-content");
 	var form = modal.find("form");
+	insert_spinner(modal.find(".modal-body"));
 	$.post(form.attr("action"), form.serialize())
 	 .always((data, status, xhr) => {
 	     modal.find(".modal-body").html(data);
