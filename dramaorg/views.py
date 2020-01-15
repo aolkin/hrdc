@@ -1,15 +1,15 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse_lazy, reverse, resolve
 from django.urls.exceptions import NoReverseMatch
 from django.conf import settings
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.shortcuts import redirect
-
+from django.db.models import Q
 from django import forms
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import FormView, UpdateView
+from django.views.generic.edit import FormView, UpdateView, BaseCreateView
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
 
@@ -24,6 +24,7 @@ from django.contrib.auth.mixins import (LoginRequiredMixin,
 from django.contrib.auth.decorators import login_required
 
 from .utils import user_is_initialized
+from .mixins import UserIsPdsmMixin
 from .email import send_reset, activate
 from .models import *
 
@@ -283,6 +284,69 @@ class StaffIndexView(SuccessMessageMixin, FormView):
         context = super().get_context_data(**kwargs)
         context.update(indexes)
         return context
+
+class UpdateShow(UpdateView):
+    model = Show
+    fields = ("title", "creator_credit", "affiliation", "prod_type")
+    template_name = "dramaorg/update_show.html"
+    success_url = reverse_lazy("dramaorg:index")
+
+    def form_valid(self, form):
+        super().form_valid(form)
+        messages.success(self.request, "Show updated successfully.")
+        return super().form_invalid(form)
+
+class UpdateShowStaff(UpdateView):
+    model = Show
+    fields = ("staff",)
+    template_name = "dramaorg/update_show.html"
+    success_url = reverse_lazy("dramaorg:index")
+
+    def form_valid(self, form):
+        super().form_valid(form)
+        messages.success(self.request, "Show staff updated successfully.")
+        return super().form_invalid(form)
+
+class SearchPeople(UserIsPdsmMixin, DetailView):
+    def get(self, *args, **kwargs):
+        if "term" in self.request.GET:
+            terms = self.request.GET["term"].split(" ")
+        else:
+            terms = ("",)
+        
+        users = get_user_model().objects.all()
+        for term in terms:
+            q = Q(first_name__icontains=term)
+            q |= Q(last_name__icontains=term)
+            q |= Q(email__icontains=term)
+            q |= Q(phone__icontains=term)
+            users = users.filter(q)
+        if users.count() > 20:
+            return JsonResponse([
+                { "text": "Too many results, please narrow your search..." }
+            ], safe=False)
+        people = [{
+            "text": str(i) + " " + i.apostrophe_year,
+            "id": i.id
+        } for i in users]
+        return JsonResponse(people, safe=False)
+
+class AddPerson(UserIsPdsmMixin, BaseCreateView):
+    model = get_user_model()
+    fields = "email", "first_name", "last_name", "year"
+    
+    def form_valid(self, form):
+        person = form.save()
+        return JsonResponse({
+            "text": str(person) + " " + person.apostrophe_year,
+            "id": person.id
+        })
+
+    def form_invalid(self, form):
+        return JsonResponse({
+            "errors": form.errors
+        })
+
 
 class HomePage(TemplateView):
     template_name = "dramaorg/home.html"

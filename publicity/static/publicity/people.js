@@ -44,7 +44,7 @@ $(() => {
 	    return false;
 	}
 	$("#add-button").prop("disabled", true);
-	$.post("add", data).done((data, status, xhr) => {
+	$.post("/people/add/", data).done((data, status, xhr) => {
 	    if (data.errors) {
 		$("#add-errors").empty();
 		for (var field in data.errors) {
@@ -70,7 +70,7 @@ $(() => {
     $(".person-field").select2({
 	placeholder: "Search by name, email, or phone...",
         ajax: {
-            url: "search",
+            url: "/people/search/",
             delay: 250,
             processResults(data, params) {
 		if (!data || data.length) {

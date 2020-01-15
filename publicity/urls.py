@@ -12,8 +12,6 @@ urlpatterns = [
         url(r'^script.js$', ScriptView.as_view(), name="script"),
         url(r'^info/$', InfoView.as_view(), name="info"),
         url(r'^people/$', PeopleView.as_view(), name="people"),
-        url(r'^people/search$', SearchPerson.as_view(), name="search_people"),
-        url(r'^people/add$', AddUser.as_view(), name="add_person"),
         url(r'^people/import/staff$', ImportStaff.as_view(),
             name="import_staff"),
         url(r'^people/import/cast$', ImportCast.as_view(),

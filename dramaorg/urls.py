@@ -1,6 +1,6 @@
 
 from django.conf.urls import url, include
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, path
 from django.contrib.auth import views as auth_views
 
 from .views import *
@@ -21,11 +21,20 @@ auth_urls = [
 app_name = "dramaorg"
 urlpatterns = [
     url(r'^$', HomePage.as_view(), name="home"),
+
     url(r'^staff/$', StaffIndexView.as_view(), name="index"),
+    url(r'^staff/show/(?P<pk>\d+)/$', UpdateShow.as_view(), name="update"),
+    url(r'^staff/show/(?P<pk>\d+)/staff/$', UpdateShowStaff.as_view(),
+        name="update_staff"),
+
     url(r'^season/$', ManagementView.as_view(), name="admin"),
     url(r'^season/(?P<year>\d+)/(?P<season>\d+)/', include([
         url(r'^$', SeasonView.as_view(), name="season"),
     ])),
+
+    url(r'^people/search/$', SearchPeople.as_view(), name="search_people"),
+    url(r'^people/add/$', AddPerson.as_view(), name="add_person"),
+
     url(r'^', include(auth_urls)),
     url(r'^profile/$', ProfileView.as_view(), name="profile"),
     url(r'^account/$', AccountView.as_view(), name="account"),

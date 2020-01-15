@@ -1,0 +1,15 @@
+{% load crispy_forms_tags %}
+
+<form action="{{ request.path }}" method="POST">
+  {% csrf_token %}
+  {{ form|crispy }}
+</form>
+
+{% if "staff" in form.fields %}
+<div class="alert alert-info">
+  If you cannot find the person you are looking for, please ask them to sign up
+  for an account on this site first.
+</div>
+{% endif %}
+
+{% include "bt/messages.html" with BT_messages_column_spec="col"%}

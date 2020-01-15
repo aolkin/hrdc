@@ -166,46 +166,6 @@ class PeopleView(MenuMixin, ShowStaffMixin, TemplateView):
         )
         return context
 
-class SearchPerson(ShowStaffMixin, DetailView):
-    def get(self, *args, **kwargs):
-        if "term" in self.request.GET:
-            terms = self.request.GET["term"].split(" ")
-        else:
-            terms = ("",)
-        
-        users = get_user_model().objects.all()
-        for term in terms:
-            q = Q(first_name__icontains=term)
-            q |= Q(last_name__icontains=term)
-            q |= Q(email__icontains=term)
-            q |= Q(phone__icontains=term)
-            users = users.filter(q)
-        if users.count() > 20:
-            return JsonResponse([
-                { "text": "Too many results, please narrow your search..." }
-            ], safe=False)
-        people = [{
-            "text": str(i) + " " + i.apostrophe_year,
-            "id": i.id
-        } for i in users]
-        return JsonResponse(people, safe=False)
-
-class AddUser(BaseCreateView):
-    model = get_user_model()
-    fields = "email", "first_name", "last_name", "year"
-    
-    def form_valid(self, form):
-        person = form.save()
-        return JsonResponse({
-            "text": str(person) + " " + person.apostrophe_year,
-            "id": person.id
-        })
-
-    def form_invalid(self, form):
-        return JsonResponse({
-            "errors": form.errors
-        })
-
 class ImportStaff(ShowStaffMixin, DetailView):
     def get(self, *args, **kwargs):
         self.object = self.get_object()

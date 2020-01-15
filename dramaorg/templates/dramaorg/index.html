@@ -24,7 +24,13 @@
   <tbody>
   {% for show in request.user.show_set.occurring %}
   <tr>
-    <td>{{ show.title }}</td>
+    <td>
+      {{ show.title }}
+      <a class="badge badge-secondary"
+	 href="{% url 'dramaorg:update' show.pk %}"
+	 data-toggle="modal" title="{{ show.title }}"
+	 data-target="#edit-show-modal">edit</a>
+    </td>
     <td>{{ show.seasonstr }}</td>
     <td>
       {{ show.space }}
@@ -38,7 +44,13 @@
       {% endfor %}
       {% endif %}
     </td>
-    <td>{{ show.people }}</td>
+    <td>
+      {{ show.people }}
+      <a class="badge badge-secondary"
+	 href="{% url 'dramaorg:update_staff' show.pk %}"
+	 data-toggle="modal" title="{{ show.title }}"
+	 data-target="#edit-show-modal">edit</a>
+    </td>
     <td>
       {% for i in show.enabled_apps %}
       <a href="{% url i|add:':index' %}">
@@ -49,6 +61,31 @@
   </tr>
   {% endfor %}
 </table>
+
+<div class="modal fade edit-show-modal"
+     id="edit-show-modal" tabindex="-1">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+	<h5 class="modal-title">
+	  Edit <span id="edit-show-modal-title"></span>
+	</h5>
+	<button type="button" class="close" data-dismiss="modal"
+		aria-label="Close">
+	  <span aria-hidden="true">&times;</span>
+	</button>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+	<button type="button" class="btn btn-secondary"
+		data-dismiss="modal">Close</button>
+	<button type="button" class="btn btn-primary body-submit">
+	  Update</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% if not perms.dramaorg.change_show %}
 <p class="text-muted text-center">If any of this information is incorrect or
   shows are missing from your dashboard, please contact
