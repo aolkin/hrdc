@@ -51,7 +51,7 @@
 }
 
 .calendar-select .input-group select {
-    flex: 1.75 1 auto;
+    flex: 1.75 1;
     font-weight: bold;
 }
 

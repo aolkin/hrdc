@@ -71,12 +71,12 @@ class PerformanceDateAdmin(admin.ModelAdmin):
     
 @admin.register(Announcement)
 class AnnouncementAdmin(admin.ModelAdmin):
-    readonly_fields = ("user", "title", "message", "note", "graphic",
+    readonly_fields = ("user", "title", "rendered_message", "note", "graphic",
                        "start_date", "end_date", "submitted", "modified")
     fields = (
         ("user",),
         ("title",),
-        ("message",),
+        ("rendered_message",),
         ("graphic",),
         ("note",),
         ("start_date", "end_date"),

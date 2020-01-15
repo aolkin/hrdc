@@ -12,7 +12,7 @@ $(() => {
 	    format: DATE_FORMAT,
 	    useCurrent: false,
 	    date: moment($el.val(), DATE_FORMAT),
-	    minDate: moment().subtract(1, "days"),
+	    //minDate: moment().subtract(1, "days"),
 	});
     }).on("focus", function () {
 	$(this).datetimepicker("show");

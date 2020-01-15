@@ -3,8 +3,10 @@ from django.conf import settings
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
-from django.utils.html import format_html
+from django.utils.html import format_html, mark_safe
 from django.urls import reverse_lazy, reverse
+
+import bleach
 
 from django_thumbs.fields import ImageThumbsField
 
@@ -175,6 +177,10 @@ class Announcement(models.Model):
     class Meta:
         ordering = ("-end_date", "start_date", "-submitted")
     
+    @property
+    def rendered_message(self):
+        return mark_safe(bleach.clean(self.message))
+
     def clean(self):
         if self.end_date < self.start_date:
             raise ValidationError({
