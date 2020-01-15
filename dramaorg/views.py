@@ -308,10 +308,20 @@ class UpdateShow(ShowStaffMixin, UpdateView):
         messages.success(self.request, "Show updated successfully.")
         return super().form_invalid(form)
 
+class LazySelectMultiple(forms.widgets.SelectMultiple):
+    def optgroups(self, name, value, attrs=None):
+        self.choices.queryset = self.choices.queryset.filter(pk__in=value)
+        return super().optgroups(name, value, attrs)
+
 class UpdateShowStaff(ShowStaffMixin, UpdateView):
     fields = ("staff",)
     template_name = "dramaorg/update_show.html"
     success_url = reverse_lazy("dramaorg:index")
+
+    def get_form_class(self):
+        return forms.modelform_factory(self.model, fields=self.fields, widgets={
+            "staff": LazySelectMultiple()
+        })
 
     def form_valid(self, form):
         super().form_valid(form)
