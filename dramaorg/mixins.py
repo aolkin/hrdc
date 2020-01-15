@@ -1,10 +1,17 @@
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.contrib import messages
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
 
-from .utils import test_initialized
+from .utils import test_initialized, user_is_initialized
 
 class InitializedMixin(UserPassesTestMixin):
     login_url = "dramaorg:profile"
+    def test_func(self):
+        return test_initialized(self.request.user)
+
+@method_decorator(login_required, name="dispatch")
+class InitializedLoginMixin(UserPassesTestMixin):
     def test_func(self):
         return test_initialized(self.request.user)
 

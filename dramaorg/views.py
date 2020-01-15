@@ -8,7 +8,7 @@ from django.shortcuts import redirect
 from django.db.models import Q
 from django import forms
 from django.views.generic.base import TemplateView
-from django.views.generic.detail import DetailView
+from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.views.generic.edit import FormView, UpdateView, BaseCreateView
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.decorators.cache import never_cache
@@ -24,7 +24,7 @@ from django.contrib.auth.mixins import (LoginRequiredMixin,
 from django.contrib.auth.decorators import login_required
 
 from .utils import user_is_initialized
-from .mixins import UserIsPdsmMixin
+from .mixins import UserIsPdsmMixin, InitializedLoginMixin
 from .email import send_reset, activate
 from .models import *
 
@@ -285,8 +285,20 @@ class StaffIndexView(SuccessMessageMixin, FormView):
         context.update(indexes)
         return context
 
-class UpdateShow(UpdateView):
+class ShowStaffMixin(InitializedLoginMixin, SingleObjectMixin):
     model = Show
+    
+    def test_func(self):
+        if super().test_func():
+            if self.get_object().user_is_staff(self.request.user):
+                return True
+            else:
+                messages.error(self.request, "You are not a member of the "
+                               "executive staff of that show. Log in as a "
+                               "different user?")
+        return False
+
+class UpdateShow(ShowStaffMixin, UpdateView):
     fields = ("title", "creator_credit", "affiliation", "prod_type")
     template_name = "dramaorg/update_show.html"
     success_url = reverse_lazy("dramaorg:index")
@@ -296,8 +308,7 @@ class UpdateShow(UpdateView):
         messages.success(self.request, "Show updated successfully.")
         return super().form_invalid(form)
 
-class UpdateShowStaff(UpdateView):
-    model = Show
+class UpdateShowStaff(ShowStaffMixin, UpdateView):
     fields = ("staff",)
     template_name = "dramaorg/update_show.html"
     success_url = reverse_lazy("dramaorg:index")
