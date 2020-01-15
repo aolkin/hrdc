@@ -333,6 +333,7 @@ class Show(Season):
         permissions = (
             ("change_current_season", "Can change the current season"),
         )
+        ordering = ("-residency_starts", "-residency_ends")
 
 @receiver(pre_save)
 def fix_slug(sender, instance, raw, *args, **kwargs):

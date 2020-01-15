@@ -200,7 +200,7 @@ class UserAdmin(BaseUserAdmin):
 class ShowAdmin(admin.ModelAdmin):
     list_display = ('title', 'seasonstr', 'space',
                     'residency_starts', 'residency_ends', 'liaison_display')
-    list_filter = ('season', 'year', 'space')
+    list_filter = ('season', 'year', 'space', 'residency_starts')
     autocomplete_fields = ('staff', 'liaisons')
     fieldsets = (
         ("Show Information",
