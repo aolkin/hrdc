@@ -13,7 +13,7 @@ $(() => {
 		['clean'],
 	    ]
 	},
-	placeholder: "Compose your message body here...",
+	placeholder: "Compose your message here...",
 	theme: 'snow'
     });
     quill.on('text-change', () => {
