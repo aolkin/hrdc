@@ -1,6 +1,6 @@
 {% extends "casting/sign_in/base.html" %}
 
-{% load bootstrap crispy_forms_tags %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 <div class="text-center">
@@ -13,7 +13,8 @@
   </p>
 </div>
 <div class="row justify-content-center">
-  <form method="POST" class="col-lg-6 col-md-8 audition-sign-in-shows">
+  <form method="POST"
+	class="col-lg-6 col-md-8 audition-sign-in-shows">
     {% csrf_token %}
     {% if located_user_signin %}
     <div class="form-group">
@@ -26,7 +27,9 @@
       {% endif %}
     </div>
     {% else %}
-    {{ form|bootstrap_inline }}
+    <div class="hide-labels">
+    {{ form|crispy }}
+    </div>
     {% endif %}
     <p class="lead text-center">
       Shows currently holding auditions at {{ object }}:

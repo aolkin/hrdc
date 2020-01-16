@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'archive',
     'shortlinks',
     'crispy_forms',
-    'bootstrapform',
     'anymail',
     'channels',
 ]

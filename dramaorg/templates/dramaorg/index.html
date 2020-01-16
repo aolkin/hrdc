@@ -1,6 +1,6 @@
 {% extends "bt/default.html" %}
 
-{% load bootstrap crispy_forms_tags %}
+{% load crispy_forms_tags %}
 {% load drama %}
 {% load config bt %}
 
@@ -128,9 +128,9 @@
 <div class="row justify-content-center mt-5">
 {% if perms.dramaorg.change_current_season %}
   <a name="update-season"></a>
-  <form method="POST" class="col-md-6">
+  <form method="POST" class="col-md-6 hide-labels">
     {% csrf_token %}
-    {{ form|bootstrap_inline }}
+    {{ form|crispy }}
     <button type="submit" class="btn btn-primary btn-block">
       Set Current Season
     </button>
