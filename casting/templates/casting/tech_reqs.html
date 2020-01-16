@@ -79,7 +79,7 @@
   <tbody>
     {% for signing in object.tech_reqers.all|order_by:"character__show" %}
     <tr>
-      <td>{{ signing.actor.get_full_name }}</td>
+      <td>{{ signing.actor }}</td>
       <td>{{ signing.actor.pgps|break_punctuation }}</td>
       <td>
 	<a href="mailto:{{ signing.actor.email }}">{{ signing.actor.email }}</a>

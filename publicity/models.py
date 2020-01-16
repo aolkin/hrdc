@@ -139,7 +139,7 @@ class ShowPerson(models.Model):
         return "'{:02d}".format(self.year % 100) if self.year else ""
     
     def __str__(self):
-        return "{}: {} {}".format(self.position, self.name, self.yearstr())
+        return "{}: {}".format(self.position, self.person)
 
     @staticmethod
     def collate(qs):

@@ -73,6 +73,6 @@ function updateDisplayName() {
 $(() => {
     if ($("#display_name_field").length) {
 	$("[name=first_name], [name=last_name], [name=affiliation], [name=year], [name=display_affiliation]").on("input", updateDisplayName); 
+	updateDisplayName();
     }
-    updateDisplayName();
 });

@@ -162,12 +162,6 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     def get_short_name(self):
         return self.first_name.strip()
 
-    def __str__(self):
-        if self.is_board:
-            return self.get_full_name() + " ({})".format(
-                get_admin_group().name)
-        return self.get_full_name()
-
     @property
     def display_name(self):
         extra = year = ""
@@ -178,8 +172,14 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         if year:
             extra = " " + year
         if self.display_affiliation:
-            extra = "({}{})".format(self.affiliation, year)
-        return self.get_full_name() + (" " + extra if extra else "")
+            extra = " ({}{})".format(self.affiliation, extra)
+        return self.get_full_name() + extra
+
+    def __str__(self):
+        if self.is_board:
+            return self.get_full_name() + " ({})".format(
+                get_admin_group().name + " Account")
+        return self.display_name
 
 @receiver(post_save, sender=User)
 def invite_user(sender, instance, created, raw, **kwargs):

@@ -347,7 +347,7 @@ class SearchPeople(UserIsPdsmMixin, DetailView):
                 { "text": "Too many results, please narrow your search..." }
             ], safe=False)
         people = [{
-            "text": str(i) + " " + i.apostrophe_year,
+            "text": str(i),
             "id": i.id
         } for i in users]
         return JsonResponse(people, safe=False)
@@ -359,7 +359,7 @@ class AddPerson(UserIsPdsmMixin, BaseCreateView):
     def form_valid(self, form):
         person = form.save()
         return JsonResponse({
-            "text": str(person) + " " + person.apostrophe_year,
+            "text": str(person),
             "id": person.id
         })
 

@@ -6,7 +6,7 @@
 	    data-select-placeholder="Enter Actor Name...">
       {% if callback.actor %}
       <option value="{{ callback.actor.pk }}" selected>
-	{{ callback.actor }}
+	{{ callback.actor.get_full_name }}
       </option>
       {% endif %}
     </select>

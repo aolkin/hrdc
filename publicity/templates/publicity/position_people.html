@@ -1,5 +1,5 @@
 {% if position %}{{ position }} ... {% endif %}
 {% for person in people %}
-  {{ person.name }}{% if person.year %} {{ person.yearstr }}{% endif %}{% if not forloop.last %}{% if position %}, {% else %}<br>{% endif %}{% endif %}
+  {{ person.person }}{% if not forloop.last %}{% if position %}, {% else %}<br>{% endif %}{% endif %}
 {% endfor %}
 <br>

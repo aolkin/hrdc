@@ -120,7 +120,7 @@
 		    title="Blocked" data-toggle="tooltip"> </span>
 	      {% endif %}
 	      {% endif %}
-	      {{ signing.actor }}
+	      {{ signing.actor.get_full_name }}
 	    </div>
 	  </li>
 	  {% endif %}
@@ -154,7 +154,7 @@
 	  <small>
 	    <span class="text-muted">This role has been filled by</span>
 	    {% for actor in character.actors %}
-	    {{ actor }}{% if forloop.revcounter0 == 1 %}
+	    {{ actor.get_full_name }}{% if forloop.revcounter0 == 1 %}
 	    and
 	    {% elif not forloop.last %},
 	    {% endif %}

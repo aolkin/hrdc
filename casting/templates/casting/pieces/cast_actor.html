@@ -11,7 +11,7 @@
 	    data-select-placeholder="Enter Actor Name...">
       {% if signing.actor %}
       <option value="{{ signing.actor.pk }}" selected>
-	{{ signing.actor }}
+	{{ signing.actor.get_full_name }}
       </option>
       {% endif %}
     </select>

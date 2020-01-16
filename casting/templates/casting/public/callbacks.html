@@ -85,7 +85,7 @@
 	  {% for cb in character.callback_set.all %}
 	  <li class="list-group-item">
 	    {% if object.callbacks_released or user_is_staff %}
-	    {{ cb.actor }}
+	    {{ cb.actor.get_full_name }}
 	    {% else %}
 	    <span class="text-muted">[Actor Hidden]</span>
 	    {% endif %}
