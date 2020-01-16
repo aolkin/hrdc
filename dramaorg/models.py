@@ -46,6 +46,9 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
                                             verbose_name="Graduation Year")
     affiliation = models.CharField(max_length=160,
                                    verbose_name="School or Affiliation")
+    display_affiliation = models.BooleanField(
+        default=False,
+        help_text="Include your affiliation with your name and year?")
     pgps = models.CharField(max_length=20, blank=True,
                             verbose_name="Preferred Gender Pronouns")
     gender_pref = models.CharField(max_length=30, blank=True,
@@ -120,7 +123,7 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     
     @property
     def apostrophe_year(self):
-        if self.year and len(str(self.year)) >= 2:
+        if self.year and len(str(self.year)) == 4:
             return "'" + str(self.year)[-2:]
         return ""
 
@@ -164,6 +167,19 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
             return self.get_full_name() + " ({})".format(
                 get_admin_group().name)
         return self.get_full_name()
+
+    @property
+    def display_name(self):
+        extra = year = ""
+        if self.apostrophe_year:
+            year = self.apostrophe_year
+        elif self.display_affiliation:
+            year = str(self.year) if self.year else ""
+        if year:
+            extra = " " + year
+        if self.display_affiliation:
+            extra = "({}{})".format(self.affiliation, year)
+        return self.get_full_name() + (" " + extra if extra else "")
 
 @receiver(post_save, sender=User)
 def invite_user(sender, instance, created, raw, **kwargs):

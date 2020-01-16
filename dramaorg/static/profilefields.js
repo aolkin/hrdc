@@ -42,5 +42,37 @@ $("input[name=affiliation]").typeahead({
     minLength: 0,
     source: suggestAffiliation,
     fitToElement: true,
-    autoSelect: true
+    autoSelect: true,
+    showHintOnFocus: true,
+});
+
+function updateDisplayName() {
+    let name = $("[name=first_name]").val();
+    name += " " + $("[name=last_name]").val();
+    let year = $("[name=year]").val().toString();
+    let affiliation = $("[name=affiliation]").val();
+    if (!$("[name=display_affiliation]").prop("checked")) {
+	affiliation = "";
+	    }
+    if (year.length == 4) {
+	year = "'" + year.slice(-2);
+    }
+    if (year) {
+	year = " " + year;
+    }
+    if (affiliation) {
+	name += ` (${affiliation}${year})`;
+    } else {
+	if (year.search("'") > -1) {
+	    name += year;
+	}
+    }
+    $("#display_name_field").val(name);
+}
+
+$(() => {
+    if ($("#display_name_field").length) {
+	$("[name=first_name], [name=last_name], [name=affiliation], [name=year], [name=display_affiliation]").on("input", updateDisplayName); 
+    }
+    updateDisplayName();
 });

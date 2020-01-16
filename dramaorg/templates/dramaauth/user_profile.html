@@ -16,7 +16,28 @@
     <legend class="text-center">
       User Profile Information</legend>
     {% csrf_token %}
-    {{ form|crispy }}
+    <div class="form-row">
+      <div class="col">{{ form.first_name|as_crispy_field }}</div>
+      <div class="col">{{ form.last_name|as_crispy_field }}</div>
+    </div>
+    <div class="form-row">
+      <div class="col">{{ form.pgps|as_crispy_field }}</div>
+      <div class="col">{{ form.gender_pref|as_crispy_field }}</div>
+    </div>
+    <div class="form-row">
+      <div class="col col-sm-8">{{ form.affiliation|as_crispy_field }}</div>
+      <div class="col col-sm-4">{{ form.year|as_crispy_field }}</div>
+    </div>
+    {{ form.display_affiliation|as_crispy_field }}
+    <div class="form-group">
+      <label for="display_name_field">Display Name</label>
+      <input type="text" value="{{ form.instance.display_name }}"
+	     class="form-control" id="display_name_field" readonly>
+    </div>
+    <div class="form-row">
+      <div class="col-12 col-sm-8">{{ form.email|as_crispy_field }}</div>
+      <div class="col-12 col-sm-4">{{ form.phone|as_crispy_field }}</div>
+    </div>
     <button type="submit" class="btn btn-primary btn-block">Save</button>
   </form>
 </div>

@@ -15,19 +15,41 @@
   this page again.
 </p>
 <div class="row justify-content-center">
-  <form method="POST" class="col-lg-6 col-md-8 audition-sign-in-shows">
+  <form method="POST" class="col-lg-6 col-md-8 audition-sign-in-shows"
+	autocomplete="off">
     {% if form.is_bound and not form.is_valid %}
     <div class="alert alert-danger" role="alert">
       There were errors in your profile! Please correct them below.
     </div>
     {% endif %}
+    {% csrf_token %}
+    <div class="form-row">
+      <div class="col">{{ form.first_name|as_crispy_field }}</div>
+      <div class="col">{{ form.last_name|as_crispy_field }}</div>
+    </div>
+    <div class="form-row">
+      <div class="col-12 col-sm-8">{{ form.email|as_crispy_field }}</div>
+      <div class="col-12 col-sm-4">{{ form.phone|as_crispy_field }}</div>
+    </div>
     {% if not form.is_bound %}
     <div class="alert alert-info" role="alert">
       Please double-check that your email address is correct!
     </div>
     {% endif %}
-    {% csrf_token %}
-    {{ form|crispy }}
+    <div class="form-row">
+      <div class="col col-sm-8">{{ form.affiliation|as_crispy_field }}</div>
+      <div class="col col-sm-4">{{ form.year|as_crispy_field }}</div>
+    </div>
+    {{ form.display_affiliation|as_crispy_field }}
+    <div class="form-group">
+      <label for="display_name_field">Display Name</label>
+      <input type="text" value="{{ form.instance.display_name }}"
+	     class="form-control" id="display_name_field" readonly>
+    </div>
+    <div class="form-row">
+      <div class="col">{{ form.pgps|as_crispy_field }}</div>
+      <div class="col">{{ form.gender_pref|as_crispy_field }}</div>
+    </div>
     <button type="submit" class="btn btn-primary btn-block">Continue</button>
   </form>
 </div>

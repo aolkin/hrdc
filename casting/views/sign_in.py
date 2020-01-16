@@ -12,7 +12,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
 
 from django.conf.urls import url
-
+from django.conf import settings
 from django import forms
 from django.utils import timezone
 from django.utils.functional import SimpleLazyObject
@@ -187,14 +187,17 @@ class ActorSignInStart(ActorSignInBase, BaseUpdateView):
 
 PROFILE_FIELDS = ["email", "first_name", "last_name", "phone", "affiliation"]
 PROFILE_WIDGETS = dict(zip(PROFILE_FIELDS, [
-    forms.TextInput(attrs={ "autocomplete": "off" }) for i in range(len(
+    forms.TextInput(attrs={ "autocomplete": "nope" }) for i in range(len(
         PROFILE_FIELDS))]))
+PROFILE_WIDGETS["affiliation"].attrs[
+    "placeholder"] = settings.DEFAULT_AFFILIATION
 PROFILE_WIDGETS["year"] = forms.NumberInput()
 
 class ActorProfileForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
-        fields = PROFILE_FIELDS + ["year", "pgps", "gender_pref"]
+        fields = PROFILE_FIELDS + ["year", "display_affiliation",
+                                   "pgps", "gender_pref"]
         widgets = PROFILE_WIDGETS
     
 class ActorSignInProfile(ActorSignInBase, BaseUpdateView):
