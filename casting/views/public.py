@@ -22,10 +22,7 @@ from . import show_model, get_current_slots
 class FixHeaderUrlMixin:
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        if self.request.user.is_authenticated:
-            if self.request.user.is_season_pdsm:
-                context["BT_header_url"] = 'casting:index'
-        else:
+        if not self.request.user.is_authenticated:
             context["BT_header_url"] = 'casting:public_index'
         return context
 
@@ -37,13 +34,18 @@ class PublicView(FixHeaderUrlMixin, DetailView):
         context["user_is_staff"] = self.object.show.user_is_staff(
             self.request.user)
         context["sidebar_menu"] = {}
-        if (self.request.user.is_authenticated and
-            self.request.user.is_season_pdsm):
+        if self.request.user.is_authenticated:
             submenu = context["sidebar_menu"]["Common Casting"] = []
             submenu.append({
-                "name": "Home",
-                "url": reverse("casting:index"),
+                "name": "Public Portal",
+                "url": reverse("casting:public_index"),
+                "active": self.request.resolver_match.url_name == "public_index"
             })
+            if self.request.user.is_season_pdsm:
+                submenu.append({
+                    "name": "Manage Your Shows",
+                    "url": reverse("casting:index"),
+                })
         return context
     
 class CallbackView(PublicView):
