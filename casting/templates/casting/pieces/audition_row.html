@@ -1,6 +1,6 @@
 {% load bt %}
 <td class="align-middle">
-  <span class="text-nowrap">{{ audition.signed_in|date:"F j" }}</span>,
+  <span class="text-nowrap">{{ audition.signed_in|date:"M j" }}</span>,
   <span class="text-nowrap">{{ audition.signed_in|date:"g:i A" }}</span>
 </td>
 <td>{{ audition.actor.get_full_name }}</td>
@@ -17,7 +17,7 @@
 	  title="Copy actor information to clipboard for spreadsheets (includes email and phone)"
 	  data-toggle="tooltip">
     copy</button>
-  <a class="btn btn-primary btn-sm" tabindex="0" role="button"
+  <button class="btn btn-primary btn-sm" tabindex="0" role="button"
      data-toggle="popover" data-html="true"
      data-title="Contact and Other Information" data-placement="top"
      data-content="
@@ -40,7 +40,7 @@
 {{ audition.tech_interest }}</div>
 {% endif %}
 ">
-    more info</a>
+    more info</button>
   {% if audition.actor.is_suspended %}
   <i class="fa fa-times-rectangle text-danger" data-toggle="tooltip"
      title="This actor is currently suspended from Common Casting and you will be unable to cast them"></i>
