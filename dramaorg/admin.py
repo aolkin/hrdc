@@ -92,6 +92,7 @@ class UserAdmin(BaseUserAdmin):
         (None, {'fields': (('first_name', 'last_name'),
                            ('pgps', 'gender_pref'),
                            ('affiliation', 'year'),
+                           ('display_affiliation',),
                            ('suspended_until',))}),
         ('Contact Info', {'fields': ('email', 'phone')}),
         ('Permissions', {'fields': ('is_active', 'admin_access',
