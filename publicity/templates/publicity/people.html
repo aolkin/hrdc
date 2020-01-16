@@ -88,41 +88,79 @@
       </div>
       <div class="modal-body">
 	{% csrf_token %}
-        <div class="form-group row">
-	  <label for="first_name" class="col-sm-3 col-form-label">
-	    First Name</label>
-	  <div class="col-sm-9">
-	    <input type="text" class="form-control" id="first_name" required>
+	<div class="form-row">
+          <div class="form-group col">
+	    <label for="first_name" class="col-form-label">
+	      First Name</label>
+	    <div class="">
+	      <input type="text" class="form-control" id="first_name"
+		     name="first_name" required>
+	    </div>
+	  </div>
+          <div class="form-group col">
+	    <label for="last_name" class="col-form-label">
+	      Last Name</label>
+	    <div class="">
+	      <input type="text" class="form-control" id="last_name"
+		     name="last_name" required>
+	    </div>
 	  </div>
 	</div>
-        <div class="form-group row">
-	  <label for="last_name" class="col-sm-3 col-form-label">
-	    Last Name</label>
-	  <div class="col-sm-9">
-	    <input type="text" class="form-control" id="last_name" required>
+	<div class="form-row">
+	  <div class="col col-sm-8">
+	    <div class="form-group">
+	      <label for="affiliation" class="col-form-label">
+                School or Affiliation</label>
+              <div class="">
+                <input type="text" name="affiliation" maxlength="160"
+		       class="form-control" id="affiliation" required
+		       placeholder="{{ SETTINGS.DEFAULT_AFFILIATION }}">
+              </div>
+	    </div>
+	  </div>
+	  <div class="col col-sm-4">
+	    <div class="form-group">
+              <label for="year" class="col-form-label">Year</label>
+              <div class="">
+                <input type="number" name="year" min="0"
+		       class="form-control" id="year">
+              </div>
+	    </div>
 	  </div>
 	</div>
-        <div class="form-group row">
-	  <label for="year" class="col-sm-3 col-form-label">
-	    Year</label>
-	  <div class="col-sm-9">
-	    <input type="number" class="form-control" id="year">
+	<div class="form-group">
+	  <div class="form-check">
+            <label for="display_affiliation" class="form-check-label">
+              <input type="checkbox" name="display_affiliation"
+		     class="form-check-input" id="display_affiliation">
+              Display Affiliation
+            </label>
+	    <small class="form-text text-muted">
+	      Include the affiliation in the display name?</small>
 	  </div>
+        </div>
+	<div class="form-group">
+	  <label for="display_name_field">Display Name</label>
+	  <input type="text" class="form-control" id="display_name_field"
+		 readonly>
+	  <small class="form-text text-muted">
+	  </small>
 	</div>
-        <div class="form-group row">
-	  <label for="email" class="col-sm-3 col-form-label">
-	    Email</label>
-	  <div class="col-sm-9">
-	    <input type="email" class="form-control" id="email" required>
+        <div class="form-group">
+	  <label for="email" class="col-form-label">Email</label>
+	  <div class="">
+	    <input type="email" class="form-control" id="email" name="email"
+		   required>
 	    <div class="invalid-feedback">
 	      Please provide a valid email address.
 	    </div>
 	  </div>
 	</div>
-	<p class="text-muted text-right">
+	<p class="text-muted text-center">
 	  <small>
-	    Once you add this person, they will have to log in themselves to
-	    update this information if necessary.
+	    Adding this person will invite them to create an account and
+	    update their profile. Once you add this person, they will have to
+	    log in themselves to make any further updates to this information.
 	  </small>
 	</p>
 	<ul id="add-errors" class="text-danger"></ul>

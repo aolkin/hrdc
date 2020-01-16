@@ -354,7 +354,8 @@ class SearchPeople(UserIsPdsmMixin, DetailView):
 
 class AddPerson(UserIsPdsmMixin, BaseCreateView):
     model = get_user_model()
-    fields = "email", "first_name", "last_name", "year"
+    fields = ("email", "first_name", "last_name",
+              "year", "affiliation", "display_affiliation")
     
     def form_valid(self, form):
         person = form.save()

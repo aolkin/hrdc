@@ -19,6 +19,7 @@ $(() => {
 	}
     }).on("show.bs.modal", () => {
 	$("#add-modal input[id]").val("").removeClass("is-valid is-invalid");
+	$("#add-modal input[type=checkbox]").prop("checked", false);
 	$("#add-button").prop("disabled", false);
 	$("#add-error").text("");
 	$("#add-errors").empty();
@@ -27,11 +28,14 @@ $(() => {
     $("#add-button").click(() => {
 	let data = {};
 	let isValid = true;
-	$("#add-modal input").each((index, el) => {
-	    if ($(el).prop("name")) {
-		data[$(el).prop("name")] = $(el).val();
+	$("#add-modal input[name]").each((index, el) => {
+	    $(el).removeClass("is-valid is-invalid");
+	    if ($(el).prop("type") == "checkbox") {
+		if ($(el).prop("checked")) {
+		    data[$(el).prop("name")] = "on";
+		}
 	    } else {
-		data[$(el).prop("id")] = $(el).val();
+		data[$(el).prop("name")] = $(el).val();
 	    }
 	    if ($(el).val()) {
 		$(el).addClass("is-valid");
