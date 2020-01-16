@@ -48,7 +48,7 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
                                    verbose_name="School or Affiliation")
     display_affiliation = models.BooleanField(
         default=False,
-        help_text="Include your affiliation with your name and year?")
+        help_text="Display your affiliation with your name?")
     pgps = models.CharField(max_length=20, blank=True,
                             verbose_name="Preferred Gender Pronouns")
     gender_pref = models.CharField(max_length=30, blank=True,
