@@ -45,7 +45,9 @@ $(function() {
     });
 
     if (localStorage.hideFilteringMessage != "true") {
-        $(".filterable-instructions").popover();
+        $(".filterable-instructions").popover({
+	    sanitize: false
+	});
         $(".filterable-instructions").popover("show");
         $(".filterable-instructions-dismiss").click(hideFilteringMessage);
     }
