@@ -257,13 +257,17 @@ class SeasonScriptView(ScriptView):
             if type(season) == str:
                 season = config.season
         shows = PublicityInfo.objects.filter(
-            show__season=season, show__year=year).exclude(show__space=None)
+            show__season=season, show__year=year).exclude(
+                show__space=None).exclude(show__residency_starts=None)
         venues = defaultdict(list)
         for i in shows:
             venues[i.show.space].append(i)
+        sorted_shows = [(i, sorted(
+            val, key=lambda x: x.show.residency_starts))
+                        for i, val in venues.items()]
         kwargs["innerHtml"] = render_to_string(
             "publicity/render_season.html", {
-                "venues": sorted(venues.items(), key=lambda x: x[0].order)
+                "venues": sorted(sorted_shows, key=lambda x: x[0].order)
             }).replace("\n", "")
         return super().get_context_data(**kwargs)
 
