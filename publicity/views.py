@@ -212,17 +212,9 @@ class DisplayView(MenuMixin, DetailView):
     template_name = "publicity/display.html"
     model = PublicityInfo
 
-class ScriptView(TemplateView):
-    template_name = "publicity/embed.js"
-
-    def get(self, *args, **kwargs):
-        res = super().get(*args, **kwargs)
-        res["Content-Type"] = "application/javascript"
-        res["Cache-Control"] = "no-cache"
-        return res
-
-class ShowScriptView(ScriptView, DetailView):
+class ShowScriptView(DetailView):
     model = PublicityInfo
+    template_name = "publicity/embed.js"
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -245,7 +237,15 @@ class ShowScriptView(ScriptView, DetailView):
             }).replace("\n","")
         return context
 
-class SeasonScriptView(ScriptView):
+    def get(self, *args, **kwargs):
+        res = super().get(*args, **kwargs)
+        res["Content-Type"] = "application/javascript"
+        res["Cache-Control"] = "no-cache"
+        return res
+
+class SeasonScriptView(TemplateView):
+    template_name = "publicity/embed.js"
+
     def get_context_data(self, **kwargs):
         year = self.request.GET.get("year") or config.year
         season = self.request.GET.get("season") or config.season
@@ -270,6 +270,12 @@ class SeasonScriptView(ScriptView):
                 "venues": sorted(sorted_shows, key=lambda x: x[0].order)
             }).replace("\n", "")
         return super().get_context_data(**kwargs)
+
+    def get(self, *args, **kwargs):
+        res = super().get(*args, **kwargs)
+        res["Content-Type"] = "application/javascript"
+        res["Cache-Control"] = "no-cache"
+        return res
 
 class NewsletterMixin:
     def get_context_data(self, *args, **kwargs):
