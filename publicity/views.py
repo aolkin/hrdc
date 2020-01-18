@@ -336,6 +336,8 @@ class CalendarView(TemplateView):
 
     def get_context_data(self, **kwargs):
         now = timezone.now()
+        if self.request.GET.get("embed") or self.request.GET.get("upcoming"):
+            kwargs["BT_extra_body_class"] = "embedded"
         kwargs["embed"] = self.request.GET.get("embed", False)
         kwargs["year"] = year = self.kwargs.get("year", now.year)
         kwargs["month"] = month = self.kwargs.get("month", now.month)
