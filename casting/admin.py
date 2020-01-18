@@ -327,9 +327,19 @@ class TechReqMetaAdmin(MetaAdmin):
         return (", ".join([str(i.actor) for i in obj.tech_reqers])
                 if obj.tech_reqers else None)
 
+
+def mark_as_done(modeladmin, request, qs):
+    qs = qs.filter(status=Audition.STATUSES[1][0])
+    for audition in qs:
+        audition.status = Audition.STATUSES[2][0]
+        audition.done_time = timezone.now()
+        audition.save()
+    messages.success(request, "Marked {} auditions as done.".format(qs.count()))
+mark_as_done.short_description = "Mark selected auditions as done"
+
 @admin.register(Audition)
 class AuditionAdmin(admin.ModelAdmin):
-    autocomplete_fields = ('actor',)
+    autocomplete_fields = ('actor', 'show')
     list_filter = ('show__show__year', 'show__show__season')
     search_fields = ('actor__email', 'actor__first_name', 'actor__last_name',
                      'show__show__title')
@@ -337,6 +347,7 @@ class AuditionAdmin(admin.ModelAdmin):
     readonly_fields = ('busy', 'done_time', 'called_time', 'status',
                        'audition_length', 'tech_interest',
                        'actorseasonmeta')
+    actions = (mark_as_done,)
 
 @admin.register(Character)
 class CharacterAdmin(admin.ModelAdmin):

@@ -174,6 +174,22 @@ any other PDSMs viewing the show's auditions page. After "call"-ing an actor,
 the button will change to "done", allowing a PDSM to mark the actor as having
 auditioned (an update that again, will be instantly reflected everywhere).
 
+### PDSM Mistakes - Audition Admin
+
+Occasionally, PDSMs will forget to mark an audition as done. This can cause some
+problems, and therefore, any auditions still in progress after their slot ends
+will automatically be marked as done. If this doesn't happen, casting
+administrators can use the Audition admin to mark auditions as done via the
+multi-select action dropdown.
+
+Additionally, if a show wishes to callback or cast an actor who did not show up
+to auditions, there are two ways to enter them into the system. One is to create
+a fake slot for the current time and sign them in via the normal process.
+Alternatively, the Audition admin can be used to create a fake Audition for
+them. When doing so, select the right show and actor, select any space,
+and make sure to check "Sign in complete". This will cause the given actor to
+show up in the show's list.
+
 ## Callbacks
 
 After holding auditions, PDSMs must enter callback information.
@@ -241,6 +257,14 @@ will be allowed to sign.
 
 NOTE: While additional characters can be added, characters for which callbacks
 were listed cannot be removed or edited, and must have actors cast as them.
+
+### Allowing Multiple Signatures
+
+If a show would like to allow a role to be signed for in addition to other roles
+in that same show, they should create the role as normal. Then, before cast
+lists are released, an administrator can use the Character admin page to check
+"Allow multiple signatures" for that character. Actors will then be able to
+sign for the given role in addition to other roles in that show.
 
 ### First-Round Cast Lists
 
