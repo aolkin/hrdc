@@ -46,6 +46,16 @@ link back to the performance page.
 If need be, you can also edit any of the show's information from the admin as
 well.
 
+## Season List (Sidebar)
+
+To embed an auto-generated list of shows onto another website, insert this
+snippet:
+
+	`<script src="https://app.hrdctheater.org/publicity/season/?year=2019&season=Fall"></script>`
+
+Adjust the year and season as needed. In order for this to generate properly,
+you must have filled in the "Website page" field as described previously.
+
 ## Calendar and Upcoming Performances
 
 The Calendar available through the app is automatically generated from the

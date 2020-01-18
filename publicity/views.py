@@ -212,8 +212,16 @@ class DisplayView(MenuMixin, DetailView):
     template_name = "publicity/display.html"
     model = PublicityInfo
 
-class ScriptView(DetailView):
+class ScriptView(TemplateView):
     template_name = "publicity/embed.js"
+
+    def get(self, *args, **kwargs):
+        res = super().get(*args, **kwargs)
+        res["Content-Type"] = "application/javascript"
+        res["Cache-Control"] = "no-cache"
+        return res
+
+class ShowScriptView(ScriptView, DetailView):
     model = PublicityInfo
 
     def get_context_data(self, *args, **kwargs):
@@ -236,12 +244,28 @@ class ScriptView(DetailView):
                 "band": ShowPerson.collate(context["object"].band()),
             }).replace("\n","")
         return context
-    
-    def get(self, *args, **kwargs):
-        res = super().get(*args, **kwargs)
-        res["Content-Type"] = "application/javascript"
-        res["Cache-Control"] = "no-cache"
-        return res
+
+class SeasonScriptView(ScriptView):
+    def get_context_data(self, **kwargs):
+        year = self.request.GET.get("year") or config.year
+        season = self.request.GET.get("season") or config.season
+        if type(season) == str and len(season) > 1:
+            for val, name in Season.SEASONS:
+                if name.lower() == season.lower():
+                    season = val
+                    break
+            if type(season) == str:
+                season = config.season
+        shows = PublicityInfo.objects.filter(
+            show__season=season, show__year=year).exclude(show__space=None)
+        venues = defaultdict(list)
+        for i in shows:
+            venues[i.show.space].append(i)
+        kwargs["innerHtml"] = render_to_string(
+            "publicity/render_season.html", {
+                "venues": sorted(venues.items(), key=lambda x: x[0].id)
+            }).replace("\n", "")
+        return super().get_context_data(**kwargs)
 
 class NewsletterMixin:
     def get_context_data(self, *args, **kwargs):

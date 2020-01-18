@@ -9,7 +9,7 @@ urlpatterns = [
     url(r'^$', IndexView.as_view(), name="index"),
     url(r'^show/(?P<pk>\d+)/', include([
         url(r'^$', DisplayView.as_view(), name="display"),
-        url(r'^script.js$', ScriptView.as_view(), name="script"),
+        url(r'^script.js$', ShowScriptView.as_view(), name="script"),
         url(r'^info/$', InfoView.as_view(), name="info"),
         url(r'^people/$', PeopleView.as_view(), name="people"),
         url(r'^people/import/staff$', ImportStaff.as_view(),
@@ -23,4 +23,5 @@ urlpatterns = [
     path('calendar/', CalendarView.as_view(), name="public_index"),
     path('calendar/<int:year>/<int:month>/', CalendarView.as_view(),
          name="calendar"),
+    path('season/', SeasonScriptView.as_view(), name="season"),
 ]
