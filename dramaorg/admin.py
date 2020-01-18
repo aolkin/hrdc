@@ -238,9 +238,9 @@ class BuildingAdmin(admin.ModelAdmin):
     
 @admin.register(Space)
 class SpaceAdmin(admin.ModelAdmin):
-    list_display = ('__str__', 'name', 'building', 'nickname')
+    list_display = ('__str__', 'name', 'building', 'nickname', "order")
     list_filter = ('building',)
-    list_editable = ('nickname',)
+    list_editable = ('nickname', "order")
     search_fields = ('name', 'building__name', 'nickname')
 
 admin.site.register(Permission)

@@ -56,6 +56,10 @@ snippet:
 Adjust the year and season as needed. In order for this to generate properly,
 you must have filled in the "Website page" field as described previously.
 
+To change the order in which the venues are listed, adjust the "Order" column
+in "Base Data" -> "Spaces" in the admin. Spaces with lower numbers will be
+listed first.
+
 ## Calendar and Upcoming Performances
 
 The Calendar available through the app is automatically generated from the

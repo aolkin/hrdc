@@ -210,6 +210,7 @@ class Space(models.Model):
     nickname = models.CharField(
         max_length=150, blank=True,
         help_text="If set, the space will be displayed using this name.")
+    order = models.PositiveSmallIntegerField(default=0)
 
     def full_name(self):
         if self.nickname:
@@ -223,6 +224,7 @@ class Space(models.Model):
         return self.full_name()
 
     class Meta:
+        ordering = ("order",)
         unique_together = (("name", "building"),)
     
 def _get_year():

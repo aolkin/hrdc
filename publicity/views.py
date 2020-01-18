@@ -263,7 +263,7 @@ class SeasonScriptView(ScriptView):
             venues[i.show.space].append(i)
         kwargs["innerHtml"] = render_to_string(
             "publicity/render_season.html", {
-                "venues": sorted(venues.items(), key=lambda x: x[0].id)
+                "venues": sorted(venues.items(), key=lambda x: x[0].order)
             }).replace("\n", "")
         return super().get_context_data(**kwargs)
 
