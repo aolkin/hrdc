@@ -234,3 +234,16 @@ def update_releases(scheduled=True):
                           stage__gte=4, stage__lt=6).values("pk")
     for i in cbs:
         open_second_signing.delay(i["pk"])
+
+@shared_task(ignore_result=True)
+def force_complete_auditions():
+    Audition = get_model("Audition")
+    auditions = Audition.objects.filter(status=Audition.STATUSES[1][0])
+    slots = get_model("Slot").objects.current_slots()
+    for show in auditions.values_list("show_id", flat=True).distinct():
+        spaces = slots.filter(show=show).values_list("space_id", flat=True)
+        invalid_space = auditions.filter(show=show).exclude(space__in=spaces)
+        for audition in invalid_space:
+            audition.status = Audition.STATUSES[2][0]
+            audition.done_time = timezone.now()
+            audition.save()

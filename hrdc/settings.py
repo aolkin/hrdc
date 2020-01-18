@@ -47,7 +47,7 @@ INSTALLED_APPS = [
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "asgiref.inmemory.ChannelLayer",
+        "BACKEND": "asgi_redis.RedisChannelLayer",
         "ROUTING": "hrdc.routing.channel_routing",
     },
 }
@@ -154,6 +154,24 @@ MESSAGE_TAGS = {
     messages.SUCCESS: 'success',
     messages.WARNING: 'warning',
     messages.ERROR: 'danger',
+}
+
+CELERY_BEAT_SCHEDULE = {
+    'update-casting-releases': {
+        'task': 'casting.tasks.update_releases',
+        'schedule': 10.0,
+        'relative': True,
+    },
+    'auto-finish-auditions': {
+        'task': 'casting.tasks.force_complete_auditions',
+        'schedule': 10.0,
+        'relative': True,
+    },
+    'send-missed-emails': {
+        'task': 'emailtracker.tasks.send_missing',
+        'schedule': 60.0 * 10.0,
+        'relative': False,
+    },
 }
 
 AUTH_USER_MODEL = "dramaorg.User"

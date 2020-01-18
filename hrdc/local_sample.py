@@ -53,20 +53,6 @@ CASTING_IS_COMMON = True
 
 BT_GTAG_ID = ""
 
-CELERY_BEAT_SCHEDULE = {
-    'update-casting-releases': {
-        'task': 'casting.tasks.update_releases',
-        'schedule': 10.0,
-        'relative': True,
-    },
-    'send-missed-emails': {
-        'task': 'emailtracker.tasks.send_missing',
-        'schedule': 60.0 * 10.0,
-        'relative': False,
-    },
-}
-
-
 QUEUED_EMAIL_TEMP = None
 QUEUED_EMAIL_DEBUG = True
 
