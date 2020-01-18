@@ -55,6 +55,8 @@ snippet:
 
 Adjust the year and season as needed. In order for this to generate properly,
 you must have filled in the "Website page" field as described previously.
+Additionally, only shows with a venue and a residency start date will be
+included in the list.
 
 To change the order in which the venues are listed, adjust the "Order" column
 in "Base Data" -> "Spaces" in the admin. Spaces with lower numbers will be
