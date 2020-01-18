@@ -350,6 +350,12 @@ their signing.
 
 ![Signed Cast List](images/23.png)
 
+### Temporarily Disabling Signing
+
+To temporarily disable signing, check the "Disable signing" checkbox for the
+Casting Release Group. This will prevent actors from submitting their
+acceptances or rejections of roles they have been cast in until unchecked again.
+
 ### Second-Round Signing
 
 When the second signing time passes, all first-choice roles which have not been

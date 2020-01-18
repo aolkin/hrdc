@@ -190,6 +190,10 @@ class SigningView(FixHeaderUrlMixin, ListView):
         accepted = defaultdict(bool)
         techreqs = defaultdict(bool)
         for i in qs:
+            if i.signing_disabled:
+                if self.request.POST.get("signing-response-{}".format(i.pk)):
+                    messages.warning(self.request, "Unable to sign for {} in {} as signing has been temporarily disabled.".format(i.character, i.show))
+                continue
             if i.response:
                 tech = str(i.tech_req.pk) if i.tech_req else None
             else:

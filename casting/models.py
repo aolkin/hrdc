@@ -37,6 +37,9 @@ class CastingReleaseMeta(models.Model):
         default=False,
         help_text="If this is set, the stage will not advance until it is "
         "cleared again, regardless of set times.")
+    disable_signing = models.BooleanField(
+        default=False,
+        help_text="Checking this will temporarily prevent actors from signing.")
     
     signing_opens = models.DateTimeField(null=True, blank=True)
     second_signing_opens = models.DateTimeField(
@@ -56,6 +59,7 @@ class CastingReleaseMeta(models.Model):
         verbose_name = "Casting Release Group"
         permissions = (
             ("view_first_cast_lists", "Can view first-round cast lists"),
+            ("update_castingreleasemeta_stage", "Can manually set the stage"),
         )
 
 
@@ -511,7 +515,13 @@ class Signing(ActorMapping):
         return not self.editable
 
     @property
+    def signing_disabled(self):
+        return self.show.release_meta.disable_signing
+
+    @property
     def signable(self):
+        if self.signing_disabled:
+            return False
         signed = len(Signing.objects.filter(character=self.character,
                                             order__lt=self.order,
                                             response=True))

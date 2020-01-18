@@ -137,10 +137,17 @@
 	{% endif %}
 	{% else %}
 	<div class="col-5 pull-7">
+	  {% if i.signing_disabled %}
+	  <div class="form-control-static text-warning">
+	    <div class="fa fa-exclamation-triangle pull-left mt-1"> </div>
+	    <div class="ml-4">Signing has been temporarily disabled.</div>
+	  </div>
+	  {% else %}
 	  <div class="form-control-static text-danger">
 	    <div class="fa fa-exclamation-triangle pull-left mt-1"> </div>
 	    <div class="ml-4">Someone else has accepted this role.</div>
 	  </div>
+	  {% endif %}
 	</div>
 	{% endif %}
 	{% if i.character.allowed_signers > 1 %}

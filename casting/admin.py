@@ -141,7 +141,8 @@ class CastingReleaseAdmin(admin.ModelAdmin):
     form = CastingReleaseForm
     fieldsets = (
         ("Casting Release Status", {
-            "fields": ("associated_with", "stage", "prevent_advancement")
+            "fields": ("associated_with", "stage", "prevent_advancement",
+                       "disable_signing")
         }),
         ("List Publishing", {
             "fields": ("publish_callbacks", "publish_first_round_casts",
@@ -154,7 +155,7 @@ class CastingReleaseAdmin(admin.ModelAdmin):
             "description": SIGNING_HELP
         })
     )
-    readonly_fields = ("associated_with", "stage")
+    readonly_fields = ("associated_with",)
     list_display = ('__str__', 'stage', 'publish_callbacks',
                     'publish_first_round_casts', 'publish_casts',
                     'signing_opens', 'second_signing_opens',
@@ -162,6 +163,8 @@ class CastingReleaseAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj):
         readonly = list(self.readonly_fields)
+        if not request.user.has_perm("casting.update_castingreleasemeta_stage"):
+            readonly.append("stage")
         if not obj:
             return readonly
         if obj.stage > 2 or (
