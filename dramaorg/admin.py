@@ -221,6 +221,19 @@ class ShowAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("title",)}
     save_as_continue = False
 
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        for i in settings.INSTALLED_APPS:
+            try:
+                module = __import__("{}.admin".format(i)).admin
+                action = module.enable_show_action
+                name = "enable_{}".format(i)
+                if request.user.has_perm(action.permission):
+                    actions[name] = (action, name, action.short_description)
+            except (ImportError, AttributeError) as e:
+                pass
+        return actions
+
     def liaison_display(self, obj):
         return ", ".join([str(i.get_full_name()) for i in obj.liaisons.all()])
     liaison_display.short_description = "Liaisons"

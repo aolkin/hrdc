@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib import messages
 
 from django.utils.html import format_html
 
@@ -67,3 +68,24 @@ class ProductionPhotoAdmin(admin.ModelAdmin):
     def view(self, obj):
         return format_html('<a href="{}" target="_blank">{}</a>'.format(
             obj.img.url, "view"))
+
+
+def enable_show_action(showadmin, request, queryset):
+    count = queryset.count()
+    results = ArchivalInfo.objects.bulk_create([
+        ArchivalInfo(show=i) for i in queryset
+        if not hasattr(i, "archival_info")
+    ])
+    if results:
+        messages.success(
+            request, 'Activated Archival Tool for {} shows.'.format(
+                len(results)
+            ))
+    if len(results) < count:
+        messages.warning(
+            request,
+            "{} shows had already been added to the Archival Tool".format(
+                count - len(results)
+            ))
+enable_show_action.short_description = "Add selected shows to Archival Tool"
+enable_show_action.permission = "archive.add_archivalinfo"

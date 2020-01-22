@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from django.contrib import messages
 
 from rangefilter.filter import DateRangeFilter
 
@@ -97,3 +98,23 @@ class AnnouncementAdmin(admin.ModelAdmin):
         return format_html('<a href="{0}" target="_blank">view</a>',
                            obj.graphic.url) if obj.graphic else None
     graphic_link.short_description = "Graphic"
+
+def enable_show_action(showadmin, request, queryset):
+    count = queryset.count()
+    results = PublicityInfo.objects.bulk_create([
+        PublicityInfo(show=i) for i in queryset
+        if not hasattr(i, "publicity_info")
+    ])
+    if results:
+        messages.success(
+            request, 'Activated Publicity Manager for {} shows.'.format(
+                len(results)
+            ))
+    if len(results) < count:
+        messages.warning(
+            request,
+            "{} shows had already been added to the Publicity Manager".format(
+                count - len(results)
+            ))
+enable_show_action.short_description = "Add selected shows to Publicity Manager"
+enable_show_action.permission = "publicity.add_publicityinfo"

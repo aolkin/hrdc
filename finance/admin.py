@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.http import HttpResponse
 from django.utils.html import format_html
+from django.contrib import messages
 
 import csv, re, zipfile
 
@@ -283,3 +284,24 @@ class ExpenseAdmin(admin.ModelAdmin):
         return obj.amount_display
     get_amount.short_description = "Amount"
     get_amount.admin_order_field = "amount"
+
+
+def enable_show_action(showadmin, request, queryset):
+    count = queryset.count()
+    results = FinanceInfo.objects.bulk_create([
+        FinanceInfo(show=i) for i in queryset
+        if not hasattr(i, "finance_info")
+    ])
+    if results:
+        messages.success(
+            request, 'Activated Finance Manager for {} shows.'.format(
+                len(results)
+            ))
+    if len(results) < count:
+        messages.warning(
+            request,
+            "{} shows had already been added to the Finance Manager".format(
+                count - len(results)
+            ))
+enable_show_action.short_description = "Add selected shows to Finance Manager"
+enable_show_action.permission = "finance.add_financeinfo"
