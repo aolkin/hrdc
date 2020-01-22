@@ -23,5 +23,5 @@ urlpatterns = [
     path('calendar/', CalendarView.as_view(), name="public_index"),
     path('calendar/<int:year>/<int:month>/', CalendarView.as_view(),
          name="calendar"),
-    path('season/', SeasonScriptView.as_view(), name="season"),
+    path('season.js', SeasonScriptView.as_view(), name="season"),
 ]
