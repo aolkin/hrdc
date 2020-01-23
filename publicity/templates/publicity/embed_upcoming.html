@@ -4,20 +4,22 @@
 <ul class="list-group">
   {% for i in upcoming %}
   <li class="list-group-item">
-    <a {% if i.show.link %}href="{{ i.show.link }}"{% endif %}
-       target="_blank">{{ i.show }}</a>
+    <a {% if i.webpage %}href="{{ i.webpage }}"{% endif %}
+       target="_blank">{{ i.name }}</a>
     {% if i.note %}
     <i class="fa fa-info-circle text-dark"
        title="{{ i.note }}" data-toggle="tooltip"></i>
     {% endif %}
+    {% if i.venue %}
     <i class="fa fa-map-marker text-secondary"
-       title="{{ i.show.show.space }}" data-toggle="tooltip"></i>
+       title="{{ i.venue }}" data-toggle="tooltip"></i>
+    {% endif %}
     <span class="pull-right">
       {{ i.performance|date:"M j @ f A" }}
     </span>
   </li>
   {% empty %}
-  <li class="list-group-item">No upcoming performances!</li>
+  <li class="list-group-item">No upcoming events!</li>
   {% endfor %}
 </ul>
 {% endblock %}

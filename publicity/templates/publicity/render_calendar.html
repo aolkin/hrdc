@@ -43,16 +43,18 @@
 	{% for i in events %}
 	<div class="calendar-show-item mb-1">
 	  <span class="calendar-show-title">
-	    <a {% if i.show.link %}href="{{ i.show.link }}"{% endif %}
+	    <a {% if i.webpage %}href="{{ i.webpage }}"{% endif %}
 	       target="_blank">
-	      {{ i.show }}</a>
+	      {{ i.name }}</a>
 	  </span>
 	  {% if i.note %}
 	  <i class="fa fa-info-circle text-dark"
 	     title="{{ i.note }}" data-toggle="tooltip"></i>
 	  {% endif %}
+	  {% if i.venue %}
 	  <i class="fa fa-map-marker text-secondary"
-	     title="{{ i.show.show.space }}" data-toggle="tooltip"></i>
+	     title="{{ i.venue }}" data-toggle="tooltip"></i>
+	  {% endif %}
 	  <span class="calendar-show-time text-secondary">
 	    {{ i.performance|date:"f A" }}
 	  </span>

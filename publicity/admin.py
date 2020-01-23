@@ -93,11 +93,17 @@ class PerformanceDateAdmin(admin.ModelAdmin):
     search_fields = ("show__show__title", "note")
     list_filter = (("performance", DateRangeFilter),
                    "show__show__season", "show__show__year")
-    fields = ("show",), ("performance", "note")
 
     def get_readonly_fields(self, modeladmin, obj):
         return ("show",) if obj and obj.show else []
-    
+
+@admin.register(Event)
+class EventAdmin(admin.ModelAdmin):
+    list_display = "name", "performance", "venue", "note",
+    list_display_links = "name",
+    search_fields = ("name", "note")
+    list_filter = (("performance", DateRangeFilter), "venue")
+
 @admin.register(Announcement)
 class AnnouncementAdmin(admin.ModelAdmin):
     readonly_fields = ("user", "title", "rendered_message", "note", "graphic",

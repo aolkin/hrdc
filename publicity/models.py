@@ -88,16 +88,33 @@ class PublicityInfo(models.Model):
     def next_performance(self):
         return self.performancedate_set.filter(
             performance__gte=timezone.now()).first()
-    
-class PerformanceDate(models.Model):
+
+class AbstractEvent(models.Model):
+    performance = models.DateTimeField(verbose_name="Time and Date")
+    note = models.CharField(max_length=120, blank=True)
+
+    class Meta:
+        abstract = True
+
+class PerformanceDate(AbstractEvent):
     show = models.ForeignKey(PublicityInfo, on_delete=models.CASCADE,
                              db_index=True)
-    performance = models.DateTimeField()
-    note = models.CharField(max_length=50, blank=True)
 
     class Meta:
         ordering = "performance",
         unique_together = "show", "performance"
+
+    @property
+    def name(self):
+        return str(self.show)
+
+    @property
+    def webpage(self):
+        return self.show.link
+
+    @property
+    def venue(self):
+        return self.show.show.space
 
     @property
     def datestr(self):
@@ -106,6 +123,16 @@ class PerformanceDate(models.Model):
     
     def __str__(self):
         return self.datestr + (" ({})".format(self.note) if self.note else "")
+
+class Event(AbstractEvent):
+    name = models.CharField(max_length=120)
+
+    venue = models.ForeignKey("dramaorg.Space", blank=True, null=True,
+                              on_delete=models.PROTECT)
+    webpage = models.URLField(blank=True)
+
+    def __str__(self):
+        return "{} @ {}".format(self.name, self.datestr)
 
 class ShowPerson(models.Model):
     TYPE_CHOICES = (
