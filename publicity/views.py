@@ -360,7 +360,7 @@ class VenueAppWrapper:
         self.app = venueapp
         self.name = "{} Apps Due".format(self.app.venue)
         self.performance = self.app.due
-        self.note = "[Venue Applications for {} for the {} Season]".format(
+        self.note = "[Venue Applications for the {} for the {} Season]".format(
             self.app.venue, self.app.seasonstr())
         self.venue = None
         self.webpage = reverse("venueapp:public_index")
