@@ -96,6 +96,11 @@ For events that are not attached to a show, you can use the "Publicity" ->
 the calendar and in the upcoming events section just like performances. If
 desired, such events can be linked to a webpage by filling in that field.
 
+### VenueApp Deadlines
+
+Due dates for live Venue Applications will also appear on the calendar. To hide
+these dates, the application must be made to no longer be live.
+
 # Newsletter Submissions
 
 To view submitted announcements, navigate to "Announcements" under the

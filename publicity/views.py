@@ -21,7 +21,7 @@ from config import config
 from django.conf import settings
 
 from .models import *
-
+from venueapp.models import VenueApp
 from casting.models import Signing
 
 class MenuMixin:
@@ -355,6 +355,26 @@ class NewsletterEditView(InitializedLoginMixin, NewsletterMixin, UpdateView):
 
 generic_calendar = calendar.Calendar()
 
+class VenueAppWrapper:
+    def __init__(self, venueapp):
+        self.app = venueapp
+        self.name = "{} Applications Due".format(self.app.venue)
+        self.performance = self.app.due
+        self.note = "Applications for the {} Season".format(
+            self.app.seasonstr())
+        self.venue = None
+        self.webpage = reverse("venueapp:public_index")
+
+def get_events(**kwargs):
+    app_kwargs = { k.replace("performance", "due") : v
+                   for (k, v) in kwargs.items() }
+    app_kwargs["live"] = True
+    return sorted(list([VenueAppWrapper(i) for i in 
+                        VenueApp.objects.filter(**app_kwargs)]) +
+                  list(PerformanceDate.objects.filter(**kwargs)) +
+                  list(Event.objects.filter(**kwargs)),
+                  key=lambda obj: obj.performance)
+
 @method_decorator(xframe_options_exempt, name="dispatch")
 class CalendarView(TemplateView):
     verbose_name = "Calendar"
@@ -367,11 +387,6 @@ class CalendarView(TemplateView):
             return "publicity/embed_calendar.html"
         else:
             return "publicity/calendar.html"
-
-    def get_events(self, **kwargs):
-        return sorted(list(PerformanceDate.objects.filter(**kwargs)) +
-                      list(Event.objects.filter(**kwargs)),
-                      key=lambda obj: obj.performance)
 
     def get_context_data(self, **kwargs):
         now = timezone.localtime(timezone.now())
@@ -386,11 +401,11 @@ class CalendarView(TemplateView):
         kwargs["month_name"] = calendar.month_name[month]
         kwargs["calendar"] = calendar
         kwargs["cal"] = map(lambda dates: [
-            (date, self.get_events(performance__date=date))
+            (date, get_events(performance__date=date))
             for date in dates
         ], generic_calendar.monthdatescalendar(year, month))
 
-        kwargs["upcoming"] = self.get_events(
+        kwargs["upcoming"] = get_events(
             performance__gte=now, performance__lte=now + datetime.timedelta(
                 days=config.get_int("upcoming_performances_future_days", 14)))
         return super().get_context_data(**kwargs)
