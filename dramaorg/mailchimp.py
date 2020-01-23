@@ -73,6 +73,7 @@ class Contact:
                 "email_type": "html",
                 "status": SUBSCRIBED,
                 "merge_fields": merge_fields,
+                "tags": [settings.BT_SITE_TITLE],
             })
         if res.status_code != 200:
             logger.error("Failed to add '{}' to the list. ({})".format(self.email, res.text))
