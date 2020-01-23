@@ -89,6 +89,13 @@ found [here](https://app.hrdctheater.org/publicity/calendar/?upcoming=1).
 Note that, in order for the show titles in the calendar to be linked and
 clickable, the "Website page" field must be filled out for that show.
 
+### Adding Custom Events
+
+For events that are not attached to a show, you can use the "Publicity" ->
+"Events" page in the admin to add additional events that will be displayed on
+the calendar and in the upcoming events section just like performances. If
+desired, such events can be linked to a webpage by filling in that field.
+
 # Newsletter Submissions
 
 To view submitted announcements, navigate to "Announcements" under the

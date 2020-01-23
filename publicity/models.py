@@ -93,6 +93,11 @@ class AbstractEvent(models.Model):
     performance = models.DateTimeField(verbose_name="Time and Date")
     note = models.CharField(max_length=120, blank=True)
 
+    @property
+    def datestr(self):
+        return timezone.localtime(
+            self.performance).strftime("%A, %B %-d at %-I:%M %p")
+    
     class Meta:
         abstract = True
 
@@ -116,11 +121,6 @@ class PerformanceDate(AbstractEvent):
     def venue(self):
         return self.show.show.space
 
-    @property
-    def datestr(self):
-        return timezone.localtime(
-            self.performance).strftime("%A, %B %-d at %-I:%M %p")
-    
     def __str__(self):
         return self.datestr + (" ({})".format(self.note) if self.note else "")
 

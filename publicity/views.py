@@ -368,8 +368,13 @@ class CalendarView(TemplateView):
         else:
             return "publicity/calendar.html"
 
+    def get_events(self, **kwargs):
+        return sorted(list(PerformanceDate.objects.filter(**kwargs)) +
+                      list(Event.objects.filter(**kwargs)),
+                      key=lambda obj: obj.performance)
+
     def get_context_data(self, **kwargs):
-        now = timezone.now()
+        now = timezone.localtime(timezone.now())
         if self.request.GET.get("embed") or self.request.GET.get("upcoming"):
             kwargs["BT_extra_body_class"] = "embedded"
         kwargs["embed"] = self.request.GET.get("embed", False)
@@ -381,11 +386,11 @@ class CalendarView(TemplateView):
         kwargs["month_name"] = calendar.month_name[month]
         kwargs["calendar"] = calendar
         kwargs["cal"] = map(lambda dates: [
-            (date, PerformanceDate.objects.filter(performance__date=date))
+            (date, self.get_events(performance__date=date))
             for date in dates
         ], generic_calendar.monthdatescalendar(year, month))
 
-        kwargs["upcoming"] = PerformanceDate.objects.filter(
+        kwargs["upcoming"] = self.get_events(
             performance__gte=now, performance__lte=now + datetime.timedelta(
                 days=config.get_int("upcoming_performances_future_days", 14)))
         return super().get_context_data(**kwargs)
