@@ -358,10 +358,10 @@ generic_calendar = calendar.Calendar()
 class VenueAppWrapper:
     def __init__(self, venueapp):
         self.app = venueapp
-        self.name = "{} Applications Due".format(self.app.venue)
+        self.name = "{} Apps Due".format(self.app.venue)
         self.performance = self.app.due
-        self.note = "Applications for the {} Season".format(
-            self.app.seasonstr())
+        self.note = "[Venue Applications for {} for the {} Season]".format(
+            self.app.venue, self.app.seasonstr())
         self.venue = None
         self.webpage = reverse("venueapp:public_index")
 
