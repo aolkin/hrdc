@@ -14,8 +14,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]', ".ngrok.io"]
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = ''
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = ''
 
-# Database
-# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
+MAILCHIMP_API_KEY = ""
 
 DATABASES = {
     'default': {

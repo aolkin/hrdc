@@ -93,7 +93,8 @@ class UserAdmin(BaseUserAdmin):
                            ('pgps', 'gender_pref'),
                            ('affiliation', 'year'),
                            ('display_affiliation',),
-                           ('suspended_until',))}),
+                           ('suspended_until',),
+                           ('subscribed',))}),
         ('Contact Info', {'fields': ('email', 'phone')}),
         ('Permissions', {'fields': ('is_active', 'admin_access',
                                     'is_superuser', 'groups'),
@@ -116,7 +117,8 @@ class UserAdmin(BaseUserAdmin):
     add_form = UserCreationForm
     add_form_template = "dramaadmin/invite_user.html"
     list_display = ('__str__', 'email', 'phone', 'affiliationyear',
-                    'get_pdsm', 'get_season_pdsm', 'has_password', 'get_social')
+                    'get_pdsm', 'get_season_pdsm', 'has_password',
+                    'get_subscribed', 'get_social')
     list_filter = (ActiveFilter,'is_superuser', 'affiliation', 'year',
                    'suspended_until', 'last_login', 'date_joined')
     search_fields = ('email', 'first_name', 'last_name',)
@@ -128,6 +130,11 @@ class UserAdmin(BaseUserAdmin):
         [generate_tokens, clear_tokens] if settings.DEBUG else [])
     ordering = ('date_joined',)
     save_as_continue = True
+
+    def get_subscribed(self, obj):
+        return obj.subscribed
+    get_subscribed.boolean = True
+    get_subscribed.short_description = "List"
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)

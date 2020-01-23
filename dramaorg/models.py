@@ -3,7 +3,7 @@ from django.contrib import auth
 from django.conf import settings
 from django.utils import timezone
 from django.db.models.functions import Concat
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, pre_save, post_init
 from django.contrib.auth.signals import user_logged_in
 from django.dispatch import receiver
 from django.utils.text import slugify
@@ -16,6 +16,7 @@ from config import config
 
 from .utils import get_admin_group
 from . import email
+from . import mailchimp
 
 class UserManager(auth.models.BaseUserManager):
     def create_user(self, email, password=None, **extra):
@@ -53,6 +54,10 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
                             verbose_name="Preferred Gender Pronouns")
     gender_pref = models.CharField(max_length=30, blank=True,
                                    verbose_name="Preferred Stage Gender")
+
+    subscribed = models.BooleanField(
+        default=True, verbose_name="Subscribe to the Newsletter",
+        help_text="Uncheck this to unsubscribe.")
 
     suspended_until = models.DateField(null=True, blank=True)
 
@@ -186,6 +191,42 @@ def invite_user(sender, instance, created, raw, **kwargs):
     if sender == User and created and not instance.password:
         if instance.source == "default":
             email.activate(instance)
+
+@receiver(post_init, sender=User)
+def prep_mailchimp(sender, instance, **kwargs):
+    instance._was_subscribed = instance.subscribed
+    instance._mailchimp_status = None
+
+@receiver(pre_save, sender=User)
+def check_mailchimp(sender, instance, raw, **kwargs):
+    # Check presence of affiliation to ensure complete profile
+    if mailchimp.enabled() and instance.affiliation and not raw:
+        status = mailchimp.Contact(instance.email).get_status()
+        instance._mailchimp_status = status
+        if instance._was_subscribed == instance.subscribed:
+            if status not in ("missing", "error"):
+                instance.subscribed = status == mailchimp.SUBSCRIBED
+
+@receiver(post_save, sender=User)
+def sync_mailchimp(sender, instance, created, raw, **kwargs):
+    # Check presence of affiliation to ensure complete profile
+    if mailchimp.enabled() and instance.affiliation and not raw:
+        contact = mailchimp.Contact(instance.email)
+        if instance.subscribed:
+            if instance._mailchimp_status == "missing":
+                fields = {
+                    "NAME": instance.get_full_name(False),
+                    "PHONE": instance.phone,
+                    "YEAR": instance.year,
+                    "PGPS": instance.pgps,
+                    "AFFIL": instance.affiliation,
+                }
+                contact.create(fields)
+            elif instance._mailchimp_status == mailchimp.UNSUBSCRIBED:
+                contact.update_status(mailchimp.SUBSCRIBED)
+        else:
+            if instance._mailchimp_status == mailchimp.SUBSCRIBED:
+                contact.update_status(mailchimp.UNSUBSCRIBED)
 
 @receiver(user_logged_in)
 def clear_token_on_user(sender, request, user, **kwargs):

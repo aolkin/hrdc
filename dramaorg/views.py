@@ -176,7 +176,8 @@ class RegisterView(FormView):
 class ProfileView(LoginRequiredMixin, UpdateView):
     model = User
     fields = ['first_name', 'last_name', 'pgps', 'gender_pref', 'phone',
-              'affiliation', 'display_affiliation', 'year', 'email']
+              'affiliation', 'display_affiliation', 'year', 'email',
+              'subscribed']
     template_name = "dramaauth/user_profile.html"
 
     def get(self, *args, **kwargs):
