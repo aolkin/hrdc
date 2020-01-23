@@ -46,6 +46,18 @@ link back to the performance page.
 If need be, you can also edit any of the show's information from the admin as
 well.
 
+## WordPress Integration
+
+MyHRDC makes it easy to create the embedding webpages for several shows at once
+via the WordPress export function. To do this, first make sure the
+`publicity_website_page_prefix` configuration variable is set correctly. Then,
+from the "Publicity-Enabled Show" admin, select a number of shows and use the
+"Download for WordPress" action. This will set the website page field on the
+selected shows based on the prefix set above and each show's "slug" page. It
+will then export a CSV containing the show id, show title, show's embed code,
+and slug. This can then be imported into WordPress via a CSV-based post
+importing tool.
+
 ## Season List (Sidebar)
 
 To embed an auto-generated list of shows onto another website, insert this
