@@ -1,6 +1,11 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.contrib import messages
+from django.http import HttpResponse
+
+import csv
+
+from config import config
 
 from rangefilter.filter import DateRangeFilter
 
@@ -19,12 +24,35 @@ class ShowPersonAdmin(admin.StackedInline):
     )
     autocomplete_fields = "person",
 
+def export_wordpress(modeladmin, request, qs):
+    response = HttpResponse(content_type="text/csv")
+    response['Content-Disposition'] = 'attachment; filename="hrdcapp_publicity_{}.csv"'.format(
+        timezone.localtime(timezone.now()).strftime("%Y-%m-%d_%H%M%S"))
+    writer = csv.writer(response)
+    writer.writerow((
+        "ID", "Title", "Content", "URL",
+    ))
+    for i in qs:
+        writer.writerow((
+            i.id,
+            i.show.title,
+            i.embed_code(False),
+            i.show.slug,
+        ))
+        if not i.website_page:
+            i.website_page = "{}{}/".format(
+                config.publicity_website_page_prefix, i.show.slug)
+            i.save()
+    return response
+export_wordpress.short_description = "Download selected shows for WordPress"
+
 @admin.register(PublicityInfo)
 class MetaAdmin(admin.ModelAdmin):
     list_display = ('show', 'season', 'contact_email_link', "link")
     search_fields = ('show__title',)
     list_filter = ('show__season', 'show__year', 'performancedate__performance')
     autocomplete_fields = ('show',)
+    actions = export_wordpress,
     fieldsets = (
         ("", {
             "fields": ('show', "website_page", "embed_code")

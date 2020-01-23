@@ -66,12 +66,14 @@ class PublicityInfo(models.Model):
     def get_absolute_url(self):
         return reverse_lazy("publicity:display", args=(self.id,))
     
-    @property
-    def embed_code(self):
+    def embed_code(self, wrap=True):
         if self.id:
             code = '<script src="{}{}"></script>'.format(
                 settings.SITE_URL, reverse("publicity:script", args=(self.id,)))
-            return format_html("<pre>{}</pre>", code)
+            if wrap:
+                return format_html("<pre>{}</pre>", code)
+            else:
+                return code
         return format_html(
             "<i>Please save this object to view the embed code.</i>")
 
