@@ -109,7 +109,9 @@
 		  <div class="media">
 		    <i class="fa fa-map-marker fa-2x mr-3 pt-1"></i>
 		    <div class="media-body">
-		      {{ building.address|linebreaksbr }}
+		      <a {% if building.maps_link %}href="{{ building.maps_link }}"{% endif %} target="_blank">
+			{{ building.address|linebreaksbr }}
+		      </a>
 		    </div>
 		  </div>
 		</div>

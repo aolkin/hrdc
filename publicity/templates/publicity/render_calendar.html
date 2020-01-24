@@ -52,8 +52,10 @@
 	     title="{{ i.note }}" data-toggle="tooltip"></i>
 	  {% endif %}
 	  {% if i.venue %}
-	  <i class="fa fa-map-marker text-secondary"
-	     title="{{ i.venue }}" data-toggle="tooltip"></i>
+	  <a {% if i.venue.building.maps_link %}href="{{ i.venue.building.maps_link }}"{% endif %} target="_blank">
+	    <i class="fa fa-map-marker text-secondary"
+	       title="{{ i.venue }}" data-toggle="tooltip"></i>
+	  </a>
 	  {% endif %}
 	  <span class="calendar-show-time text-secondary">
 	    {{ i.performance|date:"f A" }}

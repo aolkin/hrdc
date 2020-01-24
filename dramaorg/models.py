@@ -10,7 +10,7 @@ from django.utils.text import slugify
 
 from django.core.exceptions import ValidationError
 
-import hashlib, base64, uuid, datetime, re
+import hashlib, base64, uuid, datetime, re, urllib.parse
 
 from config import config
 
@@ -238,6 +238,17 @@ class Building(models.Model):
 
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
+
+    @property
+    def maps_link(self):
+        if self.address:
+            query = self.address.replace("\n", ", ")
+        elif self.latitude and self.longitude:
+            query = "{},{}".format(self.latitude, self.longitude)
+        else:
+            return ""
+        query = urllib.parse.quote_plus(query)
+        return "https://www.google.com/maps/search/?api=1&query=" + query
 
     def __str__(self):
         return self.name
