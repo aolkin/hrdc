@@ -392,7 +392,9 @@ def get_events(**kwargs):
                     for (k, v) in kwargs.items() }
     slot_kwargs["type"] = 0
     if Slot.objects.filter(**slot_kwargs).exists():
-        events.append(AuditionWrapper(Slot.objects.filter(**slot_kwargs)))
+        for day in Slot.objects.filter(**slot_kwargs).values_list(
+                "day", flat=True).distinct():
+            events.append(AuditionWrapper(Slot.objects.filter(day=day)))
     return sorted(events, key=lambda obj: obj.performance)
 
 @method_decorator(xframe_options_exempt, name="dispatch")
