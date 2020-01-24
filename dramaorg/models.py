@@ -242,7 +242,7 @@ class Building(models.Model):
     @property
     def maps_link(self):
         if self.address:
-            query = self.address.replace("\n", ", ")
+            query = self.name + ", " + self.address.replace("\n", ", ")
         elif self.latitude and self.longitude:
             query = "{},{}".format(self.latitude, self.longitude)
         else:
