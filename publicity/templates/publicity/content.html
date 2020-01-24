@@ -20,7 +20,11 @@
 {% endif %}
 {% if enabled.dates %}
 <{{ h }}>PERFORMANCE DATES</{{ h }}>
-<p>{{ object.show.space }}</p>
+<p>
+  <a {% if object.show.space.building.maps_link %}href="{{ object.show.space.building.maps_link }}"{% endif %} target="_blank">
+    {{ object.show.space }}
+  </a>
+</p>
 <p>
   {% for perf in object.performancedate_set.all %}
   {{ perf }}<br>
