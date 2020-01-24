@@ -234,6 +234,8 @@ class ShowScriptView(DetailView):
                 "cast": ShowPerson.collate(context["object"].cast()),
                 "staff": ShowPerson.collate(context["object"].staff()),
                 "band": ShowPerson.collate(context["object"].band()),
+                "is_show_staff": context["object"].show.staff.filter(
+                    id=self.request.user.id).exists()
             }).replace("\n","")
         return context
 

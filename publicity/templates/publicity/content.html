@@ -1,3 +1,13 @@
+{% load bt %}
+{% if is_show_staff %}
+<p>
+  <i>You are logged in to {% setting "BT_SITE_TITLE" %} as a member of this show's executive staff.
+    <b>You can edit this page via the <a href="{% setting "SITE_URL" %}{% url 'publicity:info' object.pk %}">{% setting "BT_SITE_TITLE" %} Publicity Manager</a>.</b>
+    (This message is only visible to you.)
+  </i>
+</p>
+{% endif %}
+
 {% if enabled.cover and object.cover %}
 <p>
   <a href="{{ object.cover.url }}" target="_blank">
