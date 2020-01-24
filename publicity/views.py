@@ -22,7 +22,7 @@ from django.conf import settings
 
 from .models import *
 from venueapp.models import VenueApp
-from casting.models import Signing
+from casting.models import Signing, Slot
 
 class MenuMixin:
     def get_context_data(self, *args, **kwargs):
@@ -365,15 +365,35 @@ class VenueAppWrapper:
         self.venue = None
         self.webpage = reverse("venueapp:public_index")
 
+class AuditionWrapper:
+    def __init__(self, qs):
+        first = qs.order_by("start").first()
+        self.name = "Common Casting Auditions"
+        self.performance = timezone.make_aware(
+            datetime.datetime.combine(first.day, first.start))
+        venues = list(qs.values_list("space__building__name",
+                                     flat=True).distinct())
+        if len(venues) > 1:
+            sep = ("," if len(venues) > 2 else "") + " and "
+            venues = venues[:-2] + [sep.join(venues[-2:])]
+        self.note = "Auditions will be held in {}.".format(", ".join(venues))
+        self.venue = None
+        self.webpage = reverse("casting:public_index")
+
 def get_events(**kwargs):
     app_kwargs = { k.replace("performance", "due") : v
                    for (k, v) in kwargs.items() }
     app_kwargs["live"] = True
-    return sorted(list([VenueAppWrapper(i) for i in 
-                        VenueApp.objects.filter(**app_kwargs)]) +
-                  list(PerformanceDate.objects.filter(**kwargs)) +
-                  list(Event.objects.filter(**kwargs)),
-                  key=lambda obj: obj.performance)
+    events = (list([VenueAppWrapper(i) for i in 
+                    VenueApp.objects.filter(**app_kwargs)]) +
+              list(PerformanceDate.objects.filter(**kwargs)) +
+              list(Event.objects.filter(**kwargs)))
+    slot_kwargs = { k.replace("performance", "day").replace("__date", "") : v
+                    for (k, v) in kwargs.items() }
+    slot_kwargs["type"] = 0
+    if Slot.objects.filter(**slot_kwargs).exists():
+        events.append(AuditionWrapper(Slot.objects.filter(**slot_kwargs)))
+    return sorted(events, key=lambda obj: obj.performance)
 
 @method_decorator(xframe_options_exempt, name="dispatch")
 class CalendarView(TemplateView):
