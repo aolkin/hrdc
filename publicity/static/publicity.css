@@ -51,6 +51,12 @@
     pointer-events: none;
 }
 
+.peopleform .person-form:first-of-type .btn-secondary.order-dec,
+.peopleform .person-form:last-of-type .btn-secondary.order-inc {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
 .select2-container .select2-selection--single {
     height: 38px;
     padding-top: 4px;

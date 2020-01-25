@@ -99,4 +99,37 @@ $(() => {
 	    $("#add-modal").modal("show");
 	}
     });
+
+    $(".person-form input[name$=-order]").each((index, el) => {
+	let $el = $(el);
+	$el.hide();
+	if ($el.parents(".person-form").is(":last-of-type")) {
+	    return;
+	    $(".person-form").last().find("input[name$=-order]").val(
+		Number($el.val()) + 1);
+	}
+	let up = $("<button>").addClass("btn btn-secondary btn-sm order-dec");
+	let down = $("<button>").addClass("btn btn-secondary btn-sm order-inc");
+	up.attr("type", "button").html('<i class="fa fa-chevron-up"></i>');
+	down.attr("type", "button").html('<i class="fa fa-chevron-down"></i>');
+	up.click(() => {
+	    let row = $el.parents(".person-form");
+	    let prev = row.prev();
+	    let prev_input = prev.find("input[name$=-order]");
+	    let old_val = $el.val();
+	    $el.val(Number($el.val()) - 1);
+	    prev_input.val(old_val);
+	    row.detach().insertBefore(prev);
+	});
+	down.click(() => {
+	    let row = $el.parents(".person-form");
+	    let next = row.next();
+	    let next_input = next.find("input[name$=-order]");
+	    let old_val = $el.val();
+	    $el.val(Number($el.val()) + 1);
+	    next_input.val(old_val);
+	    next.detach().insertBefore(row);
+	});
+	$el.parent().append(up).append(down);
+    });
 });
