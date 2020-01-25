@@ -181,6 +181,12 @@ class Expense(models.Model):
         (1, "Personal Funds")
     )
 
+    REIMBURSEMENT_OPTIONS = (
+        (2, "Venmo"),
+        (0, "Check - Pick up"),
+        (1, "Check - Receive by Mail"),
+    )
+
     def upload_destination(instance, filename):
         return "finance/receipts/{}/{}".format(instance.show.show.slug,
                                                filename)
@@ -210,11 +216,10 @@ class Expense(models.Model):
     
     # For Reimbursement Only
     purchaser_email = models.EmailField(blank=True)
-    reimburse_via_mail = models.BooleanField(
-        default=False,
-        help_text="Does the reimbursement check need to be mailed?"
-    )
+    reimburse_via = models.PositiveSmallIntegerField(
+        default=2, choices=REIMBURSEMENT_OPTIONS)
     mailing_address = models.TextField(blank=True)
+    venmo_handle = models.CharField(max_length=20, blank=True)
     check_number = models.PositiveIntegerField(blank=True, null=True,
                                                verbose_name="Check #")
 
@@ -248,9 +253,12 @@ class Expense(models.Model):
             if not self.purchaser_email:
                 raise ValidationError(
                     "Must provide purchaser email for reimbursement.")
-            if self.reimburse_via_mail and not self.mailing_address:
+            if self.reimburse_via == 1 and not self.mailing_address:
                 raise ValidationError(
                     "Must provide mailing address to reimburse via mail.")
+            if self.reimburse_via == 2 and not self.venmo_handle:
+                raise ValidationError(
+                    "Must provide Venmo handle to reimburse via Venmo.")
             if self.purchased_using != 1:
                 raise ValidationError(
                     "Reimbursement statuses can only be selected for purchases "

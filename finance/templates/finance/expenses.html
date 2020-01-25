@@ -127,6 +127,12 @@
       <div class="row">
 	<h5>Expense</h5>
       </div>
+      <div class="d-none delete-field">
+	{{ form.DELETE|as_crispy_field }}
+      </div>
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+      {% endif %}
       <div class="row">
 	{{ form.id }}
 	{{ form.submitting_user }}
@@ -159,8 +165,14 @@
 	<div class="col-md-5 col-sm-6">
 	  {{ form.purchaser_email|as_crispy_field }}
 	</div>
-	<div class="col-md-7 col-sm-6 reimburse-via-mail">
-	  {{ form.reimburse_via_mail|as_crispy_field }}
+	<div class="col reimburse-via">
+	  {{ form.reimburse_via|as_crispy_field }}
+	</div>
+	<div class="col-md-4 col-sm-4 venmo-handle">
+	  {{ form.venmo_handle|as_crispy_field }}
+	</div>
+	<div class="col-md-4 col-sm-4 mailing-address">
+	  {{ form.mailing_address|as_crispy_field }}
 	</div>
       </div>
       <div class="row reimbursement-options">
@@ -184,9 +196,6 @@
 	</div>
       </div>
       <div class="row reimbursement-options justify-content-center">
-	<div class="col-md-6 col-sm-12 mailing-address">
-	  {{ form.mailing_address|as_crispy_field }}
-	</div>
 	<div class="col-md-6 col-sm-12">
 	  {% if form.instance.pk %}
 	  <button type="submit" name="request-reimbursement"
@@ -204,12 +213,6 @@
 	  {% endif %}
 	</div>
       </div>
-      <div class="d-none delete-field">
-	{{ form.DELETE|as_crispy_field }}
-      </div>
-      {% if form.non_field_errors %}
-      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
-      {% endif %}
       {% if not forloop.last %}
       <hr>
       {% endif %}

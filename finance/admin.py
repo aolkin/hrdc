@@ -40,8 +40,8 @@ class EditableExpenseInline(admin.StackedInline):
         }),
         ("Reimbursement Options", {
             "fields": (
-                ("purchaser_email", "reimburse_via_mail",),
-                ("mailing_address",),
+                ("purchaser_email", "reimburse_via",),
+                ("venmo_handle", "mailing_address",),
             ),
             "classes": ("collapse",),
         })
@@ -93,7 +93,7 @@ setTimeout(() => {
 @admin.register(FinanceInfo)
 class MetaAdmin(admin.ModelAdmin):
     list_display = ('show', 'season', "income_count",
-                    "requested_income", "view_budget")
+                    "received_income", "actual_balance", "view_budget")
     search_fields = ('show__title',)
     list_filter = ('show__season', 'show__year',)
     autocomplete_fields = ('show',)
@@ -186,7 +186,8 @@ def export_expense(modeladmin, request, qs):
     writer.writerow((
         "Show", "Category", "Subcategory", "Item", "Amount", "Purchaser Name",
         "Status", "Purchased Via", "Date Purchased", "Receipt",
-        "Purchaser Email", "Reimburse via Mail", "Mailing Address", "Check #",
+        "Purchaser Email", "Reimburse via", "Venmo Handle", "Mailing Address",
+        "Check #",
     ))
     for i in qs:
         writer.writerow((
@@ -202,7 +203,8 @@ def export_expense(modeladmin, request, qs):
             i.receipt.url if i.receipt and i.receipt.url.startswith(
                 "http") else i.receipt,
             i.purchaser_email,
-            i.reimburse_via_mail,
+            i.get_reimburse_via_display(),
+            i.venmo_handle,
             i.mailing_address,
             i.check_number,
         ))
@@ -235,15 +237,16 @@ mark_confirmed.short_description = "Confirm selected P-Card purchases"
 class ExpenseAdmin(admin.ModelAdmin):
     list_display = ("show", "category", "sub_category", "item",
                     "get_amount", "status",
-                    "purchased_using", "purchaser_name", "date_purchased",
-                    "administrative_note", "check_number", "view_receipt",)
-    list_filter = ("status", "purchased_using", "subcategory__category",
+                    "purchaser_name", "date_purchased", "reimbursement",
+                    "administrative_note", "view_receipt",)
+    list_filter = ("status", "purchased_using", "reimburse_via",
+                   "subcategory__category",
                    "show__show__season", "show__show__year",
                    "last_updated",)
     search_fields = ("show__show__title", "subcategory__name", "item",
                      "check_number")
     list_display_links = "item",
-    list_editable = "status", "check_number"
+    list_editable = "status",
     autocomplete_fields = "show", "submitting_user", "subcategory"
     actions = mark_confirmed, export_expense, export_receipt_zip
               
@@ -264,14 +267,24 @@ class ExpenseAdmin(admin.ModelAdmin):
         }),
         ("Reimbursement Data", {
             "fields": (
-                ("purchaser_email", "check_number",),
-                ("reimburse_via_mail", "mailing_address",),
+                ("purchaser_email", "reimburse_via",),
+                ("venmo_handle", "check_number",),
+                ("mailing_address",),
             ),
         })
     )
 
     class Media:
         js = ('finance/expense_admin.js',)
+
+    def reimbursement(self, obj):
+        if obj.purchased_using == 1:
+            return obj.get_reimburse_via_display()
+        else:
+            return format_html("<em>(N/A - {})</em>",
+                               obj.get_purchased_using_display().lower())
+    reimbursement.short_description = "Reimburse via"
+    reimbursement.admin_order_field = "reimburse_via"
 
     def view_receipt(self, obj):
         return format_html(

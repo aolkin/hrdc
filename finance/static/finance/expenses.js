@@ -22,10 +22,12 @@ $(() => {
 	    "d-none", $(this).val() != 1);
     }).change();
 
-    $(".reimburse-via-mail input").change(function() {
+    $(".reimburse-via select").change(function() {
 	let fieldset = $(this).parents(".expense-form");
 	fieldset.find(".mailing-address").toggleClass(
-	    "d-none", !this.checked);
+	    "d-none", $(this).val() != 1);
+	fieldset.find(".venmo-handle").toggleClass(
+	    "d-none", $(this).val() != 2);
     }).change();
 
     $("input[type=file]").each((index, el) => {

@@ -144,9 +144,12 @@ class ExpenseForm(forms.ModelForm):
     def clean(self):
         res = super().clean()
         if res["purchased_using"] == 1:
-            if res["reimburse_via_mail"] and not res["mailing_address"]:
+            if res["reimburse_via"] == 1 and not res["mailing_address"]:
                 raise ValidationError(
                     "Reimbursement via mail requires a mailing address.")
+            if res["reimburse_via"] == 2 and not res["venmo_handle"]:
+                raise ValidationError(
+                    "Reimbursement via Venmo requires a Venmo handle.")
         return res
 
 THIS_YEAR = datetime.date.today().year
@@ -156,10 +159,11 @@ BaseExpenseFormSet = forms.inlineformset_factory(
     form=ExpenseForm,
     fields=("item", "subcategory", "amount", "purchased_using",
             "date_purchased", "purchaser_name", "purchaser_email", "receipt",
-            "reimburse_via_mail", "mailing_address", "submitting_user"),
+            "reimburse_via", "venmo_handle", "mailing_address",
+            "submitting_user"),
     extra=1,
     widgets = {
-        "mailing_address": forms.Textarea(attrs={"rows": 4, "cols": 40}),
+        "mailing_address": forms.Textarea(attrs={"rows": 2, "cols": 40}),
         "receipt": forms.FileInput(),
         "submitting_user": forms.HiddenInput(),
         "date_purchased": forms.SelectDateWidget(
@@ -186,8 +190,8 @@ class ExpenseView(MenuMixin, ShowStaffMixin, TemplateView):
         if self.formset.is_valid():
             self.formset.save()
         else:
-            messages.error(self.request, "Failed to save expense information. "+
-                           "Please try again.")
+            messages.error(self.request, "Failed to update expenses. "+
+                           "Please correct any errors below and try again.")
             return self.get(*args, **kwargs)
         req = self.request.POST.get("request-reimbursement")
         if req:
