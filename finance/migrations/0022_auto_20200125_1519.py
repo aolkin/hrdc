@@ -18,6 +18,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='expense',
             name='reimburse_via',
-            field=models.PositiveSmallIntegerField(choices=[(2, 'Venmo'), (0, 'Check - Pick up'), (1, 'Check - Receive by Mail')], default=2),
+            field=models.IntegerField(choices=[(2, 'Venmo'), (0, 'Check - Pick up'), (1, 'Check - Receive by Mail')], default=2),
         ),
     ]
