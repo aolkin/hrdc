@@ -49,7 +49,7 @@
       This reimbursement needs to be mailed to:<br>
       <pre>{{ expense.mailing_address }}</pre>
       {% elif expense.reimburse_via == 2 %}
-      The purchaser's Venmo handle is <a href="https://venmo.com/{{ expense.venmo_handle }}" class="special-link">@{{ expense.venmo_handle }}</a>.
+      The purchaser's Venmo handle is <a href="https://venmo.com/{{ expense.venmo_handle }}" class="special-link">{{ expense.venmo_handle }}</a>.
       {% endif %}
     </td>
   </tr>

@@ -203,7 +203,7 @@ def export_expense(modeladmin, request, qs):
             i.receipt.url if i.receipt and i.receipt.url.startswith(
                 "http") else i.receipt,
             i.purchaser_email,
-            i.get_reimburse_via_display(),
+            i.get_reimburse_via_display() if i.purchased_using == 1 else "",
             i.venmo_handle,
             i.mailing_address,
             i.check_number,
@@ -249,6 +249,7 @@ class ExpenseAdmin(admin.ModelAdmin):
     list_editable = "status",
     autocomplete_fields = "show", "submitting_user", "subcategory"
     actions = mark_confirmed, export_expense, export_receipt_zip
+    ordering = "-date_purchased",
               
     fieldsets = (
         (None, {
