@@ -34,7 +34,6 @@
       <th class="table-col-sm table-col-desktop">Season</th>
       <th class="table-col-lg">Executive Staff</th>
       <th class="table-col-sm">Expected Balance</th>
-      <th class="table-col-sm">Reported Balance</th>
       <th class="table-col-sm">Actual Balance</th>
     </tr>
   </thead>
@@ -48,9 +47,6 @@
       <td>{{ show.people }}</td>
       <td {% if meta.expected_bal < 0 %}class="text-danger"{% endif %}>
 	{{ meta.expected_balance }}
-      </td>
-      <td {% if meta.reported_bal < 0 %}class="text-danger"{% endif %}>
-	{{ meta.reported_balance }}
       </td>
       <td {% if meta.actual_bal < 0 %}class="text-danger"{% endif %}>
 	{{ meta.actual_balance }}

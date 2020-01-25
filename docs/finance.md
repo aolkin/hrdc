@@ -16,16 +16,14 @@ The functionality of the financial manager is divided into three parts, the
 grants tracker, the budget spreadsheet, and the expenses tracker. On the home
 page of the financial manager, you should see a list of every show you are an
 executive staff member on that has the financial manager enabled, with your
-current expected, reported, and actual balances.
+current expected and actual balances.
 
 #### A Note on Terminology
 
-Your budget is divided into three columns, "Estimate", "Reported", and
+Your budget is divided into two columns, "Estimate" and
 "Actual". The estimate column on your budget is for planning your expenses
 and corresponds to your "requested" grants. The difference of those is your
-expected balance. The reported budget column is for tracking how much you
-think you have spent, and corresponds with your "received" grants. Together,
-those make up your reported balance. Your actual balance will be updated
+expected balance. Your actual balance will be updated
 automatically as grant funds come in and purchases are logged.
 
 ## Grants Tracker
@@ -62,10 +60,8 @@ paint, sound, etc), and "Other". Within these categories, you can create items
 for each subcategory you expect to spend money on and estimate how much you will
 spend.
 
-As you actually start spending money, update the reported column with how much
-you think you've spent, so you can get an idea of how much money you have left
-to spend. Finally, the actual column will be updated automatically by the
-expenses tracker.
+As you actually start spending money, log your purchases in the expenses
+tracker, and the actual column will be updated automatically.
 
 #### Why can't I delete a budget line?
 

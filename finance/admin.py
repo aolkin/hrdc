@@ -21,8 +21,8 @@ class BudgetExpenseInline(admin.StackedInline):
     model = BudgetExpense
     extra = 0
     fields = (
-        ("category", "name", "estimate",),
-        ("reported", "actual", "notes",)
+        ("category", "name", "notes",),
+        ("estimate", "actual",)
     )
     readonly_fields = "actual",
 
@@ -157,12 +157,10 @@ class IncomeAdmin(admin.ModelAdmin):
 
 @admin.register(BudgetExpense)
 class BudgetExpenseAdmin(admin.ModelAdmin):
-    list_display = ("show", "category", "name",
-                    "estimate", "reported", "actual")
+    list_display = ("show", "category", "name", "estimate", "actual")
     list_filter = ("category",
                    "show__show__season", "show__show__year")
     autocomplete_fields = "show",
-    #list_editable = ("estimate", "reported",)
     search_fields = ("show__show__title", "category", "name")
     list_display_links = "name",
 

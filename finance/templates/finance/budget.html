@@ -49,7 +49,7 @@
 	<tr>
 	  <th>Total Requested</th>
 	  <th>Total Received</th>
-	  <th>Total Confirmed</th>
+	  <th>Confirmed Funds Received</th>
 	</tr>
       </thead>
       <tbody>
@@ -73,7 +73,6 @@
       <tr>
 	<th>Item</th>
 	<th>Estimate</th>
-	<th>Reported</th>
 	<th>Actual</th>
 	<th>Notes</th>
 	<th></th>
@@ -81,7 +80,7 @@
     </thead>
     <tbody>
       <tr class="table-secondary category-header">
-	<td colspan="5">Administrative</td>
+	<td colspan="4">Administrative</td>
 	<td>
 	  <button class="btn btn-sm btn-success add-item"
 		  data-category="10" data-stream="budgetexpense">
@@ -96,13 +95,12 @@
       <tr class="table-light subtotals-category" data-category="10">
 	<td>Subtotals:</td>
 	<td class="total-field total-field-estimate">...</td>
-	<td class="total-field total-field-reported">...</td>
 	<td class="total-field total-field-actual">...</td>
 	<td></td>
 	<td></td>
       </tr>
       <tr class="table-secondary category-header">
-	<td colspan="5">Production</td>
+	<td colspan="4">Production</td>
 	<td>
 	  <button class="btn btn-sm btn-success add-item"
 		  data-category="20" data-stream="budgetexpense">
@@ -117,13 +115,12 @@
       <tr class="table-light subtotals-category" data-category="20">
 	<td>Subtotals:</td>
 	<td class="total-field total-field-estimate">...</td>
-	<td class="total-field total-field-reported">...</td>
 	<td class="total-field total-field-actual">...</td>
 	<td></td>
 	<td></td>
       </tr>
       <tr class="table-secondary category-header">
-	<td colspan="5">Other</td>
+	<td colspan="4">Other</td>
 	<td>
 	  <button class="btn btn-sm btn-success add-item"
 		  data-category="50" data-stream="budgetexpense">
@@ -138,7 +135,6 @@
       <tr class="table-light subtotals-category" data-category="50">
 	<td>Subtotals:</td>
 	<td class="total-field total-field-estimate">...</td>
-	<td class="total-field total-field-reported">...</td>
 	<td class="total-field total-field-actual">...</td>
 	<td></td>
 	<td></td>
@@ -153,14 +149,12 @@
 	<td>Income:</td>
 	<td class="total-field">{{ object.requested_income }}</td>
 	<td class="total-field">{{ object.received_income }}</td>
-	<td class="total-field">{{ object.confirmed_income }}</td>
 	<td></td>
 	<td></td>
       </tr>
       <tr class="table-light subtotals-all">
 	<td>Expenses:</td>
 	<td class="total-field total-field-estimate">...</td>
-	<td class="total-field total-field-reported">...</td>
 	<td class="total-field total-field-actual">...</td>
 	<td></td>
 	<td></td>
@@ -171,7 +165,6 @@
 	  <small class="text-muted">(income minus expenses)</small>
 	</td>
 	<td class="total-field total-field-estimate">...</td>
-	<td class="total-field total-field-reported">...</td>
 	<td class="total-field total-field-actual">...</td>
 	<td></td>
 	<td></td>
@@ -187,8 +180,7 @@
 <script type="text/javascript">
  let income_totals = {
      estimate: {{ object.requested_income_val }},
-     reported: {{ object.received_income_val }},
-     actual: {{ object.confirmed_income_val }},
+     actual: {{ object.received_income_val }},
  }
 
  let stream_show = "{{ object.pk }}";

@@ -7,14 +7,12 @@ function calculateTotals() {
     let categories = {};
     let totals = {
 	estimate: 0,
-	reported: 0,
 	actual: 0
     };	
     $(".subtotals-category").each((index, el) => {
 	let category = $(el).data("category");
 	categories[category] = {
 	    estimate: 0,
-	    reported: 0,
 	    actual: 0
 	};
 	for (let field in categories[category]) {

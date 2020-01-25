@@ -7,7 +7,7 @@ from ..models import *
 class BudgetExpenseBinding(WebsocketBinding):
     model = BudgetExpense
     stream = "budgetexpense"
-    fields = ("category", "name", "estimate", "reported", "actual", "notes")
+    fields = ("category", "name", "estimate", "actual", "notes")
 
     @classmethod
     def group_names(cls, instance):

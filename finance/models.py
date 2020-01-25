@@ -69,16 +69,6 @@ class FinanceInfo(models.Model):
         return "${:.2f}".format(self.expected_bal)
 
     @property
-    def reported_bal(self):
-        expenses = self.budgetexpense_set.all().aggregate(
-            models.Sum("reported"))["reported__sum"] or 0
-        return self.received_income_val - expenses
-
-    @property
-    def reported_balance(self):
-        return "${:.2f}".format(self.reported_bal)
-
-    @property
     def actual_expense_val(self):
         return self.budgetexpense_set.all().aggregate(
             models.Sum("actual"))["actual__sum"] or 0
@@ -89,7 +79,7 @@ class FinanceInfo(models.Model):
     
     @property
     def actual_bal(self):
-        return self.confirmed_income_val - self.actual_expense_val
+        return self.received_income_val - self.actual_expense_val
 
     @property
     def actual_balance(self):
@@ -158,7 +148,6 @@ class BudgetExpense(models.Model):
     name = models.CharField(max_length=80)
     
     estimate = models.DecimalField(decimal_places=2, max_digits=7, default=0)
-    reported = models.DecimalField(decimal_places=2, max_digits=7, default=0)
     actual = models.DecimalField(decimal_places=2, max_digits=7, default=0)
 
     notes = models.CharField(max_length=255, blank=True)
