@@ -25,6 +25,24 @@
   </div>
 </div>
 <div class="row justify-content-center">
+  <div class="col">
+    <div class="form-row person-form-header-labels">
+      <div class="col-md-4 col-sm-6">
+	<label>Role or Position</label>
+      </div>
+      <div class="col-md-4 col-sm-6">
+	<label>Person</label>
+      </div>
+      <div class="col-md-2 col-sm-4 col-5">
+	<label>Type</label>
+      </div>
+      <div class="col-md-1 col-sm-4 col-4">
+	<label>Order</label>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row justify-content-center">
   <form method="POST" class="col peopleform">
     {% csrf_token %}
     {{ formset.management_form }}
@@ -54,13 +72,13 @@
 	    <div class="text-danger">{{ form.person.errors }}</div>
 	  </div>
 	</div>
-	<div class="col-md-2 col-sm-4">
+	<div class="col-md-2 col-sm-4 col-5">
 	  {{ form.type|as_crispy_field }}
 	</div>
-	<div class="col-md-1 col-sm-4">
+	<div class="col-md-1 col-sm-4 col-4">
 	  {{ form.order|as_crispy_field }}
 	</div>
-	<div class="col-md-1 col-sm-2">
+	<div class="col-md-1 col-sm-2 col-3">
 	  <button type="button" class="btn btn-danger remove-person">
 	    <i class="fa fa-minus-square"></i>
 	  </button>
