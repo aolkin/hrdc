@@ -394,7 +394,11 @@ class Show(Season):
                 for k, v in self._meta.fields_map.items()
                 if type(v) == models.OneToOneRel and hasattr(self, k) and
                 k != "application"]
-    
+
+    @property
+    def liaison_str(self):
+        return ", ".join([str(i.get_full_name()) for i in self.liaisons.all()])
+
     @property
     def apps_str(self):
         return ", ".join([i.capitalize() for i in self.enabled_apps])

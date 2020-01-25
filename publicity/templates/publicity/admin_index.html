@@ -1,0 +1,46 @@
+{% extends "bt/default.html" %}
+
+{% block title %}Show Information{% endblock %}
+
+{% block extra_header %}
+{% include "dramaorg/user_dropdown.html" %}
+{% endblock %}
+
+{% load bt config %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h3 class="text-center">Show Information Browser</h3>
+    <p>
+      To view information about a show submitted via the Publicity Manager,
+      select a season to browse available shows.
+    </p>
+  </div>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-md-6 col-sm-10">
+    <table class="table table-striped">
+      <tbody>
+	{% for year, seasons in years %}
+	<tr>
+	  <th class="pl-4">{{ year }}</th>
+	  {% for season in seasons %}
+	  {% spaceless %}
+	  <td class="text-center">
+	    {% if season %}
+	    <a href="{% url 'publicity:admin:season' year season.0 %}">
+	      {{ season.1 }}
+	    </a>
+	    {% endif %}
+	  </td>
+	  {% endspaceless %}
+	  {% endfor %}
+	</tr>
+	{% endfor %}
+    </table>
+  </div>
+</div>
+
+{% endblock %}

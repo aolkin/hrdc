@@ -24,4 +24,12 @@ urlpatterns = [
     path('calendar/<int:year>/<int:month>/', CalendarView.as_view(),
          name="calendar"),
     path('season.js', SeasonScriptView.as_view(), name="season"),
+    url(r'^admin/$', AdminIndexView.as_view(), name="admin"),
+    url(r'^admin/', include(([
+        path("season/<int:year>/<int:season>/", AdminSeasonView.as_view(),
+             name="season"),
+        url(r'^show/(?P<pk>\d+)/', include([
+            url(r'^$', AdminShowView.as_view(), name="show"),
+        ])),
+    ], "admin"))),
 ]

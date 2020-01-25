@@ -7,6 +7,7 @@ from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django import forms
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib import messages
 from django.db.models import Q
 from django.utils.html import mark_safe
@@ -433,3 +434,62 @@ class CalendarView(TemplateView):
             performance__gte=now, performance__lte=now + datetime.timedelta(
                 days=config.get_int("upcoming_performances_future_days", 14)))
         return super().get_context_data(**kwargs)
+
+class AdminIndexView(PermissionRequiredMixin, TemplateView):
+    verbose_name = "Show Information"
+    help_text = "(from publicity manager)"
+
+    permission_required = ("publicity.view_publicityinfo",)
+    template_name = "publicity/admin_index.html"
+
+    def get_context_data(self, **kwargs):
+        years = defaultdict(lambda: [False] * 4)
+        for season, year in PublicityInfo.objects.all().values_list(
+            "show__season", "show__year").distinct():
+            years[year][season] = Season.SEASONS[season]
+        kwargs["years"] = sorted(years.items())
+        kwargs["headers"] = Season.SEASONS
+        return super().get_context_data(**kwargs)
+
+class AdminMixin(PermissionRequiredMixin):
+    permission_required = ("publicity.view_showperson", "dramaorg.view_user")
+
+    def get_season(self):
+        if "season" in self.kwargs and "year" in self.kwargs:
+            return self.kwargs["season"], self.kwargs["year"]
+        return self.object.show.season, self.object.show.year
+
+    def get_season_display(self):
+        season, year = self.get_season()
+        return "{} {}".format(Season.SEASONS[season][1], year)
+
+    def get_context_data(self, **kwargs):
+        current_url = self.request.resolver_match.url_name
+        menu = kwargs["sidebar_menu"] = {}
+        menu[""] = [{
+            "name": "Show Information",
+            "url": reverse_lazy("publicity:admin"),
+            "active": current_url == "admin"
+        }]
+        
+        kwargs["season"] = self.get_season_display()
+        submenu = menu[kwargs["season"]] = []
+        
+        season, year = self.get_season()
+        for show in PublicityInfo.objects.filter(
+                show__season=season, show__year=year):
+            is_active = (hasattr(self, "object") and
+                         self.object.pk == show.pk)
+            submenu.append({
+                "name": str(show),
+                "url": reverse_lazy("publicity:admin:show", args=(show.pk,)),
+                "active": is_active and current_url == "show"
+            })
+        return super().get_context_data(**kwargs)
+
+class AdminSeasonView(AdminMixin, TemplateView):
+    template_name = "publicity/admin_season.html"
+
+class AdminShowView(AdminMixin, DetailView):
+    template_name = "publicity/admin_show.html"
+    model = PublicityInfo
