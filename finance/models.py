@@ -158,7 +158,7 @@ class BudgetExpense(models.Model):
     class Meta:
         verbose_name = "Budgeted Expense Subcategory"
         verbose_name_plural = "Budgeted Expense Subcategories"
-        ordering = "category",
+        ordering = "category", "pk"
 
 class Expense(models.Model):
     EXPENSE_STATUSES = (
