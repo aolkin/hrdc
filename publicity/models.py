@@ -180,6 +180,9 @@ class ShowPerson(models.Model):
             people[person.position].append(person)
         return positions
 
+SAFE_TAGS = ['a', 'abbr', 'acronym', 'b', 'blockquote', 'code', 'em', 'i',
+             'li', 'ol', 'strong', 'ul', 'p', 'br']
+
 class Announcement(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.PROTECT,
                              verbose_name="Submitting user")
@@ -208,7 +211,7 @@ class Announcement(models.Model):
     
     @property
     def rendered_message(self):
-        return mark_safe(bleach.clean(self.message))
+        return mark_safe(bleach.clean(self.message, tags=SAFE_TAGS, strip=True))
 
     def clean(self):
         if self.end_date < self.start_date:
