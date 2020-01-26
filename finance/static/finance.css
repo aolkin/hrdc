@@ -95,6 +95,10 @@ div.row.reimbursement-options:last-of-type {
     margin-bottom: 0;
 }
 
+td.wrappable-min-width {
+    min-width: 240px;
+}
+
 /* Budget Spreadsheet Print Styles */
 @media print {
     .budget-worksheet>thead>tr>th:nth-child(5),

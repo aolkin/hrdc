@@ -39,7 +39,7 @@
 	{% for i in reimbursements %}
 	<tr class="{% if i.status == 62 %}table-success{% else %}table-warning{% endif %}">
 	  <td>{{ i.subcategory }}</td>
-	  <td>
+	  <td class="wrappable-min-width">
 	    {{ i.item }}
 	    <a href="{{ i.receipt.url }}" class="ml-1" title="View Receipt"
 	       target="_blank">
@@ -47,8 +47,8 @@
 	    </a>
 	  </td>
 	  <td>{{ i.amount_display }}</td>
-	  <td>{{ i.date_purchased }}</td>
-	  <td>
+	  <td class="text-nowrap">{{ i.date_purchased }}</td>
+	  <td class="text-nowrap">
 	    <a href="mailto:{{ i.purchaser_email }}">{{ i.purchaser_name }}</a>
 	  </td>
 	  <td>{{ i.get_status_display }}</td>
@@ -80,7 +80,7 @@
 	{% for i in p_card %}
 	<tr>
 	  <td>{{ i.subcategory }}</td>
-	  <td>
+	  <td class="wrappable-min-width">
 	    {{ i.item }}
 	    {% if i.receipt %}
 	    <a href="{{ i.receipt.url }}" class="ml-1" title="View Receipt"
@@ -90,8 +90,8 @@
 	    {% endif %}
 	  </td>
 	  <td>{{ i.amount_display }}</td>
-	  <td>{{ i.date_purchased }}</td>
-	  <td>{{ i.purchaser_name }}</td>
+	  <td class="text-nowrap">{{ i.date_purchased }}</td>
+	  <td class="text-nowrap">{{ i.purchaser_name }}</td>
 	  <td>{{ i.get_status_display }}</td>
 	</tr>
 	{% endfor %}
