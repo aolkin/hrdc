@@ -95,23 +95,38 @@ div.row.reimbursement-options:last-of-type {
     margin-bottom: 0;
 }
 
+/* Budget Spreadsheet Print Styles */
 @media print {
-    .budget-worksheet>thead>tr>th:nth-child(6),
-    .budget-worksheet>tbody>tr>td:nth-child(6),
+    .budget-worksheet>thead>tr>th:nth-child(5),
+    .budget-worksheet>tbody>tr>td:nth-child(5),
     .budget-worksheet>tbody>tr.category-header>td:nth-child(2) {
 	display: none;
     }
 
-    .budget-worksheet>tbody>tr>td:not(.dollar-field) input {
+    .budget-worksheet>tbody>tr>td input {
 	border: none;
 	padding: 0;
+    }
+
+    .print-text-right {
+	text-align: right;
     }
 
     .budget-worksheet>tbody>tr>td input[readonly] {
 	background: none;
     }
 
+    .budget-worksheet>tbody>tr>td .input-group-text {
+	background: none;
+	border: none;
+    }
+
     .budget-worksheet>tbody>tr.budget-expense-row>td {
-	padding: .25rem .75rem;
+	padding: 0rem .75rem;
+    }
+
+    .budget-worksheet>tbody>tr.subtotals-all>td,
+    .budget-worksheet>tbody>tr.subtotals-net>td {
+	padding: 0.25rem .75rem;
     }
 }
