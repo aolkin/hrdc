@@ -1,0 +1,31 @@
+<h3 class="text-center mt-4 mb-2">{{ type }} Contact Sheet</h3>
+<div class="table-responsive">
+  <table class="table table-sm contact-sheet">
+    <thead>
+      <tr>
+	<th>Position</th>
+	<th>Name</th>
+	<th>Email</th>
+	<th>Phone</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for staff in list %}
+      <tr>
+	<td>{{ staff.position }}</td>
+	<td>{{ staff.person }}</td>
+	<td><a href="mailto:{{ staff.person.email }}">
+	  {{ staff.person.email }}</a></td>
+	<td><a href="tel:{{ staff.person.phone }}">
+	  {{ staff.person.phone }}</a></td>
+      </tr>
+      {% empty %}
+      <tr>
+	<td colspan="4" class="text-center"><em>
+	  (No {{ type|lower }} members have been listed yet.)
+	</em></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

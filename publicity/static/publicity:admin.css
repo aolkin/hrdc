@@ -1,0 +1,18 @@
+
+.publicity-info .col-sm-3 {
+    margin-top: 0.5em;
+}
+
+@media (min-width: 576px) {
+    .publicity-info .col-sm-3 {
+	text-align: right;
+    }
+
+    .publicity-info .col-sm-9 {
+	margin-top: 0.5em;
+    }
+}
+
+.contact-sheet td:not([colspan]) {
+    white-space: nowrap;
+}

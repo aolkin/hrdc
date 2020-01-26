@@ -130,3 +130,7 @@ div.row.reimbursement-options:last-of-type {
 	padding: 0.25rem .75rem;
     }
 }
+
+.incomeform .income-form:not(:last-of-type) .form-group {
+    margin-bottom: 0.25em;
+}

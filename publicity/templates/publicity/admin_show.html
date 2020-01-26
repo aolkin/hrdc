@@ -13,24 +13,24 @@
 </div>
 
 <h3 class="text-center mt-4 mb-2">Show Metadata</h3>
-<div class="row justify-content-center">
-  <div class="col-6 text-right"><em>Author/Creator:</em></div>
+<div class="form-row justify-content-center">
+  <div class="col-6 text-right"><b>Author/Creator:</b></div>
   <div class="col-6">
     {{ object.show.creator_credit|default:"<em>N/A</em>" }}
   </div>
-  <div class="col-6 text-right"><em>Affiliation:</em></div>
+  <div class="col-6 text-right"><b>Affiliation:</b></div>
   <div class="col-6">
     {{ object.show.affiliation|default:"<em>N/A</em>" }}
   </div>
-  <div class="col-6 text-right"><em>Production Type:</em></div>
+  <div class="col-6 text-right"><b>Production Type:</b></div>
   <div class="col-6">
     {{ object.show.get_prod_type_display }}
   </div>
-  <div class="col-6 text-right"><em>Venue:</em></div>
+  <div class="col-6 text-right"><b>Venue:</b></div>
   <div class="col-6">
     {{ object.show.space|default:"(none)" }}
   </div>
-  <div class="col-6 text-right"><em>Residency:</em></div>
+  <div class="col-6 text-right"><b>Residency:</b></div>
   <div class="col-6">
     {% if object.show.residency_starts %}
     {{ object.show.residency_starts|date:"M j" }} -
@@ -38,7 +38,7 @@
     {% else %}(none)
     {% endif %}
   </div>
-  <div class="col-6 text-right"><em>Liaison(s):</em></div>
+  <div class="col-6 text-right"><b>Liaison(s):</b></div>
   <div class="col-6">
     {{ object.show.liaison_str|default:"(none)" }}
   </div>
@@ -65,32 +65,32 @@
 </div>
 
 <h3 class="text-center mt-4 mb-2">Publicity Information</h3>
-<div class="row justify-content-center">
-  <div class="col-sm-3 text-right"><em>Billing:</em></div>
+<div class="form-row justify-content-center publicity-info">
+  <div class="col-sm-3"><b>Billing:</b></div>
   <div class="col-sm-9">
     {{ object.credits|default:"(not supplied)"|linebreaksbr }}
   </div>
-  <div class="col-sm-3 text-right"><em>Show Email:</em></div>
+  <div class="col-sm-3"><b>Show Email:</b></div>
   <div class="col-sm-9">
     <a {% if object.contact_email %}href="mailto:{{ object.contact_email }}"{% endif %}>
       {{ object.contact_email|default:"(not supplied)" }}
     </a>
   </div>
-  <div class="col-sm-3 text-right"><em>Runtime:</em></div>
+  <div class="col-sm-3"><b>Runtime:</b></div>
   <div class="col-sm-9">
     {{ object.runtime|default:"(not supplied)" }}
   </div>
-  <div class="col-sm-3 text-right"><em>Blurb:</em></div>
+  <div class="col-sm-3"><b>Blurb:</b></div>
   <div class="col-sm-9">
     {{ object.blurb|default:"(not supplied)"|urlize|linebreaksbr }}
   </div>
-  <div class="col-sm-3 text-right"><em>Ticket Link:</em></div>
+  <div class="col-sm-3"><b>Ticket Link:</b></div>
   <div class="col-sm-9">
     <a {% if object.ticket_link %}href="{{ object.ticket_link }}"{% endif %}>
       {{ object.ticket_link|default:"(not supplied)" }}
     </a>
   </div>
-  <div class="col-sm-3 text-right"><em>Webpage:</em></div>
+  <div class="col-sm-3"><b>Webpage:</b></div>
   <div class="col-sm-9">
     <a {% if object.website_page %}href="{{ object.website_page }}"{% endif %}>
       {{ object.website_page|default:"(not set)" }}
@@ -98,99 +98,12 @@
   </div>
 </div>
 
-<h3 class="text-center mt-4 mb-2">Staff Contact Sheet</h3>
-<table class="table">
-  <thead>
-    <tr>
-      <th>Position</th>
-      <th>Name</th>
-      <th>Email</th>
-      <th>Phone</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for staff in object.staff %}
-    <tr>
-      <td>{{ staff.position }}</td>
-      <td>{{ staff.person }}</td>
-      <td><a href="mailto:{{ staff.person.email }}">
-	{{ staff.person.email }}</a></td>
-      <td><a href="tel:{{ staff.person.phone }}">
-	{{ staff.person.phone }}</a></td>
-    </tr>
-    {% empty %}
-    <tr>
-      <td colspan="4" class="text-center"><em>
-	(No staff members have been listed yet.)
-      </em></td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+{% include "publicity/admin_contact_sheet.html" with list=object.staff type="Staff" %}
 
-<h3 class="text-center mt-4 mb-2">Cast Contact Sheet</h3>
-<table class="table">
-  <thead>
-    <tr>
-      <th>Role</th>
-      <th>Name</th>
-      <th>Email</th>
-      <th>Phone</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for staff in object.cast %}
-    <tr>
-      <td>{{ staff.position }}</td>
-      <td>{{ staff.person }}</td>
-      <td><a href="mailto:{{ staff.person.email }}">
-	{{ staff.person.email }}</a></td>
-      <td><a href="tel:{{ staff.person.phone }}">
-	{{ staff.person.phone }}</a></td>
-    </tr>
-    {% empty %}
-    <tr>
-      <td colspan="4" class="text-center"><em>
-	(No cast members have been listed yet.)
-      </em></td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+{% include "publicity/admin_contact_sheet.html" with list=object.cast type="Cast" %}
 
 {% if object.band_term %}
-<h3 class="text-center mt-4 mb-2">
-  {{ object.get_band_term_display }} Contact Sheet
-</h3>
-<table class="table">
-  <thead>
-    <tr>
-      <th>Role</th>
-      <th>Name</th>
-      <th>Email</th>
-      <th>Phone</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for staff in object.band %}
-    <tr>
-      <td>{{ staff.position }}</td>
-      <td>{{ staff.person }}</td>
-      <td><a href="mailto:{{ staff.person.email }}">
-	{{ staff.person.email }}</a></td>
-      <td><a href="tel:{{ staff.person.phone }}">
-	{{ staff.person.phone }}</a></td>
-    </tr>
-    {% empty %}
-    <tr>
-      <td colspan="4" class="text-center"><em>
-	(No {{ object.get_band_term_display|lower }} members have been
-	listed yet.)
-      </em></td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+{% include "publicity/admin_contact_sheet.html" with list=object.band type=object.get_band_term_display %}
 {% endif %}
 
 {% endblock %}
