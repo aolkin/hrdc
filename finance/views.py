@@ -277,9 +277,13 @@ class ImportView(ShowStaffMixin, View):
             if lines.exists():
                 self.object.imported_budget = True
                 self.object.save()
-            messages.success(
-                self.request,
-                "Successfully imported {} budget lines.".format(count))
+                messages.success(
+                    self.request,
+                    "Successfully imported {} budget lines.".format(count))
+            else:
+                messages.warning(
+                    self.request,
+                    "No budget information found for this show and venue.")
         except AttributeError:
             messages.error(
                 self.request, "No venue application attached to this show.")
