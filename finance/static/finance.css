@@ -25,6 +25,40 @@ input[type=number]::-webkit-outer-spin-button {
     display: none;
 }
 
+.category-header>td, .subtotals-category>td {
+    padding: 0.3em 0.75em 0.4em;
+}
+
+.budget-expense-row>td:not(:last-of-type) {
+    padding: 0.3em 0.1em 0.4em;
+}
+
+.category-header>td[colspan] {
+    padding-top: 0.5em;
+}
+
+.subtotals-category>td {
+    padding-bottom: 0.75em;
+}
+
+.budget-worksheet td.dollar-field {
+    width: 128px;
+}
+
+.budget-worksheet td.text-field {
+    min-width: 240px;
+}
+
+.budget-worksheet td:last-of-type {
+    width: 40px;
+    padding: 0.46em 0.25em;
+}
+
+.category-header>td:last-of-type {
+    padding-right: 0.5em;
+}
+
+/* Expenses View */
 .date-purchased select.form-control {
     display: inline;
     width: 30%;

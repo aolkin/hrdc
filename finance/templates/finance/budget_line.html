@@ -1,7 +1,7 @@
 <tr class="budget-expense-row stream-item {% if not item %}blank-item budgetexpense-blank{% endif %} category-{{ category }} budget-expense-{{ item.id }}"
     data-stream="budgetexpense" data-pk="{{ item.pk }}"
     data-category="{{ category }}">
-  <td>
+  <td class="text-field">
     <input class="form-control" value="{{ item.name }}" name="name" type="text"
 	   data-stream="budgetexpense" data-pk="{{ item.pk }}">
   </td>
@@ -25,7 +25,7 @@
 	     data-stream="budgetexpense" data-pk="{{ item.pk }}">
     </div>
   </td>
-  <td>
+  <td class="text-field">
     <input class="form-control" value="{{ item.notes }}" name="notes"
 	   data-stream="budgetexpense" data-pk="{{ item.pk }}" type="text">
   </td>
