@@ -41,6 +41,7 @@ class VenueAdmin(admin.ModelAdmin):
     autocomplete_fields = "managers", "readers",
     search_fields = "venue__name", "venue__nickname", "season", "year"
     inlines = ResidencyInline, DefaultBudgetInline
+    save_as = True
 
 @admin.register(OldStyleApp)
 class OldStyleAppAdmin(admin.ModelAdmin):
@@ -56,6 +57,7 @@ class OldStyleAppAdmin(admin.ModelAdmin):
     )
     list_display = ("__str__", "live", "seasonstr", "due",)
     list_filter = "live", "year", "season", "due"
+    save_as = True
 
 class StaffInline(admin.TabularInline):
     model = StaffMember
