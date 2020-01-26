@@ -13,6 +13,8 @@ class FinanceInfo(models.Model):
     show = models.OneToOneField(settings.SHOW_MODEL, on_delete=models.CASCADE,
                                 related_name="finance_info")
 
+    imported_budget = models.BooleanField(default=False)
+
     class Meta:
         verbose_name = "Finance-Enabled Show"
 

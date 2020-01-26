@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, View
 from django.views.generic.edit import UpdateView
 from django.views.generic.detail import SingleObjectMixin, DetailView
 from django.urls import reverse_lazy
@@ -8,6 +8,7 @@ from django.template.loader import render_to_string
 from django import forms
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from django.utils.html import mark_safe
     
 from utils import InitializedLoginMixin
 
@@ -54,6 +55,11 @@ class MenuMixin:
             submenu = menu[str(show)] = []
             is_active = (hasattr(self, "object") and
                          self.object.pk == show.pk)
+            if not show.imported_budget and hasattr(show.show, "application"):
+                submenu.append({
+                    "name": mark_safe('<div class="text-center">Import Budget from Venue App</div>'),
+                    "url": reverse_lazy("finance:import", args=(show.pk,)),
+                })
             for name, url in urls:
                 submenu.append({
                     "name": name,
@@ -245,6 +251,39 @@ class ExpenseView(MenuMixin, ShowStaffMixin, TemplateView):
             )
         )
         return context
+
+class ImportView(ShowStaffMixin, View):
+    def get(self, *args, **kwargs):
+        self.object = self.get_object()
+        try:
+            count = 0
+            lines = self.object.show.application.budgetline_set.filter(
+                venue__venue=self.object.show.space)
+            for i in lines.filter(category=0):
+                income, created = Income.objects.get_or_create(
+                    show=self.object, name=i.name,
+                    defaults={ "requested": i.amount })
+                if created:
+                    count += 1
+            for e in lines.exclude(category=0):
+                expense, created = BudgetExpense.objects.get_or_create(
+                    show=self.object, category=e.category,
+                    name=e.name, defaults={
+                        "estimate": e.amount,
+                        "notes": e.notes,
+                    })
+                if created:
+                    count += 1
+            if lines.exists():
+                self.object.imported_budget = True
+                self.object.save()
+            messages.success(
+                self.request,
+                "Successfully imported {} budget lines.".format(count))
+        except AttributeError:
+            messages.error(
+                self.request, "No venue application attached to this show.")
+        return redirect("finance:budget", self.get_object().pk)
 
 def view_tax_certificate(request):
     if request.user.is_season_pdsm or request.user.is_board:
