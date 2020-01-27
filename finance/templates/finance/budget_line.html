@@ -3,7 +3,8 @@
     data-category="{{ category }}">
   <td class="text-field">
     <input class="form-control" value="{{ item.name }}" name="name" type="text"
-	   data-stream="budgetexpense" data-pk="{{ item.pk }}">
+	   data-stream="budgetexpense" data-pk="{{ item.pk }}"
+	   {% if object.locked %}disabled{% endif %}>
   </td>
   <td class="dollar-field">
     <div class="input-group">
@@ -12,7 +13,8 @@
       </div>
       <input class="form-control" value="{{ item.estimate }}"
 	     type="number" size="4" name="estimate"
-	     data-stream="budgetexpense" data-pk="{{ item.pk }}">
+	     data-stream="budgetexpense" data-pk="{{ item.pk }}"
+	   {% if object.locked %}disabled{% endif %}>
     </div>
   </td>
   <td class="dollar-field">
@@ -27,12 +29,15 @@
   </td>
   <td class="text-field">
     <input class="form-control" value="{{ item.notes }}" name="notes"
-	   data-stream="budgetexpense" data-pk="{{ item.pk }}" type="text">
+	   data-stream="budgetexpense" data-pk="{{ item.pk }}" type="text"
+	   {% if object.locked %}disabled{% endif %}>
   </td>
+  {% if not object.locked %}
   <td>
     <button class="btn btn-sm btn-danger delete-item"
 	    data-stream="budgetexpense" data-pk="{{ item.pk }}">
       <i class="fa fa-minus-square"></i>
     </button>
   </td>
+  {% endif %}
 </tr>

@@ -2,10 +2,73 @@ from django.contrib import admin
 from django.http import HttpResponse
 from django.utils.html import format_html
 from django.contrib import messages
+from django import forms
+from django.contrib.admin.widgets import AutocompleteSelectMultiple
+
+from types import SimpleNamespace
 
 import csv, re, zipfile
 
 from .models import *
+
+fake_rel_field = SimpleNamespace(model=FinanceInfo)
+
+class ShowInline(admin.TabularInline):
+    model = FinanceInfo
+    can_delete = False
+    show_change_link = True
+    ordering = "show__space", "show__residency_start"
+    fields = "show", "venue", "box_office", "royalties", "ignore_royalties"
+    readonly_fields = "show", "venue",
+    verbose_name = "Show"
+    verbose_name_plural = "Shows"
+
+    def venue(self, obj):
+        return obj.show.space
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+class SettlementForm(forms.ModelForm):
+    shows = forms.ModelMultipleChoiceField(
+        queryset=FinanceInfo.objects.all(), widget=AutocompleteSelectMultiple(
+            fake_rel_field, admin.site), required=False)
+
+    class Meta:
+        model = Settlement
+        fields = ("season", "year", "locked", "club_budget")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.fields["shows"].initial = self.instance.financeinfo_set.all()
+            self.fields["shows"].help_text = "Shows added here will appear below when this settlement is saved."
+        else:
+            self.fields["shows"].disabled = True
+            self.fields["shows"].help_text = "Please save this settlement once before adding shows."
+
+    def save(self, *args, **kwargs):
+        instance = super().save(*args, **kwargs)
+        if instance.pk:
+            self.fields['shows'].initial.update(settlement=None)
+            self.cleaned_data['shows'].update(settlement=instance)
+        return instance
+
+@admin.register(Settlement)
+class SettlementAdmin(admin.ModelAdmin):
+    form = SettlementForm
+    inlines = (ShowInline,)
+    list_display = "view_settlement", "edit", "showstr", "locked",
+    list_display_links = "edit",
+    list_editable = "locked",
+    list_filter = ("locked", "year", "season",)
+
+    def view_settlement(self, obj):
+        return format_html('<a href="{}">View {}</a>',
+                           obj.get_absolute_url(), obj)
+
+    def edit(self, obj):
+        return "EDIT"
 
 class IncomeInline(admin.TabularInline):
     model = Income

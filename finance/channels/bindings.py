@@ -16,11 +16,14 @@ class BudgetExpenseBinding(WebsocketBinding):
     def has_permission(self, user, action, pk):
         if action == "create":
             return True
+        show = self.model.objects.get(pk=pk).show
+        if show.locked:
+            return False
         if action == "update":
-            return (self.model.objects.get(pk=pk).show.show.user_is_staff(user)
+            return (show.show.user_is_staff(user)
                     or user.has_perm("finance.change_budgetexpense"))
         if action == "delete":
-            return (self.model.objects.get(pk=pk).show.show.user_is_staff(user)
+            return (show.show.user_is_staff(user)
                     or user.has_perm("finance.delete_budgetexpense"))
             
     def create(self, data):

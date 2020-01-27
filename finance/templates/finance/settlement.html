@@ -1,0 +1,223 @@
+{% extends "bt/default.html" %}
+
+{% block title %}{{ object }} Settlement | Finance{% endblock %}
+
+{% block extra_header %}
+{% include "dramaorg/user_dropdown.html" %}
+{% endblock %}
+
+{% load finance %}
+
+{% block content %}
+<h2 class="text-center">{{ object }} Financial Settlement</h2>
+
+<p class="lead text-center d-print-none">
+  To edit this settlement, please use the
+  <a href="{% url 'admin:finance_settlement_change' object.pk %}">
+    site admin</a>.
+</p>
+
+{% if not settlement.locked %}
+<div class="row justify-content-center d-print-none">
+  <div class="col-md-8">
+    <div class="alert alert-warning">
+      This settlement is currently unlocked, meaning show staff members can
+      still make changes to their show's financial records. This settlement
+      can be locked via the site admin.
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<h3 class="text-center mt-3">Revenue and Royalties</h3>
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+      <th>Show</th>
+      <th class="text-right">Box Office Revenue</th>
+      <th class="text-right">Royalties</th>
+      <th class="text-right">Revenue Less Royalties</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for show in object.revenue_royalties_shows %}
+    {% ifchanged show.show.space %}
+    <tr class="table-secondary">
+      <td colspan="4" class="text-center">
+	<b>{{ show.show.space|upper }}</b>
+      </td>
+    </tr>
+    {% endifchanged %}
+    <tr>
+      <td>{{ show }}</td>
+      <td class="text-right">{{ show.box_office|accounting_fmt }}</td>
+      <td class="text-right {% if show.ignore_royalties %}text-muted{% endif %}">{{ show.royalties|accounting_fmt }}</td>
+      <td class="text-right">
+	{% if show.revenue_less_royalties or not show.ignore_royalties %}
+	{{ show.revenue_less_royalties|accounting_fmt }}
+	{% endif %}
+	{% if show.ignore_royalties %}
+	<div class="text-muted"><small>
+	  <abbr title="{{ show }}'s royalties are not included in this settlement.">(royalties not included)</abbr>
+	</small></div>
+	{% endif %}
+      </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="4" class="text-muted text-center">
+	None of the shows in this settlement have revenue or royalty
+	information. Please check that the settlement is configured correctly
+	in the site admin.
+      </td>
+    </tr>
+    {% endfor %}
+    <tr>
+      <th>Total</th>
+      <th class="text-right">{{ object.total_revenue|accounting_fmt }}</th>
+      <th class="text-right">{{ object.total_royalties|accounting_fmt }}</th>
+      <th class="text-right">
+	{{ object.total_less|accounting_fmt }}
+	{% if object.total_less < 0 %}
+	<div class="text-muted"><small>
+	  <abbr title="A deficit in the revenue less royalties does not have to be paid back.">(deficit not included)</abbr>
+	</small></div>
+	{% endif %}
+      </th>
+    </tr>
+  </tbody>
+</table>
+
+<h3 class="text-center mt-3">Funding and Expenses &ndash; A.R.T. Funded Shows</h3>
+<p class="text-secondary mx-5">
+  For A.R.T.-funded shows, the amount due to the A.R.T. is the greater of either
+  p-card expenses less the A.R.T. funding, or the balance of outside grants
+  less reimbursements, but never more than A.R.T. p-card expenses. This means
+  if the HRDC reimbursed more than the grants it received, the A.R.T. will owe
+  money to the HRDC instead, but never more than the remaining funding less
+  p-card expenses.
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+      <th>Show</th>
+      <th class="text-right">Grants less Reimbursements</th>
+      <th class="text-right">A.R.T. Funding less P-Card</th>
+      <th class="text-right">Funds due to A.R.T.</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for show in object.art_shows %}
+    {% ifchanged show.show.space %}
+    <tr class="table-secondary">
+      <td colspan="4" class="text-center">
+	<b>{{ show.show.space|upper }}</b>
+      </td>
+    </tr>
+    {% endifchanged %}
+    <tr {% if show.unconfirmed_income.exists or show.uncomfirmed_expenses.exists %}class="table-warning"{% endif %}>
+      <td>{{ show }}</td>
+      <td class="text-right">
+	<span class="text-muted">${{ show.confirmed_non_art_income }} -
+	  ${{ show.reimbursement_total }} =</span>
+	{{ show.funding_less_reimbursements|accounting_fmt }}
+      </td>
+      <td class="text-right">
+	<span class="text-muted">${{ show.art_income }} -
+	  ${{ show.p_card_total }} =</span>
+	{{ show.art_remainder|accounting_fmt }}
+      </td>
+      <td class="text-right">
+	{{ show.due_to_art|accounting_fmt }}
+      </td>
+    </tr>
+    {% if show.unconfirmed_income.exists or show.uncomfirmed_expenses.exists %}
+    <tr class="d-print-none table-light">
+      <td colspan="4" class="text-center">
+	This show has unconfirmed {% if show.unconfirmed_income.exists %}income{% if show.unconfirmed_expenses %} and {% endif %}{% endif %}{% if show.unconfirmed_expenses.exists %}expenses{% endif %}. Please check that all {% if show.unconfirmed_income.exists %}income{% if show.unconfirmed_expenses %} and {% endif %}{% endif %}{% if show.unconfirmed_expenses.exists %}expenses{% endif %} have been confirmed.
+      </td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+    <tr>
+      <th colspan="3">Total due to A.R.T.</th>
+      <th class="text-right">
+	{{ object.total_art_funded_balance|accounting_fmt }}
+      </th>
+    </tr>
+  </tbody>
+</table>
+
+<h3 class="text-center mt-3">Funding and Expenses &ndash; Outside Funded Shows</h3>
+<p class="text-secondary mx-5">
+  For outside-funded shows, the A.R.T. is simply due any p-card expenses
+  incurred.
+</p>
+<table class="table table-hover table-sm">
+  <thead>
+    <tr>
+      <th>Show</th>
+      <th class="text-right">Grants less Reimbursements</th>
+      <th class="text-right">P-Card Expenses &ndash; due to A.R.T.</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for show in object.grant_shows %}
+    {% ifchanged show.show.space %}
+    <tr class="table-secondary">
+      <td colspan="4" class="text-center">
+	<b>{{ show.show.space|upper }}</b>
+      </td>
+    </tr>
+    {% endifchanged %}
+    <tr {% if show.unconfirmed_income.exists or show.uncomfirmed_expenses.exists %}class="table-warning"{% endif %}>
+      <td>{{ show }}</td>
+      <td class="text-right">
+	<span class="text-muted">${{ show.confirmed_non_art_income }} -
+	  ${{ show.reimbursement_total }} =</span>
+	{{ show.funding_less_reimbursements|accounting_fmt }}
+      </td>
+      <td class="text-right">
+	{{ show.p_card_total|accounting_fmt }}
+      </td>
+    </tr>
+    {% if show.unconfirmed_income.exists or show.uncomfirmed_expenses.exists %}
+    <tr class="d-print-none table-light">
+      <td colspan="4" class="text-center">
+	This show has unconfirmed {% if show.unconfirmed_income.exists %}income{% if show.unconfirmed_expenses %} and {% endif %}{% endif %}{% if show.unconfirmed_expenses.exists %}expenses{% endif %}. Please check that all {% if show.unconfirmed_income.exists %}income{% if show.unconfirmed_expenses %} and {% endif %}{% endif %}{% if show.unconfirmed_expenses.exists %}expenses{% endif %} have been confirmed.
+      </td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+    <tr>
+      <th colspan="2">Total due to A.R.T.</th>
+      <th class="text-right">
+	{{ object.total_outside_funded_balance|accounting_fmt }}
+      </th>
+    </tr>
+  </tbody>
+</table>
+
+<h3 class="text-center mt-3">Summary Totals &ndash; Funds due to HRDC</h3>
+<p class="text-secondary mx-5">
+</p>
+<table class="table table-hover table-sm">
+  <tbody>
+    <tr>
+      <td>Expenses due</td>
+      <td class="text-right">{{ object.total_expenses_due|accounting_fmt }}</td>
+    </tr>
+    <tr>
+      <td>Revenue less royalties</td>
+      <td class="text-right">{{ object.total_less_capped|accounting_fmt }}</td>
+    </tr>
+    <tr>
+      <td>Club budget (Grant from A.R.T.)</td>
+      <td class="text-right">{{ object.club_budget|accounting_fmt }}</td>
+    </tr>
+    <tr>
+      <th>Total owed to HRDC</th>
+      <th class="text-right">{{ object.total_due_hrdc|accounting_fmt }}</th>
+    </tr>
+  </tbody>
+</table>
+{% endblock %}

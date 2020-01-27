@@ -100,11 +100,22 @@
   </div>
 </div>
 {% endif %}
+{% if object.locked %}
+<div class="row justify-content-center mt-2">
+  <div class="col-md-8">
+    <p class="alert alert-warning text-center">
+      <i>{{ object }}</i>'s finances have been locked and may no longer be
+      changed.
+    </p>
+  </div>
+</div>
+{% endif %}
 <div class="row justify-content-center mt-3">
   <div class="col-md-8">
     <h4 class="text-center">New Expenses</h4>
   </div>
 </div>
+{% if not object.locked %}
 <div class="row justify-content-center mt-2">
   <div class="col-md-8">
     <p class="lead text-center">
@@ -113,16 +124,20 @@
     </p>
   </div>
 </div>
+{% endif %}
 <div class="row justify-content-center">
   <form method="POST" class="col expenseform" enctype="multipart/form-data">
     {% csrf_token %}
     {{ formset.management_form }}
+    {% if not object.locked %}
     <div class="row">
       <button type="submit" class="btn btn-primary btn-block primary-submit">
 	Save Changes / Add Another
       </button>
     </div>
+    {% endif %}
     {% for form in formset %}
+    {% if not object.locked or form.instance.pk %}
     <div class="expense-form">
       <div class="row">
 	<h5>Expense</h5>
@@ -133,7 +148,7 @@
       {% if form.non_field_errors %}
       <div class="alert alert-danger">{{ form.non_field_errors }}</div>
       {% endif %}
-      <div class="row">
+      <div class="form-row">
 	{{ form.id }}
 	{{ form.submitting_user }}
 	<div class="col-md-4 col-sm-6">
@@ -142,15 +157,19 @@
 	<div class="col-md-5 col-sm-6">
 	  {{ form.item|as_crispy_field }}
 	</div>
-	<div class="col-md-2 col-sm-8 dollar-field">
+	<div class="col dollar-field">
 	  {{ form.amount|as_crispy_field }}
 	</div>
+	{% if not object.locked %}
 	<div class="col-md-1 col-sm-4 mt-3">
 	  <button type="button"
 		  class="btn btn-sm btn-danger mt-4 remove-expense">
 	    <i class="fa fa-minus-square"></i>
 	  </button>
 	</div>
+	{% endif %}
+      </div>
+      <div class="form-row">
 	<div class="col-md-5 col-sm-6">
 	  {{ form.purchaser_name|as_crispy_field }}
 	</div>
@@ -161,7 +180,7 @@
 	  {{ form.purchased_using|as_crispy_field }}
 	</div>
       </div>
-      <div class="row reimbursement-options">
+      <div class="form-row reimbursement-options">
 	<div class="col-md-5 col-sm-6">
 	  {{ form.purchaser_email|as_crispy_field }}
 	</div>
@@ -175,7 +194,7 @@
 	  {{ form.mailing_address|as_crispy_field }}
 	</div>
       </div>
-      <div class="row reimbursement-options">
+      <div class="form-row reimbursement-options">
 	<div class="col-md-6 col-sm-6">
 	  <div class="form-group">
 	    <label class="col-form-label">Current Receipt</label>
@@ -195,6 +214,7 @@
 	  {{ form.receipt|as_crispy_field }}
 	</div>
       </div>
+      {% if not object.locked %}
       <div class="row reimbursement-options justify-content-center">
 	<div class="col-md-6 col-sm-12">
 	  {% if form.instance.pk %}
@@ -213,10 +233,12 @@
 	  {% endif %}
 	</div>
       </div>
+      {% endif %}
       {% if not forloop.last %}
       <hr>
       {% endif %}
     </div>
+    {% endif %}
     {% endfor %}
   </form>
 </div>

@@ -14,4 +14,5 @@ urlpatterns = [
         path('import/', ImportView.as_view(), name="import"),
     ])),
     url(r'^tax-certificate/$', view_tax_certificate, name="tax_certificate"),
+    path('settle/<int:pk>/', SettlementView.as_view(), name="settlement"),
 ]

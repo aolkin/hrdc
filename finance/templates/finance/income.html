@@ -47,6 +47,16 @@
   </div>
 </div>
 {% endif %}
+{% if object.locked %}
+<div class="row justify-content-center mt-2">
+  <div class="col-md-8">
+    <p class="alert alert-warning text-center">
+      <i>{{ object }}</i>'s finances have been locked and may no longer be
+      changed.
+    </p>
+  </div>
+</div>
+{% endif %}
 <div class="row justify-content-center mt-2">
   <div class="col-md-8">
     <h4 class="text-center">Pending Grants</h4>
@@ -57,6 +67,7 @@
     {% csrf_token %}
     {{ formset.management_form }}
     {% for form in formset %}
+    {% if not object.locked or form.instance.pk %}
     <div class="income-form">
       <div class="form-row">
 	{{ form.id }}
@@ -69,15 +80,17 @@
 	<div class="col-md-2 col-sm-3 dollar-field received-field">
 	  {{ form.received|as_crispy_field }}
 	</div>
-	<div class="col-md-3 col-sm-3 status-field">
+	<div class="col status-field">
 	  {{ form.status|as_crispy_field }}
 	</div>
+	{% if not object.locked %}
 	<div class="col-md-1 col-sm-3 mt-3">
 	  <button type="button"
 		  class="btn btn-sm btn-danger mt-4 remove-income">
 	    <i class="fa fa-minus-square"></i>
 	  </button>
 	</div>
+	{% endif %}
       </div>
       <div class="d-none">
 	{{ form.DELETE|as_crispy_field }}
@@ -86,10 +99,13 @@
       <div class="alert alert-danger">{{ form.non_field_errors }}</div>
       {% endif %}
     </div>
+    {% endif %}
     {% endfor %}
+    {% if not object.locked %}
     <button type="submit" class="btn btn-primary btn-block">
       Save Changes / Add Another
     </button>
+    {% endif %}
   </form>
 </div>
 

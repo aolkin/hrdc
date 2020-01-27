@@ -116,7 +116,8 @@ td.wrappable-min-width {
 	text-align: right;
     }
 
-    .budget-worksheet>tbody>tr>td input[readonly] {
+    .budget-worksheet>tbody>tr>td input[readonly],
+    .budget-worksheet>tbody>tr>td input[disabled] {
 	background: none;
     }
 
@@ -137,4 +138,16 @@ td.wrappable-min-width {
 
 .incomeform .income-form:not(:last-of-type) .form-group {
     margin-bottom: 0.25em;
+}
+
+.view-settlement table {
+    max-width: 992px;
+    margin: auto;
+    margin-top: 1em;
+}
+
+@media print {
+    .view-settlement abbr[title]::after {
+	content: none;
+    }
 }

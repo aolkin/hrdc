@@ -9,14 +9,109 @@ from django.db.models.signals import post_save, pre_delete, post_delete
 
 from dramaorg.models import Space, Season, Show
 
+class Settlement(Season):
+    locked = models.BooleanField(default=False, help_text="Prevent staff members of shows in this settlement from adding, modifying, or updating their budget, income, and expenses.")
+
+    club_budget = models.DecimalField(
+        decimal_places=2, max_digits=7, default=1000,
+        help_text="A.R.T. grant towards organization expenses.")
+
+    class Meta:
+        ordering = "-year", "-season"
+
+    def get_absolute_url(self):
+        return reverse_lazy("finance:settlement", args=(self.pk,))
+
+    def showstr(self):
+        return ", ".join([str(i) for i in self.financeinfo_set.all()])
+    showstr.short_description = "Shows"
+
+    def __str__(self):
+        return self.seasonstr()
+
+    @property
+    def total_revenue(self):
+        return self.financeinfo_set.all().aggregate(
+            models.Sum("box_office"))["box_office__sum"] or 0
+
+    @property
+    def total_royalties(self):
+        return self.financeinfo_set.filter(ignore_royalties=False).aggregate(
+            models.Sum("royalties"))["royalties__sum"] or 0
+
+    @property
+    def total_less(self):
+        return self.total_revenue - self.total_royalties
+
+    @property
+    def total_less_capped(self):
+        return max(self.total_revenue - self.total_royalties, 0)
+
+    @property
+    def revenue_royalties_shows(self):
+        return self.financeinfo_set.exclude(
+            box_office=0, royalties=0).order_by("show__space__order")
+
+    @property
+    def art_shows(self):
+        return self.financeinfo_set.filter(
+            income__status=92).order_by("show__space__order")
+
+    @property
+    def grant_shows(self):
+        return self.financeinfo_set.exclude(
+            income__status=92).order_by("show__space__order")
+
+    @property
+    def total_art_funded_balance(self):
+        return sum([i.due_to_art for i in self.art_shows])
+
+    @property
+    def total_outside_funded_balance(self):
+        return sum([i.p_card_total for i in self.grant_shows])
+
+    @property
+    def total_expenses_due(self):
+        return (self.total_art_funded_balance +
+                self.total_outside_funded_balance) * -1
+
+    @property
+    def total_due_hrdc(self):
+        return (self.total_expenses_due + self.total_less_capped +
+                self.club_budget)
+
 class FinanceInfo(models.Model):
     show = models.OneToOneField(settings.SHOW_MODEL, on_delete=models.CASCADE,
                                 related_name="finance_info")
 
     imported_budget = models.BooleanField(default=False)
 
+    settlement = models.ForeignKey(Settlement, on_delete=models.SET_NULL,
+                                   null=True, blank=True)
+    royalties = models.DecimalField(decimal_places=2, max_digits=7, default=0)
+    box_office = models.DecimalField(decimal_places=2, max_digits=7, default=0,
+                                     verbose_name="Box Office Revenue")
+    ignore_royalties = models.BooleanField(
+        default=False, verbose_name="Ignore Royalties Cost",
+        help_text="If checked, don't count royalties against the revenue.")
+
     class Meta:
         verbose_name = "Finance-Enabled Show"
+
+    @property
+    def revenue_less_royalties(self):
+        res = self.box_office
+        if not self.ignore_royalties:
+            res -= self.royalties
+        return res
+
+    @property
+    def art_funded(self):
+        return self.income_set.filter(status=92).exists()
+
+    @property
+    def locked(self):
+        return self.settlement and self.settlement.locked
 
     @property
     def requested_income_val(self):
@@ -78,7 +173,7 @@ class FinanceInfo(models.Model):
     @property
     def actual_expenses(self):
         return "${:.2f}".format(self.actual_expense_val)
-    
+
     @property
     def actual_bal(self):
         return self.received_income_val - self.actual_expense_val
@@ -86,6 +181,51 @@ class FinanceInfo(models.Model):
     @property
     def actual_balance(self):
         return "${:.2f}".format(self.actual_bal)
+
+    @property
+    def confirmed_non_art_income(self):
+        return self.income_set.filter(status=91).aggregate(
+            models.Sum("received"))["received__sum"] or 0
+
+    @property
+    def art_income(self):
+        return self.income_set.filter(status=92).aggregate(
+            models.Sum("received"))["received__sum"] or 0
+
+    @property
+    def p_card_total(self):
+        return self.expense_set.filter(purchased_using=0).exclude(
+            status=0).aggregate(models.Sum("amount"))["amount__sum"] or 0
+
+    @property
+    def reimbursement_total(self):
+        return self.expense_set.filter(purchased_using=1).exclude(
+            status=0).aggregate(models.Sum("amount"))["amount__sum"] or 0
+
+    @property
+    def funding_less_reimbursements(self):
+        return self.confirmed_non_art_income - self.reimbursement_total
+
+    @property
+    def art_remainder(self):
+        return self.art_income - self.p_card_total
+
+    @property
+    def due_to_art(self):
+        if self.art_remainder < 0:
+            return self.art_remainder * -1
+        if self.funding_less_reimbursements > 0:
+            return min(self.funding_less_reimbursements,
+                       self.p_card_total)
+        return max(self.funding_less_reimbursements, -self.art_remainder)
+
+    @property
+    def unconfirmed_income(self):
+        return self.income_set.filter(status__lt=90).exclude(status=11)
+
+    @property
+    def unconfirmed_expenses(self):
+        return self.expense_set.filter(status=0)
 
     def __str__(self):
         return str(self.show)

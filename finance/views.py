@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.views.generic import TemplateView, View
 from django.views.generic.edit import UpdateView
 from django.views.generic.detail import SingleObjectMixin, DetailView
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
@@ -55,6 +56,8 @@ class MenuMixin:
             submenu = menu[str(show)] = []
             is_active = (hasattr(self, "object") and
                          self.object.pk == show.pk)
+            if show.locked:
+                submenu.append({ "name": "[LOCKED]", })
             if not show.imported_budget and hasattr(show.show, "application"):
                 submenu.append({
                     "name": mark_safe('<div class="text-center">Import Budget from Venue App</div>'),
@@ -90,9 +93,15 @@ class IndexView(MenuMixin, InitializedLoginMixin, TemplateView):
     
     template_name = "finance/index.html"
 
+class IncomeForm(forms.ModelForm):
+    def __init__(self, *args, show_instance=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if show_instance and show_instance.locked:
+            for i in self.fields.values():
+                i.disabled = True
 
 BaseIncomeFormSet = forms.inlineformset_factory(
-    FinanceInfo, Income,
+    FinanceInfo, Income, form=IncomeForm,
     fields=("name", "requested", "received", "status"), extra=1
 )
 
@@ -101,22 +110,30 @@ class IncomeFormSet(BaseIncomeFormSet):
         super().__init__(*args, **kwargs)
         self.queryset = self.queryset.filter(status__lt=90)
 
+    def get_form_kwargs(self, index):
+        return { "show_instance": self.instance }
+
 class IncomeView(MenuMixin, ShowStaffMixin, TemplateView):
     template_name = "finance/income.html"
     model = FinanceInfo
 
     def post(self, *args, **kwargs):
-        self.formset = IncomeFormSet(self.request.POST,
-                                     instance=self.get_object())
-        if self.formset.is_valid():
-            self.formset.save()
+        if self.get_object().locked:
+            messages.error(
+                self.request,
+                "This show's finances have been locked and may not be changed.")
         else:
-            messages.error(self.request, "Failed to save income information. "+
-                           "Please try again.")
-            return self.get(*args, **kwargs)
-        messages.success(self.request,
-                         "Updated income information for {}.".format(
-                             self.get_object()))
+            self.formset = IncomeFormSet(self.request.POST,
+                                         instance=self.get_object())
+            if self.formset.is_valid():
+                self.formset.save()
+            else:
+                messages.error(self.request, "Failed to save income "
+                               "information. Please try again.")
+                return self.get(*args, **kwargs)
+            messages.success(self.request,
+                             "Updated income information for {}.".format(
+                                 self.get_object()))
         return redirect(reverse_lazy("finance:income",
                                      args=(self.get_object().id,)))
 
@@ -140,12 +157,16 @@ class BudgetView(MenuMixin, ShowStaffMixin, DetailView):
         return context
 
 class ExpenseForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, show_instance=None, **kwargs):
         super().__init__(*args, **kwargs)
+        self.show_instance = show_instance
         self.fields["subcategory"].queryset = self.show_instance.budgetexpense_set.all()
         self.fields["date_purchased"].widget.is_required = False
         self.receipt_filename = os.path.basename(
             self.instance.receipt.name) if self.instance.receipt else None
+        if self.show_instance.locked:
+            for i in self.fields.values():
+                i.disabled = True
 
     def clean(self):
         res = super().clean()
@@ -179,15 +200,23 @@ BaseExpenseFormSet = forms.inlineformset_factory(
 
 class ExpenseFormSet(BaseExpenseFormSet):
     def __init__(self, *args, submitting_user=None, **kwargs):
-        self.form.show_instance = kwargs["instance"]
         super().__init__(*args, **kwargs)
         self.queryset = self.queryset.filter(status__lt=50)
+
+    def get_form_kwargs(self, index):
+        return { "show_instance": self.instance }
 
 class ExpenseView(MenuMixin, ShowStaffMixin, TemplateView):
     template_name = "finance/expenses.html"
     model = FinanceInfo
 
     def post(self, *args, **kwargs):
+        if self.get_object().locked:
+            messages.error(
+                self.request,
+                "This show's finances have been locked and may not be changed.")
+            return redirect(reverse_lazy("finance:expenses",
+                                         args=(self.get_object().id,)))
         self.formset = ExpenseFormSet(
             self.request.POST, self.request.FILES,
             instance=self.get_object(),
@@ -293,3 +322,9 @@ def view_tax_certificate(request):
     if request.user.is_season_pdsm or request.user.is_board:
         return redirect(config.finance_tax_certificate)
     raise PermissionDenied()
+
+class SettlementView(PermissionRequiredMixin, DetailView):
+    permission_required = ("finance.view_settlement",
+                           "finance.view_financeinfo")
+    template_name = "finance/settlement.html"
+    model = Settlement
