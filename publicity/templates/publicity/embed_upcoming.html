@@ -1,30 +1,21 @@
-{% extends "bt/base.html" %}
-
-{% block body %}
-<ul class="list-group">
-  {% for i in upcoming %}
-  <li>
-    <a {% if i.webpage %}href="{{ i.webpage }}"{% endif %}
-       target="_blank">{{ i.name }}</a>
-    {% if i.note %}
-    <i class="fa fa-info-circle text-dark"
-       title="{{ i.note }}" data-toggle="tooltip"></i>
-    {% endif %}
-    {% if i.venue %}
-    <a {% if i.venue.building.maps_link %}href="{{ i.venue.building.maps_link }}"{% endif %} target="_blank">
-      <i class="fa fa-map-marker text-secondary"
-	 title="{{ i.venue }}" data-toggle="tooltip"></i>
-    </a>
-    {% endif %}
-    <span style="white-space: nowrap">
-      {{ i.performance|date:"M j" }}
-    </span>
-    <span style="white-space: nowrap">
-      {{ i.performance|date:"@ f A" }}
-    </span>
-  </li>
-  {% empty %}
-  <li class="list-group-item">No upcoming events!</li>
-  {% endfor %}
-</ul>
-{% endblock %}
+{% load static %}
+{% for i in upcoming %}
+{% ifchanged i.performance_date %}
+<div style="text-align: center; white-space: nowrap"><b>{{ i.performance_date|date:"M j"|upper }}</b></div>
+{% endifchanged %}
+<div>
+  <b style="white-space: nowrap; width: 80px; display: inline-block; text-align: right">
+    {{ i.performance|date:"f A" }}
+  </b>
+  <a {% if i.webpage %}href="{{ i.webpage }}"{% endif %}
+     target="_blank">{{ i.name }}</a>
+  {% if i.note %}
+  <img src="{{ site_url }}{% static 'publicity/icons/exclamation.svg' %}" title="{{ i.note }}" style="height: 1em; vertical-align: middle; opacity: 0.75;">
+  {% endif %}
+  {% if i.venue %}
+  <a {% if i.venue.building.maps_link %}href="{{ i.venue.building.maps_link }}"{% endif %} target="_blank"><img src="{{ site_url }}{% static 'publicity/icons/map-marker.svg' %}" title="{{ i.venue }}" style="height: 1em; vertical-align: middle; opacity: 0.5;"></a>
+  {% endif %}
+</div>
+{% empty %}
+<div>No upcoming events!</div>
+{% endfor %}

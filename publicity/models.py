@@ -89,19 +89,24 @@ class PublicityInfo(models.Model):
         return self.performancedate_set.filter(
             performance__gte=timezone.now()).first()
 
-class AbstractEvent(models.Model):
-    performance = models.DateTimeField(verbose_name="Time and Date")
-    note = models.CharField(max_length=120, blank=True)
+class AbstractEvent:
+    @property
+    def performance_date(self):
+        return timezone.localtime(self.performance).date()
 
     @property
     def datestr(self):
         return timezone.localtime(
             self.performance).strftime("%A, %B %-d at %-I:%M %p")
+
+class AbstractEventModel(AbstractEvent, models.Model):
+    performance = models.DateTimeField(verbose_name="Time and Date")
+    note = models.CharField(max_length=120, blank=True)
     
     class Meta:
         abstract = True
 
-class PerformanceDate(AbstractEvent):
+class PerformanceDate(AbstractEventModel):
     show = models.ForeignKey(PublicityInfo, on_delete=models.CASCADE,
                              db_index=True)
 
@@ -124,7 +129,7 @@ class PerformanceDate(AbstractEvent):
     def __str__(self):
         return self.datestr + (" ({})".format(self.note) if self.note else "")
 
-class Event(AbstractEvent):
+class Event(AbstractEventModel):
     name = models.CharField(max_length=120)
 
     venue = models.ForeignKey("dramaorg.Space", blank=True, null=True,

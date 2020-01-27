@@ -23,6 +23,7 @@ urlpatterns = [
     path('calendar/', CalendarView.as_view(), name="public_index"),
     path('calendar/<int:year>/<int:month>/', CalendarView.as_view(),
          name="calendar"),
+    path('upcoming.js', UpcomingScriptView.as_view(), name="upcoming"),
     path('season.js', SeasonScriptView.as_view(), name="season"),
     url(r'^admin/$', AdminIndexView.as_view(), name="admin"),
     url(r'^admin/', include(([

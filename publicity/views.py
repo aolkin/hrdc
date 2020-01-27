@@ -358,7 +358,7 @@ class NewsletterEditView(InitializedLoginMixin, NewsletterMixin, UpdateView):
 
 generic_calendar = calendar.Calendar()
 
-class VenueAppWrapper:
+class VenueAppWrapper(AbstractEvent):
     def __init__(self, venueapp):
         self.app = venueapp
         self.name = "{} Apps Due".format(self.app.venue)
@@ -366,9 +366,9 @@ class VenueAppWrapper:
         self.note = "[Venue Applications for the {} for the {} Season]".format(
             self.app.venue, self.app.seasonstr())
         self.venue = None
-        self.webpage = reverse("venueapp:public_index")
+        self.webpage = settings.SITE_URL + reverse("venueapp:public_index")
 
-class AuditionWrapper:
+class AuditionWrapper(AbstractEvent):
     def __init__(self, qs):
         first = qs.order_by("start").first()
         self.name = "Common Casting Auditions"
@@ -381,7 +381,7 @@ class AuditionWrapper:
             venues = venues[:-2] + [sep.join(venues[-2:])]
         self.note = "Auditions will be held in {}.".format(", ".join(venues))
         self.venue = None
-        self.webpage = reverse("casting:public_index")
+        self.webpage = settings.SITE_URL + reverse("casting:public_index")
 
 def get_events(**kwargs):
     app_kwargs = { k.replace("performance", "due") : v
@@ -406,8 +406,6 @@ class CalendarView(TemplateView):
     help_text = "view upcoming performances"
 
     def get_template_names(self):
-        if self.request.GET.get("upcoming"):
-            return "publicity/embed_upcoming.html"
         if self.request.GET.get("embed", False):
             return "publicity/embed_calendar.html"
         else:
@@ -415,7 +413,7 @@ class CalendarView(TemplateView):
 
     def get_context_data(self, **kwargs):
         now = timezone.localtime(timezone.now())
-        if self.request.GET.get("embed") or self.request.GET.get("upcoming"):
+        if self.request.GET.get("embed"):
             kwargs["BT_extra_body_class"] = "embedded"
         kwargs["embed"] = self.request.GET.get("embed", False)
         kwargs["year"] = year = self.kwargs.get("year", now.year)
@@ -434,6 +432,30 @@ class CalendarView(TemplateView):
             performance__gte=now, performance__lte=now + datetime.timedelta(
                 days=config.get_int("upcoming_performances_future_days", 14)))
         return super().get_context_data(**kwargs)
+
+
+class UpcomingScriptView(TemplateView):
+    template_name = "publicity/embed.js"
+
+    def get_context_data(self, **kwargs):
+        now = timezone.localtime(timezone.now())
+        kwargs["innerHtml"] = render_to_string(
+            "publicity/embed_upcoming.html", {
+                "upcoming": get_events(
+                    performance__gte=now,
+                    performance__lte=now +
+                    datetime.timedelta(days=config.get_int(
+                        "upcoming_performances_future_days", 14))
+                ),
+                "site_url": settings.SITE_URL,
+            }).replace("\n", "")
+        return super().get_context_data(**kwargs)
+
+    def get(self, *args, **kwargs):
+        res = super().get(*args, **kwargs)
+        res["Content-Type"] = "application/javascript"
+        res["Cache-Control"] = "no-cache"
+        return res
 
 class AdminIndexView(PermissionRequiredMixin, TemplateView):
     verbose_name = "Show Information"

@@ -82,9 +82,12 @@ performance dates supplied by PDSMs in the app.
 An embeddable version of the calendar can be found [here](https://app.hrdctheater.org/publicity/calendar/?embed=1).
 This version does not have any header or footer, just the calendar itself.
 
-When there are performances in the next couple weeks, a list of upcoming
-performances will also be displayed. An embeddable version of that list can be
-found [here](https://app.hrdctheater.org/publicity/calendar/?upcoming=1).
+When there are events in the next couple weeks, a list of upcoming
+events will also be displayed. To embed this list onto another website,
+insert this snippet:
+
+	`<script src="https://app.hrdctheater.org/publicity/upcoming.js"></script>`
+
 
 Note that, in order for the show titles in the calendar to be linked and
 clickable, the "Website page" field must be filled out for that show.
