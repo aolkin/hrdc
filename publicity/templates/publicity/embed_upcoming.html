@@ -3,7 +3,7 @@
 {% ifchanged i.performance_date %}
 <div style="text-align: right; width: 80px; margin-bottom: -0.75em; margin-top: 0.75em;"><b>{{ i.performance_date|date:"M j"|upper }}</b></div>
 {% endifchanged %}
-<div class="margin-bottom: -0.75em;">
+<div style="margin-bottom: -0.75em;">
   <b style="white-space: nowrap; width: 80px; display: inline-block; text-align: right">
     {{ i.performance|date:"f A" }}
   </b>
@@ -17,5 +17,5 @@
   {% endif %}
 </div>
 {% empty %}
-<div>No upcoming events!</div>
+<div style="text-align: center"><b><i>No upcoming events!</i></b></div>
 {% endfor %}
