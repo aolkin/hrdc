@@ -1,10 +1,10 @@
 {% load static %}
 {% for i in upcoming %}
 {% ifchanged i.performance_date %}
-<div style="text-align: right; width: 80px; margin-bottom: -0.75em; margin-top: 0.75em;"><b>{{ i.performance_date|date:"M j"|upper }}</b></div>
+<div style="text-align: right; width: 72px; margin-bottom: -0.75em; margin-top: 0.75em; margin-left: 1em;"><b>{{ i.performance_date|date:"M j"|upper }}</b></div>
 {% endifchanged %}
 <div style="margin-bottom: -0.75em;">
-  <b style="white-space: nowrap; width: 80px; display: inline-block; text-align: right">
+  <b style="white-space: nowrap; width: 72px; display: inline-block; text-align: right; margin-right: 2px;">
     {{ i.performance|date:"f A" }}
   </b>
   <a {% if i.webpage %}href="{{ i.webpage }}"{% endif %}
