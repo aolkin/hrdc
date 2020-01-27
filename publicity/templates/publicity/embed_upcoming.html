@@ -1,9 +1,9 @@
 {% load static %}
 {% for i in upcoming %}
 {% ifchanged i.performance_date %}
-<div style="margin-bottom: -0.75em; margin-top: 0.75em; margin-left: 1em; text-decoration: underline;"><b>{{ i.performance_date|date:"M j"|upper }}</b></div>
+<div style="height: 1.25em; margin-top: 0.75em; margin-left: 1em; text-decoration: underline;"><b>{{ i.performance_date|date:"M j"|upper }}</b></div>
 {% endifchanged %}
-<div style="margin-bottom: -0.75em;">
+<div style="height: 1.25em">
   <b style="white-space: nowrap; width: 72px; display: inline-block; text-align: right; margin-right: 2px;">
     {{ i.performance|date:"f A" }}
   </b>
