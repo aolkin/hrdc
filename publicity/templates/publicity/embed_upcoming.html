@@ -3,7 +3,7 @@
 {% block body %}
 <ul class="list-group">
   {% for i in upcoming %}
-  <li class="list-group-item">
+  <li>
     <a {% if i.webpage %}href="{{ i.webpage }}"{% endif %}
        target="_blank">{{ i.name }}</a>
     {% if i.note %}
@@ -16,8 +16,11 @@
 	 title="{{ i.venue }}" data-toggle="tooltip"></i>
     </a>
     {% endif %}
-    <span class="pull-right">
-      {{ i.performance|date:"M j @ f A" }}
+    <span style="white-space: nowrap">
+      {{ i.performance|date:"M j" }}
+    </span>
+    <span style="white-space: nowrap">
+      {{ i.performance|date:"@ f A" }}
     </span>
   </li>
   {% empty %}
