@@ -47,7 +47,8 @@ SESSION_TOKEN_KEY = "_CAPTURED_LOGIN_TOKEN"
 
 def capture_token(request, token):
     request.session[SESSION_TOKEN_KEY] = token
-    return HttpResponseRedirect(reverse("dramaorg:password_token"))
+    return HttpResponseRedirect(reverse("dramaorg:password_token") +
+                                "?" + request.META["QUERY_STRING"])
 
 class TokenView(FormView):
     form_class = SetPasswordForm

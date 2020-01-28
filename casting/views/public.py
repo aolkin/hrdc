@@ -278,7 +278,8 @@ def actor_token_auth(request, token):
     except Exception:
         messages.error(request, "Please request a new signing link.")
     finally:
-        return HttpResponseRedirect(reverse("casting:signing"))
+        return HttpResponseRedirect(reverse("casting:signing") +
+                                    "?" + request.META["QUERY_STRING"])
 
 def actor_token_logout(request):
     try:

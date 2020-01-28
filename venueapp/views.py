@@ -624,7 +624,10 @@ class SignOnView(MembershipMixin, UnsubmittedAppMixin, View):
         staff.save()
         messages.success(request, "Signed on to {}.".format(
                 self.get_object()))
-        return redirect("venueapp:individual", self.get_object().pk, staff.pk)
+        return redirect(
+            reverse_lazy("venueapp:individual",
+                         args=(self.get_object().pk, staff.pk)) +
+            "?" + request.META["QUERY_STRING"])
 
 class SignOffView(MembershipMixin, UnsubmittedAppMixin, View):
     def get(self, request, *args, **kwargs):
@@ -633,7 +636,8 @@ class SignOffView(MembershipMixin, UnsubmittedAppMixin, View):
         staff.save()
         messages.success(request, "Left application for {}.".format(
                 self.get_object()))
-        return redirect("venueapp:public_index")
+        return redirect(reverse_lazy("venueapp:public_index") +
+                        "?" + request.META["QUERY_STRING"])
 
 def make_cover_page(app):
         cover = OrderedDict()
