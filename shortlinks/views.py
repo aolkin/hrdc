@@ -7,11 +7,17 @@ from django.conf import settings
 
 from dramaorg.mixins import UserIsPdsmMixin
 
+from config import config
+
 from .models import Link
 
 def link(request, slug):
     l = get_object_or_404(Link, url=slug)
-    return redirect(l.destination)
+    if config.add_utm_to_shortlinks == "yes":
+        sep = "&" if "?" in l.destination else "?"
+        return redirect(l.destination + sep + "utm_medium=referral&utm_source=shortlink")
+    else:
+        return redirect(l.destination)
 
 LinkFormSet = forms.inlineformset_factory(
     get_user_model(), Link, fields=("url", "destination"),
