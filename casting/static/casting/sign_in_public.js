@@ -34,8 +34,7 @@ $(function(){
 	    CODES[error.POSITION_UNAVAILABLE] = "POSITION_UNAVAILABLE";
 	    gtag('event', "location_error", {
 		'event_category': "casting",
-		'event_label': "Location Error",
-		'value': CODES[error.code],
+		'event_label': CODES[error.code],
 	    });
 	}
     }
