@@ -366,7 +366,9 @@ class VenueAppWrapper(AbstractEvent):
         self.note = "[Venue Applications for the {} for the {} Season]".format(
             self.app.venue, self.app.seasonstr())
         self.venue = None
-        self.webpage = settings.SITE_URL + reverse("venueapp:public_index")
+        self.webpage = (settings.SITE_URL + reverse("venueapp:public_index") +
+                        "?utm_medium=referral&utm_source=Calendar"
+                        "&utm_campaign=venueapp")
 
 class AuditionWrapper(AbstractEvent):
     def __init__(self, qs):
@@ -381,7 +383,9 @@ class AuditionWrapper(AbstractEvent):
             venues = venues[:-2] + [sep.join(venues[-2:])]
         self.note = "Auditions will be held in {}.".format(", ".join(venues))
         self.venue = None
-        self.webpage = settings.SITE_URL + reverse("casting:public_index")
+        self.webpage = (settings.SITE_URL + reverse("casting:public_index") +
+                        "?utm_medium=referral&utm_source=Calendar"
+                        "&utm_campaign=casting")
 
 def get_events(**kwargs):
     app_kwargs = { k.replace("performance", "due") : v
