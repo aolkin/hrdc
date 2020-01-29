@@ -313,4 +313,10 @@ $(function() {
 $(document.body).on("click", "a.ajaxify", function(e){
     e.preventDefault();
     $.get($(this).attr("href"));
+    if (window.gtag) {
+	gtag('event', "change_audition_status", {
+	    'event_category': "casting",
+	    'event_label': $(this).text(),
+	});
+    }
 });
