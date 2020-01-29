@@ -32,6 +32,18 @@ class StaffViewMixin:
             "active": current_url == "index"
         }]
         
+        if (self.request.user.is_season_pdsm or self.request.user.has_perm(
+                "casting.table_auditions")) and get_current_slots().exists():
+            submenu = menu["Sign-in Tabling"] = []
+            for pk, name in (get_current_slots().distinct()
+                            .values_list("space__building__pk",
+                                         "space__building__name")):
+                is_active = hasattr(self, "object") and self.object.pk == pk
+                submenu.append({
+                    "name": name,
+                    "url": reverse("casting:tabling", args=(pk,)),
+                    "active": is_active and current_url == "tabling"
+                })
         for show in [i.casting_meta for i in
                      self.request.user.show_set.all().order_by("-pk")
                      if hasattr(i, "casting_meta")]:
