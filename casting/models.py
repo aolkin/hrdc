@@ -18,7 +18,7 @@ from config import config
 
 from dramaorg.models import Season
 
-class CastingReleaseMeta(models.Model):
+class CastingReleaseMeta(Season):
     publish_callbacks = models.DateTimeField(null=True, blank=True)
     publish_first_round_casts = models.DateTimeField(null=True, blank=True)
     publish_casts = models.DateTimeField(null=True, blank=True)
@@ -71,25 +71,7 @@ class CastingReleaseMeta(models.Model):
             return None
     
     def __str__(self):
-        n = self.castingmeta_set.count()
-        if n > 0:
-            show = self.association
-            if n > 1:
-                season = ""
-                for i in self.castingmeta_set.prefetch_related("show").all():
-                    if season and i.show.seasonstr() != season:
-                        return "({} associated with multiple seasons)".format(
-                            self._meta.verbose_name)
-                    else:
-                        season = i.show.seasonstr()
-                return season
-            else:
-                return show.title
-        else:
-            if self.id:
-                return "(Unassociated {})".format(self._meta.verbose_name)
-            else:
-                return "(New {})".format(self._meta.verbose_name)
+        return self.seasonstr()
             
     def clean(self):
         if (self.publish_callbacks and

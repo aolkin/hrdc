@@ -140,6 +140,9 @@ the option to sign regardless of first-round actors.
 class CastingReleaseAdmin(admin.ModelAdmin):
     form = CastingReleaseForm
     fieldsets = (
+        ("", {
+            "fields": (("season", "year",),),
+        }),
         ("Casting Release Status", {
             "fields": ("associated_with", "stage", "prevent_advancement",
                        "disable_signing")
@@ -194,7 +197,25 @@ class CastingReleaseAdmin(admin.ModelAdmin):
         self.message_user(request, "%s settings object(s) deleted." % n)
 
     def associated_with(self, obj):
-        return str(obj)
+        n = obj.castingmeta_set.count()
+        if n > 0:
+            show = obj.association
+            if n > 1:
+                season = ""
+                for i in obj.castingmeta_set.prefetch_related("show").all():
+                    if season and i.show.seasonstr() != season:
+                        return "({} associated with multiple seasons)".format(
+                            obj._meta.verbose_name)
+                    else:
+                        season = i.show.seasonstr()
+                return season
+            else:
+                return show.title
+        else:
+            if obj.id:
+                return "(Unassociated {})".format(obj._meta.verbose_name)
+            else:
+                return "(New {})".format(obj._meta.verbose_name)
     
     def has_delete_permission(self, request, obj=None):
         if obj:
