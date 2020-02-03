@@ -10,28 +10,28 @@
 {% include "dramaorg/user_dropdown.html" %}
 
 <h2 class="display-3 text-center">Welcome to {% setting "BT_SITE_TITLE" %}</h2>
-<h3 class="text-center text-uppercase">Online tools for the HRDC</h3>
 
 <div class="row justify-content-center">
-  <div class="col-md-8">
-    <p class="lead text-center mt-3">
+  <div class="col-md-6">
+    <!--<p class="lead text-center mt-3">
       Access different management portals for shows you are an executive staff
       member on below, as well as public applications accessible even if
       you are not on the staff of any shows.
-    </p>
+    </p>-->
     <p class="text-center mb-0">
-      If you need to update your profile or contact information, please do so
+      If you need to update your profile, including public display name,
+      contact information, or newsletter subscription, please do so
       <a class="" href="{% url 'dramaorg:profile' %}">here</a>.
     </p>
   </div>
 </div>
 
-<div class="row justify-content-around">
+<div class="row justify-content-around mt-5">
   <div class="col-md-5">
     {% if public_indexes %}
-    <h3 class="text-center mt-5">
+    <!--<h3 class="text-center mt-4">
       Public Content
-    </h3>
+    </h3>-->
     {% for index in public_indexes %}
     <a href="{{ index.0 }}" class="list-group-item list-group-item-action">
       <div class="d-flex w-100 justify-content-between">
@@ -46,9 +46,9 @@
   </div>
   <div class="col-md-5">
     {% if staff_indexes %}
-    <h3 class="text-center mt-5">
+    <!--<h3 class="text-center mt-4">
       Manage your Shows
-    </h3>
+    </h3>-->
     {% if request.user.is_anonymous %}
     <p class="lead text-center">
       To access shows you are an executive staff member on, please
@@ -79,7 +79,7 @@
   </div>
   {% if user.is_staff %}
   <div class="col-md-5">
-    <h3 class="text-center mt-5">
+    <h3 class="text-center mt-4">
       Administrative Tools
     </h3>
     {% for index in admin_indexes %}
