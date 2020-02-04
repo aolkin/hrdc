@@ -430,6 +430,9 @@ class Character(AssociateShowMixin):
     def __str__(self):
         return self.name if self.name else "<Unnamed Character>"
 
+    class Meta:
+        ordering = "pk",
+
 class ActorMapping(models.Model):
     character = models.ForeignKey(Character, on_delete=models.CASCADE)
     actor = models.ForeignKey(get_user_model(), null=True,
