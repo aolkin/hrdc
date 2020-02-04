@@ -9,7 +9,10 @@
 {% block content %}
 {% include "dramaorg/user_dropdown.html" %}
 
-<h2 class="display-3 text-center">Welcome to {% setting "BT_SITE_TITLE" %}</h2>
+<h2 class="display-3 text-center">
+  <span class="d-none d-sm-inline">Welcome to</span>
+  {% setting "BT_SITE_TITLE" %}
+</h2>
 
 <div class="row justify-content-center">
   <div class="col-md-6">
