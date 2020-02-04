@@ -298,6 +298,15 @@ above. Once cast lists are released, they replace callbacks on the public site.
 
 ![Cast List Input](images/17.png)
 
+## Callback and Cast List Mistakes
+
+While the admin interface does not provide a way to directly fix mistakes in
+callback or cast lists, it does allow undoing the team's submission of said
+list, allowing the team to go back in and fix the mistake themselves. To do so,
+simply go to the show in the Common Casting admin and unchecked the appropriate
+box under "Submitted Lists". The team will then be able to continue editing
+and submit again when they have fixed their mistake.
+
 # Actors' Interface
 
 ## Casting
