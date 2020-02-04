@@ -31,7 +31,7 @@ def href(context, url, text, *args, **kwargs):
     sep = "&" if "?" in url else "?"
     url += sep + "utm_medium=email&utm_source=MyHRDC&utm_campaign="
     url += urllib.parse.quote_plus(" ".join(context["MESSAGE"].tags))
-    url += "&utm_term=" + urllib.parse.quote_plus(text)
+    url += "&utm_term=" + urllib.parse.quote_plus(str(text))
     args = " ".join(['{}={}'.format(i, j) for i, j in kwargs.items()])
     return { "url": settings.SITE_URL + url,
              "text": text,
