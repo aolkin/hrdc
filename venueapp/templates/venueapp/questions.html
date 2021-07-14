@@ -44,7 +44,7 @@
 	{% endifchanged %}
 	<div class="question row justify-content-center">
 	  <div class="col-md-8">
-	    <label class="mt-1">{{ form.instance.question.question }}</label>
+	    <label class="mt-1">{{ form.instance.question.question|urlize|linebreaksbr }}</label>
 	    {{ form|crispy }}
 	    {% if form.non_field_errors %}
 	    <div class="alert alert-danger">{{ form.non_field_errors }}</div>

@@ -29,7 +29,7 @@
 	    {{ venue.venue }}
 	    <span class="font-weight-normal">({{ venue.dow }})</span>
 	    <div class="font-weight-normal text-muted">
-	      {{ venue.residency_instr }}
+	      {{ venue.residency_instr|urlize|linebreaksbr }}
 	    </div>
 	  </th>
 	  {% endfor %}

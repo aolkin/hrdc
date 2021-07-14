@@ -42,7 +42,7 @@
 	   id="budget-tab-{{ form.instance.venue.id }}">
 	{% endif %}
 	{% if form.instance.venue.budget_instr %}
-	<p class="alert alert-light">{{ form.instance.venue.budget_instr }}</p>
+	<p class="alert alert-light">{{ form.instance.venue.budget_instr|urlize|linebreaksbr }}</p>
 	{% endif %}
 	{% endifchanged %}
 	{% ifchanged form.instance.category %}
