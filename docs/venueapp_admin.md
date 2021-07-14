@@ -143,6 +143,11 @@ In order to remove a staff role from the dropdown, simply check the "Archived"
 checkbox, rather than trying to delete the role. This will prevent the role
 from being displayed or selected on staff lists.
 
+In general, when you need to make a change to a role, it is better to archive
+the old one and create a new one, as existing applications referencing that
+role will not update correctly. By creating a new one and archiving the old
+one, new staff members added to any application will use the new role instance.
+
 ### "Other" Staff Roles
 
 "Other" staff roles are also special, in that they allow production teams to
