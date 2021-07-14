@@ -1,6 +1,6 @@
 {% extends "archive/base.html" %}
 
-{% load bt crispy_forms_tags %}
+{% load i18n bt crispy_forms_tags %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -89,7 +89,7 @@
 </div>
 <div class="row justify-content-center mt-2 px-5">
   <div class="col">
-    <h4>Production Photos</h4>
+    <h4>{% trans "Production Photos" %}</h4>
     <div class="row justify-content-start">
       {% for photo in object.productionphoto_set.all %}
       <div class="col-md-3 col-sm-6 col-xs-1 pb-2 px-1">
@@ -108,7 +108,7 @@
 </div>
 <div class="row justify-content-center mt-3 px-5">
   <div class="col">
-    <h4>Uploaded Files</h4>
+    <h4>{% trans "Additional Materials" %}</h4>
     {% for file in object.extrafile_set.all %}
     <div>
       {{ file.description }} by {{ file.credit }}:

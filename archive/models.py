@@ -3,6 +3,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 
 from django_thumbs.fields import ImageThumbsField
 
@@ -54,8 +55,10 @@ class ExtraFile(models.Model):
             instance.show.show.slug, filename)
 
     show = models.ForeignKey(ArchivalInfo, on_delete=models.PROTECT)
-    credit = models.CharField(max_length=120)
-    description = models.CharField(max_length=240)
+    credit = models.CharField(max_length=120,
+                              verbose_name=_("File Credit"))
+    description = models.CharField(max_length=240,
+                                   verbose_name=_("File Description"))
     file = models.FileField(upload_to=upload_destination)
 
     def __str__(self):
@@ -63,6 +66,10 @@ class ExtraFile(models.Model):
 
     def filename(self):
         return os.path.basename(self.file.name)
+
+    class Meta:
+        verbose_name = _("Additional Material")
+        verbose_name_plural = _("Additional Materials")
 
 class ProductionPhoto(models.Model):
     def upload_destination(instance, filename):
@@ -76,8 +83,10 @@ class ProductionPhoto(models.Model):
     )
 
     show = models.ForeignKey(ArchivalInfo, on_delete=models.PROTECT)
-    credit = models.CharField(max_length=120)
-    allow_in_publicity = models.BooleanField(default=False)
+    credit = models.CharField(max_length=120, verbose_name=_("Photo Credit"))
+    allow_in_publicity = models.BooleanField(
+        default=False,
+        help_text=_("Allow this image or images to be used in HRDC publicity materials, such as the weekly newsletter"))
 
     height = models.PositiveIntegerField()
     width = models.PositiveIntegerField()
@@ -89,3 +98,7 @@ class ProductionPhoto(models.Model):
 
     def filename(self):
         return os.path.basename(self.img.name)
+
+    class Meta:
+        verbose_name = _("Production Photo")
+        verbose_name_plural = _("Production Photos")

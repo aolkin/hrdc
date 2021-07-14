@@ -7,6 +7,7 @@ from django.db.models.signals import post_save, pre_save, post_init
 from django.contrib.auth.signals import user_logged_in
 from django.dispatch import receiver
 from django.utils.text import slugify
+from django.utils.translation import gettext_lazy as _
 
 from django.core.exceptions import ValidationError
 
@@ -42,22 +43,22 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     first_name = models.CharField(max_length=80, db_index=True)
     last_name = models.CharField(max_length=80, db_index=True)
     email = models.CharField(max_length=254, unique=True, db_index=True)
-    phone = models.CharField(max_length=20, verbose_name="Phone Number")
+    phone = models.CharField(max_length=20, verbose_name=_("Phone Number"))
     year = models.PositiveSmallIntegerField(null=True, blank=True,
-                                            verbose_name="Graduation Year")
+                                            verbose_name=_("Graduation Year"))
     affiliation = models.CharField(max_length=160,
-                                   verbose_name="School or Affiliation")
+                                   verbose_name=_("School or Affiliation"))
     display_affiliation = models.BooleanField(
         default=False,
-        help_text="Display your affiliation with your name?")
+        help_text=_("Display your affiliation with your name?"))
     pgps = models.CharField(max_length=20, blank=True,
-                            verbose_name="Preferred Gender Pronouns")
+                            verbose_name=_("Preferred Gender Pronouns"))
     gender_pref = models.CharField(max_length=30, blank=True,
-                                   verbose_name="Preferred Stage Gender")
+                                   verbose_name=_("Preferred Stage Gender"))
 
     subscribed = models.BooleanField(
-        default=True, verbose_name="Subscribe to the Newsletter",
-        help_text="Uncheck this to unsubscribe.")
+        default=True, verbose_name=_("Subscribe to the Newsletter"),
+        help_text=_("Uncheck this to unsubscribe."))
 
     suspended_until = models.DateField(null=True, blank=True)
 
@@ -326,23 +327,27 @@ class ShowManager(SeasonManager):
 
 class Show(Season):
     TYPES = (
-        ("play", "Play"),
-        ("musical", "Musical or Opera"),
-        ("dance", "Dance Performance"),
-        ("devised", "Devised Piece"),
-        ("workshop", "Workshop"),
-        ("other", "Other"),
+        ("play", _("Play")),
+        ("musical", _("Musical or Opera")),
+        ("dance", _("Dance Performance")),
+        ("devised", _("Devised Piece")),
+        ("workshop", _("Workshop")),
+        ("other", _("Other")),
     )
 
     title = models.CharField(max_length=150)
 
     creator_credit = models.CharField(max_length=300,
-                                      verbose_name="Author/Composer")
+                                      # Translators: site-wide show metadata
+                                      verbose_name=_("Author/Composer"))
     affiliation = models.CharField(
-        max_length=60, blank=True, verbose_name="Sponsorship/Affiliation",
-        help_text="Producing or sponsoring group, if applicable.")
+        # Translators: this is used for the site-wide show metadata field
+        max_length=60, blank=True, verbose_name=_("Sponsorship/Affiliation"),
+        # Translators: this is used for the site-wide show metadata field
+        help_text=_("Producing or sponsoring group, if applicable."))
     prod_type = models.CharField(default="play", choices=TYPES, max_length=30,
-                                 verbose_name="Production Type")
+        # Translators: this is used for the site-wide show metadata field
+                                 verbose_name=_("Production Type"))
     
     staff = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
     space = models.ForeignKey(Space, null=True, on_delete=models.SET_NULL,

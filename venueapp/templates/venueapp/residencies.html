@@ -1,19 +1,20 @@
 {% extends "venueapp/base.html" %}
 
-{% load bt crispy_forms_tags %}
+{% load i18n bt crispy_forms_tags %}
 
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-md-8">
     {% if request.method == "POST" %}
     <div class="alert alert-secondary font-weight-bold text-center">
-      Please check the above messages to verify your preferences are correct!
+      {% comment %}Translators: For venueapp residency preferences.{% endcomment %}
+      {% trans "Please check the above messages to verify your preferences are correct!" %}
     </div>
     {% endif %}
     <h3 class="text-center">Preferred Residencies for {{ object }}</h3>
     {% include "venueapp/pieces/addremove_venues.html" %}
     <p class="mt-3 text-center">
-      Rank your preferred residencies below starting with 1 being your top priority. For venues without specific dates listed for each slot, you may enter the same preference for multiple slots to denote multi-week residencies. Elaborate on your length preferences at the bottom of the page.
+      {% trans "Rank your preferred residencies below starting with 1 being your top priority. For venues without specific dates listed for each slot, you may enter the same preference for multiple slots to denote multi-week residencies. Elaborate on your length preferences at the bottom of the page." %}
     </p>
   </div>
 </div>

@@ -1,4 +1,4 @@
-{% load bt static %}
+{% load i18n bt static %}
 <html>
   <head>
     {% _bt_style "https://stackpath.bootstrapcdn.com/bootstrap/{}/css/bootstrap.min.css" "bootstrap" %}
@@ -80,8 +80,9 @@
       <footer>
 	<hr>
 	<div>
-	  &copy;2019 Harvard-Radcliffe Dramatic Club |
-	  <a href="https://hrdctheater.org">hrdctheater.org</a>
+	  &copy;{% now "Y" %} {% setting "BT_FOOTER_OWNER" %}
+	  {% if BT_footer_site %}| <a href="{{ BT_footer_site }}">
+	    {{ BT_footer_site|cut:"http://"|cut:"https://" }}</a>{% endif %}
 	</div>
       </footer>
     </div>

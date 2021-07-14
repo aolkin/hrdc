@@ -1,6 +1,6 @@
 {% extends "venueapp/base.html" %}
 
-{% load bt %}
+{% load i18n bt %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -19,7 +19,7 @@
     {% endif %}
     {% if old.exists %}
     <div class="text-center mb-4">
-      The following venues do not use this application system. Please click
+      The following venues do not use this application system. Please use
       the button{{ old.count|pluralize }} for more information
       and to access the application{{old.count|pluralize }}:
       {% for app in old %}

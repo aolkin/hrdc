@@ -7,6 +7,8 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django.conf import settings
 from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import pgettext
 
 import os.path
 
@@ -98,19 +100,25 @@ class Application(models.Model):
     show = models.OneToOneField(Show, on_delete=models.PROTECT)
     venues = models.ManyToManyField(VenueApp)
     band_size = models.CharField(max_length=80,
-                                 verbose_name="Band/Orchestra Size")
-    cast_breakdown = models.CharField(max_length=80,
-                                      verbose_name="Cast Gender Breakdown")
+                                 verbose_name=_("Band/Orchestra Size"))
+    cast_breakdown = models.CharField(
+        # Translators: The name of the cast breakdown field
+        max_length=80, verbose_name=_("Cast Gender Breakdown"),
+        # Translators: The description below the cast breakdown field
+        help_text=_("Intended gender preferences for your cast"))
     script = models.FileField(
         upload_to=upload_destination,
-        blank=True, help_text="Only include for original or unknown works.",
+        verbose_name=_("Script"),
+        # Translators: The description below the script upload button for
+        # venue applications
+        blank=True, help_text=_("Only include for original or unknown works."),
         validators=[FileExtensionValidator(allowed_extensions=['pdf'])])
 
     created = models.DateTimeField(auto_now_add=True)
 
     submitted = models.DateTimeField(null=True)
 
-    length_description = models.TextField(help_text="Please elaborate on your preferences for residency length, if necessary.", verbose_name="Residency Length Preferences", blank=True)
+    length_description = models.TextField(verbose_name=_("Residency Length Preferences"), help_text=_("Please elaborate on your preferences for residency length, if necessary."), blank=True)
 
     @property
     def due(self):
@@ -201,7 +209,7 @@ class SeasonStaffMeta(Season):
     resume = models.FileField(
         upload_to=upload_destination,
         validators=[FileExtensionValidator(allowed_extensions=['pdf'])])
-    conflicts = models.TextField(help_text="Big-picture conflicts for the upcoming season, such as other leadership positions or involvements.")
+    conflicts = models.TextField(help_text=_("Big-picture conflicts for the upcoming season, such as other leadership positions or involvements."))
 
     objects = SeasonManager()
 
@@ -218,8 +226,10 @@ class RoleManager(models.Manager):
 
 class StaffRole(models.Model):
     CATEGORIES = (
-        (5, "Author"),
-        (10, "Executive"),
+        # Translators: the staff category name
+        (5, _("Author")),
+        # Translators: the staff category name with special privileges
+        (10, _("Executive")),
         (20, "Designer"),
         (30, "Technician"),
         (40, "Assistant"),
@@ -354,10 +364,10 @@ class RoleAnswer(AbstractAnswer):
 
 class AbstractBudgetLine(models.Model):
     BUDGET_CATEGORIES = (
-        (0, "Income"),
-        (10, "Administrative Expenses"),
-        (20, "Production Expenses"),
-        (50, "Other Expenses"),
+        (0, _("Income")),
+        (10, _("Administrative Expenses")),
+        (20, _("Production Expenses")),
+        (50, _("Other Expenses")),
     )
 
     venue = models.ForeignKey(VenueApp, on_delete=models.CASCADE, db_index=True)

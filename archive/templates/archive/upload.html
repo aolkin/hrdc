@@ -1,6 +1,6 @@
 {% extends "archive/base.html" %}
 
-{% load bt crispy_forms_tags %}
+{% load i18n bt crispy_forms_tags %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -11,7 +11,7 @@
 <div class="row justify-content-center">
   <form method="POST" class="col-md-8" enctype="multipart/form-data">
     {% csrf_token %}
-    <h4>Upload Production Photos</h4>
+    <h4>Upload {% trans "Production Photos" %}</h4>
     <div class="form-group mt-3">
       <div class="custom-file">
 	<input type="file" class="custom-file-input"
@@ -24,7 +24,7 @@
       </small>
     </div>
     <div class="form-group">
-      <label for="photo-credit">Photo Credit</label>
+      <label for="photo-credit">{% trans "Photo Credit" %}</label>
       <input class="form-control" id="photo-credit" name="photo-credit"
 	     required placeholder="John Harvard '20" maxlength="100">
       <small class="form-text text-muted">
@@ -36,8 +36,7 @@
       <input type="checkbox" class="form-check-input" checked
 	     id="allow_in_publicity" name="allow_in_publicity">
       <label class="form-check-label" for="allow_in_publicity">
-	Allow these images to be used in HRDC publicity materials,
-	such as the weekly newsletter
+	{% trans "Allow this image or images to be used in HRDC publicity materials, such as the weekly newsletter" %}
       </label>
     </div>
     <button type="submit" class="btn btn-primary btn-block btn-lg">
@@ -47,7 +46,7 @@
 
   <form method="POST" class="col-md-8" enctype="multipart/form-data">
     {% csrf_token %}
-    <h4 class="mt-5">Upload Additional Materials</h4>
+    <h4 class="mt-5">Upload {% trans "Additional Materials" %}</h4>
     <div class="form-group mt-3">
       <label>Upload extra files to archive (designs, sketches, etc)...</label>
       <div class="custom-file">
@@ -61,15 +60,16 @@
       </small>
     </div>
     <div class="form-group">
-      <label for="file-credit">File Credit</label>
+      <label for="file-credit">{% trans "File Credit" %}</label>
       <input class="form-control" id="file-credit" name="file-credit"
 	     required placeholder="John Harvard '20" maxlength="100">
     </div>
     <div class="form-group">
-      <label for="file-desc">File Description</label>
+      <label for="file-desc">{% trans "File Description" %}</label>
       <input class="form-control" id="file-desc" name="file-desc"
 	     required maxlength="200"
-	     placeholder="Scenic sketch, light plot, Facebook cover photo, etc">
+	     {% comment %}Translators: For archival, the example additional materials to upload.{% endcomment %}
+	     placeholder="{% trans "Scenic sketch, light plot, Facebook cover photo, etc" %}">
       <small class="form-text text-muted">
 	Please submit this form separately for files with different
 	descriptions.

@@ -1,6 +1,6 @@
 {% extends "venueapp/base.html" %}
 
-{% load bt crispy_forms_tags %}
+{% load i18n bt crispy_forms_tags %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -40,14 +40,14 @@
 
     {% if staff.role.statement_length %}
     <h5 class="mt-3">
-      Please include a statement (up to {{ staff.role.statement_length }} words)
+      {% trans "Please include a statement" %} (up to {{ staff.role.statement_length }} words)
     </h5>
     {{ supplement.statement|as_crispy_field }}
     <span class="text-danger">{{ supplement.statement.errors }}</span>
     {% endif %}    
     {% if staff.role.accepts_attachment %}
     <h5 class="mt-3">
-      Please attach a design plan, statement, or other PDF document.
+      {% trans "Please attach a design plan, statement, or other PDF document." %}
     </h5>
     {{ supplement.attachment|as_crispy_field }}
     <span class="text-danger">{{ supplement.attachment.errors }}</span>
