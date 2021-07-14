@@ -237,7 +237,6 @@ class NewApplication(ApplicationFormMixin, MenuMixin, InitializedLoginMixin,
 
 class UpdateApplication(ApplicationFormMixin, MenuMixin, UserStaffMixin,
                         UnsubmittedAppMixin, DetailView):
-
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         show_form, app_form, venue_form = self.get_forms()
