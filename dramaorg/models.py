@@ -4,6 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.db.models.functions import Concat
 from django.db.models.signals import post_save, pre_save, post_init
+from django.contrib.postgres.fields import CIEmailField
 from django.contrib.auth.signals import user_logged_in
 from django.dispatch import receiver
 from django.utils.text import slugify
@@ -42,7 +43,7 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 
     first_name = models.CharField(max_length=80, db_index=True)
     last_name = models.CharField(max_length=80, db_index=True)
-    email = models.CharField(max_length=254, unique=True, db_index=True)
+    email = CIEmailField(unique=True, db_index=True)
     phone = models.CharField(max_length=20, verbose_name=_("Phone Number"))
     year = models.PositiveSmallIntegerField(null=True, blank=True,
                                             verbose_name=_("Graduation Year"))
