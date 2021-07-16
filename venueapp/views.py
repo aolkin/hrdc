@@ -15,6 +15,7 @@ from django.db.models import Q
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponse
 from django.utils import timezone
+from django.utils.translation import gettext as _
 
 from emailtracker.tools import render_for_user, render_to_queue
 
@@ -282,8 +283,16 @@ class StaffMemberForm(forms.ModelForm):
         model = StaffMember
         fields = "role", "other_role"
 
+class StaffMemberFormSet(forms.BaseInlineFormSet):
+    def clean(self):
+        if any(self.errors):
+            return
+        if not any([i.cleaned_data["role"].category == 10 for i in self.forms]):
+            raise forms.ValidationError(_("Unable to save changes, your application must have at least one executive staff member!"))
+
 StaffFormSet = forms.inlineformset_factory(
     Application, StaffMember, form=StaffMemberForm,
+    formset=StaffMemberFormSet,
     fields=("role", "other_role"), extra=0,
 )
 

@@ -18,6 +18,9 @@
     </p>
     {% csrf_token %}
     {{ form.management_form }}
+    {% for error in form.non_form_errors %}
+    <div class="alert alert-danger">{{ error }}</div>
+    {% endfor %}
     {% for form in form %}
     <div class="staff-form">
       <div class="row">
