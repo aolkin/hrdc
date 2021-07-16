@@ -21,7 +21,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-14 02:16-0400\n"
+"POT-Creation-Date: 2021-07-16 02:39-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -71,84 +71,84 @@ msgstr ""
 msgid "Scenic sketch, light plot, Facebook cover photo, etc"
 msgstr ""
 
-#: dramaorg/models.py:46
+#: dramaorg/models.py:47
 msgid "Phone Number"
 msgstr ""
 
-#: dramaorg/models.py:48
+#: dramaorg/models.py:49
 msgid "Graduation Year"
 msgstr ""
 
-#: dramaorg/models.py:50
+#: dramaorg/models.py:51
 msgid "School or Affiliation"
 msgstr ""
 
-#: dramaorg/models.py:53
+#: dramaorg/models.py:54
 msgid "Display your affiliation with your name?"
 msgstr ""
 
-#: dramaorg/models.py:55
+#: dramaorg/models.py:56
 msgid "Preferred Gender Pronouns"
 msgstr ""
 
-#: dramaorg/models.py:57
+#: dramaorg/models.py:58
 msgid "Preferred Stage Gender"
 msgstr ""
 
-#: dramaorg/models.py:60
+#: dramaorg/models.py:61
 msgid "Subscribe to the Newsletter"
 msgstr ""
 
-#: dramaorg/models.py:61
+#: dramaorg/models.py:62
 msgid "Uncheck this to unsubscribe."
 msgstr ""
 
-#: dramaorg/models.py:330
+#: dramaorg/models.py:331
 msgid "Play"
 msgstr ""
 
-#: dramaorg/models.py:331
+#: dramaorg/models.py:332
 msgid "Musical or Opera"
 msgstr ""
 
-#: dramaorg/models.py:332
+#: dramaorg/models.py:333
 msgid "Dance Performance"
 msgstr ""
 
-#: dramaorg/models.py:333
+#: dramaorg/models.py:334
 msgid "Devised Piece"
 msgstr ""
 
-#: dramaorg/models.py:334
+#: dramaorg/models.py:335
 msgid "Workshop"
 msgstr ""
 
-#: dramaorg/models.py:335
+#: dramaorg/models.py:336
 msgid "Other"
 msgstr ""
 
 #. Translators: site-wide show metadata
-#: dramaorg/models.py:342
+#: dramaorg/models.py:343
 msgid "Author/Composer"
 msgstr ""
 
 #. Translators: this is used for the site-wide show metadata field
-#: dramaorg/models.py:345
+#: dramaorg/models.py:346
 msgid "Sponsorship/Affiliation"
 msgstr ""
 
 #. Translators: this is used for the site-wide show metadata field
-#: dramaorg/models.py:347
+#: dramaorg/models.py:348
 msgid "Producing or sponsoring group, if applicable."
 msgstr ""
 
 #. Translators: this is used for the site-wide show metadata field
-#: dramaorg/models.py:350
+#: dramaorg/models.py:351
 msgid "Production Type"
 msgstr ""
 
 #. Translators: The message displayed below the Google login button
-#: dramaorg/templates/dramaauth/social_login.html:8
+#: dramaorg/templates/dramaauth/social_login.html:9
 msgid "Please use your school or organization account."
 msgstr ""
 
@@ -271,4 +271,10 @@ msgid ""
 "priority. For venues without specific dates listed for each slot, you may "
 "enter the same preference for multiple slots to denote multi-week "
 "residencies. Elaborate on your length preferences at the bottom of the page."
+msgstr ""
+
+#: venueapp/views.py:291
+msgid ""
+"Unable to save changes, your application must have at least one executive "
+"staff member!"
 msgstr ""
