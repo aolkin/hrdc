@@ -2,15 +2,15 @@
 
 {% load i18n bt crispy_forms_tags %}
 
-{% block title %}Emailer{% endblock %}
+{% block title %}{% trans "Mail Merge" %}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-md-8">
     {% if not target %}
-    <h3>Select an Email Target</h3>
+    <h3>Select a {% trans "Mail Merge" %} Target</h3>
     {% else %}
-    <h3>Send Email to {{ target.verbose_name }}</h3>
+    <h3>Send {% trans "Mail Merge" %} to {{ target.verbose_name }}</h3>
     {% endif %}
     {% if emails %}
     <h4 class="text-center mt-3">Preview Emails to be Sent</h4>

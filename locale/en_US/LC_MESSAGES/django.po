@@ -21,7 +21,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-16 02:39-0400\n"
+"POT-Creation-Date: 2021-07-17 17:26-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -164,6 +164,12 @@ msgstr ""
 msgid "Administrative Staff"
 msgstr ""
 
+#: emailtracker/templates/emailtracker/emailer.html:5
+#: emailtracker/templates/emailtracker/emailer.html:11
+#: emailtracker/templates/emailtracker/emailer.html:13 emailtracker/views.py:33
+msgid "Mail Merge"
+msgstr ""
+
 #: hrdc/settings.py:122
 msgid "English"
 msgstr ""
@@ -201,35 +207,35 @@ msgid ""
 "Please elaborate on your preferences for residency length, if necessary."
 msgstr ""
 
-#: venueapp/models.py:212
+#: venueapp/models.py:213
 msgid ""
 "Big-picture conflicts for the upcoming season, such as other leadership "
 "positions or involvements."
 msgstr ""
 
 #. Translators: the staff category name
-#: venueapp/models.py:230
+#: venueapp/models.py:231
 msgid "Author"
 msgstr ""
 
 #. Translators: the staff category name with special privileges
-#: venueapp/models.py:232
+#: venueapp/models.py:233
 msgid "Executive"
 msgstr ""
 
-#: venueapp/models.py:367
+#: venueapp/models.py:368
 msgid "Income"
 msgstr ""
 
-#: venueapp/models.py:368
+#: venueapp/models.py:369
 msgid "Administrative Expenses"
 msgstr ""
 
-#: venueapp/models.py:369
+#: venueapp/models.py:370
 msgid "Production Expenses"
 msgstr ""
 
-#: venueapp/models.py:370
+#: venueapp/models.py:371
 msgid "Other Expenses"
 msgstr ""
 
@@ -273,7 +279,7 @@ msgid ""
 "residencies. Elaborate on your length preferences at the bottom of the page."
 msgstr ""
 
-#: venueapp/views.py:291
+#: venueapp/views.py:292
 msgid ""
 "Unable to save changes, your application must have at least one executive "
 "staff member!"

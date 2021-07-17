@@ -152,9 +152,10 @@ class Application(models.Model):
     def exec_staff_names(self):
         qs = self.staffmember_set.filter(role__category=10)
         out = ""
-        count = qs.count()
-        for i, v in enumerate(qs.all()):
-            out += str(v.person)
+        names = set([str(i.person) for i in qs.all()])
+        count = len(names)
+        for i, v in enumerate(names):
+            out += v
             if i < count - 2:
                 out += ", "
             elif i < count - 1:

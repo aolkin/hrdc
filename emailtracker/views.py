@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.views.generic.base import TemplateView
 from django.http import Http404
 from django.core.exceptions import PermissionDenied
+from django.utils.translation import gettext as _
 
 from django import forms
 from django.contrib import messages
@@ -29,8 +30,8 @@ class TargetsForm(forms.Form):
     target = forms.ChoiceField(choices=get_targets)
 
 class EmailerView(TemplateView):
-    verbose_name = "Send Emails"
-    help_text = "to users, staffs, etc"
+    verbose_name = _("Mail Merge")
+    help_text = "email users, staffs, et al"
 
     template_name = "emailtracker/emailer.html"
 
@@ -43,7 +44,7 @@ class EmailerView(TemplateView):
                         raise PermissionDenied()
                 self.target = target()
             else:
-                raise Http404("Mail target not found.")
+                raise Http404("Mail merge target not found.")
         else:
             self.target = None
         return self.target
