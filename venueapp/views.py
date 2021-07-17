@@ -9,6 +9,7 @@ from django.forms import widgets
 from django.contrib import messages    
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.db.models import Q
@@ -688,15 +689,13 @@ class PreviewSubmitView(MenuMixin, UserStaffMixin, DetailView):
         messages.success(self.request, "Application for {} submitted to {}! Check your email for confirmation.".format(self.object, self.object.venuesand()))
         return redirect("venueapp:public_index")
 
-class AdminIndexView(TemplateView):
+class AdminIndexView(LoginRequiredMixin, TemplateView):
     verbose_name = "Venue Applications"
     help_text = "read applications"
 
     template_name = "venueapp/admin.html"
 
     def get_context_data(self, **kwargs):
-        if self.request.user.is_anonymous:
-            raise PermissionDenied()
         kwargs["readable"] = self.request.user.venueapp_set.all()
         return super().get_context_data(**kwargs)
 
@@ -733,18 +732,16 @@ class VenueSidebarMixin:
                 })
         return context
 
-class AdminListView(VenueSidebarMixin, DetailView):
+class AdminListView(LoginRequiredMixin, VenueSidebarMixin, DetailView):
     template_name = "venueapp/list.html"
     model = VenueApp
     
     def get_context_data(self, **kwargs):
-        if self.request.user.is_anonymous:
-            raise PermissionDenied()
         kwargs["preapps"] = self.object.application_set.filter(submitted=None)
         kwargs["apps"] = self.object.application_set.exclude(submitted=None)
         return super().get_context_data(**kwargs)
 
-class AdminReadView(VenueSidebarMixin, DetailView):
+class AdminReadView(LoginRequiredMixin, VenueSidebarMixin, DetailView):
     template_name = "venueapp/read.html"
     model = VenueApp
 
