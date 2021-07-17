@@ -385,7 +385,16 @@ class ResidencyView(MenuMixin, UserStaffMixin, FormMixin, UnsubmittedAppMixin,
         venues = kwargs["venues"] = self.object.venues.all()[:]
         residencies = AvailableResidency.objects.filter(venue__in=venues)
         calendar = []
-        current = residencies.first().start
+        range_residencies = residencies.filter(type=False)
+        single_residencies = residencies.filter(type=True)
+        if range_residencies.exists():
+            current = range_residencies.first().start
+            if single_residencies.exists():
+                single_start = single_residencies.first().start
+                while single_start < current:
+                    current -= timedelta(days=7)
+        else:
+            current = residencies.first().start
         end = residencies.last().end
         while current <= end:
             slots = [
