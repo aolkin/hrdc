@@ -657,6 +657,14 @@ class SignOffView(MembershipMixin, UnsubmittedAppMixin, View):
         return redirect(reverse_lazy("venueapp:public_index") +
                         "?" + request.META["QUERY_STRING"])
 
+class _CoverLink:
+    def __init__(self, url, fn):
+        self.url = url
+        self.fn = fn
+
+    def __str__(self):
+        return self.url
+
 def make_cover_page(app):
         cover = OrderedDict()
         cover["Production"] = app.show.title
@@ -666,6 +674,10 @@ def make_cover_page(app):
         cover["Executive Staff"] = app.exec_staff_list()
         cover["Cast Gender Breakdown"] = app.cast_breakdown
         cover["Band/Orchestra Size"] = app.band_size
+        if app.script:
+            cover["Script"] = _CoverLink(app.script.url, app.script_filename)
+        else:
+            cover["Script"] = None
         cover["Application Submitted"] = app.submitted
         return cover
 

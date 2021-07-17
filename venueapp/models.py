@@ -120,12 +120,16 @@ class Application(models.Model):
 
     length_description = models.TextField(verbose_name=_("Residency Length Preferences"), help_text=_("Please elaborate on your preferences for residency length, if necessary."), blank=True)
 
+    def __str__(self):
+        return str(self.show)
+
     @property
     def due(self):
         return self.venues.all().order_by("due").first().due
 
-    def __str__(self):
-        return str(self.show)
+    @property
+    def script_filename(self):
+        return self.script and os.path.basename(self.script.name)
 
     def venuestr(self):
         return ", ".join(
