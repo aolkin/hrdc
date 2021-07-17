@@ -1,6 +1,6 @@
 <p class="preview-question mb-1">
-  {{ answer.question.question }}
+  {{ answer.question.question|urlize|linebreaksbr }}
 </p>
 <p class="preview-answer mx-4 mb-2">
-  {{ answer.answer|linebreaksbr|default:"<em>No answer supplied.</em>" }}
+  {{ answer.answer|urlize|linebreaksbr|default:"<em>No answer supplied.</em>" }}
 </p>

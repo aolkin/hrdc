@@ -47,7 +47,7 @@
     {% for staff in object.staffmember_set.signed_on %}
     {% if pdf %}
     <a name="supplement-{{ staff.id }}"></a>
-    <h3 class="text-center" style="bookmark-label: &quot;{{ staff.role_name|escapejs }} {{ staff.person|escapejs }}'s Supplement&quot;">{{ staff.role_name }} Supplement</h3>
+    <h3 class="text-center" style="bookmark-label: &quot;{{ staff.role_name|escape }} {{ staff.person|escape }}'s Supplement&quot;">{{ staff.role_name }} Supplement</h3>
     <h4 class="text-center">{{ staff.person }}</h4>
     {% else %}
     <h4 class="mx-5">
@@ -81,7 +81,7 @@
       <div class="col-md-9">
 	<h5>Statement</h5>
 	<p class="mx-4">
-	  {{ staff.statement|linebreaksbr|default:"<em>None supplied.</em>" }}
+	  {{ staff.statement|urlize|linebreaksbr|default:"<em>None supplied.</em>" }}
 	</p>
       </div>
     </div>
