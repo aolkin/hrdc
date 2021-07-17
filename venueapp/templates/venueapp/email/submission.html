@@ -44,7 +44,11 @@
 	  {% for attr, val in cover.items %}
 	  <tr>
 	    <td style="text-align: right;"><em>{{ attr }}:</em></td>
+	    {% if val.url %}
+	    <td><a href="{{ val.url }}" target="_blank">{{ val.fn }}</a></td>
+	    {% else %}
 	    <td>{{ val|default:"<em>N/A</em>" }}</td>
+	    {% endif %}
 	  </tr>
 	  {% endfor %}
 	</tbody>
