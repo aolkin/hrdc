@@ -11,6 +11,6 @@ urlpatterns = [
     url(r'^sign-in/', include(signin_patterns)),
     url(r'^staff/', include(pdsm_patterns)),
     url(r'^actor/', include(public_patterns)),
-    
+
     url(r'^admin/$', admin, name="admin"),
 ]

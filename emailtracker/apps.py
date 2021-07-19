@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 
 from django.conf import settings
-            
+
 from importlib import import_module
 
 class EmailtrackerConfig(AppConfig):

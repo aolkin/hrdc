@@ -19,7 +19,7 @@ class Link(models.Model):
 
     def __str__(self):
         return "/" + self.url
-    
+
     @property
     def link(self):
         try:
@@ -32,6 +32,6 @@ class Link(models.Model):
         return mark_safe(
             '<a href="http://{0}" target="blank">{0}</a>'.format(self.link))
     link_markup.short_description = "Shortlink"
-        
+
     def get_absolute_url(self):
         return "http://" + self.link

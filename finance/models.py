@@ -154,7 +154,7 @@ class FinanceInfo(models.Model):
     def other_budget(self):
         return self.budgetexpense_set.filter(
             category=BudgetExpense.BUDGET_CATEGORIES[2][0])
-    
+
     @property
     def expected_bal(self):
         expenses = self.budgetexpense_set.all().aggregate(
@@ -169,7 +169,7 @@ class FinanceInfo(models.Model):
     def actual_expense_val(self):
         return self.budgetexpense_set.all().aggregate(
             models.Sum("actual"))["actual__sum"] or 0
-    
+
     @property
     def actual_expenses(self):
         return "${:.2f}".format(self.actual_expense_val)
@@ -246,7 +246,7 @@ class Income(models.Model):
         ),
         (11, "Rejected"),
     )
-    
+
     show = models.ForeignKey(FinanceInfo, on_delete=models.PROTECT,
                              db_index=True)
     name = models.CharField(max_length=40)
@@ -266,10 +266,10 @@ class Income(models.Model):
             if self.received is not None:
                 raise ValidationError(
                     "Cannot provide amount received before grant is received.")
-    
+
     def __str__(self):
         return self.name
-    
+
     class Meta:
         verbose_name = "Grant/Income"
         verbose_name_plural = "Grants and Income"
@@ -281,14 +281,14 @@ class BudgetExpense(models.Model):
         (20, "Production"),
         (50, "Other"),
     )
-    
+
     show = models.ForeignKey(FinanceInfo, on_delete=models.CASCADE,
                              db_index=True)
 
     category = models.PositiveSmallIntegerField(choices=BUDGET_CATEGORIES,
                                                 default=10)
     name = models.CharField(max_length=80)
-    
+
     estimate = models.DecimalField(decimal_places=2, max_digits=7, default=0)
     actual = models.DecimalField(decimal_places=2, max_digits=7, default=0)
 
@@ -332,7 +332,7 @@ class Expense(models.Model):
     def upload_destination(instance, filename):
         return "finance/receipts/{}/{}".format(instance.show.show.slug,
                                                filename)
-    
+
     show = models.ForeignKey(FinanceInfo, on_delete=models.PROTECT,
                              db_index=True)
 
@@ -355,7 +355,7 @@ class Expense(models.Model):
                                         on_delete=models.SET_NULL)
 
     administrative_note = models.CharField(max_length=255, blank=True)
-    
+
     # For Reimbursement Only
     purchaser_email = models.EmailField(blank=True)
     reimburse_via = models.PositiveSmallIntegerField(
@@ -367,7 +367,7 @@ class Expense(models.Model):
 
     class Meta:
         ordering = "date_purchased",
-    
+
     def category(self):
         return self.subcategory.get_category_display()
     category.admin_order_field = "subcategory__category"
@@ -380,7 +380,7 @@ class Expense(models.Model):
     @property
     def amount_display(self):
         return "${:.2f}".format(self.amount)
-    
+
     def __str__(self):
         return ("{} - ${:.2f}".format(self.item, self.amount)
                 if self.amount else self.item)

@@ -6,7 +6,7 @@ from django.utils.html import mark_safe, format_html
 from django.shortcuts import redirect, render
 from django import forms
 from django.forms import widgets
-from django.contrib import messages    
+from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -734,7 +734,7 @@ class VenueSidebarMixin:
 
         if not hasattr(self, "object"):
             return context
-        
+
         for name, qs in (
                 ("Pre-Applications",
                  self.object.application_set.filter(submitted=None)),
@@ -768,7 +768,7 @@ class AdminIndexView(LoginRequiredMixin, VenueSidebarMixin, TemplateView):
 class AdminListView(LoginRequiredMixin, VenueSidebarMixin, DetailView):
     template_name = "venueapp/list.html"
     model = VenueApp
-    
+
     def get_context_data(self, **kwargs):
         kwargs["preapps"] = self.object.application_set.filter(submitted=None)
         kwargs["apps"] = self.object.application_set.exclude(submitted=None)

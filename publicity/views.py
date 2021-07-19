@@ -44,7 +44,7 @@ class MenuMixin:
             ("Personnel List", "publicity:people"),
             ("Preview", "publicity:display")
         )
-        
+
         for show in [i.publicity_info for i in
                      self.request.user.show_set.all().order_by("-pk")
                      if hasattr(i, "publicity_info")]:
@@ -61,9 +61,9 @@ class MenuMixin:
 
 class ShowStaffMixin(InitializedLoginMixin, SingleObjectMixin):
     model = PublicityInfo
-    
+
     test_silent = False
-    
+
     def test_func(self):
         if super().test_func():
             if self.get_object().show.user_is_staff(self.request.user):
@@ -78,7 +78,7 @@ class ShowStaffMixin(InitializedLoginMixin, SingleObjectMixin):
 class IndexView(MenuMixin, InitializedLoginMixin, TemplateView):
     verbose_name = "Publicity Manager"
     help_text = "update your webpage and directory"
-    
+
     template_name = "publicity/index.html"
 
 DateFormSet = forms.inlineformset_factory(
@@ -99,14 +99,14 @@ class InfoForm(forms.ModelForm):
             'blurb': forms.Textarea(attrs={'rows': 5, 'cols': 40}),
             'content_warning': forms.Textarea(attrs={'rows': 2, 'cols': 40}),
         }
-    
+
 class InfoView(MenuMixin, ShowStaffMixin, UpdateView):
     template_name = "publicity/info.html"
     form_class = InfoForm
 
     def get_success_url(self):
         return reverse_lazy("publicity:info", args=(self.object.id,))
-    
+
     def post(self, *args, **kwargs):
         res = super().post(*args, **kwargs)
         self.formset = DateFormSet(self.request.POST,
@@ -121,7 +121,7 @@ class InfoView(MenuMixin, ShowStaffMixin, UpdateView):
                          "Updated publicity information for {}.".format(
                              self.get_object()))
         return res
-    
+
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["date_formset"] = (
@@ -335,12 +335,12 @@ class NewsletterView(InitializedLoginMixin, NewsletterMixin, CreateView):
     def post(self, *args, **kwargs):
         assert self.request.POST.get("user") == str(self.request.user.pk)
         return super().post(*args, **kwargs)
-    
+
     def form_valid(self, *args, **kwargs):
         messages.success(self.request, "Successfully submitted announcement! "
                          "You may continue to edit it until it is published.")
         return super().form_valid(*args, **kwargs)
-        
+
     def get_initial(self):
         return { "user": self.request.user }
 
@@ -391,7 +391,7 @@ def get_events(**kwargs):
     app_kwargs = { k.replace("performance", "due") : v
                    for (k, v) in kwargs.items() }
     app_kwargs["live"] = True
-    events = (list([VenueAppWrapper(i) for i in 
+    events = (list([VenueAppWrapper(i) for i in
                     VenueApp.objects.filter(**app_kwargs)]) +
               list(PerformanceDate.objects.filter(**kwargs)) +
               list(Event.objects.filter(**kwargs)))
@@ -497,10 +497,10 @@ class AdminMixin(PermissionRequiredMixin):
             "url": reverse_lazy("publicity:admin"),
             "active": current_url == "admin"
         }]
-        
+
         kwargs["season"] = self.get_season_display()
         submenu = menu[kwargs["season"]] = []
-        
+
         season, year = self.get_season()
         for show in PublicityInfo.objects.filter(
                 show__season=season, show__year=year):

@@ -33,7 +33,7 @@ import time
 
 class LoginView(DjangoLoginView):
     template_name = "dramaauth/login.html"
-    
+
     def get(self, *args, **kwargs):
         if not self.request.user.is_anonymous:
             return redirect(self.request.GET.get("next", "/"))
@@ -42,7 +42,7 @@ class LoginView(DjangoLoginView):
                 self.request,
                 "Please log in or create an account to access that page.")
         return super().get(*args, **kwargs)
-    
+
 SESSION_TOKEN_KEY = "_CAPTURED_LOGIN_TOKEN"
 
 def capture_token(request, token):
@@ -62,7 +62,7 @@ class TokenView(FormView):
         else:
             url = reverse("dramaorg:home")
         return url
-            
+
     @method_decorator(sensitive_post_parameters())
     @method_decorator(never_cache)
     def dispatch(self, *args, **kwargs):
@@ -75,13 +75,13 @@ class TokenView(FormView):
         except (TypeError, KeyError, ValueError, OverflowError,
                 get_user_model().DoesNotExist):
             self.user = None
-        
+
         if self.user is not None:
             return super().dispatch(*args, **kwargs)
         else:
             self.delete_captured_token()
             return self.render_to_response(self.get_context_data(valid=False))
-    
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.user
@@ -90,14 +90,14 @@ class TokenView(FormView):
     def delete_captured_token(self):
         if self.request.session.exists(SESSION_TOKEN_KEY):
             self.request.session.delete(SESSION_TOKEN_KEY)
-    
+
     def form_valid(self, form):
         user = form.save()
         self.delete_captured_token()
         login(self.request, user,
               backend="django.contrib.auth.backends.ModelBackend")
         return super().form_valid(form)
-        
+
     def get_context_data(self, valid=True, **kwargs):
         context = super().get_context_data(**kwargs)
         if not valid:
@@ -146,7 +146,7 @@ class RegisterView(FormView):
     def get_success_url(self):
         return reverse("dramaorg:register") + "?post={}&from={}".format(
             self.request.GET.get("post",""), self.request.GET.get("from",""))
-    
+
     def form_valid(self, form):
         users = get_user_model().objects.filter(**{
             '%s__iexact' % get_user_model().get_email_field_name():
@@ -173,7 +173,7 @@ class RegisterView(FormView):
             settings.DEFAULT_FROM_EMAIL) +
                       "complete the sign up process.")
         return super().form_valid(form)
-                                                    
+
 class ProfileView(LoginRequiredMixin, UpdateView):
     model = User
     fields = ['first_name', 'last_name', 'pgps', 'gender_pref', 'phone',
@@ -187,7 +187,7 @@ class ProfileView(LoginRequiredMixin, UpdateView):
                 self.request, messages.WARNING,
                 "Please fill out your missing profile information.")
         return super().get(*args, **kwargs)
-    
+
     def get_object(self, queryset=None):
         return self.request.user
 
@@ -248,11 +248,11 @@ class SeasonForm(forms.ModelForm):
                 "season": config.get(settings.ACTIVE_SEASON_KEY, None)
             }
         super().__init__(*args, **kwargs)
-        
+
     def save(self, *args):
         config[settings.ACTIVE_SEASON_KEY] = self.cleaned_data["season"]
         config[settings.ACTIVE_YEAR_KEY] = self.cleaned_data["year"]
-                        
+
 class StaffIndexView(SuccessMessageMixin, FormView):
     verbose_name = "Your Shows"
     help_text = "view and manage your shows"
@@ -263,7 +263,7 @@ class StaffIndexView(SuccessMessageMixin, FormView):
 
     def get_success_message(self, data):
         return "Season updated successfully."
-    
+
     @method_decorator(login_required)
     @method_decorator(user_is_initialized)
     def dispatch(self, *args, **kwargs):
@@ -276,12 +276,12 @@ class StaffIndexView(SuccessMessageMixin, FormView):
             messages.error(self.request,
                            "Illegal operation: cannot set current season")
             return super().get(*args, **kwargs)
-        
+
     def form_valid(self, form):
         if self.request.user.has_perm("dramaorg.change_current_season"):
             form.save()
         return super().form_valid(form)
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(indexes)
@@ -289,7 +289,7 @@ class StaffIndexView(SuccessMessageMixin, FormView):
 
 class ShowStaffMixin(InitializedLoginMixin, SingleObjectMixin):
     model = Show
-    
+
     def test_func(self):
         if super().test_func():
             if self.get_object().user_is_staff(self.request.user):
@@ -336,7 +336,7 @@ class SearchPeople(UserIsPdsmMixin, DetailView):
             terms = self.request.GET["term"].split(" ")
         else:
             terms = ("",)
-        
+
         users = get_user_model().objects.all()
         for term in terms:
             q = Q(first_name__icontains=term)
@@ -358,7 +358,7 @@ class AddPerson(UserIsPdsmMixin, BaseCreateView):
     model = get_user_model()
     fields = ("email", "first_name", "last_name",
               "year", "affiliation", "display_affiliation")
-    
+
     def form_valid(self, form):
         person = form.save()
         return JsonResponse({
@@ -456,7 +456,7 @@ class SeasonView(PermissionRequiredMixin, SeasonSidebarMixin, FormView):
         kwargs["queryset"] = Show.objects.filter(
             year=self.get_year(), season=self.get_season())
         return kwargs
-    
+
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)

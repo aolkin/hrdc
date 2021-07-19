@@ -31,7 +31,7 @@ class ArchivalInfo(models.Model):
 
     def program_name(self):
         return os.path.basename(self.program.name)
-    
+
     def __str__(self):
         return str(self.show)
 

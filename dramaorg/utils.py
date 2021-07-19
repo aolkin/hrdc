@@ -20,33 +20,33 @@ def get_admin_group():
 
 def add_view_permissions(*models):
     add_permissions(models, Q(codename__contains="view"))
-    
+
 def add_change_permissions(*models):
     add_permissions(models,
                     Q(codename__contains="add") |
                     Q(codename__contains="change"))
-    
+
 def add_all_permissions(*models):
     add_permissions(models,
                     Q(codename__contains="add") |
                     Q(codename__contains="delete") |
                     Q(codename__contains="change"))
-    
+
 def add_delete_permissions(*models):
     add_permissions(models,
                     Q(codename__contains="view") |
                     Q(codename__contains="delete"))
-    
+
 def add_permissions(models, q):
     group = get_admin_group()
     if group:
         Permission = import_module("django.contrib.auth.models").Permission
         cts = import_module("django.contrib.contenttypes.models")
-        
+
         types = cts.ContentType.objects.get_for_models(*models)
         perms = Permission.objects.filter(q, content_type__in=types.values())
         group.permissions.add(*perms)
-    
+
 def test_initialized(user):
     return user.is_authenticated and user.is_initialized
 
@@ -63,7 +63,7 @@ class InitializedLoginMixin:
 
 class ShowStaffMixin(InitializedLoginMixin, SingleObjectMixin):
     test_silent = False
-    
+
     def test_func(self):
         if super().test_func():
             if self.get_object().show.user_is_staff(self.request.user):
@@ -84,7 +84,7 @@ class UserStaffMixin:
             raise PermissionDenied()
         return super().dispatch(*args, **kwargs)
 
-    
+
 def social_create_user(strategy, details, backend, user=None, *args, **kwargs):
     if user:
         return {'is_new': False}

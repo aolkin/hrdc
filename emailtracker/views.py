@@ -12,7 +12,7 @@ from .mailer import targets
 class _DummyMessage:
     def __getattr__(self, attr):
         return self
-    
+
     def __call__(self, *args, **kwargs):
         return
 

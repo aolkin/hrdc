@@ -34,7 +34,7 @@ class QueuedEmail(models.Model):
 
     msg_id = models.CharField(max_length=80)
     status = models.CharField(max_length=255)
-    
+
     name = models.CharField(max_length=40)
     ident = models.CharField(max_length=80)
 
@@ -104,7 +104,7 @@ class QueuedEmail(models.Model):
         self.sent = timezone.now()
         self.save()
         return msg
-        
+
     def __str__(self):
         return '<{} "{}" to {}>'.format("Sent" if self.sent else "Unsent",
                                         self.subject, self.to)

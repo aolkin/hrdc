@@ -7,7 +7,7 @@ from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django import forms
 from django.contrib import messages
-    
+
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from utils import user_is_initialized
@@ -48,7 +48,7 @@ class MenuMixin:
             ("Manage Show", "archive:show"),
             ("Upload Materials", "archive:upload"),
         ]
-        
+
         for show in shows:
             submenu = menu[str(show)] = []
             is_active = (hasattr(self, "object") and
@@ -65,14 +65,14 @@ class MenuMixin:
                     "url": reverse_lazy("archive:public", args=(show.pk,)),
                     "active": False
                 })
-        
+
         return context
 
 class ShowStaffMixin(InitializedLoginMixin, SingleObjectMixin):
     model = ArchivalInfo
-    
+
     test_silent = False
-    
+
     def test_func(self):
         if super().test_func():
             if self.get_object().user_is_staff(self.request.user):

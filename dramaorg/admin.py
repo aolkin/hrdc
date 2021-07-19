@@ -32,7 +32,7 @@ class UserCreationForm(forms.ModelForm):
 def generate_tokens(modeladmin, request, queryset):
     for obj in queryset:
         obj.new_token(expiring=True)
-        
+
 def clear_tokens(modeladmin, request, queryset):
     for obj in queryset:
         obj.clear_token()
@@ -85,7 +85,7 @@ class ActiveFilter(admin.SimpleListFilter):
             return queryset.filter(is_active=True).exclude(password="")
         if self.value() == "social":
             return queryset.filter(is_active=True, social_auth__isnull=False)
-        
+
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     fieldsets = (
@@ -143,7 +143,7 @@ class UserAdmin(BaseUserAdmin):
                 if name not in ("email",):
                     field.required = False
         return form
-    
+
     def get_initialized(self, obj):
         return obj.is_initialized
     get_initialized.boolean = True
@@ -173,7 +173,7 @@ class UserAdmin(BaseUserAdmin):
         return obj.social_auth.exists()
     get_social.boolean = True
     get_social.short_description = "OAuth"
-    
+
     def has_password(self, obj):
         if obj.is_active is False:
             return False
@@ -185,7 +185,7 @@ class UserAdmin(BaseUserAdmin):
             return obj.is_active and obj.has_usable_password()
     has_password.boolean = True
     has_password.short_description = "Active"
-    
+
     def get_readonly_fields(self, request, obj):
         if obj:
             if request.user.has_perm("dramaorg.modify_user"):
@@ -203,7 +203,7 @@ class UserAdmin(BaseUserAdmin):
                 return self.staff_fieldsets
         else:
             return self.add_fieldsets
-            
+
 @admin.register(Show)
 class ShowAdmin(admin.ModelAdmin):
     list_display = ('title', 'seasonstr', 'space',
@@ -220,7 +220,7 @@ class ShowAdmin(admin.ModelAdmin):
          {"fields": (("staff", "liaisons"), "contact_staff_members")}),
         ("Metadata",
          {"fields": (("created", "modified"),)}),
-                                         
+
     )
     readonly_fields = "created", "modified", 'contact_staff_members'
     exclude = ('invisible',)
@@ -250,12 +250,12 @@ class ShowAdmin(admin.ModelAdmin):
             '<a href="mailto:{0}">{1}</a>', i.email,
             "{} <{}>".format(i.get_full_name(False), i.email))
                                     for i in obj.staff.all()]))
-    
+
 @admin.register(Building)
 class BuildingAdmin(admin.ModelAdmin):
     list_display = ("__str__", "latitude", "longitude")
     list_editable = ('latitude', 'longitude')
-    
+
 @admin.register(Space)
 class SpaceAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'name', 'building', 'nickname', "order")

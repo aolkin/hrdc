@@ -96,7 +96,7 @@ class Application(models.Model):
         return "venueapp/{}/{}/shows/{}/script/{}".format(
             instance.show.year, instance.show.get_season_display(),
             instance.show.slug, filename)
-    
+
     show = models.OneToOneField(Show, on_delete=models.PROTECT)
     venues = models.ManyToManyField(VenueApp)
     band_size = models.CharField(max_length=80,
@@ -168,7 +168,7 @@ class Application(models.Model):
                 else:
                     out += " and "
         return out
-    
+
     def season(self):
         return self.show.seasonstr()
     venuestr.short_description = "Venues"
@@ -388,7 +388,7 @@ class AbstractBudgetLine(models.Model):
     class Meta:
         abstract = True
 
-class BudgetLine(AbstractBudgetLine):    
+class BudgetLine(AbstractBudgetLine):
     show = models.ForeignKey(
         Application, on_delete=models.CASCADE, db_index=True)
     required = models.BooleanField(default=False)

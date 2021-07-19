@@ -65,21 +65,21 @@ class MetaAdmin(admin.ModelAdmin):
                        'band_term',)
         })
     )
-    
+
     inlines = [
         PerformanceDateAdmin,
         ShowPersonAdmin,
     ]
-    
+
     def contact_email_link(self, obj):
         return format_html('<a href="mailto:{0}">{0}</a>', obj.contact_email)
     contact_email_link.short_description = "Show Email"
-    
+
     def link(self, obj):
         return format_html('<a href="{0}" target="_blank">{0}</a>',
                            obj.website_page)
     link.short_description = "Website Link"
-    
+
     def season(self, obj):
         return obj.show.seasonstr()
 

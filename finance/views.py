@@ -10,7 +10,7 @@ from django import forms
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.utils.html import mark_safe
-    
+
 from utils import InitializedLoginMixin
 
 from emailtracker.tools import render_to_queue
@@ -51,7 +51,7 @@ class MenuMixin:
         if (self.request.user.is_staff and
             self.request.user.has_perm("finance.change_financeinfo")):
             urls += [ ("[Admin Access]", "admin:finance_financeinfo_change") ]
-        
+
         for show in shows:
             submenu = menu[str(show)] = []
             is_active = (hasattr(self, "object") and
@@ -73,9 +73,9 @@ class MenuMixin:
 
 class ShowStaffMixin(InitializedLoginMixin, SingleObjectMixin):
     model = FinanceInfo
-    
+
     test_silent = False
-    
+
     def test_func(self):
         if super().test_func():
             if self.get_object().show.user_is_staff(self.request.user):
@@ -90,7 +90,7 @@ class ShowStaffMixin(InitializedLoginMixin, SingleObjectMixin):
 class IndexView(MenuMixin, InitializedLoginMixin, TemplateView):
     verbose_name = "Finance Manager"
     help_text = "manage budget and accounting"
-    
+
     template_name = "finance/index.html"
 
 class IncomeForm(forms.ModelForm):

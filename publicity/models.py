@@ -62,10 +62,10 @@ class PublicityInfo(models.Model):
 
     def band(self):
         return self.showperson_set.filter(type=3)
-    
+
     def get_absolute_url(self):
         return reverse_lazy("publicity:display", args=(self.id,))
-    
+
     def embed_code(self, wrap=True):
         if self.id:
             code = '<script src="{}{}"></script>'.format(
@@ -102,7 +102,7 @@ class AbstractEvent:
 class AbstractEventModel(AbstractEvent, models.Model):
     performance = models.DateTimeField(verbose_name="Time and Date")
     note = models.CharField(max_length=120, blank=True)
-    
+
     class Meta:
         abstract = True
 
@@ -146,7 +146,7 @@ class ShowPerson(models.Model):
         (2, "Cast"),
         (3, "Band"),
     )
-    
+
     show = models.ForeignKey(PublicityInfo, on_delete=models.PROTECT,
                              db_index=True)
     person = models.ForeignKey(get_user_model(), on_delete=models.PROTECT)
@@ -158,20 +158,20 @@ class ShowPerson(models.Model):
     @property
     def year(self):
         return self.person.year
-    
+
     position = models.CharField(max_length=120, verbose_name="Role or Position",
                                 blank=True)
-    
+
     type = models.PositiveSmallIntegerField(default=0, choices=TYPE_CHOICES,
                                             db_index=True)
     order = models.SmallIntegerField(db_index=True, default=0)
-    
+
     class Meta:
         ordering = "type", "order", "pk"
-    
+
     def yearstr(self):
         return "'{:02d}".format(self.year % 100) if self.year else ""
-    
+
     def __str__(self):
         return "{}: {}".format(self.position, self.person)
 
@@ -205,7 +205,7 @@ class Announcement(models.Model):
         help_text="Do not include in the newsletter before this date.")
     end_date = models.DateField(
         help_text="Do not include in the newsletter after this date.")
-    
+
     submitted = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
@@ -213,7 +213,7 @@ class Announcement(models.Model):
 
     class Meta:
         ordering = ("-end_date", "start_date", "-submitted")
-    
+
     @property
     def rendered_message(self):
         return mark_safe(bleach.clean(self.message, tags=SAFE_TAGS, strip=True))
@@ -224,7 +224,7 @@ class Announcement(models.Model):
                 "start_date": "Must be before end date.",
                 "end_date": "Must be after start date.",
             })
-    
+
     def __str__(self):
         return self.title
 

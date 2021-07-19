@@ -40,7 +40,7 @@ class CastingReleaseMeta(Season):
     disable_signing = models.BooleanField(
         default=False,
         help_text="Checking this will temporarily prevent actors from signing.")
-    
+
     signing_opens = models.DateTimeField(null=True, blank=True)
     second_signing_opens = models.DateTimeField(
         null=True, blank=True, verbose_name="Signing closes")
@@ -54,7 +54,7 @@ class CastingReleaseMeta(Season):
                                    "signing_opens",
                                    "second_signing_opens",
                                    "second_signing_warning"))
-    
+
     class Meta:
         verbose_name = "Casting Release Group"
         permissions = (
@@ -69,10 +69,10 @@ class CastingReleaseMeta(Season):
             return self.castingmeta_set.all()[0].show
         else:
             return None
-    
+
     def __str__(self):
         return self.seasonstr()
-            
+
     def clean(self):
         if (self.publish_callbacks and
             self.stage > 0 and self.publish_callbacks >= timezone.now()):
@@ -191,11 +191,11 @@ class CastingMeta(models.Model):
         default=False, verbose_name="Full Cast")
     contact_email = models.EmailField(
         blank=True, verbose_name="Show Contact Email")
-    
+
     release_meta = models.ForeignKey(
         CastingReleaseMeta, verbose_name=CastingReleaseMeta._meta.verbose_name,
         on_delete=models.CASCADE)
-    
+
     tech_req_pool = models.ManyToManyField(
         "self", blank=True, verbose_name="Actors must tech req on one of",
         symmetrical=False, related_name="tech_req_contributor_set")
@@ -226,15 +226,15 @@ class CastingMeta(models.Model):
     def tech_actors(self):
         return [i.actor for i in
                 Signing.objects.filter(tech_req=self, response=True)]
-    
+
     @property
     def tech_reqers(self):
         return Signing.objects.filter(tech_req=self, response=True)
-    
+
     @property
     def tech_reqer_count(self):
         return Signing.objects.filter(tech_req=self, response=True).count()
-    
+
     @property
     def needs_more_tech_reqers(self):
         return self.tech_reqer_count < self.num_tech_reqers
@@ -242,31 +242,31 @@ class CastingMeta(models.Model):
     @property
     def tech_req_contributors(self):
         return self.tech_req_contributor_set.all()
-    
+
     @property
     def audition_avg(self):
         avg = Audition.objects.filter(
             show=self, audition_length__isnull=False).aggregate(
                 Avg("audition_length"))["audition_length__avg"]
         return round(avg.total_seconds() / 60) if avg else avg
-    
+
     @property
     def callbacks_released(self):
         return self.callbacks_submitted and self.release_meta.stage > 0
-    
+
     @property
     def first_cast_released(self):
         return self.first_cast_submitted and self.release_meta.stage > 1
-    
+
     @property
     def cast_list_released(self):
         return self.cast_submitted and self.release_meta.stage > 2
-    
+
     @property
     def audition_slots(self):
         return self.slot_set.filter(type=Slot.TYPES[0][0]).order_by(
             "day", "start")
-    
+
     @property
     def callback_slots(self):
         return self.slot_set.filter(type=Slot.TYPES[1][0])
@@ -282,7 +282,7 @@ class AuditionCastingMeta(CastingMeta):
         proxy = True
         verbose_name = "Casting-Enabled Show - Audition Info"
         verbose_name_plural = "Casting-Enabled Shows - Audition Info"
-    
+
 class AssociateShowMixin(models.Model):
     show = models.ForeignKey(CastingMeta, on_delete=models.CASCADE)
 
@@ -295,7 +295,7 @@ class ActorSeasonMeta(Season):
 
     def __str__(self):
         return "{} Meta for {}".format(self.seasonstr(), self.actor)
-     
+
 class Audition(AssociateShowMixin):
     STATUSES = (
         ("waiting", "Waiting"),
@@ -320,7 +320,7 @@ class Audition(AssociateShowMixin):
         permissions = (
             ("table_auditions", "Can table at audition sign-ins"),
         )
-    
+
     @property
     def actorseasonmeta(self):
         if not hasattr(self, "_cached_actorseasonmeta"):
@@ -331,7 +331,7 @@ class Audition(AssociateShowMixin):
 
     def audition_minutes(self):
         return round(self.audition_length.seconds / 60)
-    
+
     def __str__(self):
         return "{} for {}".format(self.actor, self.show)
 
@@ -345,7 +345,7 @@ STATUS_CLASSES = {
 def update_audition_length(sender, instance, *args, **kwargs):
     if sender == Audition and instance.done_time:
         instance.audition_length = instance.done_time - instance.called_time
-        
+
 @receiver(post_save)
 def send_auditions(sender, instance, *args, **kwargs):
     if sender == Audition and instance.actor.is_initialized:
@@ -426,7 +426,7 @@ class Character(AssociateShowMixin):
                 return signers
         else:
             return None
-    
+
     def __str__(self):
         return self.name if self.name else "<Unnamed Character>"
 
@@ -440,21 +440,21 @@ class ActorMapping(models.Model):
 
     class Meta:
         abstract = True
-    
+
     @property
     def show(self):
         return self.character and self.character.show
-    
+
     def __str__(self):
         try:
             return "{} for {} in {}".format(self.actor, self.character,
                                             self.show)
         except ObjectDoesNotExist:
             return "(Unnassigned {})".format(self.__class__.__name__)
-    
+
 class Callback(ActorMapping):
     pass
-    
+
 class Signing(ActorMapping):
     order = models.PositiveSmallIntegerField(default=0)
     response = models.NullBooleanField(choices=(
@@ -487,7 +487,7 @@ class Signing(ActorMapping):
             return "({} alternate)".format(humanize.ordinal(order))
         else:
             return ""
-        
+
     @property
     def editable(self):
         if self.show.cast_submitted:
@@ -495,7 +495,7 @@ class Signing(ActorMapping):
         if self.show.first_cast_submitted:
             return self.order >= self.character.allowed_signers
         return True
-    
+
     @property
     def uneditable(self):
         return not self.editable
@@ -512,10 +512,10 @@ class Signing(ActorMapping):
                                             order__lt=self.order,
                                             response=True))
         return signed < self.character.allowed_signers
-    
+
     class Meta:
         ordering = ("character__show", "character", "order")
-        
+
 @receiver(pre_delete)
 def shift_signings(sender, instance, **kwargs):
     if sender == Signing:
@@ -562,7 +562,7 @@ END_TIME_CHOICES = (
 class SlotManager(models.Manager):
     def auditions(self):
         return self.filter(type=Slot.TYPES[0][0])
-    
+
     def callbacks(self):
         return self.filter(type=Slot.TYPES[1][0])
 
@@ -576,7 +576,7 @@ class SlotManager(models.Manager):
     def active_slot(self, show):
         slots = self.current_slots().filter(show_id=show)
         return slots[0] if slots else None
-    
+
 class Slot(models.Model):
     show = models.ForeignKey(CastingMeta, on_delete=models.CASCADE)
     space = models.ForeignKey(settings.SPACE_MODEL, on_delete=models.CASCADE)
@@ -590,6 +590,6 @@ class Slot(models.Model):
     type = models.PositiveSmallIntegerField(default=0, choices=TYPES)
 
     objects = SlotManager()
-    
+
     def __str__(self):
         return "{} Slot for {}".format(Slot.TYPES[self.type][1], self.show)

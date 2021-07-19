@@ -53,7 +53,7 @@ def queue_msg(msg, name, ident="", silent=True):
 def _fix_to(kwargs):
     if type(kwargs["to"]) not in (list, tuple):
         kwargs["to"] = [kwargs["to"]]
-        
+
 def queue_email(name, ident="", silent=True, **kwargs):
     _fix_to(kwargs)
     msg = AnymailMessage(**kwargs)
@@ -68,7 +68,7 @@ def render_msg(template, context={}, **kwargs):
         msg.tags = kwargs["tags"]
     context["MESSAGE"] = msg
     context["SUBJECT"] = kwargs.get("subject", "")
-    
+
     template = get_template(template)
 
     context["IS_HTML"] = False
@@ -78,7 +78,7 @@ def render_msg(template, context={}, **kwargs):
     text = NEWLINE_COLLAPSE_RE.sub('\n\n', text)
     text = WHITESPACE_COLLAPSE_RE.sub('', text)
     msg.body = text.strip()
-    
+
     context["IS_HTML"] = True
     msg.attach_alternative(template.render(context), 'text/html')
 

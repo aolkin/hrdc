@@ -30,7 +30,7 @@ def get_shows(crm, arg, returnqs=False):
         return metas
     if metas.exists():
         return list(map(lambda x: x["pk"], metas.values("pk")))
-    
+
 @shared_task(ignore_result=True)
 def release_callbacks(pk):
     crm = get_crm(pk)
@@ -55,7 +55,7 @@ def release_callbacks(pk):
                                 tags=["casting", "callbacks"])
         crm.stage = 1
         crm.save()
-    
+
 @shared_task(ignore_result=True)
 def release_first_round(pk):
     crm = get_crm(pk)
@@ -205,7 +205,7 @@ def notify_alternates(pk):
                                            alt.character,
                                            alt.character.show),
                                        tags=["casting", "role_available"])
-      
+
 @shared_task(ignore_result=True)
 def update_releases(scheduled=True):
     releases = get_model("CastingReleaseMeta").objects.filter(

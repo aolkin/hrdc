@@ -20,7 +20,7 @@ class ApplicationTarget(MailTarget):
     form_class = ApplicationMailForm
     permission = "venueapp.view_application"
 
-    verbose_name = "Venue Application Executive Staffs" 
+    verbose_name = "Venue Application Executive Staffs"
     variables_description = """show - the name of the show being applied for
     venues - the venues being applied to
     venue - the selected venue in your filters

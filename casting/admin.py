@@ -46,7 +46,7 @@ class SigningAdmin(admin.ModelAdmin):
     search_fields = ('actor__first_name', 'actor__last_name',
                      'character__name')
     actions = [send_confirmation] + ([clear_response] if settings.DEBUG else [])
-    
+
     fieldsets = (
         ("Role", {
             "fields": ("show", "character", "order_title")
@@ -57,10 +57,10 @@ class SigningAdmin(admin.ModelAdmin):
     )
     readonly_fields = ("show", "character", "order_title", "actor",
                        "signed_time")
-    
+
     def has_delete_permission(self, request, obj=None):
         return False
-    
+
     def has_add_permission(self, request, obj=None):
         return False
 
@@ -70,7 +70,7 @@ CASTING_RELEASE_TIME_LOCKS = ("publish_callbacks", "publish_first_round_casts",
 CASTING_RELEASE_LOCK_TIME = timedelta(minutes=10)
 def is_locked(dt):
     return dt and (dt - CASTING_RELEASE_LOCK_TIME < timezone.now())
-    
+
 class CastingReleaseForm(forms.ModelForm):
     def clean_publish_callbacks(self):
         if (is_locked(self.instance.publish_callbacks) or
@@ -87,7 +87,7 @@ class CastingReleaseForm(forms.ModelForm):
                 "Cannot change first-round cast list publishing time, it is "
                 "too soon or has already passed.")
         return self.cleaned_data["publish_first_round_casts"]
-        
+
     def clean_publish_casts(self):
         if (is_locked(self.instance.publish_casts) or
             self.instance.stage > 2):
@@ -100,19 +100,19 @@ class CastingReleaseForm(forms.ModelForm):
         if is_locked(self.instance.publish_casts) or self.instance.stage > 2:
             raise forms.ValidationError("Cannot change signing options after "
                                         "casts have been published.")
-    
+
     def clean_signing_opens(self):
         self.clean_signing_option_field()
         return self.cleaned_data["signing_opens"]
-    
+
     def clean_second_signing_opens(self):
         self.clean_signing_option_field()
         return self.cleaned_data["second_signing_opens"]
-    
+
     def clean_second_signing_warning(self):
         self.clean_signing_option_field()
         return self.cleaned_data["second_signing_warning"]
-    
+
 PUBLISHING_HELP = """
 The callback and cast lists will become visible on the site after the inputted
 dates and times. Additionally, actors will be emailed when these times pass.
@@ -189,7 +189,7 @@ class CastingReleaseAdmin(admin.ModelAdmin):
         return { "delete_unnassociated": (
             CastingReleaseAdmin.delete_unnassociated,
             "delete_unnassociated", "Delete unnassociated settings") }
-    
+
     def delete_unnassociated(self, request, queryset):
         qs = queryset.filter(castingmeta__isnull=True)
         n = qs.count()
@@ -216,7 +216,7 @@ class CastingReleaseAdmin(admin.ModelAdmin):
                 return "(Unassociated {})".format(obj._meta.verbose_name)
             else:
                 return "(New {})".format(obj._meta.verbose_name)
-    
+
     def has_delete_permission(self, request, obj=None):
         if obj:
             return not obj.association
@@ -235,14 +235,14 @@ class SlotAdmin(admin.StackedInline):
 
     def get_queryset(self, request):
         return super().get_queryset(request).filter(type=self.type)
-    
+
     def get_extra(self, request, obj=None, **kwargs):
         if obj:
             n = obj.slot_set.filter(type=self.type).count()
             return max(self.extra - n, 0)
         else:
             return self.extra
-    
+
 class AuditionSlotAdmin(SlotAdmin):
     type = Slot.TYPES[0][0]
     extra = 3
@@ -297,7 +297,7 @@ class MetaAdmin(admin.ModelAdmin):
             return ["show"] + fields
         else:
             return fields
-    
+
     def contact_email_link(self, obj):
         return format_html('<a href="mailto:{0}">{0}</a>', obj.contact_email)
     contact_email_link.short_description = "Staff-set Show Contact Email"
@@ -309,7 +309,7 @@ class MetaAdmin(admin.ModelAdmin):
         return ("{} mins".format(obj.audition_avg) if obj.audition_avg
                 is not None else None)
     audition_avg_display.short_description = "Avg Aud Len"
-    
+
     def season(self, obj):
         return obj.show.seasonstr()
 
@@ -327,7 +327,7 @@ class AuditionMetaAdmin(MetaAdmin):
     def active_slot(self, obj):
         slot = Slot.objects.active_slot(obj)
         return slot.space if slot else None
-    
+
 @admin.register(TechReqCastingMeta)
 class TechReqMetaAdmin(MetaAdmin):
     list_display = ('show', 'contributes_to', 'contributors',
@@ -338,7 +338,7 @@ class TechReqMetaAdmin(MetaAdmin):
     def contributes_to(self, obj):
         return (", ".join([str(i) for i in obj.tech_req_pool.all()])
                 if obj.tech_req_pool else None)
-    
+
     def contributors(self, obj):
         return ((", ".join([str(i) for i in obj.tech_req_contributors]) or None)
                 if obj.tech_req_contributors else None)
@@ -379,7 +379,7 @@ class CharacterAdmin(admin.ModelAdmin):
         return False
     def has_add_permission(self, request):
         return False
-    
+
     list_filter = ('show__show__year', 'show__show__season',
                    'show__show__space__building',
                    'added_for_signing', 'hidden_for_signing')

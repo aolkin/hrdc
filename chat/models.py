@@ -18,7 +18,7 @@ class Message(models.Model):
     message = models.TextField()
 
     timestamp = models.DateTimeField(auto_now_add=True)
-    
+
     def set_user(self, obj):
         self.user = obj
         self.nickname = self.user.get_full_name()

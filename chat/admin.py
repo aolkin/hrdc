@@ -8,7 +8,7 @@ class MessageAdmin(admin.ModelAdmin):
 
     list_display = "timestamp", "room", "user", "nickname", "message"
     list_filter = "room",
-    
+
     def has_add_permission(self, request):
         return False
     def has_change_permission(self, request, obj=None):

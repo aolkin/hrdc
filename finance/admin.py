@@ -116,24 +116,24 @@ class LimitedExpenseInline(admin.TabularInline):
     show_change_link = True
     def has_add_permission(self, request, obj):
         return False
-    
+
 class PCardExpenseInline(LimitedExpenseInline):
     fields = ("subcategory", "item", "amount", "status", "purchaser_name",
               "date_purchased")
     readonly_fields = ("subcategory", "item", "purchaser_name",
                        "date_purchased",)
     verbose_name_plural = "P-Card Expenses"
-    
+
     def get_queryset(self, request):
         return super().get_queryset(request).filter(purchased_using=0)
-    
+
 class ReimburseableExpenseInline(LimitedExpenseInline):
     fields = ("subcategory", "item", "amount", "status", "purchaser_name",
               "date_purchased")
     readonly_fields = ("subcategory", "item", "purchaser_name",
                        "date_purchased",)
     verbose_name_plural = "Reimburseable Expenses"
-    
+
     def get_queryset(self, request):
         return super().get_queryset(request).filter(purchased_using=1)
 
@@ -170,10 +170,10 @@ class MetaAdmin(admin.ModelAdmin):
     inlines = (IncomeInline, PCardExpenseInline, ReimburseableExpenseInline)
 
     view_budget_text = "View budget"
-    
+
     def get_readonly_fields(self, modeladmin, obj):
         return ("show", "view_budget") if obj and obj.show else ("view_budget",)
-    
+
     def season(self, obj):
         return obj.show.seasonstr()
 
@@ -184,7 +184,7 @@ class MetaAdmin(admin.ModelAdmin):
     def view_budget(self, obj):
         return format_html('<a href="{}">{}</a>'.format(
             obj.get_absolute_url(), self.view_budget_text))
-    
+
 def export_income(modeladmin, request, qs):
     response = HttpResponse(content_type="text/csv")
     response['Content-Disposition'] = 'attachment; filename="hrdcapp_income_{}.csv"'.format(
@@ -313,7 +313,7 @@ class ExpenseAdmin(admin.ModelAdmin):
     autocomplete_fields = "show", "submitting_user", "subcategory"
     actions = mark_confirmed, export_expense, export_receipt_zip
     ordering = "-date_purchased",
-              
+
     fieldsets = (
         (None, {
             "fields": (

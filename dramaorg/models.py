@@ -67,21 +67,21 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     def is_suspended(self):
         return (self.suspended_until and
                 self.suspended_until > timezone.localdate())
-    
+
     source = models.CharField(default="default", editable=False,
                               max_length=20)
     post_register = models.CharField(default="", editable=False, max_length=240)
-    
+
     is_active = models.BooleanField(default=True)
     login_token = models.CharField(max_length=86, default=generate_token)
     token_expiry = models.DateTimeField(default=timezone.now)
 
     admin_access = models.BooleanField(
         default=False, help_text="Has access to this administrative portal")
-    
+
     date_joined = models.DateTimeField(default=timezone.now)
     last_login = models.DateTimeField(default=timezone.now)
-    
+
     objects = UserManager()
 
     class Meta:
@@ -92,7 +92,7 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     def set_password(self, *args, **kwargs):
         self.clear_token(False)
         super().set_password(*args, **kwargs)
-    
+
     def new_token(self, save=True, expiring=False):
         self.login_token = generate_token()
         if expiring:
@@ -127,7 +127,7 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
         return self.affiliation
     affiliationyear.short_description = "Affiliation"
     affiliationyear.admin_order_field = Concat("affiliation", "year")
-    
+
     @property
     def apostrophe_year(self):
         if self.year and len(str(self.year)) == 4:
@@ -142,19 +142,19 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
     @property
     def is_board(self):
         return self.groups.filter(id=get_admin_group().id).exists()
-    
+
     @property
     def is_pdsm(self):
         return self.show_set.exists()
-    
+
     @property
     def is_season_pdsm(self):
         return self.show_set.current_season().exists()
-    
+
     @property
     def is_staff(self):
         return self.admin_access or self.is_superuser or self.is_board
-    
+
     def get_full_name(self, use_email=True):
         full_name = '{} {}'.format(self.first_name, self.last_name).strip()
         if full_name:
@@ -165,7 +165,7 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
             return ""
     get_full_name.short_description = "Full Name"
     get_full_name.admin_order_field = "first_name"
-    
+
     def get_short_name(self):
         return self.first_name.strip()
 
@@ -254,7 +254,7 @@ class Building(models.Model):
 
     def __str__(self):
         return self.name
-        
+
 class Space(models.Model):
     name = models.CharField(max_length=150)
     building = models.ForeignKey(Building, on_delete=models.CASCADE)
@@ -273,21 +273,21 @@ class Space(models.Model):
             return "{} - {}".format(self.building, self.name)
         else:
             return self.name
-    
+
     def __str__(self):
         return self.full_name()
 
     class Meta:
         ordering = ("order",)
         unique_together = (("name", "building"),)
-    
+
 def _get_year():
     return timezone.now().year
 
 class SeasonManager(models.Manager):
     def in_season(self, obj):
         return self.filter(year=obj.year, season=obj.season)
-    
+
     def current_season(self):
         return self.filter(
             year=config.get(settings.ACTIVE_YEAR_KEY, None),
@@ -298,7 +298,7 @@ class SeasonManager(models.Manager):
         kwargs["season"] = season.season
         return super().get_or_create(*args, **kwargs)
 
-class Season(models.Model):    
+class Season(models.Model):
     SEASONS = (
         (0, "Winter"),
         (1, "Spring"),
@@ -313,11 +313,11 @@ class Season(models.Model):
     @property
     def seasonname(self):
         return Season.SEASONS[self.season][1]
-    
+
     def seasonstr(self):
         return "{} {}".format(self.seasonname, self.year)
     seasonstr.short_description = "Season"
-    
+
     class Meta:
         abstract = True
 
@@ -349,20 +349,20 @@ class Show(Season):
     prod_type = models.CharField(default="play", choices=TYPES, max_length=30,
         # Translators: this is used for the site-wide show metadata field
                                  verbose_name=_("Production Type"))
-    
+
     staff = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
     space = models.ForeignKey(Space, null=True, on_delete=models.SET_NULL,
                               verbose_name="Venue")
 
     residency_starts = models.DateField(null=True)
     residency_ends = models.DateField(null=True)
-    
+
     slug = models.SlugField(unique=True, db_index=True)
     invisible = models.BooleanField(default=False)
 
     liaisons = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True,
                                       related_name="liaison_shows")
-    
+
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
@@ -373,14 +373,14 @@ class Show(Season):
                  other.residency_starts >= self.residency_starts) or
                 (other.residency_ends <= self.residency_ends and
                  other.residency_ends > self.residency_starts))
-    
+
     @property
     def residency_length(self):
         return self.residency_ends - self.residency_starts
-    
+
     def __str__(self):
         return self.title
-    
+
     def people(self):
         return ", ".join([i.get_full_name() for i in self.staff.all()])
     people.short_description = "Exec Staff"

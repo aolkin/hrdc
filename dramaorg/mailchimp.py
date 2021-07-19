@@ -33,7 +33,7 @@ class Contact:
     def get_status(self):
         """
         Possible return values:
-        
+
         - subscribed
         - unsubscribed
         - cleaned
@@ -78,4 +78,4 @@ class Contact:
         if res.status_code != 200:
             logger.error("Failed to add '{}' to the list. ({})".format(self.email, res.text))
         return res.status_code == 200
-                      
+
