@@ -43,15 +43,15 @@ class MenuMixin:
             "active": current_url == "public_index"
         }]
 
+        if self.request.user.is_anonymous:
+            return context
+
         if self.request.user.venueapp_set.exists():
             menu[""].append({
                 "name": _("Read Applications"),
                 "url": reverse_lazy("venueapp:venuelist"),
                 "active": current_url == "venuelist"
             })
-
-        if self.request.user.is_anonymous:
-            return context
 
         staff = StaffMember.objects.filter(
             person__user=self.request.user, signed_on=True
