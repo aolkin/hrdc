@@ -43,6 +43,13 @@ class MenuMixin:
             "active": current_url == "public_index"
         }]
 
+        if self.request.user.venueapp_set.exists():
+            menu[""].append({
+                "name": _("Read Applications"),
+                "url": reverse_lazy("venueapp:venuelist"),
+                "active": current_url == "venuelist"
+            })
+
         if self.request.user.is_anonymous:
             return context
 
@@ -160,6 +167,7 @@ class IndexView(MenuMixin, TemplateView):
         if not self.request.user.is_anonymous:
             kwargs["roles"] = StaffMember.objects.filter(
                 person__user=self.request.user)
+            kwargs["readable"] = self.request.user.venueapp_set.all()
         return super().get_context_data(**kwargs)
 
 class ShowForm(forms.ModelForm):
@@ -701,28 +709,31 @@ class PreviewSubmitView(MenuMixin, UserStaffMixin, DetailView):
         messages.success(self.request, "Application for {} submitted to {}! Check your email for confirmation.".format(self.object, self.object.venuesand()))
         return redirect("venueapp:public_index")
 
-class AdminIndexView(LoginRequiredMixin, TemplateView):
-    verbose_name = "Venue Applications"
-    help_text = "read applications"
-
-    template_name = "venueapp/admin.html"
-
-    def get_context_data(self, **kwargs):
-        kwargs["readable"] = self.request.user.venueapp_set.all()
-        return super().get_context_data(**kwargs)
-
 class VenueSidebarMixin:
     def get_context_data(self, *args, **kwargs):
-        if not self.object.readers.filter(pk=self.request.user.pk).exists():
+        if hasattr(self, "object") and not self.object.readers.filter(
+                pk=self.request.user.pk).exists():
             raise PermissionDenied()
         context = super().get_context_data(*args, **kwargs)
         current_url = self.request.resolver_match.url_name
         menu = context["sidebar_menu"] = {}
+
         menu[""] = [{
-            "name": str(self.object),
-            "url": reverse_lazy("venueapp:applist", args=(self.object.pk,)),
-            "active": current_url == "applist"
+            "name": _("Return to Submitting Apps"),
+            "url": reverse_lazy("venueapp:public_index"),
+            "active": current_url == "public_index"
         }]
+
+        if self.request.user.venueapp_set.exists():
+            menu[_("Read Applications")] = [{
+                "name": str(venue),
+                "url": reverse_lazy("venueapp:applist", args=(venue.pk,)),
+                "active": (hasattr(self, "object") and
+                           self.object.pk == venue.pk)
+            } for venue in self.request.user.venueapp_set.all()]
+
+        if not hasattr(self, "object"):
+            return context
         
         for name, qs in (
                 ("Pre-Applications",
@@ -743,6 +754,16 @@ class VenueSidebarMixin:
                     "name": mark_safe('<em class="text-muted">(None currently available)</em>')
                 })
         return context
+
+class AdminIndexView(LoginRequiredMixin, VenueSidebarMixin, TemplateView):
+    verbose_name = "Venue Applications"
+    help_text = "read applications"
+
+    template_name = "venueapp/admin.html"
+
+    def get_context_data(self, **kwargs):
+        kwargs["readable"] = self.request.user.venueapp_set.all()
+        return super().get_context_data(**kwargs)
 
 class AdminListView(LoginRequiredMixin, VenueSidebarMixin, DetailView):
     template_name = "venueapp/list.html"

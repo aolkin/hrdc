@@ -5,6 +5,13 @@
 {% block content %}
 <div class="row justify-content-center">
   <div class="col-md-8">
+    {% if readable.exists %}
+    <div class="alert alert-info">
+      You are listed as a reader on one or more venue applications. To view
+      submitted applications, go
+      <a href="{% url 'venueapp:venuelist' %}">here</a>.
+    </div>
+    {% endif %}
     <h3 class="text-center">Venue Application Manager</h3>
     {% if live.exists %}
     <p class="text-center my-4">

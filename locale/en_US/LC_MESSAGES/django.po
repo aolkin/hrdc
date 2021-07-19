@@ -21,7 +21,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-17 17:26-0400\n"
+"POT-Creation-Date: 2021-07-19 00:52-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -207,35 +207,35 @@ msgid ""
 "Please elaborate on your preferences for residency length, if necessary."
 msgstr ""
 
-#: venueapp/models.py:213
+#: venueapp/models.py:217
 msgid ""
 "Big-picture conflicts for the upcoming season, such as other leadership "
 "positions or involvements."
 msgstr ""
 
 #. Translators: the staff category name
-#: venueapp/models.py:231
+#: venueapp/models.py:235
 msgid "Author"
 msgstr ""
 
 #. Translators: the staff category name with special privileges
-#: venueapp/models.py:233
+#: venueapp/models.py:237
 msgid "Executive"
 msgstr ""
 
-#: venueapp/models.py:368
+#: venueapp/models.py:372
 msgid "Income"
 msgstr ""
 
-#: venueapp/models.py:369
+#: venueapp/models.py:373
 msgid "Administrative Expenses"
 msgstr ""
 
-#: venueapp/models.py:370
+#: venueapp/models.py:374
 msgid "Production Expenses"
 msgstr ""
 
-#: venueapp/models.py:371
+#: venueapp/models.py:375
 msgid "Other Expenses"
 msgstr ""
 
@@ -279,8 +279,16 @@ msgid ""
 "residencies. Elaborate on your length preferences at the bottom of the page."
 msgstr ""
 
-#: venueapp/views.py:292
+#: venueapp/views.py:48 venueapp/views.py:728
+msgid "Read Applications"
+msgstr ""
+
+#: venueapp/views.py:300
 msgid ""
 "Unable to save changes, your application must have at least one executive "
 "staff member!"
+msgstr ""
+
+#: venueapp/views.py:722
+msgid "Return to Submitting Apps"
 msgstr ""
