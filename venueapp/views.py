@@ -404,7 +404,7 @@ class ResidencyView(MenuMixin, UserStaffMixin, FormMixin, UnsubmittedAppMixin,
                     current -= timedelta(days=7)
         else:
             current = residencies.first().start
-        end = residencies.last().end
+        end = residencies.order_by("end").last().end
         while current <= end:
             slots = [
                 self.get_residency(venue, current) for venue in venues
