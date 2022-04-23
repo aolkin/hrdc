@@ -3,6 +3,8 @@ from django.db.models import Q
 from django.views.generic.detail import SingleObjectMixin
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth import logout, login
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 
 from importlib import import_module
@@ -85,10 +87,7 @@ class UserStaffMixin:
         return super().dispatch(*args, **kwargs)
 
 
-def social_create_user(strategy, details, backend, user=None, *args, **kwargs):
-    if user:
-        return {'is_new': False}
-
+def social_create_user(strategy, details, backend, request, user=None, *args, **kwargs):
     fields = {
         "email":  details.get("email"),
         "source": "social"
@@ -96,13 +95,23 @@ def social_create_user(strategy, details, backend, user=None, *args, **kwargs):
 
     User = import_module("django.contrib.auth").get_user_model()
     qs = User.objects.filter(email__iexact=fields["email"])
-    if qs.exists():
-        return {
-            'is_new': False,
-            'user': qs.first()
-        }
+
+    is_new = not qs.exists()
+
+    if user and user.email != details.get("email"):
+        logout(request)
+        if qs.exists():
+            user = qs.first()
+        else:
+            user = None
+
+    if user is None:
+        user = strategy.create_user(**fields)
+        is_new = True
+
+    login(request, user, backend=settings.AUTHENTICATION_BACKENDS[-1])
 
     return {
-        'is_new': True,
-        'user': strategy.create_user(**fields)
+        'is_new': is_new,
+        'user': user
     }

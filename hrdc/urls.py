@@ -19,7 +19,7 @@ urlpatterns = [
     url(r'^email/', include('emailtracker.urls')),
     path(r'shortlinks/<slug:slug>', link, name="shortlink"),
     path('links/', include('shortlinks.urls')),
-    path('social/', include('social_django.urls', namespace='social')),
+    path('social/', include('hrdc.social_wrappers', namespace='social')),
 ]
 
 if settings.DEBUG:
