@@ -363,7 +363,7 @@ class ShowQueryView(View):
 class SeasonScriptView(BaseEmbedView):
     def get_context_data(self, **kwargs):
         year = self.request.GET.get("year") or config.year
-        season = parse_season(self.request.GET.get("season"))
+        season = parse_season(self.request.GET.get("season")) or config.season
         season_name = Season.SEASONS[int(season)][1]
         shows = PublicityInfo.objects.filter(
             show__season=season, show__year=year).exclude(
