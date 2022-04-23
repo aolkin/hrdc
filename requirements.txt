@@ -4,13 +4,13 @@ bleach~=3.3.0
 celery~=4.2.1
 channels==1.1.8
 django-model-utils==3.0.0
-Twisted[http2]~=20.3.0
-Twisted[tls]~=20.3.0
+Twisted[http2]~=22.4.0
+Twisted[tls]~=22.4.0
 service-identity==18.1.0
 social-auth-app-django==3.1.0
 social-auth-core==3.2.0
 django-crispy-forms==1.7.2
-Pillow==9.0.1
+Pillow==8.4.0
 django-admin-rangefilter==0.5.0
 -e git+https://github.com/aolkin/django-thumbs-v2.git@cdc9633c78aa420c0e70a0f27d3a0e5b01967f58#egg=django_thumbs_v2
 WeasyPrint==50
