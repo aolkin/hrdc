@@ -325,14 +325,11 @@ def parse_season(season):
 class ShowQueryView(View):
     def get(self, request, *args, **kwargs):
         params = request.GET
-        page = 1
+        page = int(params["page"]) if "page" in params else 1
         limit = min(25, int(params.get("limit", 25)))
         if "title" in params:
             qs = PublicityInfo.objects.filter(
                 show__title__icontains=params["title"])
-        elif "page" in params:
-            qs = PublicityInfo.objects.all()
-            page = int(params["page"])
         else:
             qs = PublicityInfo.objects.all()
             year = params.get("year") or params.get("showyear")
@@ -341,7 +338,7 @@ class ShowQueryView(View):
                 qs = qs.filter(show__year=year)
             if season:
                 qs = qs.filter(show__season=season)
-            if not (year or season):
+            if not (year or season or page):
                 qs = PublicityInfo.objects.filter(
                     show__season=config.season, show__year=config.year)
         qs = qs.exclude(show__space=None).exclude(
