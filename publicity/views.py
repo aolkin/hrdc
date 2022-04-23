@@ -233,10 +233,11 @@ class BaseEmbedView(TemplateView):
         res["Cache-Control"] = "no-cache"
         return res
 
-class ShowScriptView(BaseEmbedView, DetailView):
+class ShowScriptView(DetailView, BaseEmbedView):
     model = PublicityInfo
 
     def get_context_data(self, *args, **kwargs):
+        self.object = self.get_object()
         context = super().get_context_data(*args, **kwargs)
         context["innerHtml"] = render_to_string(
             "publicity/content.html", {
