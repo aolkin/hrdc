@@ -69,7 +69,8 @@ class PublicityInfo(models.Model):
     def embed_code(self, wrap=True):
         if self.id:
             code = '<script src="{}{}"></script>'.format(
-                settings.SITE_URL, reverse("publicity:script", args=(self.id,)))
+                settings.SITE_URL, reverse("publicity:script", args=(self.id,),
+                                           kwargs={"format": "js"}))
             if wrap:
                 return format_html("<pre>{}</pre>", code)
             else:

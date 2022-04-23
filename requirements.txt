@@ -19,3 +19,4 @@ asgi-redis==1.4.3
 redis==2.10.6
 hiredis==1.0.1
 requests==2.22.0
+django-cors-headers==3.10.1

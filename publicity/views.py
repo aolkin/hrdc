@@ -81,6 +81,14 @@ class IndexView(MenuMixin, InitializedLoginMixin, TemplateView):
 
     template_name = "publicity/index.html"
 
+    def get(self, *args, **kwargs):
+        if not self.request.user.is_anonymous:
+            for i in self.request.user.show_set.filter(
+                    space__isnull=False,
+                    publicity_info__isnull=True):
+                PublicityInfo(show=i).save()
+        return super().get(*args, **kwargs)
+
 DateFormSet = forms.inlineformset_factory(
     PublicityInfo, PerformanceDate, fields=("performance", "note"), extra=1,
     widgets={
@@ -213,9 +221,20 @@ class DisplayView(MenuMixin, DetailView):
     template_name = "publicity/display.html"
     model = PublicityInfo
 
-class ShowScriptView(DetailView):
+class BaseEmbedView(TemplateView):
+    def get_template_names(self):
+        return ["publicity/embed.{}".format(
+            self.request.resolver_match.kwargs["format"])]
+
+    def get(self, *args, format, **kwargs):
+        res = super().get(*args, **kwargs)
+        res["Content-Type"] = "application/{}".format(
+            "javascript" if format == "js" else "json")
+        res["Cache-Control"] = "no-cache"
+        return res
+
+class ShowScriptView(BaseEmbedView, DetailView):
     model = PublicityInfo
-    template_name = "publicity/embed.js"
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -240,15 +259,7 @@ class ShowScriptView(DetailView):
             }).replace("\n","")
         return context
 
-    def get(self, *args, **kwargs):
-        res = super().get(*args, **kwargs)
-        res["Content-Type"] = "application/javascript"
-        res["Cache-Control"] = "no-cache"
-        return res
-
-class SeasonScriptView(TemplateView):
-    template_name = "publicity/embed.js"
-
+class SeasonScriptView(BaseEmbedView):
     def get_context_data(self, **kwargs):
         year = self.request.GET.get("year") or config.year
         season = self.request.GET.get("season") or config.season
@@ -273,12 +284,6 @@ class SeasonScriptView(TemplateView):
                 "venues": sorted(sorted_shows, key=lambda x: x[0].order)
             }).replace("\n", "")
         return super().get_context_data(**kwargs)
-
-    def get(self, *args, **kwargs):
-        res = super().get(*args, **kwargs)
-        res["Content-Type"] = "application/javascript"
-        res["Cache-Control"] = "no-cache"
-        return res
 
 class NewsletterMixin:
     def get_context_data(self, *args, **kwargs):
@@ -438,9 +443,7 @@ class CalendarView(TemplateView):
         return super().get_context_data(**kwargs)
 
 
-class UpcomingScriptView(TemplateView):
-    template_name = "publicity/embed.js"
-
+class UpcomingScriptView(BaseEmbedView):
     def get_context_data(self, **kwargs):
         now = timezone.localtime(timezone.now())
         kwargs["innerHtml"] = render_to_string(
@@ -454,12 +457,6 @@ class UpcomingScriptView(TemplateView):
                 "site_url": settings.SITE_URL,
             }).replace("\n", "")
         return super().get_context_data(**kwargs)
-
-    def get(self, *args, **kwargs):
-        res = super().get(*args, **kwargs)
-        res["Content-Type"] = "application/javascript"
-        res["Cache-Control"] = "no-cache"
-        return res
 
 class AdminIndexView(PermissionRequiredMixin, TemplateView):
     verbose_name = "Show Information"

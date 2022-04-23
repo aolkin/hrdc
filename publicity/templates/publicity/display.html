@@ -6,7 +6,7 @@
 <div class="row justify-content-center">
   <div class="col">
     <h3>{{ object }}</h3>
-    <script src="{% url 'publicity:script' object.pk %}?h=h5"></script>
+    <script src="{% url 'publicity:script' object.pk 'js' %}?h=h5"></script>
     {% if request.user.is_board %}
     <div class="alert alert-secondary">
       To include this in another webpage, insert the following code snippet:

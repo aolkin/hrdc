@@ -9,7 +9,7 @@ urlpatterns = [
     url(r'^$', IndexView.as_view(), name="index"),
     url(r'^show/(?P<pk>\d+)/', include([
         url(r'^$', DisplayView.as_view(), name="display"),
-        url(r'^script.js$', ShowScriptView.as_view(), name="script"),
+        url(r'^script.(?P<format>js|json)$', ShowScriptView.as_view(), name="script"),
         url(r'^info/$', InfoView.as_view(), name="info"),
         url(r'^people/$', PeopleView.as_view(), name="people"),
         url(r'^people/import/staff$', ImportStaff.as_view(),
@@ -23,8 +23,8 @@ urlpatterns = [
     path('calendar/', CalendarView.as_view(), name="public_index"),
     path('calendar/<int:year>/<int:month>/', CalendarView.as_view(),
          name="calendar"),
-    path('upcoming.js', UpcomingScriptView.as_view(), name="upcoming"),
-    path('season.js', SeasonScriptView.as_view(), name="season"),
+    url('^upcoming.(?P<format>js|json)$', UpcomingScriptView.as_view(), name="upcoming"),
+    url('^season.(?P<format>js|json)$', SeasonScriptView.as_view(), name="season"),
     url(r'^admin/$', AdminIndexView.as_view(), name="admin"),
     url(r'^admin/', include(([
         path("season/<int:year>/<int:season>/", AdminSeasonView.as_view(),
