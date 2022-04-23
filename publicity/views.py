@@ -327,6 +327,8 @@ class ShowQueryView(View):
         params = request.GET
         page = int(params["page"]) if "page" in params else 1
         limit = min(25, int(params.get("limit", 25)))
+        year = None
+        season = None
         if "title" in params:
             qs = PublicityInfo.objects.filter(
                 show__title__icontains=params["title"])
@@ -334,13 +336,13 @@ class ShowQueryView(View):
             qs = PublicityInfo.objects.all()
             year = params.get("year") or params.get("showyear")
             season = parse_season(params.get("season"))
+            if not (year or season or "page" in params):
+                year = config.year
+                season = config.season
             if year:
                 qs = qs.filter(show__year=year)
             if season:
                 qs = qs.filter(show__season=season)
-            if not (year or season or page):
-                qs = PublicityInfo.objects.filter(
-                    show__season=config.season, show__year=config.year)
         qs = qs.exclude(show__space=None).exclude(
             show__residency_starts=None).order_by(
                 "-show__year", "-show__season")
@@ -352,7 +354,9 @@ class ShowQueryView(View):
             "next_page": show_page.next_page_number() if show_page.has_next() else None,
             "prev_page": show_page.previous_page_number() if show_page.has_previous() else None,
             "count": paginator.count,
-            "pages": paginator.num_pages
+            "pages": paginator.num_pages,
+            "year": year,
+            "season": Season.SEASONS[int(season)][1] if season else None
         })
         res["Cache-Control"] = "no-cache"
         return res
@@ -376,6 +380,25 @@ class SeasonScriptView(BaseEmbedView):
                 "year": year,
                 "season": season_name,
                 "venues": sorted(sorted_shows, key=lambda x: x[0].order)
+            }).replace("\n", "")
+        return super().get_context_data(**kwargs)
+
+class SeasonsScriptView(BaseEmbedView):
+    def get_context_data(self, **kwargs):
+        shows = (PublicityInfo.objects
+                   .exclude(show__space=None)
+                   .exclude(show__residency_starts=None)
+                   .values("show__year", "show__season")
+                   .order_by("-show__year", "show__season")
+                   .distinct())
+        years = defaultdict(set)
+        print(shows)
+        for i in shows:
+            years[i["show__year"]].add(i["show__season"])
+        kwargs["innerHtml"] = render_to_string(
+            "publicity/render_seasons.html", {
+                "years": years.items,
+                "seasons": Season.SEASONS
             }).replace("\n", "")
         return super().get_context_data(**kwargs)
 

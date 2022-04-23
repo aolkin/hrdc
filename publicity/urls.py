@@ -25,6 +25,7 @@ urlpatterns = [
          name="calendar"),
     url('^upcoming.(?P<format>js|json)$', UpcomingScriptView.as_view(), name="upcoming"),
     url('^season.(?P<format>js|json)$', SeasonScriptView.as_view(), name="season"),
+    url('^seasons.(?P<format>js|json)$', SeasonsScriptView.as_view(), name="seasons"),
     url(r'^admin/$', AdminIndexView.as_view(), name="admin"),
     url(r'^admin/', include(([
         path("season/<int:year>/<int:season>/", AdminSeasonView.as_view(),

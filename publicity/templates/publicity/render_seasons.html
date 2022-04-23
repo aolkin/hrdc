@@ -1,0 +1,16 @@
+<table style="border-width: 0; width: auto; margin: auto;">
+{% for year, yearseasons in years %}
+<tr>
+  <th style="border-width: 0; padding: 4px;">{{ year }}</th>
+  {% for id, season in seasons %}
+  <td style="border-width: 0; padding: 2px 4px;">
+    {% if id in yearseasons %}
+    <a href="/season/{{ year }}/{{ season|lower }}/">
+      {{ season }}
+    </a>
+    {% endif %}
+  </td>
+  {% endfor %}
+</tr>
+{% endfor %}
+</table>

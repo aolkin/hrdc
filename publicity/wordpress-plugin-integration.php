@@ -8,7 +8,7 @@ Author: Aaron Olkin
 License: GPLv2 or later
 */
 
-function makePost($show) {
+function makePost($show, $include_season) {
   $post_id = 0 - $show->show_id; // negative ID, to avoid clash with a valid post
   $post = new stdClass();
   $post->ID = $post_id;
@@ -17,7 +17,12 @@ function makePost($show) {
   $post->post_date_gmt = current_time( 'mysql', 1 );
   $post->post_title = $show->title;
   $post->post_content = $show->body;
-  $post->post_excerpt =  "<b>" . $show->season . " " . $show->year . "</b><br>" . $show->blurb;
+  if ($include_season) {
+    $show_season = "<b>" . $show->season . " " . $show->year . "</b> - ";
+  } else {
+    $show_season = "";
+  }
+  $post->post_excerpt =  $show_season . $show->venue . "<br>" . $show->blurb;
   $post->post_category = 'shows';
   $post->post_status = 'publish';
   $post->comment_status = 'closed';
@@ -38,7 +43,10 @@ function fetch( $query ) {
     return false;
   }
   $body = wp_remote_retrieve_body($response);
-  return json_decode($body);
+  $data = json_decode($body);
+  wp_cache_add("myhrdc_year", $data->year);
+  wp_cache_add("myhrdc_season", $data->season);
+  return $data;
 }
 
 function updateQuerySingle( $wp_post ) {
@@ -98,9 +106,9 @@ function updateQueryMulti( $wp_posts, $meta ) {
   $wp_query->is_single = false;
   $wp_query->is_attachment = false;
   $wp_query->is_archive = true;
-  $wp_query->is_category = true;
+  $wp_query->is_category = !($meta->year && $meta->season);
   $wp_query->is_tag = false;
-  $wp_query->is_tax = false;
+  $wp_query->is_tax = $meta->year && $meta->season;
   $wp_query->is_author = false;
   $wp_query->is_date = false;
   $wp_query->is_year = false;
@@ -145,14 +153,22 @@ function spoof_main_query() {
   if (is_search()) {
     $shows = fetch("/query?title=" . get_search_query());
     if ($shows->count > 0) {
-      $posts = array_map("makePost", $shows->shows);
+      $posts = array_map(fn($value) => makePost($value, true), $shows->shows);
       updateQuerySearch($posts, $shows);
     }
+  } else if (str_starts_with($request_path, '/season/')) {
+    $params = explode('/', substr($request_path, 8));
+    if (count($params) < 2) {
+      wp_redirect('/shows/');
+    }
+    $shows = fetch("/query?year=" . $params[0] . "&season=" . $params[1]);
+    $posts = array_map(fn($value) => makePost($value, false), $shows->shows);
+    updateQueryMulti($posts, $shows);
   } else if (str_starts_with($request_path, '/shows/')) {
     $slug = substr($request_path, 7);
     if (empty($slug)) {
       $shows = fetch("/query?" . parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY));
-      $posts = array_map("makePost", $shows->shows);
+      $posts = array_map(fn($value) => makePost($value, true), $shows->shows);
       updateQueryMulti($posts, $shows);
     } else {
       if (str_ends_with($slug, '/')) {
@@ -160,11 +176,22 @@ function spoof_main_query() {
       }
       $show = fetch("/slug/" . $slug);
       if ($show != false) {
-	$wp_post = makePost($show);
+	$wp_post = makePost($show, true);
 	updateQuerySingle($wp_post);
       }
     }
    }
 }
+
+add_filter('get_the_archive_title', function ($title, $original_title, $prefix) {
+    if (is_tax()) {
+      $year = wp_cache_get("myhrdc_year");
+      $season = wp_cache_get("myhrdc_season");
+      if (!empty($year) && !empty($season)) {
+	return $season . " " . $year;
+      }
+    }
+    return $title;
+  }, 99, 3);
 
 ?>
