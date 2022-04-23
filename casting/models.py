@@ -296,6 +296,9 @@ class ActorSeasonMeta(Season):
     def __str__(self):
         return "{} Meta for {}".format(self.seasonstr(), self.actor)
 
+    class Meta:
+        unique_together = ('year', 'season', 'actor')
+
 class Audition(AssociateShowMixin):
     STATUSES = (
         ("waiting", "Waiting"),
