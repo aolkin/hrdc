@@ -4,7 +4,7 @@
   <b>{{ venue|upper }}</b>
   {% for show in shows %}
   <br>
-  <a {% if show.website_page %}href="{{ show.website_page }}"{% endif %}>
+  <a href="{{ show.link }}">
     {{ show }}
   </a>
   {% endfor %}

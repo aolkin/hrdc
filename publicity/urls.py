@@ -33,4 +33,8 @@ urlpatterns = [
             url(r'^$', AdminShowView.as_view(), name="show"),
         ])),
     ], "admin"))),
+    url('^api/', include([
+        path('slug/<slug:slug>', ShowDataView.as_view(), name="show_data"),
+        path('query', ShowQueryView.as_view(), name="show_query")
+    ]))
 ]

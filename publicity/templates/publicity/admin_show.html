@@ -92,8 +92,8 @@
   </div>
   <div class="col-sm-3"><b>Webpage:</b></div>
   <div class="col-sm-9">
-    <a {% if object.website_page %}href="{{ object.website_page }}"{% endif %}>
-      {{ object.website_page|default:"(not set)" }}
+    <a {% if object.link %}href="{{ object.link }}"{% endif %}>
+      {{ object.link|default:"(not set)" }}
     </a>
   </div>
 </div>

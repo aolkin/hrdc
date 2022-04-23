@@ -1,1 +1,1 @@
-{"html":"{{ innerHtml|escapejs }}"}
+{"html":"{{ innerHtml|escapejs }}","title":"{{ title|escapejs }}","id":{{ id|default:0 }}}

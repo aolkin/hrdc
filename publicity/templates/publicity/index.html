@@ -37,8 +37,8 @@
       <td>{{ show.people }}</td>
       <td>{{ meta.next_performance|default:"-" }}</td>
       <td>
-	{% if meta.website_page %}
-	<a href="{{ meta.website_page }}">{{ meta.website_page }}</a>
+	{% if meta.link %}
+	<a href="{{ meta.link }}">{{ meta.link }}</a>
 	{% else %}
 	<small class="text-muted">Unknown or not yet linked</small>
 	{% endif %}

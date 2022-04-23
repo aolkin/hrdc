@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.core.paginator import Paginator
 from django.views.generic import View, TemplateView
 from django.views.generic.edit import UpdateView, CreateView, BaseCreateView
 from django.views.generic.detail import SingleObjectMixin, DetailView
@@ -258,19 +259,104 @@ class ShowScriptView(DetailView, BaseEmbedView):
                 "is_show_staff": context["object"].show.staff.filter(
                     id=self.request.user.id).exists()
             }).replace("\n","")
+        context["title"] = str(context["object"])
+        context["id"] = context["object"].id
         return context
+
+def render_show(show, request):
+    return render_to_string(
+        "publicity/content.html", {
+            "object": show,
+            "h": request.GET.get("h", "h3"),
+            "enabled": {
+                "cover": request.GET.get("cover", "") != "0",
+                "credits": request.GET.get("credits", "") != "0",
+                "cast": request.GET.get("cast", "") != "0",
+                "staff": request.GET.get("staff", "") != "0",
+                "band": request.GET.get("band", "") != "0",
+                "about": request.GET.get("about", "") != "0",
+                "dates": request.GET.get("dates", "") != "0",
+            },
+            "cast": ShowPerson.collate(show.cast()),
+            "staff": ShowPerson.collate(show.staff()),
+            "band": ShowPerson.collate(show.band()),
+            "is_show_staff": show.show.staff.filter(id=request.user.id).exists()
+        }).replace("\n","")
+
+class ShowScriptView(DetailView, BaseEmbedView):
+    model = PublicityInfo
+
+    def get_context_data(self, *args, **kwargs):
+        self.object = self.get_object()
+        context = super().get_context_data(*args, **kwargs)
+        context["innerHtml"] = render_show(context["object"], self.request)
+        context["title"] = str(context["object"])
+        context["id"] = context["object"].id
+        return context
+
+def prep_show_data(show, body):
+    return {
+        "body": body,
+        "title": show.show.title,
+        "slug": show.show.slug,
+        "link": show.link,
+        "publicity_id": show.id,
+        "show_id": show.show.id,
+        "year": show.show.year,
+        "season": Season.SEASONS[show.show.season][1],
+        "venue": str(show.show.space)
+    }
+
+class ShowDataView(View):
+    def get(self, request, *args, slug, **kwargs):
+        show = PublicityInfo.objects.get(show__slug=slug)
+        res = JsonResponse(prep_show_data(show, render_show(show, request)))
+        res["Cache-Control"] = "no-cache"
+        return res
+
+def parse_season(season):
+    if type(season) == str and len(season) > 1:
+        for val, name in Season.SEASONS:
+            if name.lower() == season.lower():
+                return val
+    return config.season
+
+class ShowQueryView(View):
+    def get(self, request, *args, **kwargs):
+        params = request.GET
+        page = 1
+        limit = min(25, int(params.get("limit", 25)))
+        if "title" in params:
+            qs = PublicityInfo.objects.filter(
+                show__title__icontains=params["title"])
+        elif "page" in params:
+            qs = PublicityInfo.objects.all()
+            page = int(params["page"])
+        else:
+            year = params.get("year") or config.year
+            season = parse_season(params.get("season"))
+            qs = PublicityInfo.objects.filter(
+                show__season=season, show__year=year)
+        qs = qs.exclude(show__space=None).exclude(
+            show__residency_starts=None).order_by(
+                "show__year", "show__season")
+        paginator = Paginator(qs, limit)
+        show_page = paginator.get_page(page)
+        shows = show_page.object_list
+        res = JsonResponse({
+            "shows": list(map(lambda show: prep_show_data(show, show.blurb), shows)),
+            "next_page": show_page.next_page_number() if show_page.has_next() else None,
+            "prev_page": show_page.previous_page_number() if show_page.has_previous() else None,
+            "count": paginator.count,
+            "pages": paginator.num_pages
+        })
+        res["Cache-Control"] = "no-cache"
+        return res
 
 class SeasonScriptView(BaseEmbedView):
     def get_context_data(self, **kwargs):
         year = self.request.GET.get("year") or config.year
-        season = self.request.GET.get("season") or config.season
-        if type(season) == str and len(season) > 1:
-            for val, name in Season.SEASONS:
-                if name.lower() == season.lower():
-                    season = val
-                    break
-            if type(season) == str:
-                season = config.season
+        season = parse_season(self.request.GET.get("season"))
         season_name = Season.SEASONS[int(season)][1]
         shows = PublicityInfo.objects.filter(
             show__season=season, show__year=year).exclude(

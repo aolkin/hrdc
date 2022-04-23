@@ -6,6 +6,8 @@ from django.contrib.auth import get_user_model
 from django.utils.html import format_html, mark_safe
 from django.urls import reverse_lazy, reverse
 
+from config import config
+
 import bleach
 
 from django_thumbs.fields import ImageThumbsField
@@ -80,7 +82,7 @@ class PublicityInfo(models.Model):
 
     @property
     def link(self):
-        return self.website_page #or self.get_absolute_url()
+        return self.website_page or config.publicity_shows_base_url + self.show.slug + "/"
 
     def __str__(self):
         return str(self.show)
