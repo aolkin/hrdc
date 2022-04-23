@@ -343,7 +343,7 @@ class ShowQueryView(View):
                     show__season=config.season, show__year=config.year)
         qs = qs.exclude(show__space=None).exclude(
             show__residency_starts=None).order_by(
-                "show__year", "show__season")
+                "-show__year", "-show__season")
         paginator = Paginator(qs, limit)
         show_page = paginator.get_page(page)
         shows = show_page.object_list

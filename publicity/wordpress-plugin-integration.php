@@ -139,7 +139,7 @@ function updateQuerySearch( $wp_posts, $meta ) {
   $wp->register_globals();
 }
 
-add_action( 'template_redirect', 'spoof_main_query' );
+add_action( 'template_redirect', 'spoof_main_query', 1);
 function spoof_main_query() {
   $request_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
   if (is_search()) {
