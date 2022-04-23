@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.core.paginator import Paginator
 from django.views.generic import View, TemplateView
 from django.views.generic.edit import UpdateView, CreateView, BaseCreateView
@@ -297,6 +297,7 @@ class ShowScriptView(DetailView, BaseEmbedView):
 def prep_show_data(show, body):
     return {
         "body": body,
+        "blurb": show.blurb,
         "title": show.show.title,
         "slug": show.show.slug,
         "link": show.link,
@@ -309,7 +310,7 @@ def prep_show_data(show, body):
 
 class ShowDataView(View):
     def get(self, request, *args, slug, **kwargs):
-        show = PublicityInfo.objects.get(show__slug=slug)
+        show = get_object_or_404(PublicityInfo, show__slug=slug)
         res = JsonResponse(prep_show_data(show, render_show(show, request)))
         res["Cache-Control"] = "no-cache"
         return res
