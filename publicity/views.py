@@ -320,7 +320,7 @@ def parse_season(season):
         for val, name in Season.SEASONS:
             if name.lower() == season.lower():
                 return val
-    return config.season
+    return None
 
 class ShowQueryView(View):
     def get(self, request, *args, **kwargs):
@@ -334,10 +334,16 @@ class ShowQueryView(View):
             qs = PublicityInfo.objects.all()
             page = int(params["page"])
         else:
-            year = params.get("year") or config.year
+            qs = PublicityInfo.objects.all()
+            year = params.get("year") or params.get("showyear")
             season = parse_season(params.get("season"))
-            qs = PublicityInfo.objects.filter(
-                show__season=season, show__year=year)
+            if year:
+                qs = qs.filter(show__year=year)
+            if season:
+                qs = qs.filter(show__season=season)
+            if not (year or season):
+                qs = PublicityInfo.objects.filter(
+                    show__season=config.season, show__year=config.year)
         qs = qs.exclude(show__space=None).exclude(
             show__residency_starts=None).order_by(
                 "show__year", "show__season")
