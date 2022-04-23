@@ -270,6 +270,7 @@ class SeasonScriptView(BaseEmbedView):
                     break
             if type(season) == str:
                 season = config.season
+        season_name = Season.SEASONS[int(season)][1]
         shows = PublicityInfo.objects.filter(
             show__season=season, show__year=year).exclude(
                 show__space=None).exclude(show__residency_starts=None)
@@ -281,6 +282,8 @@ class SeasonScriptView(BaseEmbedView):
                         for i, val in venues.items()]
         kwargs["innerHtml"] = render_to_string(
             "publicity/render_season.html", {
+                "year": year,
+                "season": season_name,
                 "venues": sorted(sorted_shows, key=lambda x: x[0].order)
             }).replace("\n", "")
         return super().get_context_data(**kwargs)
