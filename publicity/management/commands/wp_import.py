@@ -39,14 +39,20 @@ def season_name(season):
     return Season.SEASONS[season][1]
 
 def confirm(prompt="Are you sure (y/n)? "):
-    choice = input(prompt)
+    try:
+        choice = input(prompt)
+    except (EOFError, InterruptedError):
+        raise CommandError("Cancelled")
     if not sys.stdin.isatty():
         print()
     return choice.lower().startswith("y")
 
 def choose(question, choices: dict):
     print("\n".join([f"\t{i}) {label}" for i, label in choices.items()]))
-    choice = input(question)
+    try:
+        choice = input(question)
+    except (EOFError, InterruptedError):
+        raise CommandError("Cancelled")
     if not sys.stdin.isatty():
         print()
         return min(choices.keys())

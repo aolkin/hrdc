@@ -395,7 +395,7 @@ class SeasonSidebarMixin:
                 "year", flat=True).distinct().order_by("-year"):
             submenu = menu[str(year)] = []
             for season in Show.objects.filter(year=year).values_list(
-                "season", flat=True).distinct().order_by("-season"):
+                "season", flat=True).distinct().order_by("season"):
                 submenu.append({
                     "name": "{} {}".format(Show.SEASONS[season][1], year),
                     "url": reverse_lazy("dramaorg:season",
