@@ -18,7 +18,7 @@ from publicity.models import PublicityInfo, ShowPerson, PerformanceDate
 
 HEADER_RE = re.compile(r"^\s*([A-Z &,]{4,})\s*$", re.MULTILINE)
 YEAR_RE = re.compile(r"^(.+) (20|')(\d{2})\D*$")
-RUNTIME_RE = re.compile(r"^Run ?time:? (.+)$", re.IGNORECASE)
+RUNTIME_RE = re.compile(r"^Run ?time:? (.+?)(?:\. (\S+.*))?$", re.IGNORECASE)
 SPLIT_RE = re.compile(r"\s*(?:(?:, ??)|(?:&| and )\s*)+(?=\w)", re.IGNORECASE)
 PRESENTED_RE = re.compile(r"^Presented by:? (?:the )?(.+)$", re.IGNORECASE)
 CREDIT_PATTERN = r"(?:Written|Book|Music|Libretto|Lyrics|Adapted|Created)"
@@ -41,7 +41,7 @@ def season_name(season):
 def confirm(prompt="Are you sure (y/n)? "):
     try:
         choice = input(prompt)
-    except (EOFError, InterruptedError):
+    except (EOFError, KeyboardInterrupt):
         raise CommandError("Cancelled")
     if not sys.stdin.isatty():
         print()
@@ -51,7 +51,7 @@ def choose(question, choices: dict):
     print("\n".join([f"\t{i}) {label}" for i, label in choices.items()]))
     try:
         choice = input(question)
-    except (EOFError, InterruptedError):
+    except (EOFError, KeyboardInterrupt):
         raise CommandError("Cancelled")
     if not sys.stdin.isatty():
         print()
@@ -117,13 +117,16 @@ class ShowParser:
 
     def parse_line(self, text: str):
         line = text.strip()
+        runtime = RUNTIME_RE.match(line)
         if HEADER_RE.match(line) and line != "OBERON":
             self.update_state(line.lower())
-        elif RUNTIME_RE.match(line):
+        elif runtime:
             if self.runtime:
                 raise InvalidState(f"Found runtime \"{line}\" but runtime was "
                                    f"already present: \"{self.runtime}\"")
-            self.runtime = RUNTIME_RE.match(line).group(1)
+            self.runtime = runtime.group(1)
+            if runtime.group(2):
+                self.blurb_suffix += runtime.group(2) + "\n"
         elif DAY_RE.match(line):
             self.parse_date(line)
         elif self.state == self.MASTHEAD:
