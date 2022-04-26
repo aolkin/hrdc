@@ -20,7 +20,8 @@ class PublicityInfo(models.Model):
     show = models.OneToOneField(settings.SHOW_MODEL, on_delete=models.CASCADE,
                                 related_name="publicity_info")
 
-    credits = models.TextField(blank=True, verbose_name="Masthead Credits", help_text="Include authorial credits, as well as directors and producers.")
+    credits = models.TextField(blank=True, verbose_name="Masthead Credits",
+                               help_text="Include authorial credits, as well as directors and producers.")
     contact_email = models.EmailField(blank=True,
                                       verbose_name="Email for Publicity")
     runtime = models.CharField(
@@ -82,10 +83,13 @@ class PublicityInfo(models.Model):
 
     @property
     def link(self):
-        return self.website_page or config.publicity_shows_base_url + self.show.slug + "/"
+        if self.website_page or config.publicity_shows_base_url:
+            return self.website_page or config.publicity_shows_base_url + self.show.slug + "/"
+        else:
+            return reverse("publicity:display", args=(self.id,))
 
     def __str__(self):
-        return str(self.show)
+        return self.show.name
 
     @property
     def next_performance(self):

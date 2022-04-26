@@ -35,7 +35,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',
     'django_thumbs',
     'social_django',
     'rangefilter',
@@ -59,7 +58,6 @@ CHANNEL_LAYERS = {
 }
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -222,8 +220,8 @@ ACTIVE_YEAR_KEY = "year"
 
 THUMBS_JPG = False
 
-CORS_ALLOWED_ORIGINS = [
-    "https://hrdctheater.org"
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "https://hrdctheater.org"
+# ]
 
 from .local_settings import *

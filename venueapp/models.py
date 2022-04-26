@@ -121,7 +121,7 @@ class Application(models.Model):
     length_description = models.TextField(verbose_name=_("Residency Length Preferences"), help_text=_("Please elaborate on your preferences for residency length, if necessary."), blank=True)
 
     def __str__(self):
-        return str(self.show)
+        return self.show.name
 
     @property
     def due(self):

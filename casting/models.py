@@ -215,7 +215,7 @@ class CastingMeta(models.Model):
         )
 
     def __str__(self):
-        return str(self.show)
+        return self.show.name
 
     @property
     def signed_actors(self):

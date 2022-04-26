@@ -190,7 +190,7 @@ class User(auth.models.AbstractBaseUser, auth.models.PermissionsMixin):
 
 @receiver(post_save, sender=User)
 def invite_user(sender, instance, created, raw, **kwargs):
-    if sender == User and created and not instance.password:
+    if sender == User and not raw and created and not instance.password:
         if instance.source == "default":
             email.activate(instance)
 
@@ -381,6 +381,10 @@ class Show(Season):
     def __str__(self):
         return self.title
 
+    @property
+    def name(self):
+        return self.title
+
     def people(self):
         return ", ".join([i.get_full_name() for i in self.staff.all()])
     people.short_description = "Exec Staff"
@@ -420,9 +424,12 @@ def fix_slug(sender, instance, raw, *args, **kwargs):
     if sender == Show and not raw:
         if not instance.slug:
             instance.slug = slugify(instance.title)
-        i = 2
+        i = 1
         slug = instance.slug
         while Show.objects.filter(slug=instance.slug).exclude(
                 pk=instance.pk).exists():
-            instance.slug = "{}-{}".format(slug, i)
+            if i == 1:
+                instance.slug = "{}-{}".format(slug, instance.year)
+            else:
+                instance.slug = "{}-{}".format(slug, i)
             i += 1

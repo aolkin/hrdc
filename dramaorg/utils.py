@@ -88,25 +88,19 @@ class UserStaffMixin:
 
 
 def social_create_user(strategy, details, backend, request, user=None, *args, **kwargs):
-    fields = {
-        "email":  details.get("email"),
-        "source": "social"
-    }
-
     User = import_module("django.contrib.auth").get_user_model()
-    qs = User.objects.filter(email__iexact=fields["email"])
-
-    is_new = not qs.exists()
+    qs = User.objects.filter(email__iexact=details.get("email"))
 
     if user and user.email != details.get("email"):
         logout(request)
-        if qs.exists():
-            user = qs.first()
-        else:
-            user = None
+        user = None
+
+    is_new = False
+    if qs.exists():
+        user = qs.first()
 
     if user is None:
-        user = strategy.create_user(**fields)
+        user = strategy.create_user(email=details.get("email"), source="social")
         is_new = True
 
     login(request, user, backend=settings.AUTHENTICATION_BACKENDS[-1])

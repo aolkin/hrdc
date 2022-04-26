@@ -228,7 +228,7 @@ class FinanceInfo(models.Model):
         return self.expense_set.filter(status=0)
 
     def __str__(self):
-        return str(self.show)
+        return self.show.name
 
     def get_absolute_url(self):
         return reverse_lazy("finance:budget", args=(self.pk,))

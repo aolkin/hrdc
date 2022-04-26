@@ -234,35 +234,6 @@ class BaseEmbedView(TemplateView):
         res["Cache-Control"] = "no-cache"
         return res
 
-class ShowScriptView(DetailView, BaseEmbedView):
-    model = PublicityInfo
-
-    def get_context_data(self, *args, **kwargs):
-        self.object = self.get_object()
-        context = super().get_context_data(*args, **kwargs)
-        context["innerHtml"] = render_to_string(
-            "publicity/content.html", {
-                "object": context["object"],
-                "h": self.request.GET.get("h", "h3"),
-                "enabled": {
-                    "cover": self.request.GET.get("cover", "") != "0",
-                    "credits": self.request.GET.get("credits", "") != "0",
-                    "cast": self.request.GET.get("cast", "") != "0",
-                    "staff": self.request.GET.get("staff", "") != "0",
-                    "band": self.request.GET.get("band", "") != "0",
-                    "about": self.request.GET.get("about", "") != "0",
-                    "dates": self.request.GET.get("dates", "") != "0",
-                },
-                "cast": ShowPerson.collate(context["object"].cast()),
-                "staff": ShowPerson.collate(context["object"].staff()),
-                "band": ShowPerson.collate(context["object"].band()),
-                "is_show_staff": context["object"].show.staff.filter(
-                    id=self.request.user.id).exists()
-            }).replace("\n","")
-        context["title"] = str(context["object"])
-        context["id"] = context["object"].id
-        return context
-
 def render_show(show, request):
     return render_to_string(
         "publicity/content.html", {
@@ -392,7 +363,6 @@ class SeasonsScriptView(BaseEmbedView):
                    .order_by("-show__year", "show__season")
                    .distinct())
         years = defaultdict(set)
-        print(shows)
         for i in shows:
             years[i["show__year"]].add(i["show__season"])
         kwargs["innerHtml"] = render_to_string(

@@ -33,7 +33,7 @@ class ArchivalInfo(models.Model):
         return os.path.basename(self.program.name)
 
     def __str__(self):
-        return str(self.show)
+        return self.show.name
 
     def get_absolute_url(self):
         return reverse_lazy("archive:show", args=(self.pk,))
