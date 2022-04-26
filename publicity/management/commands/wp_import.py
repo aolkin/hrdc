@@ -309,10 +309,11 @@ class Command(BaseCommand):
             self.update_performance_dates(info, parser.performances, parser.performance_note)
 
             show: Show = info.show
-            if show.season == 3 and show.residency_starts.year == show.year and show.residency_starts.month < 6:
-                show.residency_starts = plus_one_year(show.residency_starts)
-                show.residency_ends = plus_one_year(show.residency_ends)
-                show.save()
+            if show.season == 3 and show.residency_starts:
+                if show.residency_starts.year == show.year and show.residency_starts.month < 6:
+                    show.residency_starts = plus_one_year(show.residency_starts)
+                    show.residency_ends = plus_one_year(show.residency_ends)
+                    show.save()
 
         for parser, info in infos:
             self.add_people(info, parser.people)
