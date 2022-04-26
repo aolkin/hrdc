@@ -17,7 +17,7 @@ from dramaorg.models import Show, Space, Building, User, Season
 from publicity.models import PublicityInfo, ShowPerson, PerformanceDate
 
 HEADER_RE = re.compile(r"^\s*([A-Z &,]{4,})\s*$", re.MULTILINE)
-YEAR_RE = re.compile(r"^(.+) (20|')(\d{2})\D*$")
+YEAR_RE = re.compile(r"^(.+) (20|'|‘)(\d{2})\D*$")
 RUNTIME_RE = re.compile(r"^Run ?time:? (.+?)(?:\. (\S+.*))?$", re.IGNORECASE)
 SPLIT_RE = re.compile(r"\s*(?:(?:, ??)|(?:&| and )\s*)+(?=\w)", re.IGNORECASE)
 PRESENTED_RE = re.compile(r"^Presented by:? (?:the )?(.+)$", re.IGNORECASE)
@@ -25,7 +25,7 @@ CREDIT_PATTERN = r"(?:Written|Book|Music|Libretto|Lyrics|Adapted|Created)"
 AUTHOR_RE = re.compile(r"^({0}(?: and (?:{0}|Directed|Music Directed))? by):? (.+)$".format(CREDIT_PATTERN), re.IGNORECASE)
 DAY_RE = re.compile(r"^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),? ", re.IGNORECASE)
 TIME_PATTERN = r"([0-2]?[0-9])[:.]?([0-5][0-9])? ?(?i:([ap]\.?m\.?))?"
-DATE_RE = re.compile(r"^[A-Z][a-z]+,? *([A-Z][a-z]{2,}) ([0-3]?\d)(?i:th|rd|nd|st)?,?\s+" +
+DATE_RE = re.compile(r"^[A-Z][a-z]+,? *([A-Z][a-z]{2,}) ([0-3]?\d)(?i:th|rd|nd|st)?,?\s*" +
                      r"(?:(?i:@|at)? ?{0}(?: ?(?:and|&|,) ?{0})?)?\.? ?\(?(\*|.+?)?\)?$".format(TIME_PATTERN))
 PEOPLE_RE = re.compile(r"^(?:(\S+?\s*?.*?) ?(?:…|:|\.{3,}) ?)?(\S*?\s*?.*?)$")
 THEATRE_THEATRE_RE = re.compile("(Theat)re", re.IGNORECASE)
@@ -253,8 +253,8 @@ class Command(BaseCommand):
         parser.add_argument('--only', type=str, required=False)
         parser.add_argument('--okay', type=str, nargs="+")
 
-    def handle(self, filename, *args, only=None, okay=[], **options):
-        self.okay = list([i.lower() for i in okay])
+    def handle(self, filename, *args, only=None, okay=None, **options):
+        self.okay = list([i.lower() for i in okay]) if okay else []
         results = []
 
         ns = dict([node for _, node in ElementTree.iterparse(filename, events=['start-ns'])])
