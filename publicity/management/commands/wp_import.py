@@ -251,8 +251,10 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('filename', type=str)
         parser.add_argument('--only', type=str, required=False)
+        parser.add_argument('--okay', type=str, nargs="+")
 
-    def handle(self, filename, *args, only=None, **options):
+    def handle(self, filename, *args, only=None, okay=[], **options):
+        self.okay = list([i.lower() for i in okay])
         results = []
 
         ns = dict([node for _, node in ElementTree.iterparse(filename, events=['start-ns'])])
@@ -499,6 +501,9 @@ class Command(BaseCommand):
             objstr = ", ".join([self.get_okay_to_create_obj(cls, i) for i in args])
         else:
             objstr = self.get_okay_to_create_obj(cls, args)
+        if cls.__name__.lower() in self.okay:
+            self.warn(f"Automatically creating {objstr}...")
+            return True
         result = confirm(f"Okay to create {objstr}? (y/n):")
         if failfast and not result:
             raise CommandError("Operation cancelled")
