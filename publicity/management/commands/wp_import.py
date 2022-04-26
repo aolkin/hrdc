@@ -3,7 +3,7 @@ import sys
 from xml.etree import ElementTree
 from lxml.html.clean import Cleaner
 from bs4 import BeautifulSoup
-from datetime import datetime
+from datetime import datetime, timedelta
 import nltk
 
 from django.utils.text import slugify
@@ -62,6 +62,9 @@ def get_stop_words():
 def remove_stopwords(text):
     tokenized = re.sub(r"[,./<>?\[\]\\{}|=_+`~!;':\"-]*", "", text).split()
     return " ".join([w for w in tokenized if not w.lower() in get_stop_words()])
+
+def plus_one_year(dt: datetime):
+    return dt.replace(year=dt.year + 1)
 
 class Person:
     def __init__(self, type_, name, role=None, year=None):
@@ -295,6 +298,12 @@ class Command(BaseCommand):
 
         for parser, info in infos:
             self.update_performance_dates(info, parser.performances, parser.performance_note)
+
+            show: Show = info.show
+            if show.season == 3 and show.residency_starts.year == show.year and show.residency_starts.month < 6:
+                show.residency_starts = plus_one_year(show.residency_starts)
+                show.residency_ends = plus_one_year(show.residency_ends)
+                show.save()
 
         for parser, info in infos:
             self.add_people(info, parser.people)
