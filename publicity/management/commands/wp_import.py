@@ -1,19 +1,20 @@
 import re
-import sys
 from xml.etree import ElementTree
+
 from lxml.html.clean import Cleaner
 from bs4 import BeautifulSoup
-from datetime import datetime, timedelta
-import nltk
+from datetime import datetime
 
 from django.utils.text import slugify
 from django.utils.timezone import get_default_timezone
 from django.db.models import Q
 from django.db.utils import IntegrityError
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import CommandError
 
 from dramaorg.models import Show, Space, Building, User, Season
+from publicity.management.commands.utils import plus_one_year, season_name, remove_stopwords, choose, ImportCommand, \
+    season_from_month
 from publicity.models import PublicityInfo, ShowPerson, PerformanceDate
 
 HEADER_RE = re.compile(r"^\s*([A-Z &,]{4,})\s*$", re.MULTILINE)
@@ -34,43 +35,6 @@ class ParsingException(CommandError): pass
 class InvalidState(ParsingException): pass
 class UnexpectedInput(ParsingException): pass
 class UnexpectedHeader(UnexpectedInput): pass
-
-def season_name(season):
-    return Season.SEASONS[season][1]
-
-def confirm(prompt="Are you sure (y/n)? "):
-    try:
-        choice = input(prompt)
-    except (EOFError, KeyboardInterrupt):
-        raise CommandError("Cancelled")
-    if not sys.stdin.isatty():
-        print()
-    return choice.lower().startswith("y")
-
-def choose(question, choices: dict):
-    print("\n".join([f"\t{i}) {label}" for i, label in choices.items()]))
-    try:
-        choice = input(question)
-    except (EOFError, KeyboardInterrupt):
-        raise CommandError("Cancelled")
-    if not sys.stdin.isatty():
-        print()
-        return min(choices.keys())
-    return choice
-
-def get_stop_words():
-    try:
-        return set(nltk.corpus.stopwords.words("english"))
-    except LookupError:
-        nltk.download("stopwords")
-    return set(nltk.corpus.stopwords.words("english"))
-
-def remove_stopwords(text):
-    tokenized = re.sub(r"[,./<>?\[\]\\{}|=_+`~!;':\"-]*", "", text).split()
-    return " ".join([w for w in tokenized if not w.lower() in get_stop_words()])
-
-def plus_one_year(dt: datetime):
-    return dt.replace(year=dt.year + 1)
 
 class Person:
     def __init__(self, type_, name, role=None, year=None):
@@ -243,18 +207,11 @@ class ShowParser:
             return self.blurb.strip() + "\n\n" + self.blurb_suffix.strip()
         return self.blurb.strip()
 
-class Command(BaseCommand):
+class Command(ImportCommand):
     help = 'Import Shows from a WordPress post export'
-    requires_migrations_checks = True
-    requires_system_checks = True
 
-    def add_arguments(self, parser):
-        parser.add_argument('filename', type=str)
-        parser.add_argument('--only', type=str, required=False)
-        parser.add_argument('--okay', type=str, nargs="+")
-
-    def handle(self, filename, *args, only=None, okay=None, **options):
-        self.okay = list([i.lower() for i in okay]) if okay else []
+    def handle(self, filename, *args, only=None, **options):
+        super().handle(filename, *args, only=only, **options)
         results = []
 
         ns = dict([node for _, node in ElementTree.iterparse(filename, events=['start-ns'])])
@@ -275,7 +232,7 @@ class Command(BaseCommand):
             post_date = post.findtext("wp:post_date", namespaces=ns)
             date = datetime.strptime(post_date + " +0000", "%Y-%m-%d %H:%M:%S %z")
             year = date.year
-            season = Season.SEASONS[1][0] if date.month < 6 else Season.SEASONS[3][0]
+            season = season_from_month(date.month)
 
             body = post.findtext("content:encoded", namespaces=ns)
             cleaned = cleaner.clean_html(body)
@@ -474,7 +431,7 @@ class Command(BaseCommand):
             for kwargs, person, order in users_to_create:
                 try:
                     user, created = User.objects.get_or_create(
-                        **kwargs, defaults={"is_active": False, "source": "wp-import"})
+                        **kwargs, defaults={"is_active": False, "source": "wp-import", "subscribed": False})
                 except IntegrityError as e:
                     existing = User.objects.get(email=kwargs["email"])
                     self.warn(f"Unable to save user: {kwargs} (found {existing})")
@@ -488,29 +445,3 @@ class Command(BaseCommand):
                     **person, defaults={"order": order})
                 if not created:
                     self.warn(f"Found matching person, did not create: {person}")
-
-    def get_okay_to_create_obj(self, cls, args):
-        argstr = ", ".join([f"{self.style.SQL_KEYWORD(k)}={self.style.SQL_COLTYPE(repr(v))}" for k, v in args.items()])
-        return f"{self.style.SQL_TABLE(cls.__name__)}({argstr})"
-
-    def okay_to_create(self, cls, args, failfast=True):
-        if type(args) != dict:
-            args = list(args)
-            if len(args) < 1:
-                return False
-            objstr = ", ".join([self.get_okay_to_create_obj(cls, i) for i in args])
-        else:
-            objstr = self.get_okay_to_create_obj(cls, args)
-        if cls.__name__.lower() in self.okay:
-            self.warn(f"Automatically creating {objstr}...")
-            return True
-        result = confirm(f"Okay to create {objstr}? (y/n):")
-        if failfast and not result:
-            raise CommandError("Operation cancelled")
-        return result
-
-    def warn(self, output: str):
-        self.stdout.write(self.style.WARNING(output))
-
-    def log(self, output: str):
-        self.stdout.write(self.style.SUCCESS(output))
