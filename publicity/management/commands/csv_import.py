@@ -162,8 +162,7 @@ class Command(ImportCommand):
                 self.warn(f"Unable to parse dates for {name} ({row['production_id']}): "
                           f"{row['start_date']} - {row['end_date']} [{row['modified']}]")
                 try:
-                    start = date.fromisoformat(prompt("Enter start date (YYYY-MM-DD): "))
-                    end = date.fromisoformat(prompt("Enter start date (YYYY-MM-DD): "))
+                    start = end = date.fromisoformat(prompt("Enter date to use for residency (YYYY-MM-DD): "))
                 except Exception:
                     self.warn(f"Failed to get dates interactively for {name}.")
                     return None
