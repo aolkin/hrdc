@@ -84,7 +84,7 @@ class Command(ImportCommand):
         for show, showpeople in mastheads.items():
             if showpeople is False:
                 self.warn(f"Skipped importing some people for {show}, cannot update masthead...")
-            elif show.credits:
+            elif show.credits and (len(show.credits.split("\n")) > 1 or not "Presented by " in show.credits):
                 self.warn(f"Masthead for {show} already present, will not replace...")
             else:
                 credits = []
@@ -103,6 +103,8 @@ class Command(ImportCommand):
                         credits.append((rank, position + " by ", names))
                 credits.sort()
                 show.credits = "\n".join([i[1] + i[2] for i in credits])
+                if show.show.affiliation and show.show.affiliation != "Harvard-Radcliffe Dramatic Club":
+                    show.credits = f"Presented by {show.show.affiliation}\n" + show.credits
                 self.log(f"Updating masthead for {show}: {repr(show.credits)}")
                 show.save()
                 if credits[0][0] < 100 and not show.show.creator_credit:
@@ -177,6 +179,8 @@ class Command(ImportCommand):
             self.log(f"PublicityInfo already exists for {show}")
         except Show.publicity_info.RelatedObjectDoesNotExist:
             pub_args = {"show": show}
+            if show.affiliation and show.affiliation != "Harvard-Radcliffe Dramatic Club":
+                pub_args["credits"] = f"Presented by {show.affiliation}"
             if not self.okay_to_create(PublicityInfo, pub_args, False):
                 return None
             pub = PublicityInfo(**pub_args)
