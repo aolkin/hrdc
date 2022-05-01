@@ -237,4 +237,4 @@ class Command(ImportCommand):
             return existing.first()
         else:
             if self.okay_to_create(ShowPerson, args, False):
-                return ShowPerson.objects.create(**args, order=rank)
+                return ShowPerson.objects.create(**args, order=rank or 999)
