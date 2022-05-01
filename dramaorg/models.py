@@ -357,7 +357,7 @@ class Show(Season):
     residency_starts = models.DateField(null=True)
     residency_ends = models.DateField(null=True)
 
-    slug = models.SlugField(unique=True, db_index=True, max_length=100)
+    slug = models.SlugField(unique=True, db_index=True, max_length=120)
     invisible = models.BooleanField(default=False)
 
     liaisons = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True,
