@@ -351,13 +351,13 @@ class Show(Season):
                                  verbose_name=_("Production Type"))
 
     staff = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
-    space = models.ForeignKey(Space, null=True, on_delete=models.SET_NULL,
+    space = models.ForeignKey(Space, null=True, on_delete=models.PROTECT,
                               verbose_name="Venue")
 
     residency_starts = models.DateField(null=True)
     residency_ends = models.DateField(null=True)
 
-    slug = models.SlugField(unique=True, db_index=True)
+    slug = models.SlugField(unique=True, db_index=True, max_length=80)
     invisible = models.BooleanField(default=False)
 
     liaisons = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True,
