@@ -29,7 +29,11 @@
   {% for perf in object.performancedate_set.all %}
   {{ perf }}<br>
   {% empty %}
+  {% if object.show.residency_starts %}
+  In residence {{ object.show.residency_starts }} to {{ object.show.residency_ends }}
+  {% else %}
   Performance Dates TBD
+  {%  endif %}
   {% endfor %}
 </p>
 <p>Run time: {{ object.runtime|default:"TBD" }}</p>
