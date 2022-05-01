@@ -17,3 +17,17 @@
 .fa-ul .fa-li {
     top: 0;
 }
+
+.archive-search-form #div_id_credit_type .form-check {
+    display: inline-block;
+    padding-right: 0.25rem;
+}
+
+.search-results-header {
+    font-weight: bold;
+}
+
+.archive-search-form .form-group {
+    margin: auto;
+    line-height: 1.2;
+}

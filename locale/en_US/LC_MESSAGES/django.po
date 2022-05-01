@@ -21,7 +21,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-19 00:52-0400\n"
+"POT-Creation-Date: 2022-05-01 04:02-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,38 +30,40 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: archive/models.py:59 archive/templates/archive/upload.html:63
+#: archive/models.py:60 archive/templates/archive/upload.html:63
 msgid "File Credit"
 msgstr ""
 
-#: archive/models.py:61 archive/templates/archive/upload.html:68
+#: archive/models.py:62 archive/templates/archive/upload.html:68
 msgid "File Description"
 msgstr ""
 
-#: archive/models.py:71
+#: archive/models.py:72
 msgid "Additional Material"
 msgstr ""
 
-#: archive/models.py:72 archive/templates/archive/show.html:111
+#: archive/models.py:73 archive/templates/archive/detail.html:73
+#: archive/templates/archive/show.html:111
 #: archive/templates/archive/upload.html:49
 msgid "Additional Materials"
 msgstr ""
 
-#: archive/models.py:86 archive/templates/archive/upload.html:27
+#: archive/models.py:94 archive/templates/archive/upload.html:27
 msgid "Photo Credit"
 msgstr ""
 
-#: archive/models.py:89 archive/templates/archive/upload.html:39
+#: archive/models.py:97 archive/templates/archive/upload.html:39
 msgid ""
-"Allow this image or images to be used in HRDC publicity materials, such as "
-"the weekly newsletter"
+"Allow this image or images to be viewed publicly and used in publicity "
+"materials such as the HRDC newsletter"
 msgstr ""
 
-#: archive/models.py:103
+#: archive/models.py:114
 msgid "Production Photo"
 msgstr ""
 
-#: archive/models.py:104 archive/templates/archive/show.html:92
+#: archive/models.py:115 archive/templates/archive/detail.html:49
+#: archive/templates/archive/show.html:92
 #: archive/templates/archive/upload.html:14
 msgid "Production Photos"
 msgstr ""
@@ -279,7 +281,7 @@ msgid ""
 "residencies. Elaborate on your length preferences at the bottom of the page."
 msgstr ""
 
-#: venueapp/views.py:48 venueapp/views.py:728
+#: venueapp/views.py:51 venueapp/views.py:728
 msgid "Read Applications"
 msgstr ""
 

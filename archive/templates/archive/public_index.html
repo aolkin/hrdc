@@ -1,0 +1,113 @@
+{% extends "archive/public_base.html" %}
+
+{% load i18n bt config crispy_forms_tags %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h3 class="text-center">Search the MyHRDC Archives</h3>
+  </div>
+</div>
+
+<form class="archive-search-form">
+  <div class="row justify-content-center">
+    <div class="col-md-4 col-sm-6 col-sm-12">
+      {{ form.title|as_crispy_field }}
+    </div>
+    <div class="col-md-2 col-sm-3 col-6">
+      {{ form.season|as_crispy_field }}
+    </div>
+    <div class="col-md-2 col-sm-3 col-6">
+      {{ form.year|as_crispy_field }}
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-md-3 col-sm-4 col-12">
+      {{ form.affiliation|as_crispy_field }}
+    </div>
+    <div class="col-md-3 col-sm-4 col-12">
+      {{ form.venue|as_crispy_field }}
+    </div>
+    <div class="col-md-2 col-sm-4 col-12">
+      {{ form.residency_date|as_crispy_field }}
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-md-4 col-sm-5 col-12">
+      {{ form.credit|as_crispy_field }}
+    </div>
+    <div class="col-md-4 col-sm-7 col-12">
+      {{ form.credit_type|as_crispy_field }}
+    </div>
+  </div>
+
+  <div class="row justify-content-center mt-2">
+    <div class="col-md-8 col-12">
+      <input type="submit" value="Search" class="btn btn-primary btn-block" />
+    </div>
+    {% if form.changed_data %}
+    <div class="col-md-8 col-12 text-center mt-2">
+      <a href="?">Reset Form</a>
+    </div>
+    {% endif %}
+  </div>
+</form>
+
+<hr />
+{% if object_list %}
+<div class="row justify-content-center search-results-header">
+  <div class="col-md-4 col-4">Show</div>
+  <div class="col-md-2 col-3">Venue</div>
+  <div class="col-md-2 col-2">Season</div>
+  <div class="col-md-4 col-3">Affiliation</div>
+</div>
+{% for show in object_list %}
+<hr />
+<div class="row justify-content-center">
+  <div class="col-md-4 col-4">
+    <a href="{% url 'archive:detail' show.pk %}">{{ show }}</a>
+  </div>
+  <div class="col-md-2 col-3">
+    <a href="?venue={{ show.space.nickname|default:show.space.name|urlencode }}&building={{ show.space.building.name|urlencode }}">
+      {{ show.space }}
+    </a>
+  </div>
+  <div class="col-md-2 col-2">
+    <a href="?year={{ show.year }}&season={{ show.season }}">{{ show.seasonstr }}</a>
+  </div>
+  <div class="col-md-4 col-3">
+    <a href="?affiliation={{ show.affiliation|urlencode }}">{{ show.affiliation }}</a>
+  </div>
+</div>
+{% endfor %}
+<nav class="pagination-container mt-4 row justify-content-center">
+  <ul class="pagination m-auto">
+    {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?{{ existing_query.urlencode }}&page=1">&laquo; First</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?{{ existing_query.urlencode }}&page={{ page_obj.previous_page_number }}">Previous</a>
+      </li>
+    {% endif %}
+    <li class="page-item">
+      <a class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</a>
+    </li>
+    {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?{{ existing_query.urlencode }}&page={{ page_obj.next_page_number }}">Next</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?{{ existing_query.urlencode }}&page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+      </li>
+    {% endif %}
+    </ul>
+</nav>
+{% else %}
+<div class="row justify-content-center">
+  <h4 class="text-center col">No results!</h4>
+</div>
+{% endif %}
+{% endblock %}

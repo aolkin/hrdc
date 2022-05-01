@@ -1,6 +1,8 @@
+from django.db.models import Q
+from django.forms import DateInput, CheckboxSelectMultiple
 from django.shortcuts import render
-from django.views.generic import TemplateView
-from django.views.generic.edit import UpdateView
+from django.views.generic import TemplateView, ListView
+from django.views.generic.edit import UpdateView, FormView, FormMixin
 from django.views.generic.detail import SingleObjectMixin, DetailView
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
@@ -133,6 +135,119 @@ class UploadView(MenuMixin, ShowStaffMixin, DetailView):
                     request, "Failed to upload photo '{}'.".format(f))
         return redirect(self.get_object().get_absolute_url())
 
-class PublicView(DetailView):
-    template_name = "archive/public.html"
-    model = ArchivalInfo
+SEASONS = list(org.Season.SEASONS)
+SEASONS.append((None, '-'))
+
+CREDIT_TYPES = (
+    (0, "Creators/Executives"),
+    (1, "Staff/Crew"),
+    (2, "Cast"),
+    (3, "Musicians")
+)
+
+class ImprovedDateInput(DateInput):
+    input_type = "date"
+
+class SearchForm(forms.Form):
+    year = forms.IntegerField(min_value=1900, max_value=2100, required=False)
+    season = forms.ChoiceField(choices=SEASONS, required=False)
+    title = forms.CharField(required=False)
+
+    residency_date = forms.DateField(required=False, widget=ImprovedDateInput)
+    venue = forms.CharField(required=False)
+    building = forms.CharField(required=False)
+    affiliation = forms.CharField(required=False)
+    credit = forms.CharField(required=False)
+    credit_type = forms.MultipleChoiceField(choices=CREDIT_TYPES, required=False,
+                                            widget=CheckboxSelectMultiple,
+                                            help_text="Limit search to the selected type(s) of credit")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({"class": "form-control-sm"})
+
+class PublicView(FormMixin, ListView):
+    verbose_name = "Archives"
+    help_text = "view production records"
+    template_name = "archive/public_index.html"
+    form_class = SearchForm
+    model = Show
+    paginate_by = 25
+    allow_empty = True
+
+    def get_form_kwargs(self):
+        return {
+            'initial': self.get_initial(),
+            'prefix': self.get_prefix(),
+            'data': self.request.GET
+        }
+
+    def get_queryset(self):
+        form: forms.Form = self.get_form()
+        form.full_clean()
+        qs = super().get_queryset().filter(space__isnull=False).distinct()
+        precise_qs = qs.all()
+        for field in form.changed_data:
+            value = form.cleaned_data[field]
+            if field == "credit_type":
+                continue
+            elif field == "credit":
+                credit_type = form.cleaned_data["credit_type"] if "credit_type" in form.changed_data else []
+                q = Q(publicity_info__showperson__type__in=credit_type) if credit_type else Q()
+                pq = q
+                for word in value.split():
+                    q = q & (Q(publicity_info__showperson__person__first_name__icontains=word) |
+                             Q(publicity_info__showperson__person__last_name__icontains=word))
+                    pq = pq & (Q(publicity_info__showperson__person__first_name__iexact=word) |
+                               Q(publicity_info__showperson__person__last_name__iexact=word))
+                if '0' in credit_type:
+                    q |= Q(publicity_info__credits__icontains=value)
+                    pq |= Q(publicity_info__credits__icontains=value)
+                print(field, value, q)
+            elif field == "venue":
+                pq = Q(space__name__iexact=value) | Q(space__nickname__iexact=value)
+                if "building" in form.changed_data:
+                    q = Q(space__name=value) | Q(space__nickname=value)
+                else:
+                    q = Q(space__name__icontains=value) | Q(space__nickname__icontains=value) \
+                        | Q(space__building__name__icontains=value)
+            elif field == "building":
+                q = pq = Q(space__building__name=value)
+            elif field in ("title", "affiliation"):
+                q = Q(**{field + "__icontains": value})
+                pq = Q(**{field + "__iexact": value})
+            elif field == "residency_date":
+                q = pq = Q(residency_starts__lt=value, residency_ends__gt=value)
+            else:
+                q = pq = Q(**{field: value})
+            qs = qs.filter(q)
+            precise_qs = precise_qs.filter(pq)
+
+        if precise_qs.exists():
+            matches = list(precise_qs)
+            qs = qs.exclude(pk__in=[i.pk for i in matches])
+            return matches + list(qs)
+        else:
+            return qs
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data["existing_query"] = self.request.GET.copy()
+        if "page" in data["existing_query"]:
+            del data["existing_query"]["page"]
+        return data
+
+class PublicDetailView(DetailView):
+    template_name = "archive/detail.html"
+    model = Show
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        try:
+            photos = data["object"].archival_info.productionphoto_set
+            data["more_photos_exist"] = photos.private().exists() and not self.request.user.is_authenticated
+            data["photos"] = photos.all() if self.request.user.is_authenticated else photos.public()
+        except Show.archival_info.RelatedObjectDoesNotExist:
+            pass
+        return data

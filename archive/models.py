@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.db.models import Manager
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
@@ -71,6 +72,13 @@ class ExtraFile(models.Model):
         verbose_name = _("Additional Material")
         verbose_name_plural = _("Additional Materials")
 
+class ProductionPhotoManager(Manager):
+    def public(self):
+        return self.filter(allow_in_publicity=True)
+
+    def private(self):
+        return self.filter(allow_in_publicity=False)
+
 class ProductionPhoto(models.Model):
     def upload_destination(instance, filename):
         return "archive/{}/{}/{}/photos/{}".format(
@@ -86,7 +94,8 @@ class ProductionPhoto(models.Model):
     credit = models.CharField(max_length=120, verbose_name=_("Photo Credit"))
     allow_in_publicity = models.BooleanField(
         default=False,
-        help_text=_("Allow this image or images to be used in HRDC publicity materials, such as the weekly newsletter"))
+        help_text=_("Allow this image or images to be viewed publicly and used in "
+                    "publicity materials such as the HRDC newsletter"))
 
     height = models.PositiveIntegerField()
     width = models.PositiveIntegerField()
@@ -99,6 +108,9 @@ class ProductionPhoto(models.Model):
     def filename(self):
         return os.path.basename(self.img.name)
 
+    objects = ProductionPhotoManager()
+
     class Meta:
         verbose_name = _("Production Photo")
         verbose_name_plural = _("Production Photos")
+        base_manager_name = "objects"

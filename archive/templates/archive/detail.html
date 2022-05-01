@@ -1,0 +1,101 @@
+{% extends "archive/public_base.html" %}
+
+{% load i18n bt crispy_forms_tags %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col text-center">
+    <h4 class="text-muted"><a href="{% url 'archive:public_index' %}">Archives</a></h4>
+    <h3 class="text-muted">{{ object.seasonstr }}</h3>
+    <h2>{{ object }}</h2>
+    {% if object.affiliation %}<h4 class="text-muted">{{ object.affiliation }}</h4>{% endif %}
+    <h5 class="text-muted">{{ object.residency_starts }} &mdash; {{ object.residency_ends }}</h5>
+  </div>
+</div>
+
+{% if object.publicity_info %}
+<div class="row justify-content-center">
+  <div class="col">
+    <h3>Publicity Materials</h3>
+    <script src="{% url 'publicity:script' object.publicity_info.pk 'js' %}?h=h5"></script>
+  </div>
+</div>
+{% endif %}
+
+{% if object.archival_info %}
+{% with archive=object.archival_info %}
+<div class="row justify-content-center">
+  <div class="col">
+    <h3>Archival Materials</h3>
+    <div>
+      {% if archive.poster %}
+        <a href="{{ archive.poster.url }}" target="_blank">
+          {{ archive }} Poster
+        </a>
+      {% endif %}
+    </div>
+    <div>
+      {% if archive.program %}
+        <a href="{{ archive.program.url }}" target="_blank">
+          {{ archive }} Program
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="row justify-content-center mt-2">
+  <div class="col">
+    <h4>{% trans "Production Photos" %}</h4>
+    {% if more_photos_exist %}
+    <a class="font-italic" href="{% url 'dramaorg:login' %}?next={{ request.path }}">
+      More photos are available to logged-in users.
+    </a>
+    {% endif %}
+    <div class="row justify-content-start">
+      {% for photo in photos %}
+        <div class="col-md-3 col-sm-6 col-xs-1 pb-2 px-1">
+          <a href="{{ photo.img.url }}" target="_blank"
+             data-toggle="lightbox" data-gallery="photos"
+             data-remote="{{ photo.img.url_preview }}">
+            <img src="{{ photo.img.url_thumb }}" class="img-fluid img-thumbnail"
+                 data-preview="{{ photo.img.url_preview }}">
+          </a>
+        </div>
+      {% empty %}
+        <div class="col">No photos available!</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<div class="row justify-content-center mt-3">
+  <div class="col">
+    <h4>{% trans "Additional Materials" %}</h4>
+    {% if archive.extrafile_set.exists %}
+    {% if not request.user.is_authenticated %}
+      <a class="font-italic" href="{% url 'dramaorg:login' %}?next={{ request.path }}">
+        Extra materials are only available to logged-in users.
+      </a>
+    {% else %}
+      <ul>
+        {% for file in archive.extrafile_set.all %}
+          <li>
+            <a href="{{ file.file.url }}" target="_blank">{{ file.description }} by {{ file.credit }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% else %}
+    <div>No files uploaded!</div>
+    {% endif %}
+  </div>
+</div>
+{% endwith %}
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.min.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ekko-lightbox/5.3.0/ekko-lightbox.css">
+{% endblock %}
