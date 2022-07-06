@@ -19,6 +19,6 @@ asgi-redis==1.4.3
 redis==2.10.6
 hiredis==1.0.1
 requests==2.22.0
-lxml==4.8.0
+lxml==4.9.1
 beautifulsoup4==4.11.1
 nltk==3.7
