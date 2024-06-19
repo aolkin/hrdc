@@ -186,6 +186,8 @@ class PublicView(FormMixin, ListView):
     def get_queryset(self):
         form: forms.Form = self.get_form()
         form.full_clean()
+        if not form.is_valid():
+            return []
         qs = super().get_queryset().filter(space__isnull=False).distinct()
         precise_qs = qs.all()
         for field in form.changed_data:
