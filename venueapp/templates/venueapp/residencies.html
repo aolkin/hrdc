@@ -79,6 +79,12 @@
 	</tr>
 	{% endifchanged %}
 	{% endif %}
+	{% empty %}
+	<tr>
+	  <td colspan="2">
+	    <em class="text-muted">No available residencies have been configured.</em>
+	  </td>
+	</tr>
 	{% endfor %}
       </tbody>
     </table>

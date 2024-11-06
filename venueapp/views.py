@@ -393,6 +393,9 @@ class ResidencyView(MenuMixin, UserStaffMixin, FormMixin, UnsubmittedAppMixin,
     def get_context_data(self, **kwargs):
         venues = kwargs["venues"] = self.object.venues.all()[:]
         residencies = AvailableResidency.objects.filter(venue__in=venues)
+        if not residencies.exists():
+            kwargs["calendar"] = []
+            return super().get_context_data(**kwargs)
         calendar = []
         range_residencies = residencies.filter(type=False)
         single_residencies = residencies.filter(type=True)
