@@ -36,7 +36,7 @@ class LoginView(DjangoLoginView):
 
     def get(self, *args, **kwargs):
         if not self.request.user.is_anonymous:
-            return redirect(self.request.GET.get("next", "/"))
+            return redirect(self.request.GET.get("next", "/") or "/")
         if self.request.GET.get("next", None):
             messages.warning(
                 self.request,
