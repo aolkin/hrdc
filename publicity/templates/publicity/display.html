@@ -10,7 +10,7 @@
     {% if request.user.is_board %}
     <div class="alert alert-secondary">
       To include this in another webpage, insert the following code snippet:
-      <pre class="mt-3"><code>&lt;script src="{{ SETTINGS.SITE_URL }}{% url 'publicity:script' object.pk %}"&gt;&lt;/script&gt;</code></pre>
+      <pre class="mt-3"><code>&lt;script src="{{ SETTINGS.SITE_URL }}{% url 'publicity:script' object.pk 'js' %}"&gt;&lt;/script&gt;</code></pre>
     </div>
     {% endif %}
   </div>
