@@ -4,10 +4,20 @@ from django.urls import path
 from django.conf.urls import url, include
 from django.contrib import admin
 from django.conf import settings
+from django.http import HttpResponse
 from config.views import autocomplete_json
 from shortlinks.views import link, LinksView
 
+
+def robots_txt(request):
+    """Serve robots.txt to block search engine indexing of casting pages."""
+    content = """User-agent: *
+Disallow: /casting/
+"""
+    return HttpResponse(content, content_type="text/plain")
+
 urlpatterns = [
+    path('robots.txt', robots_txt, name='robots_txt'),
     url(r'^', include("dramaorg.urls")),
     url(r'^autocomplete/$', autocomplete_json),
     url(r'^venues/', include("venueapp.urls")),
