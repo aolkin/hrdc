@@ -9,7 +9,7 @@ License: GPLv2 or later
 */
 
 function makePost($show, $include_season) {
-  $post_id = 0 - $show->show_id; // negative ID, to avoid clash with a valid post
+  $post_id = 1_000_000 + $show->show_id; // large ID, to avoid clash with a valid post
   $post = new stdClass();
   $post->ID = $post_id;
   $post->post_author = 1;
@@ -22,7 +22,7 @@ function makePost($show, $include_season) {
   } else {
     $show_season = "";
   }
-  $post->post_excerpt =  $show_season . $show->venue . "<br>" . $show->blurb;
+  $post->post_excerpt =  $show_season . "<i>" . $show->venue . "</i><br>" . $show->blurb;
   $post->post_category = 'shows';
   $post->post_status = 'publish';
   $post->comment_status = 'closed';
@@ -33,13 +33,15 @@ function makePost($show, $include_season) {
 
   $wp_post = new WP_Post($post);
   wp_cache_add($post_id, $wp_post, 'posts');
-  wp_cache_add($post_id, array(4), 'category_relationships');
+  $cat = get_category_by_slug('shows');
+  wp_cache_add($post_id, array($cat->term_id), 'category_relationships');
   return $wp_post;
 }
 
 function fetch( $query ) {
-  $response = wp_remote_get("https://my.hrdctheater.org/publicity/api" . $query);
+  $response = wp_remote_get("http://localhost:8123/publicity/api" . $query);
   if (is_wp_error($response)) {
+    error_log("API Error: " . $response->get_error_message());
     return false;
   }
   $body = wp_remote_retrieve_body($response);
