@@ -3,7 +3,7 @@ from django.core.paginator import Paginator
 from django.views.generic import View, TemplateView
 from django.views.generic.edit import UpdateView, CreateView, BaseCreateView
 from django.views.generic.detail import SingleObjectMixin, DetailView
-from django.http import JsonResponse, HttpResponseBadRequest
+from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
@@ -293,31 +293,7 @@ def parse_season(season):
                 return val
     return None
 
-def safe_int(value, default=None, min_value=None, max_value=None):
-    """
-    Safely convert a value to int with optional bounds checking.
-    Returns (int_value, error_message) tuple.
-    If conversion fails or bounds check fails, returns (None, error_message).
-    Used for non-JSON views like SeasonScriptView.
-    """
-    if value is None:
-        return default, None
-
-    try:
-        int_value = int(value)
-    except (ValueError, TypeError):
-        return None, f"Invalid integer value: {value}"
-
-    if min_value is not None and int_value < min_value:
-        return None, f"Value must be at least {min_value}"
-
-    if max_value is not None and int_value > max_value:
-        return None, f"Value must be at most {max_value}"
-
-    return int_value, None
-
 class ShowQueryForm(forms.Form):
-    """Form for validating ShowQueryView parameters"""
     page = forms.IntegerField(required=False, min_value=1)
     limit = forms.IntegerField(required=False, min_value=1, max_value=100)
     year = forms.IntegerField(required=False)
@@ -325,26 +301,30 @@ class ShowQueryForm(forms.Form):
     season = forms.CharField(required=False)
     title = forms.CharField(required=False)
 
+class SeasonScriptForm(forms.Form):
+    year = forms.IntegerField(required=False)
+    season = forms.CharField(required=False)
+
 class ShowQueryView(View):
     def get(self, request, *args, **kwargs):
         form = ShowQueryForm(request.GET)
         if not form.is_valid():
-            return JsonResponse({'error': form.errors}, status=400)
+            return JsonResponse({"error": form.errors}, status=400)
 
         data = form.cleaned_data
-        page = data.get('page', 1)
-        limit = min(25, data.get('limit', 25))
+        page = data.get("page", 1)
+        limit = min(25, data.get("limit", 25))
 
         year = None
         season = None
-        if data.get('title'):
+        if data.get("title"):
             qs = PublicityInfo.objects.filter(
-                show__title__icontains=data['title'])
+                show__title__icontains=data["title"])
         else:
             qs = PublicityInfo.objects.all()
-            year = data.get('year') or data.get('showyear')
-            season = parse_season(data.get('season'))
-            if not (year or season or 'page' in request.GET):
+            year = data.get("year") or data.get("showyear")
+            season = parse_season(data.get("season"))
+            if not (year or season or "page" in request.GET):
                 year = config.year
                 season = config.season
             if year:
@@ -371,24 +351,16 @@ class ShowQueryView(View):
 
 class SeasonScriptView(BaseEmbedView):
     def get_context_data(self, **kwargs):
-        year_param = self.request.GET.get("year")
-        if year_param:
-            year, error = safe_int(year_param)
-            if error:
-                # Return error in JavaScript-friendly format
-                kwargs["innerHtml"] = f"Error: Invalid year parameter - {error}"
-                return super().get_context_data(**kwargs)
-        else:
-            year = config.year
+        form = SeasonScriptForm(self.request.GET)
+        if not form.is_valid():
+            kwargs["innerHtml"] = "Error: Invalid parameters"
+            return super().get_context_data(**kwargs)
 
-        season = parse_season(self.request.GET.get("season"))
+        data = form.cleaned_data
+        year = data.get("year") or config.year
+        season = parse_season(data.get("season"))
         if season is None:
             season = config.season
-
-        # Validate season is in valid range
-        if season is not None and not (0 <= season < len(Season.SEASONS)):
-            kwargs["innerHtml"] = f"Error: Invalid season value"
-            return super().get_context_data(**kwargs)
 
         season_name = Season.SEASONS[int(season)][1]
         shows = PublicityInfo.objects.filter(
