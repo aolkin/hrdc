@@ -293,26 +293,43 @@ def parse_season(season):
                 return val
     return None
 
+class ShowQueryForm(forms.Form):
+    page = forms.IntegerField(required=False, min_value=1)
+    limit = forms.IntegerField(required=False, min_value=1, max_value=25)
+    year = forms.IntegerField(required=False)
+    showyear = forms.IntegerField(required=False)
+    season = forms.CharField(required=False)
+    title = forms.CharField(required=False)
+
+class SeasonScriptForm(forms.Form):
+    year = forms.IntegerField(required=False)
+    season = forms.CharField(required=False)
+
 class ShowQueryView(View):
     def get(self, request, *args, **kwargs):
-        params = request.GET
-        page = int(params["page"]) if "page" in params else 1
-        limit = min(25, int(params.get("limit", 25)))
+        form = ShowQueryForm(request.GET)
+        if not form.is_valid():
+            return JsonResponse({"error": form.errors}, status=400)
+
+        data = form.cleaned_data
+        page = data.get("page", 1)
+        limit = data.get("limit", 25)
+
         year = None
         season = None
-        if "title" in params:
+        if data.get("title"):
             qs = PublicityInfo.objects.filter(
-                show__title__icontains=params["title"])
+                show__title__icontains=data["title"])
         else:
             qs = PublicityInfo.objects.all()
-            year = params.get("year") or params.get("showyear")
-            season = parse_season(params.get("season"))
-            if not (year or season or "page" in params):
+            year = data.get("year") or data.get("showyear")
+            season = parse_season(data.get("season"))
+            if not (year or season or "page" in request.GET):
                 year = config.year
                 season = config.season
             if year:
                 qs = qs.filter(show__year=year)
-            if season:
+            if season is not None:
                 qs = qs.filter(show__season=season)
         qs = qs.exclude(show__space=None).exclude(
             show__residency_starts=None).order_by(
@@ -327,15 +344,24 @@ class ShowQueryView(View):
             "count": paginator.count,
             "pages": paginator.num_pages,
             "year": year,
-            "season": Season.SEASONS[int(season)][1] if season else None
+            "season": Season.SEASONS[int(season)][1] if season is not None else None
         })
         res["Cache-Control"] = "no-cache"
         return res
 
 class SeasonScriptView(BaseEmbedView):
     def get_context_data(self, **kwargs):
-        year = self.request.GET.get("year") or config.year
-        season = parse_season(self.request.GET.get("season")) or config.season
+        form = SeasonScriptForm(self.request.GET)
+        if not form.is_valid():
+            kwargs["innerHtml"] = "Error: Invalid parameters"
+            return super().get_context_data(**kwargs)
+
+        data = form.cleaned_data
+        year = data.get("year") or config.year
+        season = parse_season(data.get("season"))
+        if season is None:
+            season = config.season
+
         season_name = Season.SEASONS[int(season)][1]
         shows = PublicityInfo.objects.filter(
             show__season=season, show__year=year).exclude(
