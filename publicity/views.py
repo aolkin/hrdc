@@ -298,6 +298,7 @@ def safe_int(value, default=None, min_value=None, max_value=None):
     Safely convert a value to int with optional bounds checking.
     Returns (int_value, error_message) tuple.
     If conversion fails or bounds check fails, returns (None, error_message).
+    Used for non-JSON views like SeasonScriptView.
     """
     if value is None:
         return default, None
@@ -315,36 +316,35 @@ def safe_int(value, default=None, min_value=None, max_value=None):
 
     return int_value, None
 
+class ShowQueryForm(forms.Form):
+    """Form for validating ShowQueryView parameters"""
+    page = forms.IntegerField(required=False, min_value=1)
+    limit = forms.IntegerField(required=False, min_value=1, max_value=100)
+    year = forms.IntegerField(required=False)
+    showyear = forms.IntegerField(required=False)
+    season = forms.CharField(required=False)
+    title = forms.CharField(required=False)
+
 class ShowQueryView(View):
     def get(self, request, *args, **kwargs):
-        params = request.GET
+        form = ShowQueryForm(request.GET)
+        if not form.is_valid():
+            return JsonResponse({'error': form.errors}, status=400)
 
-        # Validate page parameter
-        page, error = safe_int(params.get("page"), default=1, min_value=1)
-        if error:
-            return HttpResponseBadRequest(f"Invalid page parameter: {error}")
-
-        # Validate limit parameter
-        limit, error = safe_int(params.get("limit", 25), min_value=1, max_value=100)
-        if error:
-            return HttpResponseBadRequest(f"Invalid limit parameter: {error}")
-        limit = min(25, limit)
+        data = form.cleaned_data
+        page = data.get('page', 1)
+        limit = min(25, data.get('limit', 25))
 
         year = None
         season = None
-        if "title" in params:
+        if data.get('title'):
             qs = PublicityInfo.objects.filter(
-                show__title__icontains=params["title"])
+                show__title__icontains=data['title'])
         else:
             qs = PublicityInfo.objects.all()
-            year_param = params.get("year") or params.get("showyear")
-            if year_param:
-                year, error = safe_int(year_param)
-                if error:
-                    return HttpResponseBadRequest(f"Invalid year parameter: {error}")
-
-            season = parse_season(params.get("season"))
-            if not (year or season or "page" in params):
+            year = data.get('year') or data.get('showyear')
+            season = parse_season(data.get('season'))
+            if not (year or season or 'page' in request.GET):
                 year = config.year
                 season = config.season
             if year:
