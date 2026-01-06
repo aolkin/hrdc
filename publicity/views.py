@@ -295,7 +295,7 @@ def parse_season(season):
 
 class ShowQueryForm(forms.Form):
     page = forms.IntegerField(required=False, min_value=1)
-    limit = forms.IntegerField(required=False, min_value=1, max_value=100)
+    limit = forms.IntegerField(required=False, min_value=1, max_value=25)
     year = forms.IntegerField(required=False)
     showyear = forms.IntegerField(required=False)
     season = forms.CharField(required=False)
@@ -313,7 +313,7 @@ class ShowQueryView(View):
 
         data = form.cleaned_data
         page = data.get("page", 1)
-        limit = min(25, data.get("limit", 25))
+        limit = data.get("limit", 25)
 
         year = None
         season = None
