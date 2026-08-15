@@ -3,7 +3,7 @@ from django.core.paginator import Paginator
 from django.views.generic import View, TemplateView
 from django.views.generic.edit import UpdateView, CreateView, BaseCreateView
 from django.views.generic.detail import SingleObjectMixin, DetailView
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
@@ -312,8 +312,8 @@ class ShowQueryView(View):
             return JsonResponse({"error": form.errors}, status=400)
 
         data = form.cleaned_data
-        page = data.get("page", 1)
-        limit = data.get("limit", 25)
+        page = data.get("page") or 1
+        limit = data.get("limit") or 25
 
         year = None
         season = None
@@ -324,7 +324,7 @@ class ShowQueryView(View):
             qs = PublicityInfo.objects.all()
             year = data.get("year") or data.get("showyear")
             season = parse_season(data.get("season"))
-            if not (year or season or "page" in request.GET):
+            if not (year or season is not None or "page" in request.GET):
                 year = config.year
                 season = config.season
             if year:
@@ -540,6 +540,8 @@ class CalendarView(TemplateView):
         kwargs["embed"] = self.request.GET.get("embed", False)
         kwargs["year"] = year = self.kwargs.get("year", now.year)
         kwargs["month"] = month = self.kwargs.get("month", now.month)
+        if not (1 <= month <= 12) or not (datetime.MINYEAR <= year <= datetime.MAXYEAR):
+            raise Http404("Invalid year or month.")
         date = datetime.date(year, month, 1)
         kwargs["prev"] = date - datetime.timedelta(days=1)
         kwargs["next"] = date + datetime.timedelta(days=31)
@@ -597,6 +599,8 @@ class AdminMixin(PermissionRequiredMixin):
 
     def get_season_display(self):
         season, year = self.get_season()
+        if not (0 <= season < len(Season.SEASONS)):
+            raise Http404("Invalid season.")
         return "{} {}".format(Season.SEASONS[season][1], year)
 
     def get_context_data(self, **kwargs):
