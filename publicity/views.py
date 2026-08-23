@@ -293,16 +293,20 @@ def parse_season(season):
                 return val
     return None
 
+YEAR_MIN = 1900
+CURRENT_YEAR = datetime.date.today().year
+YEAR_MAX = CURRENT_YEAR + 10
+
 class ShowQueryForm(forms.Form):
     page = forms.IntegerField(required=False, min_value=1)
     limit = forms.IntegerField(required=False, min_value=1, max_value=25)
-    year = forms.IntegerField(required=False)
-    showyear = forms.IntegerField(required=False)
+    year = forms.IntegerField(required=False, min_value=YEAR_MIN, max_value=YEAR_MAX)
+    showyear = forms.IntegerField(required=False, min_value=YEAR_MIN, max_value=YEAR_MAX)
     season = forms.CharField(required=False)
     title = forms.CharField(required=False)
 
 class SeasonScriptForm(forms.Form):
-    year = forms.IntegerField(required=False)
+    year = forms.IntegerField(required=False, min_value=YEAR_MIN, max_value=YEAR_MAX)
     season = forms.CharField(required=False)
 
 class ShowQueryView(View):
