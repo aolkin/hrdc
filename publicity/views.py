@@ -286,13 +286,6 @@ class ShowDataView(View):
         res["Cache-Control"] = "no-cache"
         return res
 
-def parse_season(season):
-    if type(season) == str and len(season) > 1:
-        for val, name in Season.SEASONS:
-            if name.lower() == season.lower():
-                return val
-    return None
-
 YEAR_MIN = 1900
 CURRENT_YEAR = datetime.date.today().year
 YEAR_MAX = CURRENT_YEAR + 10
@@ -300,6 +293,14 @@ YEAR_MAX = CURRENT_YEAR + 10
 class SeasonForm(forms.Form):
     year = forms.IntegerField(required=False, min_value=YEAR_MIN, max_value=YEAR_MAX)
     season = forms.CharField(required=False)
+
+    def clean_season(self):
+        season = self.cleaned_data["season"]
+        if len(season) > 1:
+            for val, name in Season.SEASONS:
+                if name.lower() == season.lower():
+                    return val
+        return None
 
 class ShowQueryForm(SeasonForm):
     page = forms.IntegerField(required=False, min_value=1)
@@ -325,7 +326,7 @@ class ShowQueryView(View):
         else:
             qs = PublicityInfo.objects.all()
             year = data.get("year") or data.get("showyear")
-            season = parse_season(data.get("season"))
+            season = data.get("season")
             if not (year or season is not None or "page" in request.GET):
                 year = config.year
                 season = config.season
@@ -360,7 +361,7 @@ class SeasonScriptView(BaseEmbedView):
 
         data = form.cleaned_data
         year = data.get("year") or config.year
-        season = parse_season(data.get("season"))
+        season = data.get("season")
         if season is None:
             season = config.season
 
