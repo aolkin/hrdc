@@ -3,7 +3,7 @@ from django.core.paginator import Paginator
 from django.views.generic import View, TemplateView
 from django.views.generic.edit import UpdateView, CreateView, BaseCreateView
 from django.views.generic.detail import SingleObjectMixin, DetailView
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
@@ -286,33 +286,53 @@ class ShowDataView(View):
         res["Cache-Control"] = "no-cache"
         return res
 
-def parse_season(season):
-    if type(season) == str and len(season) > 1:
-        for val, name in Season.SEASONS:
-            if name.lower() == season.lower():
-                return val
-    return None
+YEAR_MIN = 1900
+CURRENT_YEAR = datetime.date.today().year
+YEAR_MAX = CURRENT_YEAR + 10
+
+class SeasonForm(forms.Form):
+    year = forms.IntegerField(required=False, min_value=YEAR_MIN, max_value=YEAR_MAX)
+    season = forms.CharField(required=False)
+
+    def clean_season(self):
+        season = self.cleaned_data["season"]
+        if len(season) > 1:
+            for val, name in Season.SEASONS:
+                if name.lower() == season.lower():
+                    return val
+        return None
+
+class ShowQueryForm(SeasonForm):
+    page = forms.IntegerField(required=False, min_value=1)
+    limit = forms.IntegerField(required=False, min_value=1, max_value=25)
+    showyear = forms.IntegerField(required=False, min_value=YEAR_MIN, max_value=YEAR_MAX)
+    title = forms.CharField(required=False)
 
 class ShowQueryView(View):
     def get(self, request, *args, **kwargs):
-        params = request.GET
-        page = int(params["page"]) if "page" in params else 1
-        limit = min(25, int(params.get("limit", 25)))
+        form = ShowQueryForm(request.GET)
+        if not form.is_valid():
+            return JsonResponse({"error": form.errors}, status=400)
+
+        data = form.cleaned_data
+        page = data.get("page") or 1
+        limit = data.get("limit") or 25
+
         year = None
         season = None
-        if "title" in params:
+        if data.get("title"):
             qs = PublicityInfo.objects.filter(
-                show__title__icontains=params["title"])
+                show__title__icontains=data["title"])
         else:
             qs = PublicityInfo.objects.all()
-            year = params.get("year") or params.get("showyear")
-            season = parse_season(params.get("season"))
-            if not (year or season or "page" in params):
+            year = data.get("year") or data.get("showyear")
+            season = data.get("season")
+            if not (year or season is not None or "page" in request.GET):
                 year = config.year
                 season = config.season
             if year:
                 qs = qs.filter(show__year=year)
-            if season:
+            if season is not None:
                 qs = qs.filter(show__season=season)
         qs = qs.exclude(show__space=None).exclude(
             show__residency_starts=None).order_by(
@@ -327,15 +347,24 @@ class ShowQueryView(View):
             "count": paginator.count,
             "pages": paginator.num_pages,
             "year": year,
-            "season": Season.SEASONS[int(season)][1] if season else None
+            "season": Season.SEASONS[int(season)][1] if season is not None else None
         })
         res["Cache-Control"] = "no-cache"
         return res
 
 class SeasonScriptView(BaseEmbedView):
     def get_context_data(self, **kwargs):
-        year = self.request.GET.get("year") or config.year
-        season = parse_season(self.request.GET.get("season")) or config.season
+        form = SeasonForm(self.request.GET)
+        if not form.is_valid():
+            kwargs["innerHtml"] = "Error: Invalid parameters"
+            return super().get_context_data(**kwargs)
+
+        data = form.cleaned_data
+        year = data.get("year") or config.year
+        season = data.get("season")
+        if season is None:
+            season = config.season
+
         season_name = Season.SEASONS[int(season)][1]
         shows = PublicityInfo.objects.filter(
             show__season=season, show__year=year).exclude(
@@ -514,6 +543,8 @@ class CalendarView(TemplateView):
         kwargs["embed"] = self.request.GET.get("embed", False)
         kwargs["year"] = year = self.kwargs.get("year", now.year)
         kwargs["month"] = month = self.kwargs.get("month", now.month)
+        if not (1 <= month <= 12) or not (datetime.MINYEAR <= year <= datetime.MAXYEAR):
+            raise Http404("Invalid year or month.")
         date = datetime.date(year, month, 1)
         kwargs["prev"] = date - datetime.timedelta(days=1)
         kwargs["next"] = date + datetime.timedelta(days=31)
@@ -571,6 +602,8 @@ class AdminMixin(PermissionRequiredMixin):
 
     def get_season_display(self):
         season, year = self.get_season()
+        if not (0 <= season < len(Season.SEASONS)):
+            raise Http404("Invalid season.")
         return "{} {}".format(Season.SEASONS[season][1], year)
 
     def get_context_data(self, **kwargs):
