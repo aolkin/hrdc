@@ -297,17 +297,15 @@ YEAR_MIN = 1900
 CURRENT_YEAR = datetime.date.today().year
 YEAR_MAX = CURRENT_YEAR + 10
 
-class ShowQueryForm(forms.Form):
+class SeasonForm(forms.Form):
+    year = forms.IntegerField(required=False, min_value=YEAR_MIN, max_value=YEAR_MAX)
+    season = forms.CharField(required=False)
+
+class ShowQueryForm(SeasonForm):
     page = forms.IntegerField(required=False, min_value=1)
     limit = forms.IntegerField(required=False, min_value=1, max_value=25)
-    year = forms.IntegerField(required=False, min_value=YEAR_MIN, max_value=YEAR_MAX)
     showyear = forms.IntegerField(required=False, min_value=YEAR_MIN, max_value=YEAR_MAX)
-    season = forms.CharField(required=False)
     title = forms.CharField(required=False)
-
-class SeasonScriptForm(forms.Form):
-    year = forms.IntegerField(required=False, min_value=YEAR_MIN, max_value=YEAR_MAX)
-    season = forms.CharField(required=False)
 
 class ShowQueryView(View):
     def get(self, request, *args, **kwargs):
@@ -355,7 +353,7 @@ class ShowQueryView(View):
 
 class SeasonScriptView(BaseEmbedView):
     def get_context_data(self, **kwargs):
-        form = SeasonScriptForm(self.request.GET)
+        form = SeasonForm(self.request.GET)
         if not form.is_valid():
             kwargs["innerHtml"] = "Error: Invalid parameters"
             return super().get_context_data(**kwargs)
