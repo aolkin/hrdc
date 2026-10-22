@@ -8,7 +8,7 @@ from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
 from django.contrib.humanize.templatetags import humanize
 
-from channels.generic.websockets import JsonWebsocketConsumer
+from hrdc.websockets import group_send
 from model_utils import FieldTracker
 
 from django.utils import timezone
@@ -378,11 +378,11 @@ def send_auditions(sender, instance, *args, **kwargs):
         if not instance.sign_in_complete:
             return
         if instance.space:
-            JsonWebsocketConsumer.group_send(
+            group_send(
                 "auditions-building-{}".format(instance.space.building.pk),
                 make_message("casting/pieces/tabling_row.html",
                              instance.status))
-        JsonWebsocketConsumer.group_send(
+        group_send(
             "auditions-show-{}".format(instance.show.pk),
             make_message("casting/pieces/audition_row.html"))
 

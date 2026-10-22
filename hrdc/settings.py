@@ -52,8 +52,7 @@ INSTALLED_APPS = [
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "asgi_redis.RedisChannelLayer",
-        "ROUTING": "hrdc.routing.channel_routing",
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
     },
 }
 
@@ -68,6 +67,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'hrdc.urls'
+ASGI_APPLICATION = 'hrdc.asgi.application'
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 TEMPLATES = [
     {

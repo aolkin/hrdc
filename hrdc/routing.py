@@ -1,6 +1,11 @@
-from channels.routing import include
+from channels.auth import AuthMiddlewareStack
+from channels.routing import URLRouter
+from django.urls import path
 
-channel_routing = [
-    include("casting.channels.channel_routing", path="^/casting/"),
-    include("finance.channels.channel_routing", path="^/finance/")
-]
+import casting.channels
+import finance.channels
+
+websocket_application = AuthMiddlewareStack(URLRouter([
+    path("casting/", URLRouter(casting.channels.urlpatterns)),
+    path("finance/", URLRouter(finance.channels.urlpatterns)),
+]))

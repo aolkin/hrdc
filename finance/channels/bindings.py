@@ -1,10 +1,10 @@
-from channels.binding.websockets import WebsocketBinding
+from hrdc.websockets import Binding
 
 from django.db.models import F
 
 from ..models import *
 
-class BudgetExpenseBinding(WebsocketBinding):
+class BudgetExpenseBinding(Binding):
     model = BudgetExpense
     stream = "budgetexpense"
     fields = ("category", "name", "estimate", "actual", "notes")

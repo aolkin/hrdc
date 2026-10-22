@@ -1,14 +1,15 @@
-from channels.routing import include
+from channels.routing import URLRouter
+from django.urls import path
 
 from .consumers import *
 
-channel_routing = [
-    include([
-        TablingConsumer.as_route(path=r'^building/(?P<building>\d+)/ws/$'),
-        include([
-            ShowConsumer.as_route(path=r'^auditions/ws/$'),
-            CallbackConsumer.as_route(path=r'^callbacks/ws/$'),
-            CastListConsumer.as_route(path=r'^cast/ws/$'),
-        ], path="^show/(?P<show>\d+)/"),
-    ], path="^staff/"),
+urlpatterns = [
+    path("staff/", URLRouter([
+        path("building/<int:building>/ws/", TablingConsumer.as_asgi()),
+        path("show/<int:show>/", URLRouter([
+            path("auditions/ws/", ShowConsumer.as_asgi()),
+            path("callbacks/ws/", CallbackConsumer.as_asgi()),
+            path("cast/ws/", CastListConsumer.as_asgi()),
+        ])),
+    ])),
 ]
