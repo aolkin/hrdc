@@ -1,10 +1,10 @@
-from channels.binding.websockets import WebsocketBinding
+from hrdc.websockets import Binding
 
 from django.db.models import F
 
 from ..models import *
 
-class CastingMetaBinding(WebsocketBinding):
+class CastingMetaBinding(Binding):
     model = CastingMeta
     stream = "castingmeta"
     fields = ("contact_email", "callback_description", "cast_list_description")
@@ -18,7 +18,7 @@ class CastingMetaBinding(WebsocketBinding):
         return (action == "update" and
                 self.model.objects.get(pk=pk).show.user_is_staff(user))
 
-class AssociatedShowBinding(WebsocketBinding):
+class AssociatedShowBinding(Binding):
     model = None
 
     def has_permission(self, user, action, pk):

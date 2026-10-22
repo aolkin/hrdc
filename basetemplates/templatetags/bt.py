@@ -3,7 +3,7 @@ from django.conf import settings
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html, conditional_escape
 from django.contrib.staticfiles import finders
-from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.templatetags.static import static
 
 import re, string
 

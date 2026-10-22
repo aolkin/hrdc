@@ -1,9 +1,10 @@
-from channels.routing import include
+from channels.routing import URLRouter
+from django.urls import path
 
 from .consumers import *
 
-channel_routing = [
-    include([
-        BudgetConsumer.as_route(path=r'^budget/ws/$'),
-    ], path="^show/(?P<show>\d+)/"),
+urlpatterns = [
+    path("show/<int:show>/", URLRouter([
+        path("budget/ws/", BudgetConsumer.as_asgi()),
+    ])),
 ]

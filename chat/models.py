@@ -4,7 +4,7 @@ from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
-from channels.generic.websockets import JsonWebsocketConsumer
+from hrdc.websockets import group_send
 
 from django.conf import settings
 from django.utils import timezone
@@ -36,7 +36,7 @@ class Message(models.Model):
 @receiver(post_save)
 def send_message(sender, instance, created, raw, **kwargs):
     if sender == Message and created:
-        JsonWebsocketConsumer.group_send("chat-{}".format(instance.room), {
+        group_send("chat-{}".format(instance.room), {
             "container": "#chat",
             "element": "<li>",
             "id": "chat-msg-{}".format(instance.pk),
@@ -52,7 +52,7 @@ def send_message(sender, instance, created, raw, **kwargs):
 def censor_message(sender, instance, *args, **kwargs):
     if sender == Message:
         instance.message = mark_safe("<em>*deleted*</em>")
-        JsonWebsocketConsumer.group_send("chat-{}".format(instance.room), {
+        group_send("chat-{}".format(instance.room), {
             "container": "#chat",
             "element": "<li>",
             "id": "chat-msg-{}".format(instance.pk),

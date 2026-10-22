@@ -3,7 +3,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.templatetags.static import static
 
 import urllib.parse
 
