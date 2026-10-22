@@ -23,10 +23,10 @@ def group_send(group, content):
 class GroupConsumer(JsonWebsocketConsumer):
     """Joins the groups from connection_groups() after has_access() passes."""
 
-    def has_access(self):
+    def has_access(self, **kwargs):
         return True
 
-    def connection_groups(self):
+    def connection_groups(self, **kwargs):
         return []
 
     @property
@@ -38,10 +38,10 @@ class GroupConsumer(JsonWebsocketConsumer):
         return self.scope["url_route"]["kwargs"]
 
     def connect(self):
-        if not self.has_access():
+        if not self.has_access(**self.url_kwargs):
             self.close()
             return
-        self.joined_groups = self.connection_groups()
+        self.joined_groups = self.connection_groups(**self.url_kwargs)
         for group in self.joined_groups:
             async_to_sync(self.channel_layer.group_add)(
                 group, self.channel_name)

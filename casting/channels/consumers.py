@@ -19,7 +19,7 @@ class ChatConsumer(GroupConsumer):
         return "building-{}-{}".format(self.get_building(),
                                        timezone.localdate())
 
-    def connection_groups(self):
+    def connection_groups(self, **kwargs):
         return ["chat-" + self.get_name()]
 
     def receive_json(self, content, **kwargs):
@@ -27,12 +27,12 @@ class ChatConsumer(GroupConsumer):
 
 
 class TablingConsumer(ChatConsumer):
-    def has_access(self):
+    def has_access(self, **kwargs):
         return test_pdsm(self.user) or test_board(self.user)
 
-    def connection_groups(self):
-        return (super().connection_groups() +
-                ["auditions-building-{}".format(self.get_building())])
+    def connection_groups(self, **kwargs):
+        return (super().connection_groups(**kwargs) +
+                ["auditions-building-{}".format(kwargs["building"])])
 
 
 def user_is_show_staff(user, show):
@@ -45,17 +45,17 @@ class ShowConsumer(ChatConsumer):
         active_slot = get_active_slot(self.url_kwargs["show"])
         return active_slot.space.building.pk if active_slot else 0
 
-    def has_access(self):
-        return user_is_show_staff(self.user, self.url_kwargs["show"])
+    def has_access(self, **kwargs):
+        return user_is_show_staff(self.user, kwargs["show"])
 
-    def connection_groups(self):
-        return (super().connection_groups() +
-                ["auditions-show-{}".format(self.url_kwargs["show"])])
+    def connection_groups(self, **kwargs):
+        return (super().connection_groups(**kwargs) +
+                ["auditions-show-{}".format(kwargs["show"])])
 
 
 class ListConsumer(DemultiplexConsumer):
-    def has_access(self):
-        return user_is_show_staff(self.user, self.url_kwargs["show"])
+    def has_access(self, **kwargs):
+        return user_is_show_staff(self.user, kwargs["show"])
 
 
 class CallbackConsumer(ListConsumer):
@@ -65,8 +65,8 @@ class CallbackConsumer(ListConsumer):
         "callback": CallbackBinding,
     }
 
-    def connection_groups(self):
-        return ["callbacks-show-{}".format(self.url_kwargs["show"])]
+    def connection_groups(self, **kwargs):
+        return ["callbacks-show-{}".format(kwargs["show"])]
 
 
 class CastListConsumer(ListConsumer):
@@ -76,5 +76,5 @@ class CastListConsumer(ListConsumer):
         "signing": SigningBinding,
     }
 
-    def connection_groups(self):
-        return ["cast-show-{}".format(self.url_kwargs["show"])]
+    def connection_groups(self, **kwargs):
+        return ["cast-show-{}".format(kwargs["show"])]
