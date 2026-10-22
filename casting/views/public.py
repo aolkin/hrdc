@@ -2,9 +2,8 @@ from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.views.generic.list import ListView
 from django.views.generic.edit import FormView
 from django.views.generic.base import TemplateView
-from django.conf.urls import url, include
 from django.contrib.auth import get_user_model
-from django.urls import reverse, reverse_lazy
+from django.urls import include, re_path, reverse, reverse_lazy
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.contrib import messages
 
@@ -358,19 +357,19 @@ class RequestLinkView(FixHeaderUrlMixin, FormView):
         return super().form_valid(form)
 
 urlpatterns = [
-    url(r'^show/(?P<pk>\d+)/', include([
-        url(r'^callbacks/$', CallbackView.as_view(),
+    re_path(r'^show/(?P<pk>\d+)/', include([
+        re_path(r'^callbacks/$', CallbackView.as_view(),
             name="view_callbacks"),
-        url(r'^cast/$', CastView.as_view(),
+        re_path(r'^cast/$', CastView.as_view(),
             name="view_cast"),
-        url(r'^cast/popout/$', CastView.as_view(popout=True),
+        re_path(r'^cast/popout/$', CastView.as_view(popout=True),
             name="view_cast_popout"),
     ])),
-    url(r'^$', IndexView.as_view(), name="public_index"),
-    url(r'^(?P<pk>\d+)/$', PKIndexView.as_view(), name="public_index_pk"),
+    re_path(r'^$', IndexView.as_view(), name="public_index"),
+    re_path(r'^(?P<pk>\d+)/$', PKIndexView.as_view(), name="public_index_pk"),
     
-    url(r'^sign/$', SigningView.as_view(), name="signing"),
-    url(r'^getlink/$', RequestLinkView.as_view(), name="request_link"),
-    url(r'^t/([A-Za-z0-9+-]{86})/$', actor_token_auth, name="actor_token"),
-    url(r'^sign/logout/$', actor_token_logout, name="actor_token_logout"),
+    re_path(r'^sign/$', SigningView.as_view(), name="signing"),
+    re_path(r'^getlink/$', RequestLinkView.as_view(), name="request_link"),
+    re_path(r'^t/([A-Za-z0-9+-]{86})/$', actor_token_auth, name="actor_token"),
+    re_path(r'^sign/logout/$', actor_token_logout, name="actor_token_logout"),
 ]

@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'archive',
     'shortlinks',
     'crispy_forms',
+    'crispy_bootstrap4',
     'anymail',
     'channels',
 ]
@@ -88,6 +89,7 @@ TEMPLATES = [
     },
 ]
 
+CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap4'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 WSGI_APPLICATION = 'hrdc.wsgi.application'
