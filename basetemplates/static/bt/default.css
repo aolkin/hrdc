@@ -1,0 +1,123 @@
+.bt-footer {
+    margin: 1em;
+    text-align: center;
+}
+
+.bt-footer hr {
+    margin: 2em auto 1em;
+}
+
+.bt-header {
+    margin: 1em auto 2em;
+}
+.bt-sidebar-header {
+    margin-bottom: 1em;
+    padding: .5rem 1rem;
+}
+
+.bt-header-dropdown {
+    position: absolute;
+    top: 1em;
+    right: 1em;
+    margin: 0 !important;
+}
+
+.bt-messages {
+    margin-bottom: 1em;
+}
+
+.bt-sidebar {
+    padding: 0.5em 0;
+}
+
+@media (min-width: 576px) {
+    .bt-sidebar {
+	position: absolute;
+	left: 0;
+	height: 100%;
+	z-index: 1000;
+	overflow-x: hidden;
+	overflow-y: auto;
+	border: 1px solid #eee;
+	border-left-width: 0;
+    }
+
+    .bt-sidebar .navbar-collapse {
+	display: block!important;
+    }
+
+    .bt-sidebar .navbar-toggler {
+	display: none!important;
+    }
+    
+    .bt-sidebar .nav-link {
+	border-radius: 0;
+    }
+}
+
+.bt-sidebar .nav-item {
+    width: 100%;
+}
+
+.bt-sidebar .nav-link {
+    padding: 0 1em 0 2em;
+}
+
+.bt-sidebar .nav-link>h5 {
+    padding: 0.5em 0;
+}
+
+.bt-sidebar .bt-title-link {
+    padding: 0 1em;
+}
+
+
+.bt-table-responsive .table-col-xs {
+    min-width: 6rem;
+}
+.bt-table-responsive .table-col-sm {
+    min-width: 8rem;
+}
+.bt-table-responsive .table-col-md {
+    min-width: 12rem;
+}
+.bt-table-responsive .table-col-lg {
+    min-width: 16rem;
+}
+.bt-table-responsive .table-col-xl {
+    min-width: 20rem;
+}
+
+@media (min-width: 992px) {
+    .bt-table-responsive {
+	display: table;
+    }
+
+    .bt-table-responsive .table-col-break {
+	word-wrap: break-word;
+	word-break: break-all;
+	word-break: break-word;
+    }
+    
+    .bt-table-responsive .table-col-xs:not(.table-col-desktop),
+    .bt-table-responsive .table-col-sm:not(.table-col-desktop),
+    .bt-table-responsive .table-col-md:not(.table-col-desktop),
+    .bt-table-responsive .table-col-lg:not(.table-col-desktop),
+    .bt-table-responsive .table-col-xl:not(.table-col-desktop) {
+	min-width: auto;
+    }
+}
+
+wbr:after { content: "\00200B"; }
+
+@media print {
+    .bt-sidebar {
+	display: none;
+    }
+
+    .bt-sidebar-content {
+	margin-left: auto;
+	flex: 0 0 100%;
+	max-width: 100%;
+    }
+}

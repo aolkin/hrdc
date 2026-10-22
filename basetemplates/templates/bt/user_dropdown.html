@@ -1,0 +1,19 @@
+<div class="dropdown bt-header-dropdown d-print-none">
+  <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown">
+    Welcome{% if request.user.is_authenticated %}, {{ request.user.get_short_name }}{% endif %}
+  </button>
+  <div class="dropdown-menu">
+    {% if request.user.is_authenticated %}
+    {% block user_authenticated_actions %}{% endblock %}
+    {% if request.user.is_staff %}
+    <div class="dropdown-divider"></div>
+    <a href="{% url 'admin:index' %}" class="dropdown-item">Site Admin</a>
+    {% endif %}
+    <div class="dropdown-divider"></div>
+    <a href="{% url SETTINGS.LOGOUT_URL %}" class="dropdown-item">Logout</a>
+    {% else %}
+    {% block user_menu_actions %}{% endblock %}
+    <a href="{% url SETTINGS.LOGIN_URL %}" class="dropdown-item">Login</a>
+    {% endif %}
+  </div>
+</div>

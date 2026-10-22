@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+{% load static %}
+{% load bt %}
+<html>
+  <head>
+    <title>{% block title %}{% endblock %}{{ BT_site_title }}</title>
+
+    {% if BT_viewport_scale %}<meta name="viewport" content="width=device-width, initial-scale=1.0">{% endif %}
+    {% if SETTINGS.BT_THEME_COLOR %}
+    <meta name="theme-color" content="{{ SETTINGS.BT_THEME_COLOR }}">
+    <meta name="msapplication-navbutton-color" content="{{ SETTINGS.BT_THEME_COLOR }}">
+    {% endif %}
+    {% _bt_style "https://stackpath.bootstrapcdn.com/bootstrap/{}/css/bootstrap.min.css" "bootstrap" %}
+    {% _bt_style "https://stackpath.bootstrapcdn.com/font-awesome/{}/css/font-awesome.min.css" "fontawesome" %}
+    {% _bt_style "https://cdnjs.cloudflare.com/ajax/libs/select2/{}/css/select2.min.css" "select2" %}
+    <link rel="icon" href="{% setting 'BT_FAVICON_URL' %}" />
+    {% style "bt/default.css" %}
+    {% for path in BT_styles %}
+    {% style path %}
+    {% endfor %}
+    {% _bt_app_style %}
+
+    {% if SETTINGS.BT_GTAG_ID %}
+    {% if not request.user.is_superuser or SETTINGS.BT_GTAG_INCLUDE_SUPERUSERS %}
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ SETTINGS.BT_GTAG_ID }}"></script>
+    <script>
+     window.dataLayer = window.dataLayer || [];
+     function gtag(){dataLayer.push(arguments);}
+     gtag('js', new Date());
+     
+     {% if request.user.is_anonymous %}
+     gtag('config', '{{ SETTINGS.BT_GTAG_ID }}');
+     {% else %}
+     gtag('config', '{{ SETTINGS.BT_GTAG_ID }}', {
+	 'user_id': '{{ request.user.id }}',
+     });
+     {% endif %}
+    </script>
+    {% endif %}
+    {% elif SETTINGS.DEBUG %}
+    <script>
+     function gtag() { console.log("GTAG", arguments); }
+    </script>
+    {% endif %}
+  </head>
+  <body class="app-{{ request.resolver_match.app_name }} view-{{ request.resolver_match.url_name }} {{ BT_extra_body_class }}">
+    {% block body %}{% endblock %}
+
+    {% _bt_script "https://code.jquery.com/jquery-{}.min.js" "jquery" %}
+    {% _bt_script "https://cdnjs.cloudflare.com/ajax/libs/popper.js/{}/umd/popper.min.js" "popper" %}
+    {% _bt_script "https://stackpath.bootstrapcdn.com/bootstrap/{}/js/bootstrap.min.js" "bootstrap" %}
+    {% _bt_script "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/{}/bootstrap3-typeahead.min.js" "typeahead" %}
+    {% _bt_script "https://cdnjs.cloudflare.com/ajax/libs/select2/{}/js/select2.min.js" "select2" %}
+    {% _bt_script "https://cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/{}/jquery.scrollTo.min.js" "scrollto" %}
+    {% for path in BT_scripts %}
+    {% script path %}
+    {% endfor %}
+    {% _bt_app_script %}
+    {% block extra_scripts %}{% endblock %}
+  </body>
+</html>
