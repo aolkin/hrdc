@@ -1,8 +1,7 @@
 from django.views.generic.base import TemplateView, View
 from django.views.generic.edit import UpdateView
 from django.views.generic.detail import *
-from django.urls import reverse, reverse_lazy
-from django.conf.urls import url, include
+from django.urls import include, re_path, reverse, reverse_lazy
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.db.models import Q
 from django.shortcuts import render
@@ -155,7 +154,7 @@ class ShowEditor(ShowStaffMixin, UserIsPdsmMixin, UpdateView):
             return HttpResponseRedirect(reverse("login"))
 
     def get(self, *args, **kwargs):
-        if not self.request.is_ajax():
+        if self.request.headers.get("x-requested-with") != "XMLHttpRequest":
             return HttpResponseRedirect(reverse("casting:index"))
         else:
             return super().get(*args, **kwargs)
@@ -243,7 +242,7 @@ class AuditionStatusBase(StaffViewMixin, SingleObjectMixin, View):
             self.object.status = self.new_status
             setattr(self.object, self.new_status + "_time", timezone.now())
             self.object.save()
-        if self.request.is_ajax():
+        if self.request.headers.get("x-requested-with") == "XMLHttpRequest":
             return HttpResponse("success" if not self.object.busy else "failed")
         else:
             return HttpResponseRedirect(self.get_redirect_url())
@@ -528,42 +527,42 @@ class TechReqView(ShowStaffMixin, UserIsPdsmMixin, DetailView):
         return context
     
 urlpatterns = [
-    url('^$', IndexView.as_view(), name='index'),
+    re_path('^$', IndexView.as_view(), name='index'),
     
-    url(r'^show/(?P<pk>\d+)/', include([
-        url(r'^edit/$', ShowEditor.as_view(), name="edit_show"),
+    re_path(r'^show/(?P<pk>\d+)/', include([
+        re_path(r'^edit/$', ShowEditor.as_view(), name="edit_show"),
 
-        url('^actors/$', ShowActors.as_view(), name="show_actors"),
+        re_path('^actors/$', ShowActors.as_view(), name="show_actors"),
         
-        url(r'^auditions/', include([
-            url('^$', AuditionView.as_view(), name="audition"),
-            url('^call/$', AuditionCallView.as_view(), name="audition_call"),
-            url('^cancel/$', AuditionCancelView.as_view(),
+        re_path(r'^auditions/', include([
+            re_path('^$', AuditionView.as_view(), name="audition"),
+            re_path('^call/$', AuditionCallView.as_view(), name="audition_call"),
+            re_path('^cancel/$', AuditionCancelView.as_view(),
                 name="audition_cancel"),
-            url('^done/$', AuditionDoneView.as_view(), name="audition_done"),
-            url('^export/$', AuditionExportView.as_view(),
+            re_path('^done/$', AuditionDoneView.as_view(), name="audition_done"),
+            re_path('^export/$', AuditionExportView.as_view(),
                 name="audition_export"),
         ])),
         
-        url(r'^callbacks/', include([
-            url('^$', CallbackView.as_view(), name="callbacks"),
-            url('^submit/$', CallbackSubmitView.as_view(),
+        re_path(r'^callbacks/', include([
+            re_path('^$', CallbackView.as_view(), name="callbacks"),
+            re_path('^submit/$', CallbackSubmitView.as_view(),
                 name="callback_submit"),
         ])),
         
-        url(r'^cast/', include([
-            url('^$', CastListView.as_view(), name="cast_list"),
-            url('^submit/$', CastSubmitView.as_view(), name="cast_submit"),
+        re_path(r'^cast/', include([
+            re_path('^$', CastListView.as_view(), name="cast_list"),
+            re_path('^submit/$', CastSubmitView.as_view(), name="cast_submit"),
         ])),
         
-        url(r'^techreqs/', include([
-            url('^$', TechReqView.as_view(), name="tech_reqs"),
-            url('^export/$', TechReqExportView.as_view(),
+        re_path(r'^techreqs/', include([
+            re_path('^$', TechReqView.as_view(), name="tech_reqs"),
+            re_path('^export/$', TechReqExportView.as_view(),
                 name="tech_req_export"),
         ])),
     ])),
-    url('^show/\d+/[a-z]+/actor/(?P<pk>\d+)$', ActorName.as_view(),
+    re_path(r'^show/\d+/[a-z]+/actor/(?P<pk>\d+)$', ActorName.as_view(),
         name="casting_actor_name"),
     
-    url('^building/(?P<pk>\d+)/$', TablingView.as_view(), name="tabling"),
+    re_path(r'^building/(?P<pk>\d+)/$', TablingView.as_view(), name="tabling"),
 ]

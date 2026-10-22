@@ -1,7 +1,6 @@
 """hrdc URL Configuration"""
 
-from django.urls import path
-from django.conf.urls import url, include
+from django.urls import include, path, re_path
 from django.contrib import admin
 from django.conf import settings
 from django.http import HttpResponse
@@ -18,15 +17,15 @@ Disallow: /casting/
 
 urlpatterns = [
     path('robots.txt', robots_txt, name='robots_txt'),
-    url(r'^', include("dramaorg.urls")),
-    url(r'^autocomplete/$', autocomplete_json),
-    url(r'^venues/', include("venueapp.urls")),
-    url(r'^casting/', include("casting.urls")),
-    url(r'^publicity/', include("publicity.urls")),
-    url(r'^finance/', include("finance.urls")),
-    url(r'^archive/', include("archive.urls")),
-    url(r'^admin/', admin.site.urls),
-    url(r'^email/', include('emailtracker.urls')),
+    re_path(r'^', include("dramaorg.urls")),
+    re_path(r'^autocomplete/$', autocomplete_json),
+    re_path(r'^venues/', include("venueapp.urls")),
+    re_path(r'^casting/', include("casting.urls")),
+    re_path(r'^publicity/', include("publicity.urls")),
+    re_path(r'^finance/', include("finance.urls")),
+    re_path(r'^archive/', include("archive.urls")),
+    re_path(r'^admin/', admin.site.urls),
+    re_path(r'^email/', include('emailtracker.urls')),
     path(r'shortlinks/<slug:slug>', link, name="shortlink"),
     path('links/', include('shortlinks.urls')),
     path('social/', include('hrdc.social_wrappers', namespace='social')),

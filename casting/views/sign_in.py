@@ -4,14 +4,13 @@ from django.views.generic.edit import *
 from django.http import JsonResponse
 from django.shortcuts import redirect
 
-from django.urls import reverse_lazy, reverse
+from django.urls import re_path, reverse, reverse_lazy
 from django.db.models import Q
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
 
-from django.conf.urls import url
 from django.conf import settings
 from django import forms
 from django.utils import timezone
@@ -296,19 +295,19 @@ class ActorSignInPublic(LoginRequiredMixin, FormView):
         return HttpResponseRedirect(reverse("casting:public_index"))
 
 urlpatterns = [
-    url(r'^(?P<pk>\d+)/$', ActorSignInStart.as_view(),
+    re_path(r'^(?P<pk>\d+)/$', ActorSignInStart.as_view(),
         name="sign_in_start"),
-    url(r'^(?P<pk>\d+)/all/$', ActorSignInStart.as_view(show_all=True),
+    re_path(r'^(?P<pk>\d+)/all/$', ActorSignInStart.as_view(show_all=True),
         name="sign_in_start_all"),
-    url(r'^(?P<pk>\d+)/popout/$', ActorSignInStart.as_view(popout=True),
+    re_path(r'^(?P<pk>\d+)/popout/$', ActorSignInStart.as_view(popout=True),
         name="sign_in_start_popout"),
-    url(r'^profile/$', ActorSignInProfile.as_view(),
+    re_path(r'^profile/$', ActorSignInProfile.as_view(),
         name="sign_in_profile"),
-    url(r'^season/$', ActorSignInSeasonMeta.as_view(),
+    re_path(r'^season/$', ActorSignInSeasonMeta.as_view(),
         name="sign_in_seasonmeta"),
-    url(r'^season/(?P<pk>\d+)/$', ActorSignInTech.as_view(),
+    re_path(r'^season/(?P<pk>\d+)/$', ActorSignInTech.as_view(),
         name="sign_in_tech"),
-    url(r'^done/$', ActorSignInDone.as_view(),
+    re_path(r'^done/$', ActorSignInDone.as_view(),
         name="sign_in_done"),
-    url(r'^location/$', ActorSignInPublic.as_view(), name="sign_in_public")
+    re_path(r'^location/$', ActorSignInPublic.as_view(), name="sign_in_public")
 ]

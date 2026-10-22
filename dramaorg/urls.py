@@ -1,6 +1,5 @@
 
-from django.conf.urls import url, include
-from django.urls import reverse_lazy, path
+from django.urls import include, path, re_path, reverse_lazy
 from django.contrib.auth import views as auth_views
 
 from .views import *
@@ -13,33 +12,33 @@ def auth_view(name):
     return NewView.as_view()
 
 auth_urls = [
-    url(r'^login/$', LoginView.as_view(), name='login'),
-    url(r'^logout/$', auth_view("Logout"), name='logout'),
-    url(r'^password/$', auth_view("PasswordChange"), name='password_change')
+    re_path(r'^login/$', LoginView.as_view(), name='login'),
+    re_path(r'^logout/$', auth_view("Logout"), name='logout'),
+    re_path(r'^password/$', auth_view("PasswordChange"), name='password_change')
 ]
 
 app_name = "dramaorg"
 urlpatterns = [
-    url(r'^$', HomePage.as_view(), name="home"),
+    re_path(r'^$', HomePage.as_view(), name="home"),
 
-    url(r'^staff/$', StaffIndexView.as_view(), name="index"),
-    url(r'^staff/show/(?P<pk>\d+)/$', UpdateShow.as_view(), name="update"),
-    url(r'^staff/show/(?P<pk>\d+)/staff/$', UpdateShowStaff.as_view(),
+    re_path(r'^staff/$', StaffIndexView.as_view(), name="index"),
+    re_path(r'^staff/show/(?P<pk>\d+)/$', UpdateShow.as_view(), name="update"),
+    re_path(r'^staff/show/(?P<pk>\d+)/staff/$', UpdateShowStaff.as_view(),
         name="update_staff"),
 
-    url(r'^season/$', ManagementView.as_view(), name="admin"),
-    url(r'^season/(?P<year>\d+)/(?P<season>\d+)/', include([
-        url(r'^$', SeasonView.as_view(), name="season"),
+    re_path(r'^season/$', ManagementView.as_view(), name="admin"),
+    re_path(r'^season/(?P<year>\d+)/(?P<season>\d+)/', include([
+        re_path(r'^$', SeasonView.as_view(), name="season"),
     ])),
 
-    url(r'^people/search/$', SearchPeople.as_view(), name="search_people"),
-    url(r'^people/add/$', AddPerson.as_view(), name="add_person"),
+    re_path(r'^people/search/$', SearchPeople.as_view(), name="search_people"),
+    re_path(r'^people/add/$', AddPerson.as_view(), name="add_person"),
 
-    url(r'^', include(auth_urls)),
-    url(r'^profile/$', ProfileView.as_view(), name="profile"),
-    url(r'^account/$', AccountView.as_view(), name="account"),
-    url(r'^register/$', RegisterView.as_view(), name="register"),
-    url(r'^u/([A-Za-z0-9+-]{86})/$', capture_token, name="token_reset"),
-    url(r'^password/token/$', TokenView.as_view(), name="password_token"),
-    url(r'^reset/$', ResetView.as_view(), name="start_reset"),
+    re_path(r'^', include(auth_urls)),
+    re_path(r'^profile/$', ProfileView.as_view(), name="profile"),
+    re_path(r'^account/$', AccountView.as_view(), name="account"),
+    re_path(r'^register/$', RegisterView.as_view(), name="register"),
+    re_path(r'^u/([A-Za-z0-9+-]{86})/$', capture_token, name="token_reset"),
+    re_path(r'^password/token/$', TokenView.as_view(), name="password_token"),
+    re_path(r'^reset/$', ResetView.as_view(), name="start_reset"),
 ]

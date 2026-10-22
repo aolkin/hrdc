@@ -460,7 +460,7 @@ class Callback(ActorMapping):
 
 class Signing(ActorMapping):
     order = models.PositiveSmallIntegerField(default=0)
-    response = models.NullBooleanField(choices=(
+    response = models.BooleanField(null=True, choices=(
         (True, "Accept this Role"),
         (False, "Reject this Role"),
         (None, "No Response"),
