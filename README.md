@@ -40,8 +40,8 @@ Make sure your desired message broker is running.
 ## Code Structure
 
 Models generally applicable, such as users and spaces, are in `dramaorg`.
-`config` and `basetemplates` are reusable submodules with their own
-documentation. `chat` provides a somewhat reusable chat model.
+`config` is a reusable submodule with its own documentation. `basetemplates`
+holds the shared base templates. `chat` provides a somewhat reusable chat model.
 
  `casting` holds everything related to the Common Casting application, while
  `finance` and `publicity` provide the Finance and Publicity managers,
