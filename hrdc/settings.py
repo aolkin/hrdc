@@ -131,7 +131,7 @@ LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale')
 ]
 
-TIME_ZONE = 'US/Eastern'
+TIME_ZONE = 'America/New_York'
 
 USE_I18N = True
 
