@@ -236,10 +236,9 @@ def load_indexes():
         except NoReverseMatch:
             pass
 
-class SeasonForm(forms.ModelForm):
-    class Meta:
-        model = Season
-        fields = "__all__"
+class SeasonForm(forms.Form):
+    year = Season._meta.get_field("year").formfield()
+    season = Season._meta.get_field("season").formfield()
 
     def __init__(self, *args, **kwargs):
         if not kwargs["initial"]:
