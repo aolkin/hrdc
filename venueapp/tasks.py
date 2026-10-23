@@ -9,7 +9,7 @@ from django.db.models import Q
 from django.conf import settings
 
 from weasyprint import HTML, CSS
-from PyPDF2 import PdfFileMerger, PdfFileReader
+from PyPDF2 import PdfMerger, PdfReader
 from io import BytesIO
 
 from emailtracker.tools import render_msg
@@ -22,8 +22,7 @@ LOGGER = logging.getLogger(__name__)
 
 class _Bookmark:
     def __init__(self, bm):
-        self.label = bm.label
-        self.location = bm.destination[0]
+        self.label, (self.location, *_), *_ = bm
 
     def __str__(self):
         return "{} @ {}".format(self.label, self.location)
@@ -47,34 +46,34 @@ def render_and_send_app(pk):
         bookmarks = list([_Bookmark(i) for i in bookmark_tree])
         app_pdf = BytesIO()
         doc.write_pdf(app_pdf)
-        merger = PdfFileMerger()
-        merger.append(app_pdf, import_bookmarks=False)
+        merger = PdfMerger()
+        merger.append(app_pdf, import_outline=False)
         for staff in app.staffmember_set.signed_on().filter(
                 role__accepts_attachment=True).exclude(
                     Q(attachment=None) | Q(attachment="")):
             name = "{} {}'s ".format(staff.role_name, staff.person)
             try:
                 if staff.attachment.size < max_bytes:
-                    reader = PdfFileReader(staff.attachment.open(), False)
-                    attachment_pages = reader.getNumPages()
+                    reader = PdfReader(staff.attachment.open(), strict=False)
+                    attachment_pages = len(reader.pages)
                     page = None
                     for i, bookmark in enumerate(bookmarks):
                         if bookmark.label == name + "Supplement":
                             page = bookmarks[i + 1].location
                     if page:
                         merger.merge(page, staff.attachment.open(),
-                                     import_bookmarks=False)
+                                     import_outline=False)
                         for i in bookmarks:
                             if i.location >= page:
                                 i.location += attachment_pages
                     else:
                         merger.append(staff.attachment.open(),
-                                      bookmark=name + "Attachment",
-                                      import_bookmarks=False)
+                                      outline_item=name + "Attachment",
+                                      import_outline=False)
             except Exception as e:
                 tb.print_exc()
         for i in bookmarks:
-            merger.addBookmark(i.label, i.location)
+            merger.add_outline_item(i.label, i.location)
         pdf = BytesIO() # open("/tmp/{}.pdf".format(venue.venue), "wb")
         merger.write(pdf)
         msg = render_msg(
