@@ -3,7 +3,7 @@ import os
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'hrdc.settings')
 
-app = Celery('HRDC', broker='redis:///1')
+app = Celery('HRDC', broker='redis://localhost:6379/1')
 app.config_from_object('django.conf:settings', namespace="CELERY")
 
 app.autodiscover_tasks()
