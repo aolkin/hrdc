@@ -1,6 +1,6 @@
 import logging
 
-from django.urls import re_path
+from django.urls import path
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.conf import settings
@@ -26,7 +26,7 @@ def wrapped(callback):
 
 for existing in socialurls:
     if existing.name == "complete":
-        urlpatterns.append(re_path(existing.pattern, wrapped(existing.callback),
-                               name="complete"))
+        urlpatterns.append(path(str(existing.pattern),
+                                wrapped(existing.callback), name="complete"))
     else:
         urlpatterns.append(existing)
