@@ -42,7 +42,7 @@ THUMBS_AUTOROTATE = getattr(settings, 'THUMBS_AUTOROTATE', True)
 VALID_RESIZES = ['crop', 'scale']
 VALID_ORIGINAL_EXT = ['jgp', 'jpeg', 'png', 'gif']
 RE_CODE = '^[0-9a-z]+$'
-RE_WXH = '^(\d+x\d+|\d+x|x\d+)$'
+RE_WXH = r'^(\d+x\d+|\d+x|x\d+)$'
 
 
 class SizeError(Exception):
