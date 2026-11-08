@@ -11,9 +11,11 @@
     {% boundformgroup character "name" %}
   </div>
   <ul class="card-block list-group list-group-flush">
+    {% if character.pk %}
     {% for callback in character.callback_set.all %}
     {% include "casting/pieces/callback_actor.html" %}
     {% endfor %}
+    {% endif %}
     {% include "casting/pieces/callback_actor.html" with doblank=True callback=callback_blank %}
   </ul>
   <div class="card-footer">
