@@ -25,6 +25,7 @@
     {% endif %}
   </div>
   <ul class="list-group list-group-flush {% if not object.first_cast_submitted %}card-block{% endif %}">
+    {% if character.pk %}
     {% for signing in character.signing_set.all %}
     {% include "casting/pieces/cast_actor.html" %}
     {% if object.first_cast_submitted and forloop.counter == character.allowed_signers %}
@@ -32,6 +33,7 @@
   <ul class="card-block list-group list-group-flush restart-signing-numbering">
     {% endif %}
     {% endfor %}
+    {% endif %}
     {% include "casting/pieces/cast_actor.html" with doblank=True signing=signing_blank %}
   </ul>
   <div class="card-footer">
