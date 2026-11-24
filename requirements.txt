@@ -19,7 +19,7 @@ WeasyPrint~=65.0
 PyPDF2~=3.0
 redis~=5.0
 hiredis~=3.0
-requests==2.31.0
+requests==2.33.0
 lxml~=5.0
 beautifulsoup4==4.11.1
 nltk==3.7
